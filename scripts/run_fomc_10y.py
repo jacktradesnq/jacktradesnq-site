@@ -45,6 +45,9 @@ from run_news_830_variants import (
     VARIANTS,
 )
 
+sys.path.insert(0, "/Users/angelo/monfxreplay-python")
+from costs import cost_per_trade
+
 NEWS_CSV = "/Users/angelo/news-cal-official/news_official_2016_2026.csv"
 ET = ZoneInfo("America/New_York")
 
@@ -171,7 +174,7 @@ def run_fomc(nq_idx: dict, es_idx: dict) -> dict:
                         if smt and not t["smt_target"]:
                             continue
                         sub.append(t)
-                    agg = aggregate_rows(sub)
+                    agg = aggregate_rows(sub, cost_pts=cost_per_trade("NQ"))
                     rows.append({
                         "year": year,
                         "variant": variant,

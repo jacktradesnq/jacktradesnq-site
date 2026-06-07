@@ -18,6 +18,9 @@ from collections import defaultdict
 import pandas as pd
 import numpy as np
 
+sys.path.insert(0, "/Users/angelo/monfxreplay-python")
+from costs import cost_per_trade
+
 NEWS_CSV = "/Users/angelo/news-cal-official/news_official_2016_2026.csv"
 ET = ZoneInfo("America/New_York")
 
@@ -354,8 +357,8 @@ def simulate_variant(setup, variant, bars_idx):
     return {"result": "TIMEOUT", "pts": round(timeout_pts, 4), "exit_ts": resolve_dl, "exit_price": final_price}
 
 
-def aggregate_rows(trades):
-    """Takes trade_db records (with pts, result) and computes KPI."""
+def aggregate_rows(trades, cost_pts=0.0):
+    """Takes trade_db records (with pts, result) and computes KPI. cost_pts reduces net."""
     n = len(trades)
     if n == 0:
         return {"n": 0, "w": 0, "l": 0, "be": 0, "wr": 0.0, "pf": 0.0,
@@ -370,11 +373,22 @@ def aggregate_rows(trades):
     gross_win = sum(winners)
     gross_loss = sum(abs(l) for l in losers)
     pf = gross_win / gross_loss if gross_loss > 0 else (99.0 if gross_win > 0 else 0.0)
-    net_pts = sum(t["pts"] for t in trades)
-    avg_win = gross_win / len(winners) if winners else 0.0
-    avg_loss = gross_loss / len(losers) if losers else 0.0
-    return {"n": n, "w": w, "l": l, "be": be, "wr": round(wr, 4), "pf": round(pf, 3),
-            "net_pts": round(net_pts, 4), "avg_win": round(avg_win, 2), "avg_loss": round(avg_loss, 2)}
+    net_pts = round(sum(t["pts"] for t in trades) - cost_pts * n, 2)
+    if cost_pts > 0:
+        net_win = [t["pts"] - cost_pts for t in trades if t["pts"] - cost_pts > 0]
+        net_loss = [t["pts"] - cost_pts for t in trades if t["pts"] - cost_pts < 0]
+        sum_win_net = sum(net_win) if net_win else 0
+        sum_loss_net = sum(net_loss) if net_loss else 0
+        pf_net = sum_win_net / abs(sum_loss_net) if sum_loss_net < 0 else (None if sum_win_net > 0 else 0.0)
+        pf = round(pf_net, 3) if pf_net is not None else None
+        avg_win = round(sum_win_net / len(net_win), 3) if net_win else 0.0
+        avg_loss = round(sum_loss_net / len(net_loss), 3) if net_loss else 0.0
+    else:
+        avg_win = round(gross_win / len(winners), 3) if winners else 0.0
+        avg_loss = round(gross_loss / len(losers), 3) if losers else 0.0
+        pf = round(pf, 3)
+    return {"n": n, "w": w, "l": l, "be": be, "wr": round(wr, 4), "pf": pf,
+            "net_pts": net_pts, "avg_win": avg_win, "avg_loss": avg_loss}
 
 
 def outcome_from_result(result, pts):
@@ -400,7 +414,7 @@ def build_rows(trade_db):
                            and (side == "BOTH" or t["side"] == side)
                            and (year == "ALL" or t["year"] == year)
                            and (not smt or t["smt_target"])]
-                    agg = aggregate_rows(sub)
+                    agg = aggregate_rows(sub, cost_pts=cost_per_trade("SI"))
                     rows.append({"year": year, "variant": variant, "smt": smt, "side": side, **agg})
     return rows
 

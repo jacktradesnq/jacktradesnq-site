@@ -32,6 +32,9 @@ from run_news_830_variants import (
 )
 from run_news_830_v2 import find_3bar_fvg, scan_bars_last_close
 
+sys.path.insert(0, "/Users/angelo/monfxreplay-python")
+from costs import cost_per_trade
+
 NEWS_CSV = "/Users/angelo/news-cal-official/news_official_2016_2026.csv"
 ET = ZoneInfo("America/New_York")
 
@@ -503,7 +506,7 @@ def build_rows_and_trades(trade_db: list[dict]) -> tuple[list[dict], list[dict]]
                         and (year == "ALL"  or t["year"] == year)
                         and (not smt or t["smt_target"])
                     ]
-                    agg = aggregate_rows(sub)
+                    agg = aggregate_rows(sub, cost_pts=cost_per_trade("ES"))
                     rows.append({"year": year, "variant": variant, "smt": smt, "side": side, **agg})
 
     trades = []
