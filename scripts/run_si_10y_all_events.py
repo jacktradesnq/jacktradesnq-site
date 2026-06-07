@@ -445,7 +445,7 @@ def main():
     si_idx = load_bars("/Users/angelo/backtesting/ict/data/metals/SI_1m_10y_real.parquet", DATE_FROM, DATE_TO, SI_TICK)
     gc_idx = load_bars("/Users/angelo/backtesting/ict/data/metals/GC_1m_10y_ffill.parquet", DATE_FROM, DATE_TO, GC_TICK)
 
-    out_dir = os.path.expanduser("~/jacktradesnq-site/public/data")
+    out_dir = "/Users/angelo/jacktradesnq-site-costs/public/data"
     os.makedirs(out_dir, exist_ok=True)
 
     summary_lines = []

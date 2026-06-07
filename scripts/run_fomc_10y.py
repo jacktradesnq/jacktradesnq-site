@@ -237,7 +237,7 @@ def main():
         "rows": res["rows"],
         "trades": res["trades"],
     }
-    out_path = "/Users/angelo/jtnq-hub-v3/public/data/fomc-ifvg-smt.json"
+    out_path = "/Users/angelo/jacktradesnq-site-costs/public/data/fomc-ifvg-smt.json"
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w") as f:
         json.dump(out, f, indent=2, default=str)
@@ -272,7 +272,7 @@ def main():
         "asset": "NQ",
         "prices": prices_payload,
     }
-    prices_path = "/Users/angelo/jtnq-hub-v3/public/data/fomc-ifvg-smt-trade-prices.json"
+    prices_path = "/Users/angelo/jacktradesnq-site-costs/public/data/fomc-ifvg-smt-trade-prices.json"
     with open(prices_path, "w") as f:
         json.dump(prices_out, f, indent=2, default=str)
     print(f"[done] wrote {prices_path}", file=sys.stderr)

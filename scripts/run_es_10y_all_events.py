@@ -586,7 +586,7 @@ def main():
         print(f"[ERROR] Only {len(all_trade_db)} raw trade records — check bar lookup!", file=sys.stderr)
         sys.exit(1)
 
-    out_dir = "/Users/angelo/jtnq-hub-v3-es/public/data"
+    out_dir = "/Users/angelo/jacktradesnq-site-costs/public/data"
     os.makedirs(out_dir, exist_ok=True)
     per_event_paths = []
     for event_type, evr in per_event_results.items():
@@ -694,7 +694,7 @@ def main():
         "trades": all_trades,
     }
 
-    out_path = "/Users/angelo/jtnq-hub-v3-es/public/data/es-ifvg-smt.json"
+    out_path = "/Users/angelo/jacktradesnq-site-costs/public/data/es-ifvg-smt.json"
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w") as f:
         json.dump(out, f, indent=2, default=str)

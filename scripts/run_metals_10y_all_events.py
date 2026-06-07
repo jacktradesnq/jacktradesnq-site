@@ -612,7 +612,7 @@ def main():
 
     # Emit per-event GC JSONs (same schema as NQ per-event JSONs on the site)
     # Write directly to jtnq-hub-v3 public/data (overwrite existing files)
-    out_dir = "/Users/angelo/jtnq-hub-v3/public/data"
+    out_dir = "/Users/angelo/jacktradesnq-site-costs/public/data"
     os.makedirs(out_dir, exist_ok=True)
     per_event_paths = []
     for event_type, evr in per_event_results.items():
@@ -725,7 +725,7 @@ def main():
         "trades": all_trades,
     }
 
-    out_path = "/Users/angelo/jtnq-hub-v3/public/data/gc-ifvg-smt.json"
+    out_path = "/Users/angelo/jacktradesnq-site-costs/public/data/gc-ifvg-smt.json"
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w") as f:
         json.dump(out, f, indent=2, default=str)
