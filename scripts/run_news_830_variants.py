@@ -34,6 +34,9 @@ from run_nfp_be50 import (
 )
 from run_news_830_v2 import find_3bar_fvg, scan_bars_last_close
 
+sys.path.insert(0, "/Users/angelo/monfxreplay-python")
+from costs import cost_per_trade
+
 
 OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "output", "nfp-ifvg-smt-3way.json")
 YEARS = ["2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026"]
@@ -406,8 +409,12 @@ def compute_es_smt_mirror(ev: dict, es_idx: dict[int, dict], side: str) -> bool:
         return es_low_swept
 
 
-def aggregate_rows(trades: list[dict]) -> dict:
-    """Aggregate list of {result, pts, side, year, smt} -> n/w/l/be/wr/pf/net_pts/avg_win/avg_loss."""
+def aggregate_rows(trades: list[dict], cost_pts: float = 0.0) -> dict:
+    """Aggregate list of {result, pts, side, year, smt} -> n/w/l/be/wr/pf/net_pts/avg_win/avg_loss.
+
+    *cost_pts* is the per-trade transaction cost (points). When > 0, pf and net_pts
+    are cost-adjusted (net), while w/l/be/wr stay on original result labels.
+    """
     win_pts = []
     loss_pts = []
     be_count = 0
@@ -416,7 +423,6 @@ def aggregate_rows(trades: list[dict]) -> dict:
         n += 1
         r = t["result"]
         p = t["pts"]
-        # Classify
         if r in ("WIN", "WIN_FULL"):
             win_pts.append(p)
         elif r in ("LOSS",):
@@ -424,10 +430,8 @@ def aggregate_rows(trades: list[dict]) -> dict:
         elif r in ("BE",):
             be_count += 1
         elif r == "LOSS_HALF":
-            # half lost, full negative net
             loss_pts.append(p)
         elif r == "LOSS_HALF_BE":
-            # half locked +, half BE → net positive small. Treat as WIN if pts>0, BE if 0, LOSS if neg.
             if p > 0.001:
                 win_pts.append(p)
             elif p < -0.001:
@@ -435,7 +439,6 @@ def aggregate_rows(trades: list[dict]) -> dict:
             else:
                 be_count += 1
         elif r == "BE_HALF":
-            # half locked +, half BE: positive small → WIN
             if p > 0.001:
                 win_pts.append(p)
             else:
@@ -459,21 +462,55 @@ def aggregate_rows(trades: list[dict]) -> dict:
     l = len(loss_pts)
     be = be_count
     sum_win = sum(win_pts)
-    sum_loss = sum(loss_pts)  # negative
-    pf = (sum_win / abs(sum_loss)) if sum_loss < 0 else (float("inf") if sum_win > 0 else 0.0)
+    sum_loss = sum(loss_pts)
+    pf_gross = (sum_win / abs(sum_loss)) if sum_loss < 0 else (float("inf") if sum_win > 0 else 0.0)
     wl = w + l
     wr = (w / wl) if wl else 0.0
-    net = sum_win + sum_loss  # BE adds 0
+    net_gross = sum_win + sum_loss
+
+    # --- net (cost-adjusted) ---
+    if cost_pts > 0:
+        net_win = []
+        net_loss = []
+        for t in trades:
+            pn = t["pts"] - cost_pts
+            if pn > 0.001:
+                net_win.append(pn)
+            elif pn < -0.001:
+                net_loss.append(pn)
+        sum_win_net = sum(net_win)
+        sum_loss_net = sum(net_loss)
+        if sum_loss_net < 0:
+            pf_net = sum_win_net / abs(sum_loss_net)
+        elif sum_win_net > 0:
+            pf_net = None  # infinite
+        else:
+            pf_net = 0.0
+        net_pts = round(net_gross - cost_pts * n, 2)
+        pf_out = round(pf_net, 3) if pf_net is not None else None
+        avg_win = round(sum_win_net / len(net_win), 3) if net_win else 0.0
+        avg_loss = round(sum_loss_net / len(net_loss), 3) if net_loss else 0.0
+    else:
+        pf_out = round(pf_gross, 3) if pf_gross != float("inf") else None
+        pf_net = pf_gross
+        net_pts = round(net_gross, 2)
+        avg_win = round(sum_win / w, 3) if w else 0.0
+        avg_loss = round(sum_loss / l, 3) if l else 0.0
+
     return {
         "n": n,
         "w": w,
         "l": l,
         "be": be,
         "wr": round(wr, 4),
-        "pf": (round(pf, 3) if pf != float("inf") else None),
-        "net_pts": round(net, 2),
-        "avg_win": round(sum_win / w, 3) if w else 0.0,
-        "avg_loss": round(sum_loss / l, 3) if l else 0.0,
+        "pf": pf_out,
+        "net_pts": net_pts,
+        "avg_win": avg_win,
+        "avg_loss": avg_loss,
+        "pf_gross": round(pf_gross, 3) if pf_gross != float("inf") else None,
+        "net_pts_gross": round(net_gross, 2),
+        "tx_cost_pts": cost_pts,
+        "tx_cost_total": round(cost_pts * n, 2),
     }
 
 
@@ -529,7 +566,7 @@ def main():
                         if smt_mode == "mirror" and not t["smt_mirror"]:
                             continue
                         sub.append(t)
-                    agg = aggregate_rows(sub)
+                    agg = aggregate_rows(sub, cost_pts=cost_per_trade("NQ"))
                     rows.append({
                         "year": year,
                         "variant": variant,
