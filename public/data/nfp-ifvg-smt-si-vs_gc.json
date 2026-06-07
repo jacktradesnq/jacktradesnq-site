@@ -3,13 +3,12 @@
     "source": "SI_1m_10y_real.parquet (bbo-1m, 2016-2026) + GC_1m_10y_ffill (SMT pair)",
     "date_from": "2016-01-04",
     "date_to": "2026-05-15",
-    "n_events_total": 4,
-    "n_csv_events": 128,
-    "generated_at": "2026-05-23T22:19:24.748656+00:00",
+    "n_events_total": 3,
+    "n_csv_events": 124,
+    "generated_at": "2026-06-07T20:42:33.842736+00:00",
     "event_filter": "NFP",
     "csv": "/Users/angelo/news-cal-official/news_official_2016_2026.csv",
-    "tick": "SI_TICK=0.005 (SL fix: range sweep_ts\u2192entry_ts), GC_TICK=0.1 (SMT pair)",
-    "phantom_patch": "removed 2024-08-21,2019-09-05,2020-05-11,2024-01-10 (BLS benchmark/dup rows, not monthly NFP)"
+    "tick": "SI_TICK=0.005 (SL fix: range sweep_ts\u2192entry_ts), GC_TICK=0.1 (SMT pair)"
   },
   "rows": [
     {
@@ -23,9 +22,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2017",
@@ -67,9 +66,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     },
     {
@@ -158,9 +157,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2026",
@@ -187,10 +186,10 @@
       "l": 0,
       "be": 2,
       "wr": 0.3333,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
-      "avg_loss": 0.0
+      "pf": 0.375,
+      "net_pts": -0.02,
+      "avg_win": 0.015,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -203,9 +202,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2017",
@@ -368,9 +367,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -427,9 +426,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     },
     {
@@ -518,9 +517,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2026",
@@ -547,10 +546,10 @@
       "l": 0,
       "be": 1,
       "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
-      "avg_loss": 0.0
+      "pf": 0.75,
+      "net_pts": -0.0,
+      "avg_win": 0.015,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -563,9 +562,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2017",
@@ -607,9 +606,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     },
     {
@@ -727,10 +726,10 @@
       "l": 0,
       "be": 1,
       "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
-      "avg_loss": 0.0
+      "pf": 0.75,
+      "net_pts": -0.0,
+      "avg_win": 0.015,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -743,9 +742,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2017",
@@ -908,9 +907,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -967,9 +966,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     },
     {
@@ -1087,9 +1086,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     },
     {
@@ -1103,9 +1102,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2017",
@@ -1147,9 +1146,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     },
     {
@@ -1238,9 +1237,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2026",
@@ -1267,10 +1266,10 @@
       "l": 0,
       "be": 2,
       "wr": 0.3333,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
-      "avg_loss": 0.0
+      "pf": 0.375,
+      "net_pts": -0.02,
+      "avg_win": 0.015,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -1283,9 +1282,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2017",
@@ -1448,9 +1447,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -1507,9 +1506,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     },
     {
@@ -1598,9 +1597,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2026",
@@ -1627,10 +1626,10 @@
       "l": 0,
       "be": 1,
       "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
-      "avg_loss": 0.0
+      "pf": 0.75,
+      "net_pts": -0.0,
+      "avg_win": 0.015,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -1643,9 +1642,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2017",
@@ -1687,9 +1686,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     },
     {
@@ -1807,10 +1806,10 @@
       "l": 0,
       "be": 1,
       "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
-      "avg_loss": 0.0
+      "pf": 0.75,
+      "net_pts": -0.0,
+      "avg_win": 0.015,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -1823,9 +1822,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2017",
@@ -1988,9 +1987,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -2047,9 +2046,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     },
     {
@@ -2167,9 +2166,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     },
     {
@@ -2183,9 +2182,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2017",
@@ -2227,9 +2226,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     },
     {
@@ -2318,9 +2317,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2026",
@@ -2347,10 +2346,10 @@
       "l": 0,
       "be": 2,
       "wr": 0.3333,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
-      "avg_loss": 0.0
+      "pf": 0.375,
+      "net_pts": -0.02,
+      "avg_win": 0.015,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -2363,9 +2362,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2017",
@@ -2528,9 +2527,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -2587,9 +2586,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     },
     {
@@ -2678,9 +2677,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2026",
@@ -2707,10 +2706,10 @@
       "l": 0,
       "be": 1,
       "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
-      "avg_loss": 0.0
+      "pf": 0.75,
+      "net_pts": -0.0,
+      "avg_win": 0.015,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -2723,9 +2722,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2017",
@@ -2767,9 +2766,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     },
     {
@@ -2887,10 +2886,10 @@
       "l": 0,
       "be": 1,
       "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
-      "avg_loss": 0.0
+      "pf": 0.75,
+      "net_pts": -0.0,
+      "avg_win": 0.015,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -2903,9 +2902,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2017",
@@ -3068,9 +3067,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -3127,9 +3126,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     },
     {
@@ -3247,9 +3246,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.035,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.015,
       "avg_loss": 0.0
     }
   ],

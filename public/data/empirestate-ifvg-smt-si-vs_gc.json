@@ -4,8 +4,8 @@
     "date_from": "2016-01-04",
     "date_to": "2026-05-15",
     "n_events_total": 5,
-    "n_csv_events": 125,
-    "generated_at": "2026-05-23T22:19:24.901565+00:00",
+    "n_csv_events": 126,
+    "generated_at": "2026-06-07T20:42:33.905452+00:00",
     "event_filter": "EmpireState",
     "csv": "/Users/angelo/news-cal-official/news_official_2016_2026.csv",
     "tick": "SI_TICK=0.005 (SL fix: range sweep_ts\u2192entry_ts), GC_TICK=0.1 (SMT pair)"
@@ -82,9 +82,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2021",
@@ -111,9 +111,9 @@
       "l": 0,
       "be": 1,
       "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.155,
-      "avg_win": 0.08,
+      "pf": null,
+      "net_pts": 0.11,
+      "avg_win": 0.057,
       "avg_loss": 0.0
     },
     {
@@ -141,10 +141,10 @@
       "l": 0,
       "be": 1,
       "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.115,
-      "avg_win": 0.12,
-      "avg_loss": 0.0
+      "pf": 4.75,
+      "net_pts": 0.08,
+      "avg_win": 0.095,
+      "avg_loss": -0.02
     },
     {
       "year": "2025",
@@ -186,10 +186,10 @@
       "l": 0,
       "be": 3,
       "wr": 0.4,
-      "pf": 99.0,
-      "net_pts": 0.27,
-      "avg_win": 0.09,
-      "avg_loss": 0.0
+      "pf": 5.25,
+      "net_pts": 0.17,
+      "avg_win": 0.07,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -262,9 +262,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2021",
@@ -291,9 +291,9 @@
       "l": 0,
       "be": 1,
       "wr": 0.0,
-      "pf": 99.0,
-      "net_pts": 0.08,
-      "avg_win": 0.08,
+      "pf": null,
+      "net_pts": 0.06,
+      "avg_win": 0.06,
       "avg_loss": 0.0
     },
     {
@@ -321,9 +321,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.115,
-      "avg_win": 0.12,
+      "pf": null,
+      "net_pts": 0.1,
+      "avg_win": 0.095,
       "avg_loss": 0.0
     },
     {
@@ -366,10 +366,10 @@
       "l": 0,
       "be": 2,
       "wr": 0.3333,
-      "pf": 99.0,
-      "net_pts": 0.195,
-      "avg_win": 0.1,
-      "avg_loss": 0.0
+      "pf": 7.75,
+      "net_pts": 0.14,
+      "avg_win": 0.077,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -471,9 +471,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.075,
-      "avg_win": 0.07,
+      "pf": null,
+      "net_pts": 0.05,
+      "avg_win": 0.055,
       "avg_loss": 0.0
     },
     {
@@ -502,9 +502,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2025",
@@ -546,10 +546,10 @@
       "l": 0,
       "be": 1,
       "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.075,
-      "avg_win": 0.07,
-      "avg_loss": 0.0
+      "pf": 2.75,
+      "net_pts": 0.03,
+      "avg_win": 0.055,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -622,9 +622,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2021",
@@ -682,9 +682,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2025",
@@ -727,9 +727,9 @@
       "be": 2,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.04,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -802,9 +802,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2021",
@@ -907,9 +907,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -1042,9 +1042,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2025",
@@ -1087,9 +1087,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -1162,9 +1162,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2021",
@@ -1191,9 +1191,9 @@
       "l": 0,
       "be": 1,
       "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.155,
-      "avg_win": 0.08,
+      "pf": null,
+      "net_pts": 0.11,
+      "avg_win": 0.057,
       "avg_loss": 0.0
     },
     {
@@ -1221,10 +1221,10 @@
       "l": 0,
       "be": 1,
       "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.115,
-      "avg_win": 0.12,
-      "avg_loss": 0.0
+      "pf": 4.75,
+      "net_pts": 0.08,
+      "avg_win": 0.095,
+      "avg_loss": -0.02
     },
     {
       "year": "2025",
@@ -1266,10 +1266,10 @@
       "l": 0,
       "be": 3,
       "wr": 0.4,
-      "pf": 99.0,
-      "net_pts": 0.27,
-      "avg_win": 0.09,
-      "avg_loss": 0.0
+      "pf": 5.25,
+      "net_pts": 0.17,
+      "avg_win": 0.07,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -1342,9 +1342,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2021",
@@ -1371,9 +1371,9 @@
       "l": 0,
       "be": 1,
       "wr": 0.0,
-      "pf": 99.0,
-      "net_pts": 0.08,
-      "avg_win": 0.08,
+      "pf": null,
+      "net_pts": 0.06,
+      "avg_win": 0.06,
       "avg_loss": 0.0
     },
     {
@@ -1401,9 +1401,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.115,
-      "avg_win": 0.12,
+      "pf": null,
+      "net_pts": 0.1,
+      "avg_win": 0.095,
       "avg_loss": 0.0
     },
     {
@@ -1446,10 +1446,10 @@
       "l": 0,
       "be": 2,
       "wr": 0.3333,
-      "pf": 99.0,
-      "net_pts": 0.195,
-      "avg_win": 0.1,
-      "avg_loss": 0.0
+      "pf": 7.75,
+      "net_pts": 0.14,
+      "avg_win": 0.077,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -1551,9 +1551,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.075,
-      "avg_win": 0.07,
+      "pf": null,
+      "net_pts": 0.05,
+      "avg_win": 0.055,
       "avg_loss": 0.0
     },
     {
@@ -1582,9 +1582,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2025",
@@ -1626,10 +1626,10 @@
       "l": 0,
       "be": 1,
       "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.075,
-      "avg_win": 0.07,
-      "avg_loss": 0.0
+      "pf": 2.75,
+      "net_pts": 0.03,
+      "avg_win": 0.055,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -1702,9 +1702,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2021",
@@ -1762,9 +1762,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2025",
@@ -1807,9 +1807,9 @@
       "be": 2,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.04,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -1882,9 +1882,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2021",
@@ -1987,9 +1987,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -2122,9 +2122,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2025",
@@ -2167,9 +2167,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -2242,9 +2242,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2021",
@@ -2271,8 +2271,188 @@
       "l": 0,
       "be": 1,
       "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.1175,
+      "pf": null,
+      "net_pts": 0.08,
+      "avg_win": 0.039,
+      "avg_loss": 0.0
+    },
+    {
+      "year": "2023",
+      "variant": "tp1_be",
+      "smt": false,
+      "side": "BOTH",
+      "n": 0,
+      "w": 0,
+      "l": 0,
+      "be": 0,
+      "wr": 0.0,
+      "pf": 0.0,
+      "net_pts": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0
+    },
+    {
+      "year": "2024",
+      "variant": "tp1_be",
+      "smt": false,
+      "side": "BOTH",
+      "n": 2,
+      "w": 1,
+      "l": 0,
+      "be": 1,
+      "wr": 0.5,
+      "pf": 4.625,
+      "net_pts": 0.07,
+      "avg_win": 0.092,
+      "avg_loss": -0.02
+    },
+    {
+      "year": "2025",
+      "variant": "tp1_be",
+      "smt": false,
+      "side": "BOTH",
+      "n": 0,
+      "w": 0,
+      "l": 0,
+      "be": 0,
+      "wr": 0.0,
+      "pf": 0.0,
+      "net_pts": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0
+    },
+    {
+      "year": "2026",
+      "variant": "tp1_be",
+      "smt": false,
+      "side": "BOTH",
+      "n": 0,
+      "w": 0,
+      "l": 0,
+      "be": 0,
+      "wr": 0.0,
+      "pf": 0.0,
+      "net_pts": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0
+    },
+    {
+      "year": "ALL",
+      "variant": "tp1_be",
+      "smt": false,
+      "side": "BOTH",
+      "n": 5,
+      "w": 2,
+      "l": 0,
+      "be": 3,
+      "wr": 0.4,
+      "pf": 4.25,
+      "net_pts": 0.13,
+      "avg_win": 0.057,
+      "avg_loss": -0.02
+    },
+    {
+      "year": "2016",
+      "variant": "tp1_be",
+      "smt": false,
+      "side": "LONG",
+      "n": 0,
+      "w": 0,
+      "l": 0,
+      "be": 0,
+      "wr": 0.0,
+      "pf": 0.0,
+      "net_pts": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0
+    },
+    {
+      "year": "2017",
+      "variant": "tp1_be",
+      "smt": false,
+      "side": "LONG",
+      "n": 0,
+      "w": 0,
+      "l": 0,
+      "be": 0,
+      "wr": 0.0,
+      "pf": 0.0,
+      "net_pts": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0
+    },
+    {
+      "year": "2018",
+      "variant": "tp1_be",
+      "smt": false,
+      "side": "LONG",
+      "n": 0,
+      "w": 0,
+      "l": 0,
+      "be": 0,
+      "wr": 0.0,
+      "pf": 0.0,
+      "net_pts": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0
+    },
+    {
+      "year": "2019",
+      "variant": "tp1_be",
+      "smt": false,
+      "side": "LONG",
+      "n": 0,
+      "w": 0,
+      "l": 0,
+      "be": 0,
+      "wr": 0.0,
+      "pf": 0.0,
+      "net_pts": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0
+    },
+    {
+      "year": "2020",
+      "variant": "tp1_be",
+      "smt": false,
+      "side": "LONG",
+      "n": 1,
+      "w": 0,
+      "l": 0,
+      "be": 1,
+      "wr": 0.0,
+      "pf": 0.0,
+      "net_pts": -0.02,
+      "avg_win": 0.0,
+      "avg_loss": -0.02
+    },
+    {
+      "year": "2021",
+      "variant": "tp1_be",
+      "smt": false,
+      "side": "LONG",
+      "n": 0,
+      "w": 0,
+      "l": 0,
+      "be": 0,
+      "wr": 0.0,
+      "pf": 0.0,
+      "net_pts": 0.0,
+      "avg_win": 0.0,
+      "avg_loss": 0.0
+    },
+    {
+      "year": "2022",
+      "variant": "tp1_be",
+      "smt": false,
+      "side": "LONG",
+      "n": 1,
+      "w": 0,
+      "l": 0,
+      "be": 1,
+      "wr": 0.0,
+      "pf": null,
+      "net_pts": 0.06,
       "avg_win": 0.06,
       "avg_loss": 0.0
     },
@@ -2280,186 +2460,6 @@
       "year": "2023",
       "variant": "tp1_be",
       "smt": false,
-      "side": "BOTH",
-      "n": 0,
-      "w": 0,
-      "l": 0,
-      "be": 0,
-      "wr": 0.0,
-      "pf": 0.0,
-      "net_pts": 0.0,
-      "avg_win": 0.0,
-      "avg_loss": 0.0
-    },
-    {
-      "year": "2024",
-      "variant": "tp1_be",
-      "smt": false,
-      "side": "BOTH",
-      "n": 2,
-      "w": 1,
-      "l": 0,
-      "be": 1,
-      "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.1125,
-      "avg_win": 0.11,
-      "avg_loss": 0.0
-    },
-    {
-      "year": "2025",
-      "variant": "tp1_be",
-      "smt": false,
-      "side": "BOTH",
-      "n": 0,
-      "w": 0,
-      "l": 0,
-      "be": 0,
-      "wr": 0.0,
-      "pf": 0.0,
-      "net_pts": 0.0,
-      "avg_win": 0.0,
-      "avg_loss": 0.0
-    },
-    {
-      "year": "2026",
-      "variant": "tp1_be",
-      "smt": false,
-      "side": "BOTH",
-      "n": 0,
-      "w": 0,
-      "l": 0,
-      "be": 0,
-      "wr": 0.0,
-      "pf": 0.0,
-      "net_pts": 0.0,
-      "avg_win": 0.0,
-      "avg_loss": 0.0
-    },
-    {
-      "year": "ALL",
-      "variant": "tp1_be",
-      "smt": false,
-      "side": "BOTH",
-      "n": 5,
-      "w": 2,
-      "l": 0,
-      "be": 3,
-      "wr": 0.4,
-      "pf": 99.0,
-      "net_pts": 0.23,
-      "avg_win": 0.08,
-      "avg_loss": 0.0
-    },
-    {
-      "year": "2016",
-      "variant": "tp1_be",
-      "smt": false,
-      "side": "LONG",
-      "n": 0,
-      "w": 0,
-      "l": 0,
-      "be": 0,
-      "wr": 0.0,
-      "pf": 0.0,
-      "net_pts": 0.0,
-      "avg_win": 0.0,
-      "avg_loss": 0.0
-    },
-    {
-      "year": "2017",
-      "variant": "tp1_be",
-      "smt": false,
-      "side": "LONG",
-      "n": 0,
-      "w": 0,
-      "l": 0,
-      "be": 0,
-      "wr": 0.0,
-      "pf": 0.0,
-      "net_pts": 0.0,
-      "avg_win": 0.0,
-      "avg_loss": 0.0
-    },
-    {
-      "year": "2018",
-      "variant": "tp1_be",
-      "smt": false,
-      "side": "LONG",
-      "n": 0,
-      "w": 0,
-      "l": 0,
-      "be": 0,
-      "wr": 0.0,
-      "pf": 0.0,
-      "net_pts": 0.0,
-      "avg_win": 0.0,
-      "avg_loss": 0.0
-    },
-    {
-      "year": "2019",
-      "variant": "tp1_be",
-      "smt": false,
-      "side": "LONG",
-      "n": 0,
-      "w": 0,
-      "l": 0,
-      "be": 0,
-      "wr": 0.0,
-      "pf": 0.0,
-      "net_pts": 0.0,
-      "avg_win": 0.0,
-      "avg_loss": 0.0
-    },
-    {
-      "year": "2020",
-      "variant": "tp1_be",
-      "smt": false,
-      "side": "LONG",
-      "n": 1,
-      "w": 0,
-      "l": 0,
-      "be": 1,
-      "wr": 0.0,
-      "pf": 0.0,
-      "net_pts": 0.0,
-      "avg_win": 0.0,
-      "avg_loss": 0.0
-    },
-    {
-      "year": "2021",
-      "variant": "tp1_be",
-      "smt": false,
-      "side": "LONG",
-      "n": 0,
-      "w": 0,
-      "l": 0,
-      "be": 0,
-      "wr": 0.0,
-      "pf": 0.0,
-      "net_pts": 0.0,
-      "avg_win": 0.0,
-      "avg_loss": 0.0
-    },
-    {
-      "year": "2022",
-      "variant": "tp1_be",
-      "smt": false,
-      "side": "LONG",
-      "n": 1,
-      "w": 0,
-      "l": 0,
-      "be": 1,
-      "wr": 0.0,
-      "pf": 99.0,
-      "net_pts": 0.08,
-      "avg_win": 0.08,
-      "avg_loss": 0.0
-    },
-    {
-      "year": "2023",
-      "variant": "tp1_be",
-      "smt": false,
       "side": "LONG",
       "n": 0,
       "w": 0,
@@ -2481,9 +2481,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.1125,
-      "avg_win": 0.11,
+      "pf": null,
+      "net_pts": 0.09,
+      "avg_win": 0.092,
       "avg_loss": 0.0
     },
     {
@@ -2526,10 +2526,10 @@
       "l": 0,
       "be": 2,
       "wr": 0.3333,
-      "pf": 99.0,
-      "net_pts": 0.1925,
-      "avg_win": 0.1,
-      "avg_loss": 0.0
+      "pf": 7.625,
+      "net_pts": 0.13,
+      "avg_win": 0.076,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -2631,9 +2631,9 @@
       "l": 0,
       "be": 0,
       "wr": 1.0,
-      "pf": 99.0,
-      "net_pts": 0.0375,
-      "avg_win": 0.04,
+      "pf": null,
+      "net_pts": 0.02,
+      "avg_win": 0.017,
       "avg_loss": 0.0
     },
     {
@@ -2662,9 +2662,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2025",
@@ -2706,10 +2706,10 @@
       "l": 0,
       "be": 1,
       "wr": 0.5,
-      "pf": 99.0,
-      "net_pts": 0.0375,
-      "avg_win": 0.04,
-      "avg_loss": 0.0
+      "pf": 0.875,
+      "net_pts": -0.0,
+      "avg_win": 0.017,
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -2782,9 +2782,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2021",
@@ -2842,9 +2842,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2025",
@@ -2887,9 +2887,9 @@
       "be": 2,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.04,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -2962,9 +2962,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2021",
@@ -3067,9 +3067,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2016",
@@ -3202,9 +3202,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     },
     {
       "year": "2025",
@@ -3247,9 +3247,9 @@
       "be": 1,
       "wr": 0.0,
       "pf": 0.0,
-      "net_pts": 0.0,
+      "net_pts": -0.02,
       "avg_win": 0.0,
-      "avg_loss": 0.0
+      "avg_loss": -0.02
     }
   ],
   "trades": [

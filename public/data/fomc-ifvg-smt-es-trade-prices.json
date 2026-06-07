@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T08:55:05.285247+00:00",
+  "generated_at": "2026-06-07T20:40:18.025935+00:00",
   "source": "run_es_10y_all_events.py",
   "event": "FOMC",
   "asset": "ES",
@@ -470,7 +470,7 @@
       "sl_price": 2712.25,
       "tp_price": 2744.0,
       "exit_ts": "2018-03-21T22:00:00+00:00",
-      "exit_price": null,
+      "exit_price": 2718.5,
       "data_high": 2744.0,
       "data_low": 2730.5,
       "sweep_ts": "2018-03-21T18:03:00+00:00",
