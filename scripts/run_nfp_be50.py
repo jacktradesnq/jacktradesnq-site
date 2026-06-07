@@ -28,7 +28,7 @@ from run_news_830_v2 import (
     scan_bars_last_close,
 )
 
-NEWS_CSV = os.path.expanduser("~/monfxreplay/data/news_red_folder_clean.csv")
+NEWS_CSV = "/Users/angelo/jtnq-hub/data/news_red_folder_full.csv"
 ET = ZoneInfo("America/New_York")
 TICK = 0.25
 PRE_LOOKBACK_MIN = 5
