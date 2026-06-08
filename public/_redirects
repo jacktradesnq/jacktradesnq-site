@@ -13,12 +13,6 @@
 /backtested-data/asia-open/ /studies/asia-open/ 301
 /backtested-data/cb-confidence-day-stats /studies/cb-confidence-day-stats 301
 /backtested-data/cb-confidence-day-stats/ /studies/cb-confidence-day-stats/ 301
-/backtested-data/cb-confidence-ifvg-smt /studies/cb-confidence-ifvg-smt 301
-/backtested-data/cb-confidence-ifvg-smt/ /studies/cb-confidence-ifvg-smt/ 301
-/backtested-data/cb-confidence-ifvg-smt-es /studies/cb-confidence-ifvg-smt-es 301
-/backtested-data/cb-confidence-ifvg-smt-es/ /studies/cb-confidence-ifvg-smt-es/ 301
-/backtested-data/cb-confidence-ifvg-smt-gc /studies/cb-confidence-ifvg-smt-gc 301
-/backtested-data/cb-confidence-ifvg-smt-gc/ /studies/cb-confidence-ifvg-smt-gc/ 301
 /backtested-data/cpi-day-stats /studies/cpi-day-stats 301
 /backtested-data/cpi-day-stats/ /studies/cpi-day-stats/ 301
 /backtested-data/cpi-ifvg-smt /studies/cpi-ifvg-smt 301
@@ -109,10 +103,6 @@
 /backtested-data/pce-ifvg-smt-gc/ /studies/pce-ifvg-smt-gc/ 301
 /backtested-data/philly-fed-day-stats /studies/philly-fed-day-stats 301
 /backtested-data/philly-fed-day-stats/ /studies/philly-fed-day-stats/ 301
-/backtested-data/philly-fed-ifvg-smt /studies/philly-fed-ifvg-smt 301
-/backtested-data/philly-fed-ifvg-smt/ /studies/philly-fed-ifvg-smt/ 301
-/backtested-data/philly-fed-ifvg-smt-es /studies/philly-fed-ifvg-smt-es 301
-/backtested-data/philly-fed-ifvg-smt-es/ /studies/philly-fed-ifvg-smt-es/ 301
 /backtested-data/philly-fed-ifvg-smt-gc /studies/philly-fed-ifvg-smt-gc 301
 /backtested-data/philly-fed-ifvg-smt-gc/ /studies/philly-fed-ifvg-smt-gc/ 301
 /backtested-data/ppi-ifvg-smt /studies/ppi-ifvg-smt 301
