@@ -233,7 +233,7 @@ function YearBlock({ breakdown, slug, smtLabel = 'SMT-on', trades = [], onJumpTo
 
   const best = breakdown.reduce((a, b) => (a.net >= b.net ? a : b));
   const worst = breakdown.reduce((a, b) => (a.net <= b.net ? a : b));
-  const total = aggregateYearTotals(breakdown);
+  const total = aggregateYearTotals(trades);
 
   function pctClass(val: number, type: 'win' | 'be' | 'loss') {
     if (type === 'win') return val >= 50 ? 'v3-yr-num sage' : 'v3-yr-num';
