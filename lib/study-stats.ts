@@ -273,7 +273,7 @@ function computeIfvgStats(
 
 let _stratCache: StrategyStats[] | null = null;
 
-export function getAllStrategyStats(): StrategyStats[] {
+function getAllStrategyStats(): StrategyStats[] {
   if (_stratCache) return _stratCache;
   const results: StrategyStats[] = [];
   for (const entry of IFVG_SLUGS) {
@@ -330,98 +330,6 @@ export function getStrategyStatsByVariantAndSmt(slug: string): { smtOn: VariantS
       no_be:  computeIfvgStats(json, entry, 'no_be', false),
     },
   };
-}
-
-export type MarketStudyStats = {
-  slug: string;
-  title: string;
-  asset: string;
-  headline: string;
-  sample: string;
-  detail: string;
-};
-
-export function getMarketStudyStats(): MarketStudyStats[] {
-  const results: MarketStudyStats[] = [];
-
-  // nwog-gc
-  const nwogPath = path.join(dataDir, 'nwog-gc.json');
-  if (fs.existsSync(nwogPath)) {
-    const d = JSON.parse(fs.readFileSync(nwogPath, 'utf-8'));
-    const fillPct = d.summary?.direct_pct
-      ? `${(d.summary.direct_pct * 100).toFixed(1)}%`
-      : '86.5%';
-    results.push({
-      slug: 'asia-open',
-      title: 'Asia Open NWOG',
-      asset: 'GC',
-      headline: `${fillPct} fill in ${d.directWindowMinutes ?? 30} min`,
-      sample: `${d.totalEvents ?? 155} events`,
-      detail: 'New Week Opening Gap fill rate · 10y',
-    });
-  }
-
-  // killzone-gc
-  const kzPath = path.join(dataDir, 'killzone-gc.json');
-  if (fs.existsSync(kzPath)) {
-    const d = JSON.parse(fs.readFileSync(kzPath, 'utf-8'));
-    const asia = (d.overall ?? []).find((k: { killzone: string }) => k.killzone === 'Asia');
-    results.push({
-      slug: 'killzone-past-vs-now',
-      title: 'Killzone Ranges',
-      asset: 'GC',
-      headline: asia ? `${asia.avgRange.toFixed(1)} pts avg Asia range` : '13.2 pts avg Asia range',
-      sample: `${asia?.n ?? 2671} sessions`,
-      detail: 'Killzone OHLC stats · 10y',
-    });
-  }
-
-  // cpi event bars
-  const cpiEbPath = path.join(dataDir, 'cpi_event_bars.json');
-  if (fs.existsSync(cpiEbPath)) {
-    const d = JSON.parse(fs.readFileSync(cpiEbPath, 'utf-8'));
-    const events = Array.isArray(d) ? d : d.events ?? [];
-    results.push({
-      slug: 'cpi-day-stats',
-      title: 'CPI Event Bars',
-      asset: 'NQ',
-      headline: `${events.length} CPI releases charted`,
-      sample: `${events.length} events`,
-      detail: 'Per-release bar chart · 10y',
-    });
-  }
-
-  // nfp event bars
-  const nfpEbPath = path.join(dataDir, 'nfp_event_bars.json');
-  if (fs.existsSync(nfpEbPath)) {
-    const d = JSON.parse(fs.readFileSync(nfpEbPath, 'utf-8'));
-    const events = Array.isArray(d) ? d : d.events ?? [];
-    results.push({
-      slug: 'nfp',
-      title: 'NFP Event Bars',
-      asset: 'NQ',
-      headline: `${events.length} NFP releases charted`,
-      sample: `${events.length} events`,
-      detail: 'Per-release bar chart · 10y',
-    });
-  }
-
-  // fomc event bars
-  const fomcEbPath = path.join(dataDir, 'fomc_event_bars.json');
-  if (fs.existsSync(fomcEbPath)) {
-    const d = JSON.parse(fs.readFileSync(fomcEbPath, 'utf-8'));
-    const events = Array.isArray(d) ? d : d.events ?? [];
-    results.push({
-      slug: 'fomc-day-stats',
-      title: 'FOMC Event Bars',
-      asset: 'NQ',
-      headline: `${events.length} FOMC releases charted`,
-      sample: `${events.length} events`,
-      detail: 'Per-release bar chart · 10y',
-    });
-  }
-
-  return results;
 }
 
 // Event name → IFVG SMT slug mapping per asset (NQ + GC)
@@ -481,7 +389,7 @@ export function getEventStudyMap(
   return map;
 }
 
-export function getStudyForEvent(
+function getStudyForEvent(
   eventName: string,
   asset: 'nq' | 'gc' | 'es' = 'nq',
 ): EventStudyStats | null {
@@ -692,70 +600,6 @@ export function getTradeList(slug: string, smtOn = true, variant: 'tp1_be' | 'be
       };
     })
     .sort((a, b) => (a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0));
-}
-
-// Returns top strategies per weekday (for Calendar view)
-// Returns for each day (mon..fri) the top 2 strategies by N*WR score
-export type CalendarDayEntry = {
-  slug: string;
-  name: string;
-  asset: string;
-  n: number;
-  wr: number;
-  net: number;
-};
-
-export function getCalendarWeekday(): Record<string, CalendarDayEntry[]> {
-  const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri'];
-  const result: Record<string, CalendarDayEntry[]> = {
-    mon: [], tue: [], wed: [], thu: [], fri: [],
-  };
-
-  // For each IFVG slug, compute weekday breakdown and rank by score
-  const candidates: Array<{
-    slug: string;
-    name: string;
-    asset: string;
-    day: string;
-    n: number;
-    wr: number;
-    net: number;
-    score: number;
-  }> = [];
-
-  for (const entry of IFVG_SLUGS) {
-    const json = loadIfvgJson(entry.slug);
-    if (!json || !json.trades?.length) continue;
-
-    const bd = getWeekdayBreakdown(entry.slug, true);
-    for (const [i, dayKey] of DAY_KEYS.entries()) {
-      const stats = bd[dayKey as keyof WeekdayBreakdown];
-      if (stats.n < 2) continue; // skip days with < 2 trades
-      if (stats.net <= 0) continue; // skip losing days
-      const score = stats.n * (stats.wr / 100);
-      candidates.push({
-        slug: entry.slug,
-        name: `${entry.event} IFVG+SMT`,
-        asset: entry.asset,
-        day: dayKey,
-        n: stats.n,
-        wr: stats.wr,
-        net: stats.net,
-        score,
-      });
-      void i;
-    }
-  }
-
-  // Sort candidates by score desc, pick top 2 per day
-  candidates.sort((a, b) => b.score - a.score);
-  for (const c of candidates) {
-    if (result[c.day].length < 2) {
-      result[c.day].push({ slug: c.slug, name: c.name, asset: c.asset, n: c.n, wr: c.wr, net: c.net });
-    }
-  }
-
-  return result;
 }
 
 // ─── Hub v3 StudyStats API ─────────────────────────────────────────────────
