@@ -22,8 +22,8 @@ import StraddleWrappedTabs from '../_components/StraddleWrappedTabs';
 import PerformanceTearsheet from '../_components/PerformanceTearsheet';
 import ManipDataTabs, { type ContDataFile } from '../_components/ManipDataTabs';
 import { type ManipExample } from '../_components/ManipExampleChart';
-import { computeWeekdayBreakdown, computeYearBreakdown } from '@/lib/client-stats';
-import { getStrategyStats, getStrategyStatsByVariant, getStrategyStatsByVariantAndSmt, getWeekdayBreakdown, getYearBreakdown, getTradeList, getStraddleAllTrades, getProfitableIfvgCombos, type TradeRow, type ProfitableCombo } from '@/lib/study-stats';
+import { computeWeekdayBreakdown } from '@/lib/client-stats';
+import { getStrategyStats, getStrategyStatsByVariant, getStrategyStatsByVariantAndSmt, getWeekdayBreakdown, getTradeList, getStraddleAllTrades, getProfitableIfvgCombos, type TradeRow, type ProfitableCombo } from '@/lib/study-stats';
 
 const EXPLORER_RE =
   /<div data-explorer="(cpi|nfp|jobless-claims|ppi|retail-sales|durable-goods|pce|nfp-ifvg-smt|cpi-ifvg-smt|ppi-ifvg-smt|retailsales-ifvg-smt|pce-ifvg-smt|gdp-ifvg-smt|joblessclaims-ifvg-smt|empirestate-ifvg-smt|employmentcostindex-ifvg-smt)">\s*<\/div>/i;
@@ -207,7 +207,6 @@ export default async function BacktestedDetail({ params }: PageProps) {
           <V3Tabs
             slug={slug}
             breakdown={computeWeekdayBreakdown([])}
-            yearBreakdown={computeYearBreakdown([])}
             trades={[]}
             tradesUrl={`/data/${genericCfg.dataFile}`}
             dateFrom={raw.meta.date_from ? raw.meta.date_from.slice(0, 4) : '2016'}
@@ -496,8 +495,6 @@ export default async function BacktestedDetail({ params }: PageProps) {
     const stratStats = getStrategyStats(slug);
     const breakdown = getWeekdayBreakdown(slug, true);
     const breakdownOff = getWeekdayBreakdown(slug, false);
-    const yearBreakdown = getYearBreakdown(slug, true);
-    const yearBreakdownOff = getYearBreakdown(slug, false);
     const tradesByVariant = {
       tp1_be: getTradeList(slug, true, 'tp1_be'),
       be_50:  getTradeList(slug, true, 'be_50'),
@@ -539,7 +536,7 @@ export default async function BacktestedDetail({ params }: PageProps) {
 
         {/* V3Tabs is a client component that reads ?tab from URL and renders the KPI band + tabs */}
         <Suspense fallback={<div className="v3-tabs" style={{ height: 48 }} />}>
-          <V3Tabs slug={slug} breakdown={breakdown} breakdownOff={breakdownOff} yearBreakdown={yearBreakdown} yearBreakdownOff={yearBreakdownOff} trades={trades} tradesByVariant={tradesByVariant} tradesByVariantOff={tradesByVariantOff} statsByVariant={statsByVariant} statsByVariantAndSmt={statsByVariantAndSmt} profitableCombos={profitableCombos} dateFrom={dateFrom} dateTo={dateTo} overviewContent={overviewNode} eventShort={stratStats?.event ?? ''} asset={(stratStats?.asset?.toLowerCase() ?? 'nq') as 'nq' | 'gc' | 'es' | 'si' | 'ym'} hideKpiBand={hasTearsheet} flat={true} simpleModeIntroHtml={extractFirstParagraph(entry.explanationHtmlNq)} simpleHideStatBand={!hasTearsheet} showHero={!hasTearsheet} heroMeta={`${assetShort(assetLabel)} · ${dateFrom}–${dateTo}${stratStats ? ` · ${stratStats.n} events` : ''}`} />
+          <V3Tabs slug={slug} breakdown={breakdown} breakdownOff={breakdownOff} trades={trades} tradesByVariant={tradesByVariant} tradesByVariantOff={tradesByVariantOff} statsByVariant={statsByVariant} statsByVariantAndSmt={statsByVariantAndSmt} profitableCombos={profitableCombos} dateFrom={dateFrom} dateTo={dateTo} overviewContent={overviewNode} eventShort={stratStats?.event ?? ''} asset={(stratStats?.asset?.toLowerCase() ?? 'nq') as 'nq' | 'gc' | 'es' | 'si' | 'ym'} hideKpiBand={hasTearsheet} flat={true} simpleModeIntroHtml={extractFirstParagraph(entry.explanationHtmlNq)} simpleHideStatBand={!hasTearsheet} showHero={!hasTearsheet} heroMeta={`${assetShort(assetLabel)} · ${dateFrom}–${dateTo}${stratStats ? ` · ${stratStats.n} events` : ''}`} />
         </Suspense>
 
         {pager}

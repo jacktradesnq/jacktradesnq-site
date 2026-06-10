@@ -4,7 +4,7 @@ import { useMemo, Suspense } from 'react';
 import { useAsset, type AssetKey } from './AssetContext';
 import V3Tabs from './V3Tabs';
 import type { TradeRow } from '@/lib/study-stats';
-import { computeKPI, computeYearBreakdown, computeWeekdayBreakdown } from '@/lib/client-stats';
+import { computeKPI, computeWeekdayBreakdown } from '@/lib/client-stats';
 import { assetShort, eventFull } from '@/lib/terminology';
 
 const STOP_GRIDS: Record<string, number[]> = {
@@ -84,7 +84,6 @@ export default function StraddleWrappedTabs({
   }), [stopGrid, tpGrid]);
 
   const initialBreakdown = useMemo(() => computeWeekdayBreakdown(trades), [trades]);
-  const initialYearBreakdown = useMemo(() => computeYearBreakdown(trades), [trades]);
 
   const assetLabel = ASSET_LABEL[assetKey] ?? assetKey.toUpperCase();
 
@@ -102,7 +101,6 @@ export default function StraddleWrappedTabs({
         <V3Tabs
           slug={slug}
           breakdown={initialBreakdown}
-          yearBreakdown={initialYearBreakdown}
           trades={trades}
           tradesByVariant={null}
           tradesByVariantOff={null}

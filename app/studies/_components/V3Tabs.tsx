@@ -592,8 +592,6 @@ export default function V3Tabs({
   slug,
   breakdown,
   breakdownOff,
-  yearBreakdown,
-  yearBreakdownOff,
   trades: tradesProp,
   tradesByVariant,
   tradesByVariantOff,
@@ -618,8 +616,6 @@ export default function V3Tabs({
   slug: string;
   breakdown: WeekdayBreakdown;
   breakdownOff?: WeekdayBreakdown;
-  yearBreakdown: YearBreakdown;
-  yearBreakdownOff?: YearBreakdown;
   trades: TradeRow[];
   tradesByVariant?: { tp1_be: TradeRow[]; be_50: TradeRow[]; no_be: TradeRow[] } | null;
   tradesByVariantOff?: { tp1_be: TradeRow[]; be_50: TradeRow[]; no_be: TradeRow[] } | null;
