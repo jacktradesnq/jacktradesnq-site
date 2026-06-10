@@ -250,8 +250,8 @@ function computeIfvgStats(
   const dateTo = meta?.date_to ?? '';
 
   // Simple bias: if more long trades win than short, bias is Long
-  const longs = trades.filter((t) => t.side === 'LONG');
-  const shorts = trades.filter((t) => t.side === 'SHORT');
+  const longs = trades.filter((t) => t.side.toLowerCase() === 'long');
+  const shorts = trades.filter((t) => t.side.toLowerCase() === 'short');
   const longWr = longs.length > 0 ? longs.filter((t) => t.pnl_pts > 0).length / longs.length : 0;
   const shortWr = shorts.length > 0 ? shorts.filter((t) => t.pnl_pts > 0).length / shorts.length : 0;
   const bias = longWr > shortWr + 0.05 ? 'Long' : shortWr > longWr + 0.05 ? 'Short' : 'Both';
