@@ -1457,6 +1457,9 @@ export function getStudyCountsByFamily(): { total: number; news: number; ib: num
 export interface NavEvent { key: string; label: string; count: number; bestPf: number; }
 export interface NavFamily { family: FamilyType; label: string; cat: string; count: number; events: NavEvent[]; }
 
+// Keys for cross-asset rollup cards that should be surfaced in their own group
+const CROSS_ASSET_KEYS = new Set(['es-ifvg-smt', 'si-ifvg-smt']);
+
 const NAV_FAMILY_ORDER: { family: FamilyType; label: string; cat: string }[] = [
   { family: 'News', label: 'News',            cat: 'news' },
   { family: 'Time', label: 'Sessions',        cat: 'time' },
@@ -1468,6 +1471,8 @@ const NAV_FAMILY_ORDER: { family: FamilyType; label: string; cat: string }[] = [
 export function getStudyNavTree(): NavFamily[] {
   const all = getAllStudyStats();
   const out: NavFamily[] = [];
+  const crossAssetEvents: NavEvent[] = [];
+
   for (const fam of NAV_FAMILY_ORDER) {
     const items = all.filter((s) => s.family === fam.family);
     if (items.length === 0) continue;
@@ -1478,10 +1483,33 @@ export function getStudyNavTree(): NavFamily[] {
       arr.push(s);
       evMap.set(k, arr);
     }
-    const events: NavEvent[] = [...evMap.entries()]
+    const allEvents: NavEvent[] = [...evMap.entries()]
       .map(([key, arr]) => ({ key, label: eventFull(key), count: arr.length, bestPf: Math.max(...arr.map((x) => x.pf)) }))
-      .sort((a, b) => b.bestPf - a.bestPf);
-    out.push({ family: fam.family, label: fam.label, cat: fam.cat, count: items.length, events });
+      .sort((a, b) => a.label.localeCompare(b.label));
+
+    // Separate cross-asset rollup events from this family
+    const familyEvents = allEvents.filter((ev) => !CROSS_ASSET_KEYS.has(ev.key));
+    const extracted = allEvents.filter((ev) => CROSS_ASSET_KEYS.has(ev.key));
+    crossAssetEvents.push(...extracted);
+
+    if (familyEvents.length === 0) continue;
+    const familyCount = all.filter((s) => s.family === fam.family && !CROSS_ASSET_KEYS.has(eventKeyOf(s.slug) ?? s.slug)).length;
+    out.push({ family: fam.family, label: fam.label, cat: fam.cat, count: familyCount, events: familyEvents });
   }
+
+  // Append Cross-asset group after Initial Balance (already last in IB's position)
+  if (crossAssetEvents.length > 0) {
+    const crossCount = crossAssetEvents.reduce((sum, ev) => sum + ev.count, 0);
+    const ibIdx = out.findIndex((f) => f.family === 'IB');
+    const insertAt = ibIdx >= 0 ? ibIdx + 1 : out.length;
+    out.splice(insertAt, 0, {
+      family: 'Misc' as FamilyType,
+      label: 'Cross-asset',
+      cat: 'misc',
+      count: crossCount,
+      events: crossAssetEvents.sort((a, b) => a.label.localeCompare(b.label)),
+    });
+  }
+
   return out;
 }

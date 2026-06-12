@@ -14,6 +14,24 @@ interface FamilyCounts {
   misc: number;
 }
 
+function ChevronIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      className={'v3-nav-chevron' + (open ? ' open' : '')}
+      width="12"
+      height="12"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      style={{ marginLeft: 'auto', flexShrink: 0 }}
+      aria-hidden="true"
+    >
+      <path d="M4 6l4 4 4-4" />
+    </svg>
+  );
+}
+
 export default function V3SideNav({ counts, tree }: { counts: FamilyCounts; tree: NavFamily[] }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -31,6 +49,40 @@ export default function V3SideNav({ counts, tree }: { counts: FamilyCounts; tree
   useEffect(() => {
     setDataOpen(isData);
   }, [isData]);
+
+  // Determine which family contains the active event
+  const activeFamilyKey = activeEvent
+    ? (tree.find((f) => f.events.some((ev) => ev.key === activeEvent))?.family ?? null)
+    : null;
+
+  // Per-group open state: collapsed by default, open if it contains the active event
+  const [groupOpen, setGroupOpen] = useState<Record<string, boolean>>(() => {
+    const init: Record<string, boolean> = {};
+    for (const fam of tree) {
+      const key = fam.family + ':' + fam.label;
+      init[key] = fam.family === activeFamilyKey && fam.events.some((ev) => ev.key === activeEvent);
+    }
+    return init;
+  });
+
+  // Re-compute open state when activeEvent changes (navigation)
+  useEffect(() => {
+    setGroupOpen((prev) => {
+      const next: Record<string, boolean> = {};
+      for (const fam of tree) {
+        const key = fam.family + ':' + fam.label;
+        const isActive = fam.events.some((ev) => ev.key === activeEvent);
+        // Keep open if already open OR if this group now contains the active event
+        next[key] = prev[key] || isActive;
+      }
+      return next;
+    });
+  }, [activeEvent, tree]);
+
+  function toggleGroup(fam: NavFamily) {
+    const key = fam.family + ':' + fam.label;
+    setGroupOpen((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
 
   return (
     <aside className="v3-sidenav">
@@ -59,9 +111,7 @@ export default function V3SideNav({ counts, tree }: { counts: FamilyCounts; tree
           <rect x="1" y="12" width="14" height="2" rx="1" />
         </svg>
         Data
-        <svg className={'v3-nav-chevron' + (dataOpen ? ' open' : '')} width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: 'auto', flexShrink: 0 }} aria-hidden="true">
-          <path d="M4 6l4 4 4-4" />
-        </svg>
+        <ChevronIcon open={dataOpen} />
       </button>
 
       {/* Sub-items */}
@@ -79,26 +129,41 @@ export default function V3SideNav({ counts, tree }: { counts: FamilyCounts; tree
           </Link>
         </li>
 
-        {/* Family groups with nested events */}
-        {tree.map((fam) => (
-          <li key={fam.family}>
-            <div className="v3-nav-grouplbl">{fam.label}</div>
-            <ul className="v3-nav-sublist">
-              {fam.events.map((ev) => (
-                <li key={ev.key}>
-                  <Link
-                    href={`/studies/?event=${ev.key}`}
-                    className={'v3-nav-sub' + (activeEvent === ev.key ? ' active' : '')}
-                  >
-                    <span className="v3-nav-sub-dot" aria-hidden="true" />
-                    {ev.label}
-                    <span className="v3-nav-sub-count">({ev.count})</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
+        {/* Family groups — each collapsible */}
+        {tree.map((fam) => {
+          const groupKey = fam.family + ':' + fam.label;
+          const isOpen = groupOpen[groupKey] ?? false;
+          return (
+            <li key={groupKey}>
+              <button
+                type="button"
+                className="v3-nav-grouplbl v3-nav-group-toggle"
+                onClick={() => toggleGroup(fam)}
+                aria-expanded={isOpen}
+              >
+                {fam.label}
+                <span className="v3-nav-group-count">({fam.events.length})</span>
+                <ChevronIcon open={isOpen} />
+              </button>
+              {isOpen && (
+                <ul className="v3-nav-sublist">
+                  {fam.events.map((ev) => (
+                    <li key={ev.key}>
+                      <Link
+                        href={`/studies/?event=${ev.key}`}
+                        className={'v3-nav-sub' + (activeEvent === ev.key ? ' active' : '')}
+                      >
+                        <span className="v3-nav-sub-dot" aria-hidden="true" />
+                        {ev.label}
+                        <span className="v3-nav-sub-count">({ev.count})</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          );
+        })}
       </ul>
       )}
 
