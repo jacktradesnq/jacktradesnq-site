@@ -493,7 +493,7 @@ a { color: inherit; text-decoration: none; }
 }
 .bd-root *, .bd-root *::before, .bd-root *::after { box-sizing: border-box; }
 .bd-root a { color: inherit; text-decoration: none; }
-.bd-root button:not(.bd-btn):not(.v3-asset-pill):not(.v3-flt-pill):not(.v3-tab):not(.bd-flt-asset-btn):not(.bd-edge-toggle):not(.fb-pill):not(.fb-reset):not(.fb-best):not(.bd-hub-search-clear):not(.v3-flat-chip):not(.v3-flat-sec-link):not(.v3-nav-btn) { font: inherit; color: inherit; background: none; border: 0; cursor: default; padding: 0; }
+.bd-root button:not(.bd-btn):not(.v3-asset-pill):not(.v3-flt-pill):not(.v3-tab):not(.bd-flt-asset-btn):not(.bd-edge-toggle):not(.fb-pill):not(.fb-reset):not(.fb-best):not(.bd-hub-search-clear):not(.v3-flat-chip):not(.v3-flat-sec-link):not(.v3-nav-btn):not(.v3-nav-group-toggle) { font: inherit; color: inherit; background: none; border: 0; cursor: default; padding: 0; }
 .bd-root .panda-btn { cursor: grab; }
 .bd-root .panda-btn:active { cursor: grabbing; }
 .bd-root h1, .bd-root h2, .bd-root h3, .bd-root h4, .bd-root p, .bd-root ul, .bd-root ol { margin: 0; padding: 0; }
@@ -3016,7 +3016,9 @@ a { color: inherit; text-decoration: none; }
   border: none;
   cursor: pointer;
   color: inherit;
-  font: inherit;
+  font-family: var(--f-mono, ui-monospace, monospace);
+  font-size: 10px;
+  font-weight: 600;
   text-align: left;
   border-radius: 4px;
   transition: opacity 140ms;
