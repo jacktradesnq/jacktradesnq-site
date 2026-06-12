@@ -141,7 +141,7 @@ export default function V3SideNav({ counts, tree }: { counts: FamilyCounts; tree
                 onClick={() => toggleGroup(fam)}
                 aria-expanded={isOpen}
               >
-                {fam.label}
+                <span className="v3-nav-group-lbl-text">{fam.label}</span>
                 <span className="v3-nav-group-count">({fam.events.length})</span>
                 <ChevronIcon open={isOpen} />
               </button>
