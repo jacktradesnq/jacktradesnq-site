@@ -661,6 +661,8 @@ function inferAsset(slug: string): AssetType {
 
 function inferFamily(slug: string, group?: string): FamilyType {
   if (group === '8:30 News Model') return 'News';
+  if (group === 'News Behaviour') return 'News';
+  if (group === 'Asia / London') return 'Time';
   const newsEvents = [
     'cpi', 'nfp', 'ppi', 'pce', 'gdp', 'joblessclaims', 'jobless-claims',
     'empirestate', 'employmentcostindex', 'retailsales', 'retail-sales',
