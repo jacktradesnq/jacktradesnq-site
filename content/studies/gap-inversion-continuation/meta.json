@@ -2,7 +2,7 @@
   "title": "Gap Inversion → Hourly Continuation",
   "category": "data",
   "date": "2026-05-29",
-  "excerpt": "When NQ gaps, immediately inverts back through the prior close, and the first hour closes against the gap — what does the next hour do? 10-year study (2016–2026, 33,739 hourly pairs baseline) measuring how often the second hour extends the inversion versus the unconditional base rate.",
+  "excerpt": "I wanted to know if a failed gap means anything for the next hour. So I took every NQ gap that inverts back through the prior close with a red first hour, 10 years, and checked what hour 2 does.",
   "tradingviewUrl": "https://www.tradingview.com/u/jacktradesnq/",
   "group": "Asia / London"
 }

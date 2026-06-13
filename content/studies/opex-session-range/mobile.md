@@ -1,11 +1,11 @@
 ## Opex Week — Which Sessions Compress?
 
-Does monthly options-expiration week really kill range? 10-year study (2016–2026, 7,748 sessions), Opex vs rest of month, by session.
+Everyone says Opex week kills the range. I checked it session by session over 10 years (7,748 sessions), Opex vs rest of month.
 
-- **Asia**: 62.5 vs 72.3 pts → **−13.6%** (most compressed).
-- **London**: 61.6 vs 62.1 pts → **−0.8%** (essentially untouched).
+- **Asia**: 62.5 vs 72.3 pts → **−13.6%** (most pinned).
+- **London**: 61.6 vs 62.1 pts → **−0.8%** (barely moves).
 - **NY AM**: 113.1 vs 120.7 pts → **−6.3%**.
-- Takeaway: **London is the one session that doesn't compress in Opex** — normal range while Asia pins. Held across 2022–25.
-- Volume omitted (quarterly contract roll contaminates it).
+- **London is the one that doesn't compress in Opex** — normal range while Asia sits on its hands. Held across 2022–25.
+- Left volume out (contract roll wrecks it on Opex).
 
-Behaviour only — normal range ≠ directional. Full breakdown on the study page.
+Range, not direction. Not advice, AI data — backtest it.
