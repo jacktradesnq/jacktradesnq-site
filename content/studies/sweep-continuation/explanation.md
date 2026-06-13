@@ -1,6 +1,6 @@
 ## Sweep → Continuation or Retrace? (NQ)
 
-Me and a mate kept arguing about this one. A wick sweeps a recent high or low, then closes back on the wrong side — does price keep running in the sweep direction, or come back to re-tag the level it just swept? I ran both definitions over every NQ sweep in 10 years to settle it.
+This one comes up a lot. A wick sweeps a recent high or low, then closes back on the wrong side — does price keep running in the sweep direction, or come back to re-tag the level it just swept? I ran both definitions over every NQ sweep in 10 years to settle it.
 
 ### How I set it up
 
@@ -34,7 +34,7 @@ One honest caveat: the retrace target is close and the continuation target (3× 
 
 London sweeps re-tag the most before running, but they reach continuation within six hours way more than Asia (63.2% vs 42.6%) — it's a slow re-tag-then-go. NY AM gives the highest *immediate* continuation, which fits the session's bigger displacement.
 
-So who won the argument? Expecting a re-tag before the run is the right base case every session — fading the immediate continuation is statistically the safer side. But a re-tag is an entry timing, not a reversal: continuation still arrives 61% of the time. The thing that actually separates the sweeps that run immediately is how much the sweep bar displaced.
+Bottom line: expecting a re-tag before the run is the right base case every session — fading the immediate continuation is statistically the safer side. But a re-tag is an entry timing, not a reversal: continuation still arrives 61% of the time. The thing that actually separates the sweeps that run immediately is how much the sweep bar displaced.
 
 ---
 

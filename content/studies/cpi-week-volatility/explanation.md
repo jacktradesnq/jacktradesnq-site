@@ -1,6 +1,6 @@
 ## CPI Week — Which Days Actually Move? (NQ)
 
-People say the whole CPI week trades hot. I never believed every day runs hot, so I tested it — each weekday's range and how clean it trends, in weeks where CPI prints on Wednesday vs genuinely quiet weeks. 10 years of NQ.
+People say the whole CPI week trades hot. I tested it day by day — each weekday's range and how clean it trends, in weeks where CPI prints on Wednesday vs genuinely quiet weeks. 10 years of NQ.
 
 ### How I set it up
 

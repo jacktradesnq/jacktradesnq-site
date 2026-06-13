@@ -1,6 +1,6 @@
 ## Opex Week — Which Sessions Compress? (NQ)
 
-Everyone says options-expiration week pins price and kills the range. I never fully bought that it kills *every* session equally, so I checked it — Asia, London and NY AM, Opex week vs the rest of the month, over 10 years of NQ.
+Everyone says options-expiration week pins price and kills the range. I checked whether it kills *every* session equally — Asia, London and NY AM, Opex week vs the rest of the month, over 10 years of NQ.
 
 ### How I set it up
 
