@@ -1,9 +1,9 @@
 {
   "eyebrow": "Opex week · NQ · 2016–2026 · 7,748 sessions",
-  "title": "In Opex week, only London keeps its range",
+  "title": "In Opex week, every session tightens — except London",
   "hero": {
-    "stat": "−1%",
-    "caption": "That's all **London**'s range gives up in Opex week — basically flat. Asia collapses (−14%) and NY tightens (−6%); London is the one session that stays alive."
+    "stat": "−14%",
+    "caption": "that's how much **Asia**'s range shrinks in Opex week (NY tightens too, −6%). But **London barely moves** — the only session that keeps its normal range."
   },
   "chart": {
     "kind": "diverging",
@@ -18,9 +18,9 @@
   },
   "cards": [
     { "label": "London", "value": "Stays alive", "sub": "range ≈ flat (−1%)", "hot": true },
-    { "label": "Asia", "value": "Pinned", "sub": "−14% range" },
+    { "label": "Asia", "value": "Goes quiet", "sub": "−14% range" },
     { "label": "NY AM", "value": "A bit quieter", "sub": "−6% range" }
   ],
-  "useIt": "If you trade Opex week, London is where the range survives. Asia gets pinned and NY is a touch quieter — don't expect big overnight moves outside the London session.",
+  "useIt": "If you trade Opex week, London is where the range survives. Asia goes quiet and NY is a touch tighter — don't expect big overnight moves outside the London session.",
   "disclaimer": "Not advice · AI-backtested on 10y NQ · check it yourself"
 }
