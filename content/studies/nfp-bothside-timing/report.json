@@ -1,26 +1,26 @@
 {
   "eyebrow": "NFP · NQ · 2016–2026 · 121 NFP days",
-  "title": "On NFP, both sides sweep — and it's over before 9:30",
+  "title": "On NFP, price spikes both ways — before 9:30",
   "hero": {
     "stat": "82%",
-    "caption": "of NFP days sweep **both** sides of the pre-release range. And when they do, it's usually finished before the 9:30 cash open."
+    "caption": "of NFP days **take out both the high and the low** of the little range built just before the 8:30 print. And it's usually done before the 9:30 cash open."
   },
   "chart": {
     "kind": "hbars",
     "label": "How NFP takes out the pre-release range",
-    "sub": "Reference range = the 08:15–08:30 ET consolidation before the print",
-    "note": "The whipsaw is a premarket event — by the New York open the range is usually already taken both ways.",
+    "sub": "Reference range = the 08:15–08:30 ET consolidation right before the print",
+    "note": "The whipsaw is a premarket event — by the New York open both the high and the low are usually already gone.",
     "rows": [
-      { "name": "Both sides swept (same day)", "pct": 81.8, "display": "82%" },
-      { "name": "...completed before 9:30", "pct": 73.7, "display": "74%" },
-      { "name": "First side taken before 9:30", "pct": 100, "display": "100%" }
+      { "name": "Both high & low taken (same day)", "pct": 81.8, "display": "82%" },
+      { "name": "...done before 9:30", "pct": 73.7, "display": "74%" },
+      { "name": "First level taken before 9:30", "pct": 100, "display": "100%" }
     ]
   },
   "cards": [
-    { "label": "Both sides", "value": "Usually swept", "sub": "82% of NFP days", "hot": true },
+    { "label": "Both ends", "value": "Usually taken", "sub": "high & low, 82% of days", "hot": true },
     { "label": "Timing", "value": "Before 9:30", "sub": "74% done premarket" },
     { "label": "First move", "value": "Always premarket", "sub": "100% before 9:30" }
   ],
-  "useIt": "NFP runs both directions, and the round-trip is usually finished before New York even opens. Don't chase the first 8:30 spike as direction — the other side gets taken too.",
+  "useIt": "NFP fakes both directions — it takes out the high and the low of the pre-release range — and the round-trip is usually finished before New York opens. Don't trust the first 8:30 spike as direction; the other side gets taken too.",
   "disclaimer": "Not advice · AI-backtested on 10y NQ · check it yourself"
 }
