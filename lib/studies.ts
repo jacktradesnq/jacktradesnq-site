@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { marked } from 'marked';
+import type { ReportData } from '@/app/studies/_components/StudyReport';
 
 const contentDir = path.join(process.cwd(), 'content', 'studies');
 
@@ -40,6 +41,7 @@ export interface EntryDetail extends EntryMeta {
   mobileHtml?: string;
   mobileHtmlNq?: string;
   mobileHtmlGc?: string;
+  report?: ReportData;
 }
 
 export function getAllEntries(): Entry[] {
@@ -106,6 +108,11 @@ export function getEntry(slug: string): EntryDetail | null {
   const pdfFileNq = meta.pdfFileNq ?? meta.pdfFile ?? '';
   const pdfFileGc = meta.pdfFileGc ?? meta.pdfFile ?? '';
 
+  const reportPath = path.join(entryDir, 'report.json');
+  const report = fs.existsSync(reportPath)
+    ? (JSON.parse(fs.readFileSync(reportPath, 'utf-8')) as ReportData)
+    : undefined;
+
   const mobilePath = path.join(entryDir, 'mobile.md');
   const mobileNqPath = path.join(entryDir, 'mobile_nq.md');
   const mobileGcPath = path.join(entryDir, 'mobile_gc.md');
@@ -138,5 +145,6 @@ export function getEntry(slug: string): EntryDetail | null {
     mobileHtml,
     mobileHtmlNq,
     mobileHtmlGc,
+    report,
   };
 }

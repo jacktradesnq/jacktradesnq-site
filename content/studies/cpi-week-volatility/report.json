@@ -1,0 +1,28 @@
+{
+  "eyebrow": "CPI week · NQ · 2023–2026 regime",
+  "title": "In CPI week, only Wednesday actually moves",
+  "hero": {
+    "stat": "+28%",
+    "caption": "bigger range on **CPI Wednesday** than a quiet Wednesday. Every other day trades like a normal week."
+  },
+  "chart": {
+    "kind": "diverging",
+    "label": "How much each day moves vs a normal week",
+    "sub": "Above the dotted line = bigger range than a normal week · below = smaller",
+    "note": "Wednesday is the print. The rest of CPI week is flat — Thu/Fri are actually calmer than usual.",
+    "bars": [
+      { "label": "Mon", "value": -2, "display": "−2%" },
+      { "label": "Tue", "value": 4, "display": "+4%" },
+      { "label": "Wed", "value": 28, "display": "+28%" },
+      { "label": "Thu", "value": -7, "display": "−7%" },
+      { "label": "Fri", "value": -10, "display": "−10%" }
+    ]
+  },
+  "cards": [
+    { "label": "Wednesday", "value": "The one that moves", "sub": "+28% bigger range", "hot": true },
+    { "label": "Tuesday", "value": "Fake-out", "sub": "moves around, goes nowhere" },
+    { "label": "Mon · Thu · Fri", "value": "Quiet", "sub": "like any normal week" }
+  ],
+  "useIt": "Wednesday is the only day worth treating as a CPI day. Don't size up Monday or Tuesday expecting fireworks — the \"whole week is hot\" idea isn't true anymore. And even Wednesday is a bigger range, not a cleaner trend.",
+  "disclaimer": "Not advice · AI-backtested on 10y NQ · check it yourself"
+}

@@ -1,0 +1,26 @@
+{
+  "eyebrow": "Asia reversal · NQ · 2016–2026 · 2,577 nights",
+  "title": "The Asia reversal usually lands between 20:00 and 22:00 ET",
+  "hero": {
+    "stat": "52%",
+    "caption": "of Asia sessions carve a clean down-then-up reversal. When they do, the turn clusters in the **20:00–22:00 ET** window."
+  },
+  "chart": {
+    "kind": "hbars",
+    "label": "When the reversal lands — by 2-hour block (ET)",
+    "sub": "Share of all reversal nights",
+    "note": "Median bounce out of the low is 46 points. By 23:00 ET it's basically over.",
+    "rows": [
+      { "name": "18:00–20:00 ET", "pct": 34.4, "display": "34%", "dim": true },
+      { "name": "20:00–22:00 ET", "pct": 45.7, "display": "46%" },
+      { "name": "22:00–00:00 ET", "pct": 19.8, "display": "20%", "dim": true }
+    ]
+  },
+  "cards": [
+    { "label": "Clean V-reversal", "value": "52% of nights", "sub": "just over half", "hot": true },
+    { "label": "Best window", "value": "20:00–22:00 ET", "sub": "46% of reversals" },
+    { "label": "Median bounce", "value": "46 pts", "sub": "out of the low" }
+  ],
+  "useIt": "Just over half of Asia sessions reverse. When they do, the turn usually lands 20:00–22:00 ET — earlier or later is rarer. The sweep-low still has to form and hold before any of this matters.",
+  "disclaimer": "Not advice · AI-backtested on 10y NQ · check it yourself"
+}
