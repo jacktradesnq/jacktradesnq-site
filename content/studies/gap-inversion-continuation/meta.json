@@ -1,8 +1,8 @@
 {
-  "title": "Gap Inversion → Hourly Continuation",
+  "title": "Asia open — when the gap fails",
   "category": "data",
   "date": "2026-05-29",
-  "excerpt": "I wanted to know if a failed gap means anything for the next hour. So I took every NQ gap that inverts back through the prior close with a red first hour, 10 years, and checked what hour 2 does.",
+  "excerpt": "At the 18:00 ET open NQ gaps, then trades right back through the prior close — the gap fails. When the first hour closes against it, does the move keep going? 10 years, 2,063 sessions.",
   "tradingviewUrl": "https://www.tradingview.com/u/jacktradesnq/",
   "group": "Asia / London"
 }
