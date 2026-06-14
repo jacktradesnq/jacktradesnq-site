@@ -1,27 +1,27 @@
 {
-  "eyebrow": "Asia → London · NQ · 2016–2026 · 2,599 nights",
+  "eyebrow": "Asia → London · NQ · 2016–2026 · 2,597 nights",
   "title": "London raids one side of Asia — usually the high",
   "hero": {
-    "stat": "56%",
-    "caption": "of nights London sweeps the **Asia high**. It leans up — the low gets taken less often (44.5%)."
+    "stat": "50%",
+    "caption": "of nights London sweeps the **Asia high** in its killzone. It leans up — the Asia low gets taken less often (40%)."
   },
   "chart": {
     "kind": "hbars",
-    "label": "What London does to the Asia range (02:00–07:00 ET)",
-    "sub": "Which side of the Asia session London takes out",
-    "note": "And the size of Asia tells you nothing about London — London expands ~42% of the time no matter how big or small Asia was.",
+    "label": "What London does to the Asia range",
+    "sub": "Measured over the London killzone, 02:00–05:00 ET",
+    "note": "London usually raids just one side, not both — and a clean reverse across the whole box is rare.",
     "rows": [
-      { "name": "Sweeps the Asia high", "pct": 56.0, "display": "56%" },
-      { "name": "Sweeps the Asia low", "pct": 44.5, "display": "45%" },
-      { "name": "Sweeps both sides", "pct": 13.5, "display": "14%", "dim": true },
-      { "name": "Reverses across the box", "pct": 7.2, "display": "~7%", "dim": true }
+      { "name": "Sweeps the Asia high", "pct": 50.5, "display": "50%" },
+      { "name": "Sweeps the Asia low", "pct": 39.6, "display": "40%" },
+      { "name": "Sweeps both sides", "pct": 7.2, "display": "7%", "dim": true },
+      { "name": "Reverses across the box", "pct": 4.0, "display": "~4%", "dim": true }
     ]
   },
   "cards": [
-    { "label": "Asia high", "value": "London's pick", "sub": "taken 56% of nights", "hot": true },
-    { "label": "Asia low", "value": "Less often", "sub": "taken 45%" },
-    { "label": "Full reverse", "value": "Rare", "sub": "~7% turtle soup" }
+    { "label": "Asia high", "value": "London's pick", "sub": "taken 50% of nights", "hot": true },
+    { "label": "Asia low", "value": "Less often", "sub": "taken 40%" },
+    { "label": "Full reverse", "value": "Rare", "sub": "~4% turtle soup" }
   ],
-  "useIt": "London usually raids one side of the Asia range — more often the high. The clean reverse-the-whole-range night is rare (~7%). And a big Asia doesn't mean a big London; the two are unrelated.",
-  "disclaimer": "Not advice · AI-backtested on 10y NQ · check it yourself"
+  "useIt": "London usually raids one side of the Asia range — more often the high. It rarely takes both sides in the same window (7%), and a clean reverse across the whole box is rarer still (~4%). Lean with the side it takes, don't expect the round-trip.",
+  "disclaimer": "Not advice · AI-backtested on 10y NQ, London killzone 02:00–05:00 ET · check it yourself"
 }
