@@ -183,13 +183,15 @@ if [[ "$DRY_RUN" == "0" ]]; then
             git reset -q -- "public/data/_backup_pre_5asset" 2>/dev/null || true
             if git -c user.name="site-backtest cron" -c user.email="cron@jacktradesnq.local" \
                  commit -m "data: weekly site backtest regen $(date '+%Y-%m-%d')" >>"$LOG" 2>&1; then
+                # Rebase on origin first — a concurrent session may have pushed during the ~4min run.
+                git pull --rebase origin main >>"$LOG" 2>&1 || log "  WARN — rebase before push failed (trying push anyway)"
                 if git push origin main >>"$LOG" 2>&1; then
                     COMMIT_STATUS="committed + pushed ($CHANGED files)"
                     log "  OK — committed + pushed ($CHANGED files)"
                 else
                     COMMIT_STATUS="committed (push failed)"
                     log "  WARN — commit OK but push failed"
-                    discord "${MENTION} ⚠️ **update_site_backtests** — commit OK but \`git push\` failed."
+                    discord "${MENTION} ⚠️ **update_site_backtests** — commit OK but \`git push\` failed (rebase+retry exhausted)."
                 fi
             else
                 COMMIT_STATUS="commit failed"
