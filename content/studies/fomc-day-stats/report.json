@@ -1,0 +1,26 @@
+{
+  "eyebrow": "FOMC · NQ · 2016–2026 · 86 decisions",
+  "title": "FOMC keeps moving long after the statement drops",
+  "hero": {
+    "stat": "144 pts",
+    "caption": "That's the average NQ range **one hour** after the 14:00 release. CPI and NFP spike then die in the first 5 minutes — FOMC just keeps bleeding for the whole hour."
+  },
+  "chart": {
+    "kind": "diverging",
+    "label": "How far NQ travels after the 14:00 release",
+    "sub": "Average high-to-low range, by window length",
+    "note": "The move doesn't fade after the statement bar. It expands the longer you hold.",
+    "bars": [
+      { "label": "5 min", "value": 71.6, "display": "72 pts" },
+      { "label": "30 min", "value": 96, "display": "96 pts" },
+      { "label": "60 min", "value": 144, "display": "144 pts" }
+    ]
+  },
+  "cards": [
+    { "label": "Avg 5-min range", "value": "72 pts", "sub": "median 54 · max 281", "hot": true },
+    { "label": "Wildest year", "value": "2022", "sub": "180 pts avg · 281 max" },
+    { "label": "Direction", "value": "None", "sub": "−4 pts drift · goes both ways" }
+  ],
+  "useIt": "I check this before every FOMC so I'm not surprised by the size. Expect ~70 pts in the first 5 minutes and a move that keeps running toward ~140 pts over the hour. Don't bet on a direction — across 10 years there's no up or down edge, FOMC runs both ways.",
+  "disclaimer": "Not advice · AI-backtested on 10y NQ · check it yourself"
+}

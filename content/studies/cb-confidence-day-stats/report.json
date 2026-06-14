@@ -1,0 +1,32 @@
+{
+  "eyebrow": "CB Confidence · NQ · 2016–2026 · 35 setups",
+  "title": "CB Confidence triggers 31 pts NQ release bars on average",
+  "hero": {
+    "stat": "31 pts",
+    "caption": "That's the average 1-minute release candle range on CB prints. **Max 66 pts** on the wild ones."
+  },
+  "chart": {
+    "kind": "diverging",
+    "label": "Release-bar range, year by year",
+    "sub": "Average 1-minute range, by year",
+    "note": "Ranges expanded into 2024 with much higher avgs than early years.",
+    "bars": [
+      { "label": "'18", "value": 10.8, "display": "11" },
+      { "label": "'19", "value": 10.5, "display": "11" },
+      { "label": "'20", "value": 27.0, "display": "27" },
+      { "label": "'21", "value": 25.1, "display": "25" },
+      { "label": "'22", "value": 32.8, "display": "33" },
+      { "label": "'23", "value": 30.8, "display": "31" },
+      { "label": "'24", "value": 46.6, "display": "47" },
+      { "label": "'25", "value": 34.4, "display": "34" },
+      { "label": "'26", "value": 48.2, "display": "48" }
+    ]
+  },
+  "cards": [
+    { "label": "Avg 1-min range", "value": "31 pts", "sub": "max 66 pts", "hot": true },
+    { "label": "Wildest year", "value": "2024", "sub": "47 pts avg · 66 max" },
+    { "label": "Timing", "value": "10:00 ET", "sub": "1m candle at print" }
+  ],
+  "useIt": "I check the 1m release range before CB prints so I don't get chopped on normal volatility. Expect ~31 pts avg on NQ, spikes to 66 pts possible — size the position for the bar. It's pure volatility data, no directional bias mentioned across the sample.",
+  "disclaimer": "Not advice · AI-backtested on 10y NQ · check it yourself"
+}

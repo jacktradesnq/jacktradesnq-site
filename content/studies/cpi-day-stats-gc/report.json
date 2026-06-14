@@ -1,0 +1,34 @@
+{
+  "eyebrow": "CPI · GC · 2016–2026 · 130 events",
+  "title": "CPI moves GC 8 pts on the 1m release candle",
+  "hero": {
+    "stat": "8 pts",
+    "caption": "That's the average 1-minute release bar range on CPI prints for GC. **Max 38 pts** on the wild releases."
+  },
+  "chart": {
+    "kind": "diverging",
+    "label": "Release-bar range, year by year",
+    "sub": "Average 1-minute range, by year",
+    "note": "Later years 2024-2026 show higher avgs, peak at the end.",
+    "bars": [
+      { "label": "'16", "value": 3.4, "display": "3" },
+      { "label": "'17", "value": 4.3, "display": "4" },
+      { "label": "'18", "value": 4.6, "display": "5" },
+      { "label": "'19", "value": 2.3, "display": "2" },
+      { "label": "'20", "value": 2.3, "display": "2" },
+      { "label": "'21", "value": 6.4, "display": "6" },
+      { "label": "'22", "value": 12.0, "display": "12" },
+      { "label": "'23", "value": 12.4, "display": "12" },
+      { "label": "'24", "value": 14.5, "display": "15" },
+      { "label": "'25", "value": 14.4, "display": "14" },
+      { "label": "'26", "value": 21.2, "display": "21" }
+    ]
+  },
+  "cards": [
+    { "label": "Avg 1-min range", "value": "8 pts", "sub": "max 38 pts", "hot": true },
+    { "label": "Wildest year", "value": "2026", "sub": "21 pts avg · 38 max" },
+    { "label": "Timing", "value": "8:30 ET", "sub": "1m candle at print" }
+  ],
+  "useIt": "I look at expected GC 1m range on CPI before the print. ~8 pts avg, up to 38 pts — use it to set stops and targets on the release bar. No direction stats here, just the size you have to respect at 8:30.",
+  "disclaimer": "Not advice · AI-backtested on 10y GC · check it yourself"
+}

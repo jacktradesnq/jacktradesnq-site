@@ -1,0 +1,34 @@
+{
+  "eyebrow": "CB Confidence · GC · 2016–2026 · 123 events",
+  "title": "CB Confidence moves GC 3 pts on the 1m release candle",
+  "hero": {
+    "stat": "3 pts",
+    "caption": "That's the average 1-minute release bar range on CB prints for GC. **Max 15 pts** in the biggest ones."
+  },
+  "chart": {
+    "kind": "diverging",
+    "label": "Release-bar range, year by year",
+    "sub": "Average 1-minute range, by year",
+    "note": "Ranges stayed small until 2023-2026 when they picked up.",
+    "bars": [
+      { "label": "'16", "value": 1.3, "display": "1" },
+      { "label": "'17", "value": 1.1, "display": "1" },
+      { "label": "'18", "value": 1.0, "display": "1" },
+      { "label": "'19", "value": 1.8, "display": "2" },
+      { "label": "'20", "value": 3.0, "display": "3" },
+      { "label": "'21", "value": 2.2, "display": "2" },
+      { "label": "'22", "value": 2.6, "display": "3" },
+      { "label": "'23", "value": 4.2, "display": "4" },
+      { "label": "'24", "value": 3.7, "display": "4" },
+      { "label": "'25", "value": 4.5, "display": "5" },
+      { "label": "'26", "value": 10.8, "display": "11" }
+    ]
+  },
+  "cards": [
+    { "label": "Avg 1-min range", "value": "3 pts", "sub": "max 15 pts", "hot": true },
+    { "label": "Wildest year", "value": "2026", "sub": "11 pts avg · 15 max" },
+    { "label": "Timing", "value": "10:00 ET", "sub": "1m candle at print" }
+  ],
+  "useIt": "I watch 1m GC range on CB prints before deciding entry size. Avg ~3 pts, can hit 15 pts — the release bar sets the scale for stops and targets. Pure range stats, no direction given.",
+  "disclaimer": "Not advice · AI-backtested on 10y GC · check it yourself"
+}

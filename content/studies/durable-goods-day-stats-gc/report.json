@@ -1,0 +1,34 @@
+{
+  "eyebrow": "Durable Goods · GC · 2016–2026 · 125 events",
+  "title": "Durable Goods moves GC 3 pts on the 1m release candle",
+  "hero": {
+    "stat": "3 pts",
+    "caption": "That's the average 1-minute release bar range on Durable Goods prints for GC. **Max 17 pts** on the wild releases."
+  },
+  "chart": {
+    "kind": "diverging",
+    "label": "Release-bar range, year by year",
+    "sub": "Average 1-minute range, by year",
+    "note": "Quiet until 2022 spike at 17 pts max, then settled lower.",
+    "bars": [
+      { "label": "'16", "value": 3.0, "display": "3" },
+      { "label": "'17", "value": 1.4, "display": "1" },
+      { "label": "'18", "value": 1.2, "display": "1" },
+      { "label": "'19", "value": 1.3, "display": "1" },
+      { "label": "'20", "value": 2.4, "display": "2" },
+      { "label": "'21", "value": 2.2, "display": "2" },
+      { "label": "'22", "value": 4.1, "display": "4" },
+      { "label": "'23", "value": 4.7, "display": "5" },
+      { "label": "'24", "value": 4.7, "display": "5" },
+      { "label": "'25", "value": 3.7, "display": "4" },
+      { "label": "'26", "value": 8.5, "display": "9" }
+    ]
+  },
+  "cards": [
+    { "label": "Avg 1-min range", "value": "3 pts", "sub": "max 17 pts", "hot": true },
+    { "label": "Wildest year", "value": "2022", "sub": "4 pts avg · 17 max" },
+    { "label": "Timing", "value": "8:30 ET", "sub": "1m candle at print" }
+  ],
+  "useIt": "I size GC around the Durable Goods 1m at 8:30. ~3 pts avg, up to 17 pts — the release bar tells you the minimum move to allow for. Place risk after seeing the bar print.",
+  "disclaimer": "Not advice · AI-backtested on 10y GC · check it yourself"
+}

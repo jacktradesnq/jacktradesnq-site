@@ -1,0 +1,32 @@
+{
+  "eyebrow": "Durable Goods · NQ · 2016–2026 · 34 setups",
+  "title": "Durable Goods triggers 24 pts NQ release bars on average",
+  "hero": {
+    "stat": "24 pts",
+    "caption": "That's the average 1-minute release candle range on Durable Goods prints. **Max 97 pts** on the wild ones."
+  },
+  "chart": {
+    "kind": "diverging",
+    "label": "Release-bar range, year by year",
+    "sub": "Average 1-minute range, by year",
+    "note": "Low counts early, big expansion 2022-2024 with 97 pts max in 2024.",
+    "bars": [
+      { "label": "'18", "value": 2.4, "display": "2" },
+      { "label": "'19", "value": 9.2, "display": "9" },
+      { "label": "'20", "value": 16.0, "display": "16" },
+      { "label": "'21", "value": 21.5, "display": "22" },
+      { "label": "'22", "value": 26.7, "display": "27" },
+      { "label": "'23", "value": 34.4, "display": "34" },
+      { "label": "'24", "value": 30.3, "display": "30" },
+      { "label": "'25", "value": 18.7, "display": "19" },
+      { "label": "'26", "value": 35.4, "display": "35" }
+    ]
+  },
+  "cards": [
+    { "label": "Avg 1-min range", "value": "24 pts", "sub": "max 97 pts", "hot": true },
+    { "label": "Wildest year", "value": "2024", "sub": "30 pts avg · 97 max" },
+    { "label": "Timing", "value": "8:30 ET", "sub": "1m candle at print" }
+  ],
+  "useIt": "I respect the 1m Durable Goods range on NQ before the 8:30 hit. ~24 pts avg, can go 97 pts — size your fade or breakout for the release candle. Qualified setups only, volatility first.",
+  "disclaimer": "Not advice · AI-backtested on 10y NQ · check it yourself"
+}

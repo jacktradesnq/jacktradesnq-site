@@ -1,0 +1,34 @@
+{
+  "eyebrow": "ISM Mfg · NQ · 2016–2026 · 51 setups",
+  "title": "ISM Manufacturing triggers 36 pts NQ release bars on average",
+  "hero": {
+    "stat": "36 pts",
+    "caption": "That's the average 1-minute release candle range on ISM Mfg prints. **Max 85 pts** on the wild ones."
+  },
+  "chart": {
+    "kind": "diverging",
+    "label": "Release-bar range, year by year",
+    "sub": "Average 1-minute range, by year",
+    "note": "Big jump after 2021, 2025 had the highest max at 85 pts.",
+    "bars": [
+      { "label": "'16", "value": 3.8, "display": "4" },
+      { "label": "'17", "value": 6.5, "display": "7" },
+      { "label": "'18", "value": 16.7, "display": "17" },
+      { "label": "'19", "value": 19.1, "display": "19" },
+      { "label": "'20", "value": 29.1, "display": "29" },
+      { "label": "'21", "value": 21.3, "display": "21" },
+      { "label": "'22", "value": 57.9, "display": "58" },
+      { "label": "'23", "value": 47.5, "display": "48" },
+      { "label": "'24", "value": 50.8, "display": "51" },
+      { "label": "'25", "value": 55.8, "display": "56" },
+      { "label": "'26", "value": 46.3, "display": "46" }
+    ]
+  },
+  "cards": [
+    { "label": "Avg 1-min range", "value": "36 pts", "sub": "max 85 pts", "hot": true },
+    { "label": "Wildest year", "value": "2025", "sub": "56 pts avg · 85 max" },
+    { "label": "Timing", "value": "10:00 ET", "sub": "1m candle at print" }
+  ],
+  "useIt": "I size around the ISM Mfg 1m candle before 10:00 on NQ. Expect ~36 pts avg, 2022 was brutal at 58 pts — the factory number can move hard so respect the bar. Qualified setups, volatility reference only.",
+  "disclaimer": "Not advice · AI-backtested on 10y NQ · check it yourself"
+}
