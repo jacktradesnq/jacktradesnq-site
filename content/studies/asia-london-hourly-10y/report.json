@@ -13,14 +13,14 @@
     "rows": [
       { "name": "Sweeps the Asia high", "pct": 50.5, "display": "50%" },
       { "name": "Sweeps the Asia low", "pct": 39.6, "display": "40%" },
-      { "name": "Sweeps both sides", "pct": 7.2, "display": "7%", "dim": true },
-      { "name": "Reverses across the box", "pct": 4.0, "display": "~4%", "dim": true }
+      { "name": "Takes both Asia sides", "pct": 7.2, "display": "7%", "dim": true },
+      { "name": "Sweeps one side, then flips to the other", "pct": 4.0, "display": "~4%", "dim": true }
     ]
   },
   "cards": [
     { "label": "Asia high", "value": "London's pick", "sub": "taken 50% of nights", "hot": true },
     { "label": "Asia low", "value": "Less often", "sub": "taken 40%" },
-    { "label": "Full reverse", "value": "Rare", "sub": "~4% turtle soup" }
+    { "label": "Sweep then flip", "value": "Rare", "sub": "takes one side, then the other — ~4%" }
   ],
   "useIt": "London usually raids one side of the Asia range — more often the high. It rarely takes both sides in the same window (7%), and a clean reverse across the whole box is rarer still (~4%). Lean with the side it takes, don't expect the round-trip.",
   "disclaimer": "Not advice · AI-backtested on 10y NQ, London killzone 02:00–05:00 ET · check it yourself"

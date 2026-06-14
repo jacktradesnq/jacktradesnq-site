@@ -1,14 +1,14 @@
 {
-  "eyebrow": "8:30 candle · NQ · 2016–2026 · 1,166 days",
-  "title": "After the 8:30 candle, the other side almost always gets taken",
+  "eyebrow": "8:30 news candle · NQ · 2016–2026 · 1,166 days",
+  "title": "On news, price takes both sides of the 8:30 candle",
   "hero": {
     "stat": "70–86%",
-    "caption": "of the time the **opposite side** of the 8:30 news candle gets hit the same session. A one-way day is the exception."
+    "caption": "When news drops at 8:30, the first 1-minute candle sets a high and a low. Price breaks one side — then comes back to take the **other side too**, 70–86% of the time. A one-way day is the exception."
   },
   "chart": {
     "kind": "hbars",
     "label": "How often the other side gets taken — by event",
-    "sub": "Opposite side of the 08:30 ET candle touched, 08:31–17:00",
+    "sub": "Price breaks one side of the 8:30 candle, then trades to the opposite side (08:31–17:00 ET)",
     "note": "Bigger the data, wider the 8:30 candle and the longer before it flips — CPI/NFP take ~1h, Jobless Claims ~18 min.",
     "rows": [
       { "name": "Jobless Claims", "pct": 86.6, "display": "87%" },
@@ -21,10 +21,10 @@
     ]
   },
   "cards": [
-    { "label": "The other side", "value": "Almost always", "sub": "taken 70–86%", "hot": true },
-    { "label": "CPI / NFP", "value": "Widest & slowest", "sub": "60–72pt candle, ~1h to flip" },
-    { "label": "First break", "value": "Usually confirms", "sub": "closes beyond 79–92%" }
+    { "label": "Both sides", "value": "Almost always", "sub": "the other side gets taken 70–86%", "hot": true },
+    { "label": "How fast it flips", "value": "CPI/NFP ~1h", "sub": "smaller data ~18 min" },
+    { "label": "The first break", "value": "Looks real, then flips", "sub": "closes past the level 79–92%" }
   ],
-  "useIt": "When a side of the 8:30 candle breaks, the first move is real but rarely the only one — the other side gets taken too, almost every time. The bigger the release, the wider the candle and the longer it commits before reversing.",
+  "useIt": "The first break of the 8:30 candle looks like a real move — it usually closes past the level — but it rarely is the only move: the other side gets taken too, almost every time. Don't marry the first spike. On CPI/NFP you've got ~1h before it flips; on smaller data it's minutes.",
   "disclaimer": "Not advice · AI-backtested on 10y NQ · check it yourself"
 }
