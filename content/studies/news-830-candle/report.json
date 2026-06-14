@@ -1,0 +1,30 @@
+{
+  "eyebrow": "8:30 candle · NQ · 2016–2026 · 1,166 days",
+  "title": "After the 8:30 candle, the other side almost always gets taken",
+  "hero": {
+    "stat": "70–86%",
+    "caption": "of the time the **opposite side** of the 8:30 news candle gets hit the same session. A one-way day is the exception."
+  },
+  "chart": {
+    "kind": "hbars",
+    "label": "How often the other side gets taken — by event",
+    "sub": "Opposite side of the 08:30 ET candle touched, 08:31–17:00",
+    "note": "Bigger the data, wider the 8:30 candle and the longer before it flips — CPI/NFP take ~1h, Jobless Claims ~18 min.",
+    "rows": [
+      { "name": "Jobless Claims", "pct": 86.6, "display": "87%" },
+      { "name": "GDP", "pct": 85.2, "display": "85%" },
+      { "name": "PCE", "pct": 82.0, "display": "82%" },
+      { "name": "Retail Sales", "pct": 78.9, "display": "79%" },
+      { "name": "PPI", "pct": 75.4, "display": "75%" },
+      { "name": "CPI", "pct": 73.0, "display": "73%" },
+      { "name": "NFP", "pct": 70.2, "display": "70%" }
+    ]
+  },
+  "cards": [
+    { "label": "The other side", "value": "Almost always", "sub": "taken 70–86%", "hot": true },
+    { "label": "CPI / NFP", "value": "Widest & slowest", "sub": "60–72pt candle, ~1h to flip" },
+    { "label": "First break", "value": "Usually confirms", "sub": "closes beyond 79–92%" }
+  ],
+  "useIt": "When a side of the 8:30 candle breaks, the first move is real but rarely the only one — the other side gets taken too, almost every time. The bigger the release, the wider the candle and the longer it commits before reversing.",
+  "disclaimer": "Not advice · AI-backtested on 10y NQ · check it yourself"
+}

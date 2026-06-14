@@ -20,6 +20,7 @@ import BilingualTitle from '../_components/BilingualTitle';
 import V3Tabs from '../_components/V3Tabs';
 import StraddleWrappedTabs from '../_components/StraddleWrappedTabs';
 import PerformanceTearsheet from '../_components/PerformanceTearsheet';
+import StudyReport from '../_components/StudyReport';
 import ManipDataTabs, { type ContDataFile } from '../_components/ManipDataTabs';
 import { type ManipExample } from '../_components/ManipExampleChart';
 import { computeWeekdayBreakdown } from '@/lib/client-stats';
@@ -336,6 +337,17 @@ export default async function BacktestedDetail({ params }: PageProps) {
       </span>
     </div>
   );
+
+  // Report layout (data-first card): opt-in via report.json in the study folder.
+  if (entry.report) {
+    return (
+      <article className="bd-article">
+        <Link href="/studies/" className="v3-back">← back to Data</Link>
+        <StudyReport report={entry.report} />
+        {pager}
+      </article>
+    );
+  }
 
   // Overview prose node (passed to V3Tabs as children for the Overview tab)
   const overviewNode = (

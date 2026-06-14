@@ -1,0 +1,27 @@
+{
+  "eyebrow": "Open sweep · NQ · 2024–2026",
+  "title": "When the 18:00 open sweeps the prior high, it usually keeps going",
+  "hero": {
+    "stat": "77%",
+    "caption": "continuation after the **18:00 open** sweeps the prior day's high in the first 3 minutes. London sweeps run even harder."
+  },
+  "chart": {
+    "kind": "hbars",
+    "label": "Continuation after a first-3-minute sweep",
+    "sub": "Price pushes past the sweep before trading back through the level",
+    "note": "London sweeps continue the most (82%) but also snap back the most (52% reversal) — not set-and-forget.",
+    "rows": [
+      { "name": "London — prior high swept", "pct": 82.3, "display": "82%" },
+      { "name": "18:00 — prior high swept", "pct": 76.7, "display": "77%" },
+      { "name": "London — prior low swept", "pct": 76.0, "display": "76%" },
+      { "name": "18:00 — prior low swept", "pct": 66.7, "display": "67%" }
+    ]
+  },
+  "cards": [
+    { "label": "18:00 high sweep", "value": "Runs 77%", "sub": "happens ~37% of nights", "hot": true },
+    { "label": "London sweep", "value": "Runs 82%", "sub": "but reverses 52%" },
+    { "label": "Down-side sweeps", "value": "Weaker", "sub": "67–76%" }
+  ],
+  "useIt": "A first-3-minute sweep of the prior day's high at the 18:00 open usually continues. London sweeps run even harder but also reverse more often — manage them, the continuation isn't clean.",
+  "disclaimer": "Not advice · AI-backtested over 2024–2026 · check it yourself"
+}
