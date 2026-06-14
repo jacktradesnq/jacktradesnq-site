@@ -50,6 +50,12 @@ function DivergingChart({ chart }: { chart: ReportChart }) {
   const cols = `repeat(${bars.length}, 1fr)`;
   const maxUp = Math.max(1, ...bars.filter((b) => b.value > 0).map((b) => b.value));
   const maxDown = Math.max(1, ...bars.filter((b) => b.value < 0).map((b) => -b.value));
+  // Adapt zone heights to the data so an all-negative (or all-positive) chart
+  // doesn't leave a big empty half.
+  const hasUp = bars.some((b) => b.value > 0);
+  const hasDown = bars.some((b) => b.value < 0);
+  const topH = hasUp ? (hasDown ? 124 : 150) : 30;
+  const botH = hasDown ? (hasUp ? 64 : 150) : 24;
   return (
     <div className="rep-dchart">
       <div className="rep-cols" style={{ gridTemplateColumns: cols }}>
@@ -58,7 +64,7 @@ function DivergingChart({ chart }: { chart: ReportChart }) {
           const h = up ? (b.value / maxUp) * 100 : (-b.value / maxDown) * 100;
           return (
             <div className="rep-col" key={b.label}>
-              <div className="rep-top">
+              <div className="rep-top" style={{ height: topH }}>
                 {up && b.value !== 0 ? (
                   <>
                     <span className="rep-v up">{b.display}</span>
@@ -66,7 +72,7 @@ function DivergingChart({ chart }: { chart: ReportChart }) {
                   </>
                 ) : null}
               </div>
-              <div className="rep-bot">
+              <div className="rep-bot" style={{ height: botH }}>
                 {!up ? (
                   <>
                     <div className="rep-bar down" style={{ height: `${h}%` }} />
