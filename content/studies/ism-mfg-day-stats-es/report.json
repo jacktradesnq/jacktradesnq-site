@@ -1,0 +1,34 @@
+{
+  "eyebrow": "ISM Mfg · ES · 2016–2026 · 120 events",
+  "title": "ISM Manufacturing moves ES 7 pts on the 1m release candle",
+  "hero": {
+    "stat": "7 pts",
+    "caption": "That's the average 1-minute release bar range on ISM Mfg prints for ES. **Max 21 pts** in the biggest ones."
+  },
+  "chart": {
+    "kind": "diverging",
+    "label": "Release-bar range, year by year",
+    "sub": "Average 1-minute range, by year",
+    "note": "Clear step up in 2022+, 2025 posted the highest max 21 pts.",
+    "bars": [
+      { "label": "'16", "value": 2.5, "display": "3" },
+      { "label": "'17", "value": 1.4, "display": "1" },
+      { "label": "'18", "value": 3.2, "display": "3" },
+      { "label": "'19", "value": 5.7, "display": "6" },
+      { "label": "'20", "value": 6.4, "display": "6" },
+      { "label": "'21", "value": 5.6, "display": "6" },
+      { "label": "'22", "value": 13.6, "display": "14" },
+      { "label": "'23", "value": 9.2, "display": "9" },
+      { "label": "'24", "value": 9.5, "display": "10" },
+      { "label": "'25", "value": 12.0, "display": "12" },
+      { "label": "'26", "value": 8.6, "display": "9" }
+    ]
+  },
+  "cards": [
+    { "label": "Avg 1-min range", "value": "7 pts", "sub": "max 21 pts", "hot": true },
+    { "label": "Wildest year", "value": "2025", "sub": "12 pts avg · 21 max" },
+    { "label": "Timing", "value": "10:00 ET", "sub": "1m candle at print" }
+  ],
+  "useIt": "I check the ISM Mfg 1m range on ES before the 10:00 print. ~7 pts avg, 2022 showed 14 pts — size your position for the manufacturing bar then trade the reaction or fade. Just range data.",
+  "disclaimer": "Not advice · AI-backtested on 10y ES · check it yourself"
+}

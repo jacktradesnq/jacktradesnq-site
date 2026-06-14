@@ -1,0 +1,34 @@
+{
+  "eyebrow": "Philly Fed · GC · 2016–2026 · 123 events",
+  "title": "Philly Fed moves GC 4 pts on the 1m release candle",
+  "hero": {
+    "stat": "4 pts",
+    "caption": "That's the average 1-minute release bar range on Philly Fed prints for GC. **Max 26 pts** on the wild releases."
+  },
+  "chart": {
+    "kind": "diverging",
+    "label": "Release-bar range, year by year",
+    "sub": "Average 1-minute range, by year",
+    "note": "Mostly 2-5 pts until 2025 spike to 26 pts max.",
+    "bars": [
+      { "label": "'16", "value": 2.2, "display": "2" },
+      { "label": "'17", "value": 1.9, "display": "2" },
+      { "label": "'18", "value": 1.2, "display": "1" },
+      { "label": "'19", "value": 2.5, "display": "3" },
+      { "label": "'20", "value": 2.8, "display": "3" },
+      { "label": "'21", "value": 2.4, "display": "2" },
+      { "label": "'22", "value": 2.9, "display": "3" },
+      { "label": "'23", "value": 5.2, "display": "5" },
+      { "label": "'24", "value": 4.5, "display": "5" },
+      { "label": "'25", "value": 7.4, "display": "7" },
+      { "label": "'26", "value": 7.9, "display": "8" }
+    ]
+  },
+  "cards": [
+    { "label": "Avg 1-min range", "value": "4 pts", "sub": "max 26 pts", "hot": true },
+    { "label": "Wildest year", "value": "2025", "sub": "7 pts avg · 26 max" },
+    { "label": "Timing", "value": "8:30 ET", "sub": "1m candle at print" }
+  ],
+  "useIt": "I use the Philly Fed 1m range on GC before 8:30 to set scale. ~4 pts avg, 2025 had 7 pts with 26 max — the regional survey bar tells the minimum room needed. Size after the print.",
+  "disclaimer": "Not advice · AI-backtested on 10y GC · check it yourself"
+}

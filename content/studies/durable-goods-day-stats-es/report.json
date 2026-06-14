@@ -1,0 +1,34 @@
+{
+  "eyebrow": "Durable Goods · ES · 2016–2026 · 122 events",
+  "title": "Durable Goods moves ES 3 pts on the 1m release candle",
+  "hero": {
+    "stat": "3 pts",
+    "caption": "That's the average 1-minute release bar range on Durable Goods prints for ES. **Max 20 pts** in the biggest ones."
+  },
+  "chart": {
+    "kind": "diverging",
+    "label": "Release-bar range, year by year",
+    "sub": "Average 1-minute range, by year",
+    "note": "Steady increase mid period, 2022 showed the biggest spike at 20 pts.",
+    "bars": [
+      { "label": "'16", "value": 1.1, "display": "1" },
+      { "label": "'17", "value": 0.6, "display": "1" },
+      { "label": "'18", "value": 1.8, "display": "2" },
+      { "label": "'19", "value": 1.7, "display": "2" },
+      { "label": "'20", "value": 3.0, "display": "3" },
+      { "label": "'21", "value": 2.5, "display": "3" },
+      { "label": "'22", "value": 6.7, "display": "7" },
+      { "label": "'23", "value": 5.9, "display": "6" },
+      { "label": "'24", "value": 4.6, "display": "5" },
+      { "label": "'25", "value": 4.1, "display": "4" },
+      { "label": "'26", "value": 6.0, "display": "6" }
+    ]
+  },
+  "cards": [
+    { "label": "Avg 1-min range", "value": "3 pts", "sub": "max 20 pts", "hot": true },
+    { "label": "Wildest year", "value": "2022", "sub": "7 pts avg · 20 max" },
+    { "label": "Timing", "value": "8:30 ET", "sub": "1m candle at print" }
+  ],
+  "useIt": "I set ES risk around the Durable 1m bar at 8:30. Expect ~3 pts avg but 2022 hit 20 pts max — don't ignore the print size. Use the range to place stops, then look for follow through or fade.",
+  "disclaimer": "Not advice · AI-backtested on 10y ES · check it yourself"
+}

@@ -1,0 +1,34 @@
+{
+  "eyebrow": "FOMC · ES · 2016–2026 · 85 events",
+  "title": "FOMC moves ES 13 pts on the 1m statement bar",
+  "hero": {
+    "stat": "13 pts",
+    "caption": "That's the average 1-minute release candle range on FOMC statements for ES. **Max 65 pts** in 2024."
+  },
+  "chart": {
+    "kind": "diverging",
+    "label": "Release-bar range, year by year",
+    "sub": "Average 1-minute range, by year",
+    "note": "2024 had the biggest single max at 65 pts, 2022 high avg too.",
+    "bars": [
+      { "label": "'16", "value": 4.5, "display": "5" },
+      { "label": "'17", "value": 2.8, "display": "3" },
+      { "label": "'18", "value": 9.9, "display": "10" },
+      { "label": "'19", "value": 8.0, "display": "8" },
+      { "label": "'20", "value": 7.6, "display": "8" },
+      { "label": "'21", "value": 14.8, "display": "15" },
+      { "label": "'22", "value": 28.2, "display": "28" },
+      { "label": "'23", "value": 15.6, "display": "16" },
+      { "label": "'24", "value": 21.4, "display": "21" },
+      { "label": "'25", "value": 16.0, "display": "16" },
+      { "label": "'26", "value": 10.0, "display": "10" }
+    ]
+  },
+  "cards": [
+    { "label": "Avg 1-min range", "value": "13 pts", "sub": "max 65 pts", "hot": true },
+    { "label": "Wildest year", "value": "2024", "sub": "21 pts avg · 65 max" },
+    { "label": "Timing", "value": "14:00 ET", "sub": "1m candle at print" }
+  ],
+  "useIt": "I check FOMC 1m range before the 14:00 statement to know the initial pop size on ES. ~13 pts avg, 2022-24 showed 28-21 avg with 65 max — size for the bar then watch follow through. The variants here are 1m only unlike the NQ multi-window version.",
+  "disclaimer": "Not advice · AI-backtested on 10y ES · check it yourself"
+}

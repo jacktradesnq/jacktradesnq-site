@@ -1,0 +1,34 @@
+{
+  "eyebrow": "CPI · ES · 2016–2026 · 126 events",
+  "title": "CPI lights up 17 pts ES 1m release bars",
+  "hero": {
+    "stat": "17 pts",
+    "caption": "That's the average 1-minute release candle range on CPI prints for ES. **Max 110 pts** in 2022."
+  },
+  "chart": {
+    "kind": "diverging",
+    "label": "Release-bar range, year by year",
+    "sub": "Average 1-minute range, by year",
+    "note": "2022 was the clear peak with avg over 50 pts, earlier years tiny.",
+    "bars": [
+      { "label": "'16", "value": 1.8, "display": "2" },
+      { "label": "'17", "value": 1.2, "display": "1" },
+      { "label": "'18", "value": 6.5, "display": "7" },
+      { "label": "'19", "value": 3.0, "display": "3" },
+      { "label": "'20", "value": 3.0, "display": "3" },
+      { "label": "'21", "value": 10.9, "display": "11" },
+      { "label": "'22", "value": 53.2, "display": "53" },
+      { "label": "'23", "value": 23.8, "display": "24" },
+      { "label": "'24", "value": 26.8, "display": "27" },
+      { "label": "'25", "value": 36.3, "display": "36" },
+      { "label": "'26", "value": 23.6, "display": "24" }
+    ]
+  },
+  "cards": [
+    { "label": "Avg 1-min range", "value": "17 pts", "sub": "max 110 pts", "hot": true },
+    { "label": "Wildest year", "value": "2022", "sub": "53 pts avg · 110 max" },
+    { "label": "Timing", "value": "8:30 ET", "sub": "1m candle at print" }
+  ],
+  "useIt": "I check the CPI 1m range before 8:30 to set risk. Expect ~17 pts avg on ES, but can explode to 110 pts like 2022 — size accordingly and wait for the bar to print before fading or pressing. The number sets the initial volatility scale.",
+  "disclaimer": "Not advice · AI-backtested on 10y ES · check it yourself"
+}
