@@ -201,14 +201,26 @@ def load_events(event_type: str) -> list[dict]:
                 "event_type": event_type,
                 "event_raw": f"{event_type} (CSV {row['source']})",
             })
-    # Defensive guard: NFP is exactly 1 release per calendar month. A 2nd NFP in
-    # the same month = source-CSV drift (benchmark revision / dup row) → phantom
-    # event. Fail loud rather than silently injecting it (cf taskLesson 2026-05-08).
+    # NFP is exactly 1 release per calendar month. A 2nd NFP in the same month =
+    # source-CSV drift (benchmark revision / dup row) → phantom event. The CSV is a
+    # regenerated artifact (re-scraped weekly), so dedupe HERE in the reader rather
+    # than fail loud: keep the real release (the Friday one; earliest-date tiebreak
+    # when neither/both are Friday). cf taskLesson 2026-05-08.
     if event_type == "NFP":
-        from collections import Counter
-        dupes = {m: c for m, c in Counter(e["date"][:7] for e in events).items() if c > 1}
-        if dupes:
-            raise ValueError(f"NFP calendar drift: >1 event in month(s) {dupes} — clean {NEWS_CSV}")
+        from collections import defaultdict
+        by_month: dict[str, list[dict]] = defaultdict(list)
+        for e in events:
+            by_month[e["date"][:7]].append(e)
+        deduped: list[dict] = []
+        for month, evs in by_month.items():
+            if len(evs) == 1:
+                deduped.append(evs[0])
+                continue
+            fridays = [e for e in evs if datetime.strptime(e["date"], "%Y-%m-%d").weekday() == 4]
+            pool = fridays if fridays else evs
+            keep = min(pool, key=lambda e: e["date"])
+            deduped.append(keep)
+        events = deduped
     events.sort(key=lambda x: x["t0_utc"])
     return events
 
