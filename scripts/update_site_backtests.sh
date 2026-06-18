@@ -145,6 +145,22 @@ else
     log "  [DRY_RUN] straddle produced $STRADDLE_COUNT JSON in tmp"
 fi
 
+# --- Step 3b: event-reaction bars (7 events × 5 assets) → worktree -----------
+# generate_event_bars_for_all.py reads the fresh news_official CSV + parquet and
+# rebuilds public/data/event_bars/<slug>-bars{,-<asset>}.json (the site's event
+# reaction candle charts). Honors JTNQ_SITE_ROOT like the straddle runner.
+log "Step 3b: event bars generator (output → \$JTNQ_SITE_ROOT/public/data/event_bars)"
+if [[ "$DRY_RUN" == "0" ]]; then
+    run_runner "Event bars (7 events x 5 assets)" env "JTNQ_SITE_ROOT=$DEPLOY_WT" "$HUB_PY" "$HUB_DIR/scripts/generate_event_bars_for_all.py"
+else
+    EVENTBARS_TMP="/tmp/update_site_backtests_eventbars_dry/$(date +%s)"
+    mkdir -p "$EVENTBARS_TMP/public/data"
+    log "  [DRY_RUN] event-bars output → $EVENTBARS_TMP/public/data/event_bars (real clone untouched)"
+    run_runner "Event bars (7 events x 5 assets) [dry tmp]" env "JTNQ_SITE_ROOT=$EVENTBARS_TMP" "$HUB_PY" "$HUB_DIR/scripts/generate_event_bars_for_all.py"
+    EVENTBARS_COUNT=$(find "$EVENTBARS_TMP/public/data/event_bars" -name "*-bars*.json" 2>/dev/null | wc -l | tr -d ' ')
+    log "  [DRY_RUN] event-bars produced $EVENTBARS_COUNT JSON in tmp"
+fi
+
 # --- Step 4: copy ifvg/fomc JSON into the worktree ---------------------------
 # All ifvg/fomc regenerated files match the single glob *ifvg-smt*.json
 # (per-event NQ/ES/GC/SI, *_gc, *-es, *-si-vs-gc, *-trade-prices, the combined
