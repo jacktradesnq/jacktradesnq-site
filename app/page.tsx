@@ -12,6 +12,7 @@ const SITE = {
   ],
   studies: { url: '/studies/', tagline: '10 years of futures data, backtested with AI' },
   nefarious: { name: 'Nefarious', url: '/nefarious/', tagline: 'Official partner · free Discord community' },
+  tradersLaunch: { name: 'Traders Launch', url: '/traders-launch/', tagline: 'Prop firm partner · 15% off with code JTNQ' },
   legal: {
     copyright: '© 2026 JackTradesNQ. All rights reserved.',
     mentionsUrl: '/mentions-legales/',
@@ -285,6 +286,19 @@ export default function Home() {
               </div>
               <p className="tagline">{SITE.nefarious.tagline}</p>
             </a>
+
+            <a className="hub-card" href={SITE.tradersLaunch.url}>
+              <div className="row">
+                <h3 className="title">
+                  {SITE.tradersLaunch.name}
+                  <span className="swash">.</span>
+                </h3>
+                <svg className="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 17L17 7M9 7h8v8" />
+                </svg>
+              </div>
+              <p className="tagline">{SITE.tradersLaunch.tagline}</p>
+            </a>
           </div>
         </section>
       </main>
@@ -458,10 +472,11 @@ const CSS = `
   display: grid; grid-template-columns: 1fr; gap: clamp(40px, 5vw, 64px);
 }
 .jtnq-home .hub-grid{
-  display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-  gap: clamp(32px, 5vw, 72px); align-items: stretch;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(28px, 4vw, 56px); align-items: stretch;
 }
-@media (max-width: 760px){ .jtnq-home .hub-grid{ grid-template-columns: 1fr; gap: 32px; } }
+@media (max-width: 980px){ .jtnq-home .hub-grid{ grid-template-columns: 1fr 1fr; gap: clamp(28px, 4vw, 48px); } }
+@media (max-width: 640px){ .jtnq-home .hub-grid{ grid-template-columns: 1fr; gap: 32px; } }
 .jtnq-home .hub-card{
   position: relative; display: block; padding: clamp(28px, 3.5vw, 44px) 0;
   border-top: 1px solid var(--c-line); color: var(--c-text); transition: color .25s ease;
@@ -474,8 +489,8 @@ const CSS = `
 .jtnq-home .hub-card .row{ display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
 .jtnq-home .hub-card .title{
   font-family: var(--f-serif); font-style: italic; font-weight: 400;
-  font-size: clamp(40px, 5vw, 72px); line-height: .95; letter-spacing: -0.025em;
-  margin: 0; color: var(--c-text); transition: color .25s ease;
+  font-size: clamp(34px, 3.4vw, 52px); line-height: .98; letter-spacing: -0.025em;
+  margin: 0; color: var(--c-text); transition: color .25s ease; text-wrap: balance;
 }
 .jtnq-home .hub-card .title .swash{ color: var(--c-accent); }
 .jtnq-home .hub-card .arrow{
