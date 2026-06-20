@@ -19,41 +19,41 @@ const TOP = {
     eyebrow: 'PROP FIRM PARTNER',
     title: 'Top One Futures',
     phrase:
-      'Daily payouts, a 90/10 split, and several ways to get funded — the prop firm built to actually pay traders.',
+      'A 90/10 split, fast payouts, and several ways to get funded — the prop firm built to actually pay traders.',
   },
-  what: ['DAILY PAYOUTS', '90/10 PROFIT SPLIT', '1-STEP & INSTANT', 'UP TO $150K'],
+  what: ['FAST PAYOUTS', '90/10 PROFIT SPLIT', '1-STEP & INSTANT', 'UP TO $150K'],
   firm: [
     {
       k: 'Funding',
-      v: 'Several paths to funded — 1-step Elite, instant sim funding and straight-to-funded — across account sizes from $25K to $150K.',
+      v: 'Several ways in — one-step evaluations and instant-funding accounts — across sizes from $25K to $150K.',
     },
     {
       k: 'Payouts',
-      v: 'Daily payouts once you’re eligible — get paid, then again as soon as the next day.',
+      v: 'Fast payouts across the board — and on the Elite Daily plan you can withdraw roughly every 24 hours once funded.',
     },
     {
       k: 'Rules',
-      v: 'No consistency rules once funded on the daily plan. Trade your way, keep the upside.',
+      v: 'On the Elite Daily plan, no consistency rule once funded — trade your way, keep the upside. Other plans run a 15–40% rule.',
     },
   ],
-  plansIntro: 'Top One sells a few different account types. They mostly share the same backbone — a 90/10 profit split and fast daily payouts — so the real choice is how you want to get funded and how strict the funded rules are.',
-  plansShared: ['90/10 profit split', 'Fast daily payouts'],
+  plansIntro: 'Top One sells a few different account types. They all run a 90/10 profit split, so the real choice is how you want to get funded, how fast you can withdraw, and how strict the funded rules are.',
+  plansShared: ['90/10 profit split', 'Futures sim accounts'],
   plans: [
     {
       name: 'Elite Access',
       tag: 'Most forgiving eval',
       bestFor: 'you keep blowing evaluations on a bad session, or you swing / trade the news and need room to breathe',
       what:
-        'A one-step evaluation with no daily loss limit during the challenge, and the most lenient funded rules of any plan. You pass a profit target once, then trade funded. Drawdown only updates on the daily close, so an intraday spike won’t end your account.',
+        'A one-step evaluation with no daily loss limit during the challenge. You pass a profit target once, then trade funded — and drawdown only updates on the daily close, so an intraday spike won’t end your account.',
       facts: ['One-step evaluation', 'No daily loss limit on the challenge', 'End-of-day trailing drawdown', 'Loosest funded consistency rule'],
     },
     {
       name: 'Elite Daily',
       tag: 'Daily payouts',
-      bestFor: 'you want to pull money out as often as possible and don’t want a consistency rule hanging over you',
+      bestFor: 'you want frequent withdrawals and would rather not have a consistency rule once funded',
       what:
-        'A funded plan built around frequent withdrawals — you can request a payout roughly every 24 hours — and, uniquely, no consistency target once funded. You just keep a profit buffer in the account after each withdrawal.',
-      facts: ['Withdraw roughly every 24h', 'No consistency rule once funded', 'Keeps a profit buffer after payout'],
+        'A one-phase evaluation that, once funded, is built around frequent withdrawals — you can request a payout roughly every 24 hours — and uniquely carries no consistency rule on the funded account. You keep a profit buffer after each withdrawal.',
+      facts: ['One-phase evaluation', 'Withdraw ~every 24h once funded', 'No funded consistency rule'],
     },
     {
       name: 'Instant Sim Funded',
@@ -68,7 +68,7 @@ const TOP = {
       tag: 'Most popular',
       bestFor: 'you’re a scalper or high-volume trader who grinds small consistent wins and wants to scale across several accounts',
       what:
-        'The cheapest way to skip the evaluation, designed for running multiple accounts at once. The trade-off is the strictest consistency rule of any plan — one oversized day can set you back — so it rewards discipline.',
+        'The cheapest way to skip the evaluation, designed for running multiple accounts at once. The trade-off is its tight funded rules — one oversized day can set you back — so it rewards discipline.',
       facts: ['Instant funding, no evaluation', 'Strictest funded consistency rule', 'Built to scale multiple accounts'],
     },
   ],
