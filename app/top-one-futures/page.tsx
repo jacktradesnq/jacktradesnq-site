@@ -160,7 +160,7 @@ export default function TopOneFutures() {
                 )}
               </span>
             </button>
-            <span className="code-note">Use {CODE} when you sign up on Top One Futures.</span>
+            <span className="code-note">Apply {CODE} at checkout for an exclusive discount on Top One Futures.</span>
           </div>
 
           <a className="cta" href={TOP.closer.cta.url} target="_blank" rel="noopener nofollow sponsored">
