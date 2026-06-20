@@ -8,8 +8,9 @@ const CODE = 'JTNQ';
 // Real affiliate tracking link from the Top One Futures (Trackdesk) dashboard.
 const AFFILIATE_URL = 'https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures';
 
-// Exact plan prices live on the firm's site (they change often) — link out for accuracy.
-const PLANS_URL = 'https://toponefutures.com/';
+// Live pricing → straight to the checkout, where real per-plan prices are visible
+// immediately and the JTNQ code auto-applies (attributes the sale via the coupon).
+const PLANS_URL = 'https://checkout.toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures';
 
 const TOP = {
   backToHome: { label: 'Jacktradesnq', url: '/' },
@@ -18,9 +19,9 @@ const TOP = {
     eyebrow: 'PROP FIRM PARTNER',
     title: 'Top One Futures',
     phrase:
-      'Daily payouts, no activation fee, and no consistency rules once funded — the prop firm built to actually pay traders.',
+      'Daily payouts, a 90/10 split, and several ways to get funded — the prop firm built to actually pay traders.',
   },
-  what: ['DAILY PAYOUTS', 'NO ACTIVATION FEE', 'NO FUNDED CONSISTENCY', '1-STEP & INSTANT', 'UP TO $150K'],
+  what: ['DAILY PAYOUTS', '90/10 PROFIT SPLIT', '1-STEP & INSTANT', 'UP TO $150K'],
   firm: [
     {
       k: 'Funding',
@@ -28,11 +29,47 @@ const TOP = {
     },
     {
       k: 'Payouts',
-      v: 'Daily payouts with no activation fee. Get paid, then again the next day.',
+      v: 'Daily payouts once you’re eligible — get paid, then again as soon as the next day.',
     },
     {
       k: 'Rules',
       v: 'No consistency rules once funded on the daily plan. Trade your way, keep the upside.',
+    },
+  ],
+  plansIntro: 'Top One sells a few different account types. They mostly share the same backbone — a 90/10 profit split and fast daily payouts — so the real choice is how you want to get funded and how strict the funded rules are.',
+  plansShared: ['90/10 profit split', 'Fast daily payouts'],
+  plans: [
+    {
+      name: 'Elite Access',
+      tag: 'Most forgiving eval',
+      bestFor: 'you keep blowing evaluations on a bad session, or you swing / trade the news and need room to breathe',
+      what:
+        'A one-step evaluation with no daily loss limit during the challenge, and the most lenient funded rules of any plan. You pass a profit target once, then trade funded. Drawdown only updates on the daily close, so an intraday spike won’t end your account.',
+      facts: ['One-step evaluation', 'No daily loss limit on the challenge', 'End-of-day trailing drawdown', 'Loosest funded consistency rule'],
+    },
+    {
+      name: 'Elite Daily',
+      tag: 'Daily payouts',
+      bestFor: 'you want to pull money out as often as possible and don’t want a consistency rule hanging over you',
+      what:
+        'A funded plan built around frequent withdrawals — you can request a payout roughly every 24 hours — and, uniquely, no consistency target once funded. You just keep a profit buffer in the account after each withdrawal.',
+      facts: ['Withdraw roughly every 24h', 'No consistency rule once funded', 'Keeps a profit buffer after payout'],
+    },
+    {
+      name: 'Instant Sim Funded',
+      tag: 'Skip the eval',
+      bestFor: 'you’d rather start trading funded capital today than pass a challenge first',
+      what:
+        'Instant funding — there is no evaluation to clear. You trade simulated capital from day one with a mid-tier consistency rule that leaves more headroom than the cheapest instant plan.',
+      facts: ['Instant funding, no evaluation', 'More consistency headroom than IGNITE', 'A breach closes the account'],
+    },
+    {
+      name: 'IGNITE Instant Funding',
+      tag: 'Most popular',
+      bestFor: 'you’re a scalper or high-volume trader who grinds small consistent wins and wants to scale across several accounts',
+      what:
+        'The cheapest way to skip the evaluation, designed for running multiple accounts at once. The trade-off is the strictest consistency rule of any plan — one oversized day can set you back — so it rewards discipline.',
+      facts: ['Instant funding, no evaluation', 'Strictest funded consistency rule', 'Built to scale multiple accounts'],
     },
   ],
   closer: {
@@ -92,6 +129,11 @@ export default function TopOneFutures() {
             </a>
           </div>
 
+          <span className="firm-mark" aria-hidden="true">
+            <svg viewBox="-2 -2.3 105.5 97.4" fill="none">
+              <path d="M42.7381 1.01227L3.77665 23.4988C1.44256 24.8485 0 27.3436 0 30.043V75.0285C0 77.7279 1.44256 80.2229 3.77665 81.5726L36.6026 100.524C38.2804 101.496 40.3792 100.283 40.3792 98.3447V44.97L8.75441 63.228V51.8176L46.5086 30.0182L84.2627 51.8176V63.228L52.6379 44.97V98.3447C52.6379 100.283 54.7367 101.496 56.4145 100.524L89.2405 81.5726C91.5808 80.2229 93.0171 77.7279 93.0171 75.0285V30.043C93.0171 27.3436 91.5746 24.8485 89.2405 23.4988L50.2914 1.01227C47.9511 -0.337422 45.0722 -0.337422 42.7381 1.01227ZM31.6248 60.1386V87.5348L8.7606 74.3351L31.6248 60.1386ZM61.4047 87.5348V60.1386L84.2689 74.3351L61.4047 87.5348ZM84.2689 41.7073L46.5148 19.9079L8.75441 41.7073V30.7364L46.5148 8.93705L84.2689 30.7364V41.7073Z" fill="currentColor" />
+            </svg>
+          </span>
           <div className="eyebrow">{TOP.hero.eyebrow}</div>
           <h1 className="wordmark">
             {TOP.hero.title}
@@ -126,8 +168,48 @@ export default function TopOneFutures() {
               </div>
             ))}
           </div>
+        </section>
+
+        <section className="plans">
+          <div className="section-head">
+            <h2>Which account fits you</h2>
+            <span className="count">{TOP.plans.length} ways to get funded</span>
+          </div>
+          <p className="plans-intro">{TOP.plansIntro}</p>
+          <div className="shared">
+            <span className="shared-label">Every plan</span>
+            {TOP.plansShared.map((s, i) => (
+              <span key={s} style={{ display: 'contents' }}>
+                {i > 0 && <span className="shared-sep" aria-hidden="true">·</span>}
+                <span className="shared-item">{s}</span>
+              </span>
+            ))}
+          </div>
+
+          <ol className="plan-list">
+            {TOP.plans.map((p) => (
+              <li className="plan" key={p.name}>
+                <div className="plan-head">
+                  <h3 className="plan-name">{p.name}</h3>
+                  <span className="plan-tag">{p.tag}</span>
+                </div>
+                <div className="plan-body">
+                  <p className="plan-best">
+                    <span className="lbl">Best if</span> {p.bestFor}.
+                  </p>
+                  <p className="plan-what">{p.what}</p>
+                  <ul className="plan-facts">
+                    {p.facts.map((f) => (
+                      <li key={f}>{f}</li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            ))}
+          </ol>
+
           <a className="plans-link" href={PLANS_URL} target="_blank" rel="noopener nofollow sponsored">
-            See live plans &amp; pricing
+            See live pricing on Top One
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M7 17L17 7M9 7h8v8" />
             </svg>
@@ -260,6 +342,11 @@ const CSS = `
   background: radial-gradient(60% 70% at 50% 80%, color-mix(in oklab, var(--c-accent) 16%, transparent) 0%, transparent 65%);
   pointer-events: none; z-index: -1;
 }
+.jtnq-top .firm-mark{
+  display: block; margin: 0 auto clamp(22px, 3vw, 30px);
+  width: clamp(40px, 5vw, 52px); color: var(--c-text-soft);
+}
+.jtnq-top .firm-mark svg{ display: block; width: 100%; height: auto; }
 .jtnq-top .eyebrow{
   font-family: var(--f-mono); font-size: 11px; letter-spacing: .26em; text-transform: uppercase;
   color: var(--c-accent); display: inline-flex; align-items: center; gap: 12px;
@@ -329,6 +416,60 @@ const CSS = `
 }
 .jtnq-top .plans-link svg{ width: 13px; height: 13px; }
 .jtnq-top .plans-link:hover{ color: var(--c-accent); gap: 13px; }
+
+.jtnq-top .plans{
+  max-width: var(--maxw); margin: 0 auto;
+  padding: clamp(56px, 8vw, 88px) var(--pad-x) clamp(56px, 8vw, 88px);
+  border-top: 1px solid var(--c-line-soft);
+}
+.jtnq-top .plans-intro{
+  margin: clamp(20px, 2.6vw, 28px) 0 0; max-width: 64ch;
+  font-family: var(--f-sans); font-size: clamp(15px, 1.3vw, 17px); line-height: 1.6; color: var(--c-text-soft);
+}
+.jtnq-top .shared{
+  margin: clamp(22px, 2.6vw, 30px) 0 clamp(8px, 1vw, 14px); display: flex; flex-wrap: wrap; align-items: center;
+  gap: 8px 14px; font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--c-text);
+}
+.jtnq-top .shared-label{ color: var(--c-accent); margin-right: 4px; }
+.jtnq-top .shared-sep{ color: var(--c-accent); opacity: .8; }
+.jtnq-top .plan-list{ list-style: none; margin: 0; padding: 0; counter-reset: plan; }
+.jtnq-top .plan{
+  counter-increment: plan; display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.55fr);
+  gap: clamp(16px, 4vw, 56px); padding: clamp(28px, 3.4vw, 40px) 0; border-top: 1px solid var(--c-line);
+}
+.jtnq-top .plan:last-child{ border-bottom: 1px solid var(--c-line); }
+@media (max-width: 760px){ .jtnq-top .plan{ grid-template-columns: 1fr; gap: 16px; } }
+.jtnq-top .plan-head{ display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.jtnq-top .plan-name{
+  margin: 0; font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-size: clamp(26px, 2.8vw, 38px); line-height: 1.02; letter-spacing: -0.02em; color: var(--c-text); text-wrap: balance;
+}
+.jtnq-top .plan-name::before{
+  content: counter(plan, decimal-leading-zero); display: block; margin-bottom: 10px;
+  font-family: var(--f-mono); font-style: normal; font-size: 11px; letter-spacing: .2em; color: var(--c-text-deep);
+}
+.jtnq-top .plan-tag{
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--c-accent);
+  border: 1px solid color-mix(in oklab, var(--c-accent) 45%, var(--c-line)); border-radius: 999px; padding: 5px 11px;
+}
+.jtnq-top .plan-best{
+  margin: 0; font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-size: clamp(17px, 1.5vw, 21px); line-height: 1.4; letter-spacing: -0.005em; color: var(--c-text); text-wrap: pretty;
+}
+.jtnq-top .plan-best .lbl{
+  font-family: var(--f-mono); font-style: normal; font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--c-text-mute); margin-right: 9px; vertical-align: middle;
+}
+.jtnq-top .plan-what{
+  margin: clamp(12px, 1.4vw, 16px) 0 0; font-family: var(--f-sans); font-size: 14.5px; line-height: 1.6; color: var(--c-text-soft);
+}
+.jtnq-top .plan-facts{
+  list-style: none; margin: clamp(16px, 1.8vw, 20px) 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 10px;
+}
+.jtnq-top .plan-facts li{
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .04em; color: var(--c-text-soft);
+  background: var(--c-bg-raise); border: 1px solid var(--c-line); border-radius: 999px; padding: 6px 13px;
+}
 
 .jtnq-top .closer{
   position: relative; padding: clamp(72px, 10vw, 116px) var(--pad-x) clamp(72px, 10vw, 112px);
