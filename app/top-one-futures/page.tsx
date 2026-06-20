@@ -35,32 +35,6 @@ const TOP = {
       v: 'No consistency rules once funded on the daily plan. Trade your way, keep the upside.',
     },
   ],
-  plans: [
-    {
-      name: 'Elite Daily',
-      tag: 'Daily payouts',
-      best: 'you want to get paid every day and stay flexible',
-      what: 'Monthly plan with daily payouts, no activation fee and no consistency rule once funded.',
-    },
-    {
-      name: 'Elite Access',
-      tag: 'One-time',
-      best: 'you’d rather pay once than subscribe monthly',
-      what: 'A one-time fee with a direct path to funded — no recurring billing.',
-    },
-    {
-      name: 'Instant Sim Funded',
-      tag: 'No challenge',
-      best: 'you want a funded account right away',
-      what: 'Start on a funded sim account immediately — no evaluation to pass first.',
-    },
-    {
-      name: 'IGNITE Instant Funding',
-      tag: 'Most popular',
-      best: 'you want the balanced, most-picked setup',
-      what: 'Their most popular instant-funding option — fast track straight to funded.',
-    },
-  ],
   closer: {
     lead: 'Get funded, and keep more of what you make.',
     cta: { label: 'Get funded with JTNQ', url: AFFILIATE_URL },
@@ -152,29 +126,8 @@ export default function TopOneFutures() {
               </div>
             ))}
           </div>
-        </section>
-
-        <section className="plans">
-          <div className="section-head">
-            <h2>Which plan fits you</h2>
-            <span className="count">4 funding paths</span>
-          </div>
-          <div className="plans-grid">
-            {TOP.plans.map((p) => (
-              <div className="plan-card" key={p.name}>
-                <div className="plan-top">
-                  <span className="plan-name">{p.name}</span>
-                  <span className="plan-tag">{p.tag}</span>
-                </div>
-                <p className="plan-best">
-                  <span className="lbl">Best if</span> {p.best}.
-                </p>
-                <p className="plan-what">{p.what}</p>
-              </div>
-            ))}
-          </div>
           <a className="plans-link" href={PLANS_URL} target="_blank" rel="noopener nofollow sponsored">
-            Compare full plans &amp; live pricing
+            See live plans &amp; pricing
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M7 17L17 7M9 7h8v8" />
             </svg>
@@ -376,38 +329,6 @@ const CSS = `
 }
 .jtnq-top .plans-link svg{ width: 13px; height: 13px; }
 .jtnq-top .plans-link:hover{ color: var(--c-accent); gap: 13px; }
-
-.jtnq-top .plans{
-  max-width: var(--maxw); margin: 0 auto; padding: 0 var(--pad-x) clamp(56px, 8vw, 88px);
-}
-.jtnq-top .plans-grid{
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(16px, 2vw, 24px);
-}
-@media (max-width: 760px){ .jtnq-top .plans-grid{ grid-template-columns: 1fr; } }
-.jtnq-top .plan-card{
-  background: var(--c-bg-raise); border: 1px solid var(--c-line);
-  padding: clamp(22px, 2.6vw, 30px); transition: border-color .25s ease;
-}
-.jtnq-top .plan-card:hover{ border-color: var(--c-accent); }
-.jtnq-top .plan-top{ display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
-.jtnq-top .plan-name{
-  font-family: var(--f-serif); font-style: italic; font-weight: 400;
-  font-size: clamp(22px, 2.2vw, 28px); letter-spacing: -0.02em; color: var(--c-text);
-}
-.jtnq-top .plan-tag{
-  font-family: var(--f-mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--c-accent);
-  border: 1px solid color-mix(in oklab, var(--c-accent) 45%, var(--c-line));
-  border-radius: 999px; padding: 4px 10px; white-space: nowrap;
-}
-.jtnq-top .plan-best{
-  margin: clamp(16px, 1.8vw, 20px) 0 0; font-family: var(--f-sans); font-size: 14.5px; line-height: 1.5; color: var(--c-text-soft);
-}
-.jtnq-top .plan-best .lbl{
-  font-family: var(--f-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--c-text-mute); margin-right: 7px;
-}
-.jtnq-top .plan-what{
-  margin: 10px 0 0; font-family: var(--f-sans); font-size: 13px; line-height: 1.55; color: var(--c-text-mute);
-}
 
 .jtnq-top .closer{
   position: relative; padding: clamp(72px, 10vw, 116px) var(--pad-x) clamp(72px, 10vw, 112px);
