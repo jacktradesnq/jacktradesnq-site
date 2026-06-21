@@ -7,10 +7,9 @@ import { useEffect, useState } from 'react';
 const CODE = 'JTNQ';
 const DISCOUNT = '15% OFF';
 
-// TODO(JTNQ): replace with the dedicated affiliate tracking link once Josh sends it.
-// For now this points to the real Traders Launch site so the CTA is never dead —
-// the code JTNQ is applied at checkout.
-const AFFILIATE_URL = 'https://traderslaunch.com/';
+// Dedicated affiliate tracking link (referral from the Traders Launch affiliate portal).
+// Drives tracked sign-ups (15% commission); the code JTNQ applied at checkout gives 15% off.
+const AFFILIATE_URL = 'https://app.traderslaunch.com/auth/sign-up?ref=a3c0661ed05708abe4eceb42';
 
 const TL = {
   backToHome: { label: 'Jacktradesnq', url: '/' },
