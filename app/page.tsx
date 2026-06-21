@@ -13,6 +13,7 @@ const SITE = {
   studies: { url: '/studies/', tagline: '10 years of futures data, backtested with AI' },
   nefarious: { name: 'Nefarious', url: '/nefarious/', tagline: 'Official partner · free Discord community' },
   topOne: { name: 'Top One Futures', url: '/top-one-futures/', tagline: 'Prop firm partner · daily payouts, code JTNQ' },
+  tradersLaunch: { name: 'Traders Launch', url: '/traders-launch/', tagline: 'Prop firm partner · 15% off with code JTNQ' },
   legal: {
     copyright: '© 2026 JackTradesNQ. All rights reserved.',
     mentionsUrl: '/mentions-legales/',
@@ -299,6 +300,19 @@ export default function Home() {
               </div>
               <p className="tagline">{SITE.topOne.tagline}</p>
             </a>
+
+            <a className="hub-card" href={SITE.tradersLaunch.url}>
+              <div className="row">
+                <h3 className="title">
+                  {SITE.tradersLaunch.name}
+                  <span className="swash">.</span>
+                </h3>
+                <svg className="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 17L17 7M9 7h8v8" />
+                </svg>
+              </div>
+              <p className="tagline">{SITE.tradersLaunch.tagline}</p>
+            </a>
           </div>
         </section>
       </main>
@@ -472,7 +486,7 @@ const CSS = `
   display: grid; grid-template-columns: 1fr; gap: clamp(40px, 5vw, 64px);
 }
 .jtnq-home .hub-grid{
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(28px, 4vw, 56px); align-items: stretch;
 }
 @media (max-width: 980px){ .jtnq-home .hub-grid{ grid-template-columns: 1fr 1fr; gap: clamp(28px, 4vw, 48px); } }
