@@ -126,7 +126,7 @@ export default function TradersLaunch() {
               </div>
             ))}
           </div>
-          <a className="plans-link" href="https://traderslaunch.com/" target="_blank" rel="noopener nofollow sponsored">
+          <a className="plans-link" href={AFFILIATE_URL} target="_blank" rel="noopener nofollow sponsored">
             See live plans &amp; pricing
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M7 17L17 7M9 7h8v8" />
