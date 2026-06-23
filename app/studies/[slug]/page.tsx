@@ -465,8 +465,13 @@ export default async function BacktestedDetail({ params }: PageProps) {
     const allData: Record<string, ContDataFile> = {};
     for (const a of manipAssets) {
       const suffix = a === 'nq' ? '' : `-${a}`;
-      const raw = fs.readFileSync(path.join(process.cwd(), 'public', 'data', `manip930-distribution-cont${suffix}.json`), 'utf-8');
-      allData[a] = JSON.parse(raw) as ContDataFile;
+      try {
+        const raw = fs.readFileSync(path.join(process.cwd(), 'public', 'data', `manip930-distribution-cont${suffix}.json`), 'utf-8');
+        allData[a] = JSON.parse(raw) as ContDataFile;
+      } catch {
+        // A missing/broken regen JSON must not crash the whole static build; the
+        // asset tab degrades to "No data available" (ManipDataTabs guards !data).
+      }
     }
 
     const examplesByAsset: Partial<Record<AssetKey, ManipExample[]>> = {};
