@@ -19,7 +19,6 @@ import BilingualLede from '../_components/BilingualLede';
 import BilingualTitle from '../_components/BilingualTitle';
 import V3Tabs from '../_components/V3Tabs';
 import StraddleWrappedTabs from '../_components/StraddleWrappedTabs';
-import PerformanceTearsheet from '../_components/PerformanceTearsheet';
 import StudyReport from '../_components/StudyReport';
 import ManipDataTabs, { type ContDataFile } from '../_components/ManipDataTabs';
 import { type ManipExample } from '../_components/ManipExampleChart';
@@ -350,7 +349,10 @@ export default async function BacktestedDetail({ params }: PageProps) {
   );
 
   // Report layout (data-first card): opt-in via report.json in the study folder.
-  if (entry.report) {
+  // Pure-descriptive studies render the full report-card. Studies that ALSO have
+  // an interactive body (IFVG dashboards, …) render a compact report-card HEAD on
+  // top of that body instead — see the isIfvg branch below.
+  if (entry.report && !isIfvg) {
     return (
       <article className="bd-article">
         <Link href="/studies/" className="v3-back">← back to Data</Link>
@@ -548,23 +550,26 @@ export default async function BacktestedDetail({ params }: PageProps) {
           ← back to Data
         </Link>
 
-        <h1 className="v3-sub-h1">
-          <span className="v3-sub-ev">{eventFull(eventLabel.toLowerCase().replace(/\s+/g, '-'))}</span>
-          {' · IFVG + SMT'}
-        </h1>
-        {hasTearsheet ? (
-          <p className="v3-sub-sub">
-            {assetShort(assetLabel)} futures · {stratStats?.releaseTime ?? '8:30 ET'} release · {dateFrom}–{dateTo} backtest
-            {stratStats ? ` · ${stratStats.n} events` : ''}
-          </p>
-        ) : null}
-
-        {/* Performance Tearsheet — pilot: fomc-ifvg-smt only. Extend by running gen_tearsheet.py for other slugs. */}
-        <PerformanceTearsheet slug={slug} />
+        {entry.report ? (
+          <StudyReport report={entry.report} compact />
+        ) : (
+          <>
+            <h1 className="v3-sub-h1">
+              <span className="v3-sub-ev">{eventFull(eventLabel.toLowerCase().replace(/\s+/g, '-'))}</span>
+              {' · IFVG + SMT'}
+            </h1>
+            {hasTearsheet ? (
+              <p className="v3-sub-sub">
+                {assetShort(assetLabel)} futures · {stratStats?.releaseTime ?? '8:30 ET'} release · {dateFrom}–{dateTo} backtest
+                {stratStats ? ` · ${stratStats.n} events` : ''}
+              </p>
+            ) : null}
+          </>
+        )}
 
         {/* V3Tabs is a client component that reads ?tab from URL and renders the KPI band + tabs */}
         <Suspense fallback={<div className="v3-tabs" style={{ height: 48 }} />}>
-          <V3Tabs slug={slug} breakdown={breakdown} breakdownOff={breakdownOff} trades={trades} tradesByVariant={tradesByVariant} tradesByVariantOff={tradesByVariantOff} statsByVariant={statsByVariant} statsByVariantAndSmt={statsByVariantAndSmt} profitableCombos={profitableCombos} dateFrom={dateFrom} dateTo={dateTo} overviewContent={overviewNode} eventShort={stratStats?.event ?? ''} asset={(stratStats?.asset?.toLowerCase() ?? 'nq') as 'nq' | 'gc' | 'es' | 'si' | 'ym'} hideKpiBand={hasTearsheet} flat={true} simpleModeIntroHtml={extractFirstParagraph(entry.explanationHtmlNq)} simpleHideStatBand={!hasTearsheet} showHero={!hasTearsheet} heroMeta={`${assetShort(assetLabel)} · ${dateFrom}–${dateTo}${stratStats ? ` · ${stratStats.n} events` : ''}`} />
+          <V3Tabs slug={slug} breakdown={breakdown} breakdownOff={breakdownOff} trades={trades} tradesByVariant={tradesByVariant} tradesByVariantOff={tradesByVariantOff} statsByVariant={statsByVariant} statsByVariantAndSmt={statsByVariantAndSmt} profitableCombos={profitableCombos} dateFrom={dateFrom} dateTo={dateTo} overviewContent={overviewNode} eventShort={stratStats?.event ?? ''} asset={(stratStats?.asset?.toLowerCase() ?? 'nq') as 'nq' | 'gc' | 'es' | 'si' | 'ym'} hideKpiBand={hasTearsheet} flat={true} simpleModeIntroHtml={extractFirstParagraph(entry.explanationHtmlNq)} simpleHideStatBand={!hasTearsheet || !!entry.report} showHero={!hasTearsheet && !entry.report} heroMeta={`${assetShort(assetLabel)} · ${dateFrom}–${dateTo}${stratStats ? ` · ${stratStats.n} events` : ''}`} />
         </Suspense>
 
         {pager}

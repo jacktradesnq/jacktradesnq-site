@@ -111,8 +111,34 @@ function HBarsChart({ chart }: { chart: ReportChart }) {
   );
 }
 
-export default function StudyReport({ report }: { report: ReportData }) {
+export default function StudyReport({ report, compact = false }: { report: ReportData; compact?: boolean }) {
   const { eyebrow, title, hero, chart, cards, useIt, disclaimer, pdf } = report;
+
+  // Compact mode: report-card HEAD only (eyebrow + title + hero stat + how-to-use
+  // + disclaimer). Used atop studies that keep their full interactive body
+  // (IFVG dashboards, straddle explorers) below — so the page opens like a
+  // report-card without dropping the explorable backtest data.
+  if (compact) {
+    return (
+      <div className="rep rep-compact">
+        <div className="rep-eyebrow">{eyebrow}</div>
+        <h1 className="rep-title">
+          {title}
+          <span className="dot">.</span>
+        </h1>
+        <div className="rep-hero">
+          <div className="rep-hero-big">{hero.stat}</div>
+          <div className="rep-hero-cap">{renderInline(hero.caption)}</div>
+        </div>
+        <div className="rep-use">
+          <div className="rep-use-h">How to use it</div>
+          <p>{renderInline(useIt)}</p>
+        </div>
+        <div className="rep-disc">{disclaimer}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="rep">
       <div className="rep-eyebrow">{eyebrow}</div>
