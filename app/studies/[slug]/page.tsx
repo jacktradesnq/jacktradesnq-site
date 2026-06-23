@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -169,6 +170,17 @@ function pagerDisplayTitle(e: { slug: string; title: string }): string {
     return `${eventFull(ev.toLowerCase().replace(/\s+/g, '-'))} · IFVG + SMT`;
   }
   return e.title;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const entry = getEntry(slug);
+  if (!entry) return { title: 'Study · JackTradesNQ' };
+  const title = pagerDisplayTitle(entry);
+  return {
+    title: `${title} · JackTradesNQ`,
+    description: entry.excerpt || undefined,
+  };
 }
 
 export default async function BacktestedDetail({ params }: PageProps) {

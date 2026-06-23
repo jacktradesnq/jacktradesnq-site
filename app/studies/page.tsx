@@ -7,6 +7,12 @@ import { eventFull } from '@/lib/terminology';
 import HubFilters from './_components/HubFilters';
 import BasicsBanner from './_components/BasicsBanner';
 
+export const metadata = {
+  title: 'Studies — 10 years of futures data, backtested · JackTradesNQ',
+  description:
+    'Every NQ, ES, GC and SI futures setup backtested on 10 years of 1-minute bars. Profit factor, win rate and event stats — numbers first.',
+};
+
 export default function BacktestedHub() {
   const studies = getAllStudyStats();
   const weekly = getWeeklyPlaybook(studies);

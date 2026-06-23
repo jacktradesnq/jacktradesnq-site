@@ -28,14 +28,6 @@ export default function BacktestedLayout({
         </Link>
         <div className="v3-topbar-spacer" />
         <AssetPills availableSlugs={allSlugs} />
-        <a
-          href="https://jacktradesnq.com"
-          className="v3-home-link"
-          target="_blank"
-          rel="noreferrer"
-        >
-          jacktradesnq.com
-        </a>
       </header>
 
       {/* Body: sidenav (client, pathname-aware) + main */}

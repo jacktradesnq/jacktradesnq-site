@@ -258,7 +258,7 @@ export default function HubFilters({
                       <summary className="bd-evt-head">
                         <span className="bd-evt-name">{g.label}</span>
                         <span className="bd-evt-meta">
-                          <span className="bd-evt-count">{g.items.length} variants</span>
+                          <span className="bd-evt-count">{g.items.length} {g.items.length === 1 ? 'variant' : 'variants'}</span>
                           {g.bestPf > 0 && (
                             <>
                               <span className="bd-evt-count"> · best PF </span>

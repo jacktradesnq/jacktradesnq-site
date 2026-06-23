@@ -1127,14 +1127,40 @@ function processOneSlug(slug: string): StudyStats | null {
       nByWeekday: [0, 0, 0, 0, 0],
     };
   } else {
-    // No JSON data — render as study with excerpt teaser
+    // No hub JSON data — render as study.
     kind = 'study';
     stats = {
       pf: 0, n: 0, edgePts: 0, wr: 0,
       wrByWeekday: [0, 0, 0, 0, 0],
       nByWeekday: [0, 0, 0, 0, 0],
     };
-    if (excerpt) {
+    // Report-card studies (report.json, e.g. opex/news-830-candle/amd-reversal)
+    // carry no hub JSON but DO have a rich headline stat — surface it so the
+    // hub list shows their number instead of "no data".
+    const reportPath = path.join(contentDir, slug, 'report.json');
+    if (fs.existsSync(reportPath)) {
+      try {
+        const rep = JSON.parse(fs.readFileSync(reportPath, 'utf-8')) as {
+          eyebrow?: string;
+          hero?: { stat?: string };
+          chart?: { label?: string };
+        };
+        const stat = rep.hero?.stat?.trim();
+        if (stat) {
+          const parts = (rep.eyebrow ?? '').split('·').map((p) => p.trim()).filter(Boolean);
+          descriptive = {
+            primaryValue: stat,
+            primaryLabel: parts[0] || rep.chart?.label || 'key finding',
+            secondaryValue: parts.length > 1 ? parts.slice(1).join(' · ') : `${asset} · 10y`,
+            secondaryLabel: 'study',
+            tertiary: excerpt || rep.chart?.label || undefined,
+          };
+        }
+      } catch {
+        /* malformed report.json — fall through to the no-data teaser below */
+      }
+    }
+    if (!descriptive && excerpt) {
       descriptive = {
         primaryValue: '—',
         primaryLabel: 'no data',
