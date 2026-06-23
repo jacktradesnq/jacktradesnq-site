@@ -191,6 +191,17 @@ if [[ "$DRY_RUN" == "0" ]]; then
         COMMIT_STATUS="skipped (not on main: $CUR_BRANCH)"
         log "  SKIP — worktree not on main ($CUR_BRANCH)"
     else
+        # GUARD: never deploy emptied straddle data. The 5-asset-migration
+        # regression had a broken runner writing 49-byte {ranked:[]} files;
+        # they got committed and shipped empty study pages. Abort if any
+        # *-straddle.json came back tiny (no real backtest data).
+        EMPTY_STRADDLE=$(find public/data -maxdepth 1 -name "*-straddle.json" ! -name "_backup*" -size -200c 2>/dev/null)
+        if [[ -n "$EMPTY_STRADDLE" ]]; then
+        COMMIT_STATUS="ABORTED — empty straddle JSON"
+        log "  ABORT — empty straddle JSON detected, NOT committing:"
+        printf '%s\n' "$EMPTY_STRADDLE" >>"$LOG"
+        discord "${MENTION} ⚠️ **update_site_backtests** — ABORTED commit: empty straddle JSON ($(printf '%s ' $EMPTY_STRADDLE)). Backtest runner produced no data; nothing pushed."
+        else
         # Never stage the straddle backup subdir the runner may create.
         git rm -r --cached --quiet "public/data/_backup_pre_5asset" 2>/dev/null || true
         CHANGED=$(git status --porcelain public/data | grep -v '_backup_pre_5asset' | wc -l | tr -d ' ')
@@ -216,6 +227,7 @@ if [[ "$DRY_RUN" == "0" ]]; then
         else
             COMMIT_STATUS="no changes"
             log "  SKIP — no file changes in public/data"
+        fi
         fi
     fi
 else
