@@ -6,7 +6,6 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { getAllEntries, getEntry } from '@/lib/studies';
 import { eventFull, assetShort } from '@/lib/terminology';
-import { IconArrowUpRight } from '../_components/icons';
 import { AssetProvider, type AssetKey } from '../_components/AssetContext';
 import AssetPills from '../_components/AssetPills';
 import KillzoneSwitcher from '../_components/KillzoneSwitcher';
@@ -642,12 +641,6 @@ export default async function BacktestedDetail({ params }: PageProps) {
       </div>
 
       <div className="bd-ctas" style={{ marginTop: 48 }}>
-        {entry.category === 'tradingview' && entry.tradingviewUrl ? (
-          <a className="bd-btn bd-btn-primary" href={entry.tradingviewUrl} target="_blank" rel="noreferrer noopener">
-            Open on TradingView
-            <IconArrowUpRight />
-          </a>
-        ) : null}
         {entry.pdfFileNq ? (
           <BilingualPdfLink
             pdfFileNq={entry.pdfFileNq}
