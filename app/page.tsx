@@ -10,7 +10,7 @@ const SITE = {
     { name: 'Instagram', url: 'https://www.instagram.com/jack.tradesnq' },
     { name: 'X', url: 'https://x.com/jacktradesnq' },
   ],
-  studies: { url: '/studies/', tagline: '10 years of futures data, backtested with AI' },
+  studies: { url: '/studies/', tagline: '10 years of 1-minute futures data, every setup backtested' },
   nefarious: { name: 'Nefarious', url: '/nefarious/', tagline: 'Official partner · free Discord community' },
   topOne: { name: 'Top One Futures', url: '/top-one-futures/', tagline: 'Prop firm partner · daily payouts, code JTNQ' },
   tradersLaunch: { name: 'Traders Launch', url: '/traders-launch/', tagline: 'Prop firm partner · 15% off with code JTNQ' },
@@ -250,6 +250,7 @@ export default function Home() {
               {SITE.brand}
               <span className="dot">.</span>
             </h1>
+            <p className="hero-sub">Ten years of NQ, ES, GC &amp; SI futures data — every setup backtested to the minute.</p>
           </div>
           <div className="hero-foot">
             <span className="meta-l">&nbsp;</span>
@@ -263,7 +264,7 @@ export default function Home() {
 
         <section id="hub" className="hub">
           <div className="hub-grid">
-            <a className="hub-card" href={SITE.studies.url}>
+            <a className="hub-card hub-card-primary" href={SITE.studies.url}>
               <div className="row">
                 <h3 className="title">
                   Studies<span className="swash">.</span>
@@ -449,6 +450,15 @@ const CSS = `
   0%,100%{ transform: scale(1.5); opacity: 1; }
   50%{ transform: scale(1.75); opacity: .85; }
 }
+.jtnq-home .hero-sub{
+  margin: clamp(20px, 2.4vw, 32px) auto 0; max-width: 46ch;
+  font-family: var(--f-mono); font-size: clamp(11px, 1.05vw, 13px);
+  letter-spacing: .12em; line-height: 1.7; color: var(--c-text-mute);
+  text-transform: uppercase;
+}
+@media (max-width: 640px){
+  .jtnq-home .hero-sub{ letter-spacing: .08em; font-size: 11px; max-width: 32ch; }
+}
 .jtnq-home .hero-foot{
   position: relative; z-index: 2; display: grid;
   grid-template-columns: 1fr auto 1fr; align-items: end; gap: 24px;
@@ -486,10 +496,16 @@ const CSS = `
   display: grid; grid-template-columns: 1fr; gap: clamp(40px, 5vw, 64px);
 }
 .jtnq-home .hub-grid{
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(28px, 4vw, 56px); align-items: stretch;
 }
-@media (max-width: 980px){ .jtnq-home .hub-grid{ grid-template-columns: 1fr 1fr; gap: clamp(28px, 4vw, 48px); } }
+.jtnq-home .hub-card-primary{ grid-column: 1 / -1; }
+.jtnq-home .hub-card-primary .title{ font-size: clamp(44px, 5.4vw, 78px); }
+.jtnq-home .hub-card-primary .tagline{ font-size: 12px; max-width: 52ch; }
+@media (max-width: 980px){
+  .jtnq-home .hub-grid{ grid-template-columns: 1fr 1fr; gap: clamp(28px, 4vw, 48px); }
+  .jtnq-home .hub-card-primary{ grid-column: 1 / -1; }
+}
 @media (max-width: 640px){ .jtnq-home .hub-grid{ grid-template-columns: 1fr; gap: 32px; } }
 .jtnq-home .hub-card{
   position: relative; display: block; padding: clamp(28px, 3.5vw, 44px) 0;
