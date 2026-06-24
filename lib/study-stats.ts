@@ -1171,6 +1171,22 @@ function processOneSlug(slug: string): StudyStats | null {
     }
   }
 
+  // Demote losing strategies (profit factor < 1) out of the tradeable
+  // "Strategies" list: a setup that loses money isn't an edge. Keep it fully
+  // visible as a data finding (kind='study') tagged "no edge" — never deleted,
+  // so the honesty/rigour is preserved while the Strategies list shows only
+  // setups that actually made money.
+  if (kind === 'strategy' && stats.pf > 0 && stats.pf < 1) {
+    kind = 'study';
+    descriptive = {
+      primaryValue: `${stats.pf.toFixed(2)}×`,
+      primaryLabel: 'no edge',
+      secondaryValue: `${stats.n} trades · ${stats.wr}% win rate`,
+      secondaryLabel: asset,
+      tertiary: excerpt || undefined,
+    };
+  }
+
   return {
     slug,
     title,
