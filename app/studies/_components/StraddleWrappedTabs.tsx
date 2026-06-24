@@ -71,17 +71,45 @@ export default function StraddleWrappedTabs({
 
   const trades = allTrades[assetKey] ?? [];
 
-  const filterBarOverride = useMemo(() => ({
-    variantOptions: stopGrid.map((v) => ({ key: formatNum(v), label: formatNum(v) })),
-    tpOptions: tpGrid.map((v) => ({ key: formatNum(v), label: formatNum(v) })),
-    smtOptions: SIDE_OPTS,
-    variantLabel: 'Stop',
-    tpLabel: 'TP',
-    smtLabel: 'Side',
-    defaultVariant: formatNum(stopGrid[0]),
-    defaultSmt: 'both',
-    defaultTp: formatNum(tpGrid[0]),
-  }), [stopGrid, tpGrid]);
+  // Profit factor of every stop×TP combo, so we can (1) land on the BEST combo
+  // and (2) keep only the profitable ones in the grid — instead of dumping the
+  // full "fullport" of mostly-losing combos. Profitable = PF ≥ 1 (makes money).
+  const combos = useMemo(() => {
+    const out: { x: number; y: number; pf: number }[] = [];
+    for (const x of stopGrid) {
+      for (const y of tpGrid) {
+        const sub = trades.filter((t) => t.x_stop === x && t.y_tp === y);
+        if (sub.length === 0) continue;
+        out.push({ x, y, pf: computeKPI(sub).pf });
+      }
+    }
+    return out;
+  }, [trades, stopGrid, tpGrid]);
+
+  const profitable = useMemo(() => combos.filter((c) => c.pf >= 1), [combos]);
+  const bestCombo = useMemo(
+    () => (combos.length ? combos.reduce((a, b) => (b.pf > a.pf ? b : a)) : null),
+    [combos]
+  );
+
+  const filterBarOverride = useMemo(() => {
+    // Keep only profitable stops/TPs; fall back to the full grid if nothing is
+    // profitable (so the explorer is never empty).
+    const useList = profitable.length > 0 ? profitable : combos.length > 0 ? combos : null;
+    const stops = useList ? [...new Set(useList.map((c) => c.x))].sort((a, b) => a - b) : stopGrid;
+    const tps = useList ? [...new Set(useList.map((c) => c.y))].sort((a, b) => a - b) : tpGrid;
+    return {
+      variantOptions: stops.map((v) => ({ key: formatNum(v), label: formatNum(v) })),
+      tpOptions: tps.map((v) => ({ key: formatNum(v), label: formatNum(v) })),
+      smtOptions: SIDE_OPTS,
+      variantLabel: 'Stop',
+      tpLabel: 'TP',
+      smtLabel: 'Side',
+      defaultVariant: formatNum(bestCombo?.x ?? stops[0]),
+      defaultSmt: 'both',
+      defaultTp: formatNum(bestCombo?.y ?? tps[0]),
+    };
+  }, [stopGrid, tpGrid, combos, profitable, bestCombo]);
 
   const initialBreakdown = useMemo(() => computeWeekdayBreakdown(trades), [trades]);
 
