@@ -863,6 +863,9 @@ export default function V3Tabs({
           introHtml={introHtml}
           hideStatBand={simpleHideStatBand}
         />
+        {!simpleHideStatBand && (['mon', 'tue', 'wed', 'thu', 'fri'] as const).some((k) => (breakdown[k]?.n ?? 0) > 0) ? (
+          <WeekdayBars breakdown={breakdown} title="Net PnL by weekday" subtitle={kpiVariantLabel} />
+        ) : null}
       </>
     );
   }

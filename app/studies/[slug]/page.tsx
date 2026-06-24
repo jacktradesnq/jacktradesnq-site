@@ -185,7 +185,6 @@ export default async function BacktestedDetail({ params }: PageProps) {
   const { slug } = await params;
   const entry = getEntry(slug);
   if (!entry) notFound();
-  const hasTearsheet = fs.existsSync(path.join(process.cwd(), 'content', 'studies', slug, 'tearsheet.json'));
 
   const entries = getAllEntries();
   const idx = entries.findIndex((e) => e.slug === slug);
@@ -352,7 +351,7 @@ export default async function BacktestedDetail({ params }: PageProps) {
   // Pure-descriptive studies render the full report-card. Studies that ALSO have
   // an interactive body (IFVG dashboards, …) render a compact report-card HEAD on
   // top of that body instead — see the isIfvg branch below.
-  if (entry.report && !isIfvg) {
+  if (entry.report) {
     return (
       <article className="bd-article">
         <Link href="/studies/" className="v3-back">← back to Data</Link>
@@ -550,26 +549,18 @@ export default async function BacktestedDetail({ params }: PageProps) {
           ← back to Data
         </Link>
 
-        {entry.report ? (
-          <StudyReport report={entry.report} compact />
-        ) : (
-          <>
-            <h1 className="v3-sub-h1">
-              <span className="v3-sub-ev">{eventFull(eventLabel.toLowerCase().replace(/\s+/g, '-'))}</span>
-              {' · IFVG + SMT'}
-            </h1>
-            {hasTearsheet ? (
-              <p className="v3-sub-sub">
-                {assetShort(assetLabel)} futures · {stratStats?.releaseTime ?? '8:30 ET'} release · {dateFrom}–{dateTo} backtest
-                {stratStats ? ` · ${stratStats.n} events` : ''}
-              </p>
-            ) : null}
-          </>
-        )}
+        <h1 className="v3-sub-h1">
+          <span className="v3-sub-ev">{eventFull(eventLabel.toLowerCase().replace(/\s+/g, '-'))}</span>
+          {' · IFVG + SMT'}
+        </h1>
+        <p className="v3-sub-sub">
+          {assetShort(assetLabel)} futures · {stratStats?.releaseTime ?? '8:30 ET'} release · {dateFrom}–{dateTo} backtest
+          {stratStats ? ` · ${stratStats.n} events` : ''}
+        </p>
 
         {/* V3Tabs is a client component that reads ?tab from URL and renders the KPI band + tabs */}
         <Suspense fallback={<div className="v3-tabs" style={{ height: 48 }} />}>
-          <V3Tabs slug={slug} breakdown={breakdown} breakdownOff={breakdownOff} trades={trades} tradesByVariant={tradesByVariant} tradesByVariantOff={tradesByVariantOff} statsByVariant={statsByVariant} statsByVariantAndSmt={statsByVariantAndSmt} profitableCombos={profitableCombos} dateFrom={dateFrom} dateTo={dateTo} overviewContent={overviewNode} eventShort={stratStats?.event ?? ''} asset={(stratStats?.asset?.toLowerCase() ?? 'nq') as 'nq' | 'gc' | 'es' | 'si' | 'ym'} hideKpiBand={hasTearsheet} flat={true} simpleModeIntroHtml={extractFirstParagraph(entry.explanationHtmlNq)} simpleHideStatBand={!hasTearsheet || !!entry.report} showHero={!hasTearsheet && !entry.report} heroMeta={`${assetShort(assetLabel)} · ${dateFrom}–${dateTo}${stratStats ? ` · ${stratStats.n} events` : ''}`} />
+          <V3Tabs slug={slug} breakdown={breakdown} breakdownOff={breakdownOff} trades={trades} tradesByVariant={tradesByVariant} tradesByVariantOff={tradesByVariantOff} statsByVariant={statsByVariant} statsByVariantAndSmt={statsByVariantAndSmt} profitableCombos={profitableCombos} dateFrom={dateFrom} dateTo={dateTo} overviewContent={overviewNode} eventShort={stratStats?.event ?? ''} asset={(stratStats?.asset?.toLowerCase() ?? 'nq') as 'nq' | 'gc' | 'es' | 'si' | 'ym'} hideKpiBand={false} flat={true} simpleModeIntroHtml={extractFirstParagraph(entry.explanationHtmlNq)} simpleHideStatBand={false} showHero={false} heroMeta={`${assetShort(assetLabel)} · ${dateFrom}–${dateTo}${stratStats ? ` · ${stratStats.n} events` : ''}`} />
         </Suspense>
 
         {pager}
