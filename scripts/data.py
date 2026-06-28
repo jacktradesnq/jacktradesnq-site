@@ -66,7 +66,10 @@ def load_bars(symbol: str, from_date: str, to_date: str | None = None) -> list[d
     if not frames:
         return []
 
-    result = pl.concat(frames).with_columns(
+    # `vertical_relaxed` coerces a mismatched column dtype to the common supertype
+    # (NQ_1m_2y.parquet has volume=Float64, the older fragments UInt64) so the
+    # cross-fragment concat doesn't raise a SchemaError. Values are unchanged.
+    result = pl.concat(frames, how="vertical_relaxed").with_columns(
         pl.col("ts").dt.epoch("s").cast(pl.Int64).alias("ts")
     )
 
