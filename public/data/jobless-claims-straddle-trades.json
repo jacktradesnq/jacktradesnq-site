@@ -1,6 +1,6 @@
 {
   "event": "JoblessClaims",
-  "generated_at": "2026-06-28T17:13:02.690841+00:00",
+  "generated_at": "2026-06-28T21:15:18.536856+00:00",
   "combos": [
     {
       "X": 25.0,
@@ -9527,6 +9527,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-06-25",
+          "ts": "2026-06-25T12:30:00+00:00",
+          "entry_price": 30131.0,
+          "X": 25.0,
+          "Y": 15.0,
+          "buy_stop": 30156.0,
+          "sell_stop": 30106.0,
+          "tp_buy": 30171.0,
+          "tp_sell": 30091.0,
+          "filled_side": "long",
+          "fill_ts": "2026-06-25 14:30:00+02:00",
+          "fill_price": 30156.0,
+          "exit_ts": "2026-06-25 14:30:00+02:00",
+          "exit_price": 30171.0,
+          "pnl": 15.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -19055,6 +19073,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-06-25",
+          "ts": "2026-06-25T12:30:00+00:00",
+          "entry_price": 30131.0,
+          "X": 25.0,
+          "Y": 20.0,
+          "buy_stop": 30156.0,
+          "sell_stop": 30106.0,
+          "tp_buy": 30176.0,
+          "tp_sell": 30086.0,
+          "filled_side": "long",
+          "fill_ts": "2026-06-25 14:30:00+02:00",
+          "fill_price": 30156.0,
+          "exit_ts": "2026-06-25 14:30:00+02:00",
+          "exit_price": 30176.0,
+          "pnl": 20.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -28583,6 +28619,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-06-25",
+          "ts": "2026-06-25T12:30:00+00:00",
+          "entry_price": 30131.0,
+          "X": 25.0,
+          "Y": 25.0,
+          "buy_stop": 30156.0,
+          "sell_stop": 30106.0,
+          "tp_buy": 30181.0,
+          "tp_sell": 30081.0,
+          "filled_side": "long",
+          "fill_ts": "2026-06-25 14:30:00+02:00",
+          "fill_price": 30156.0,
+          "exit_ts": "2026-06-25 14:30:00+02:00",
+          "exit_price": 30181.0,
+          "pnl": 25.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -38111,6 +38165,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-06-25",
+          "ts": "2026-06-25T12:30:00+00:00",
+          "entry_price": 30131.0,
+          "X": 30.0,
+          "Y": 15.0,
+          "buy_stop": 30161.0,
+          "sell_stop": 30101.0,
+          "tp_buy": 30176.0,
+          "tp_sell": 30086.0,
+          "filled_side": "long",
+          "fill_ts": "2026-06-25 14:30:00+02:00",
+          "fill_price": 30161.0,
+          "exit_ts": "2026-06-25 14:30:00+02:00",
+          "exit_price": 30176.0,
+          "pnl": 15.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -47639,6 +47711,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-06-25",
+          "ts": "2026-06-25T12:30:00+00:00",
+          "entry_price": 30131.0,
+          "X": 30.0,
+          "Y": 20.0,
+          "buy_stop": 30161.0,
+          "sell_stop": 30101.0,
+          "tp_buy": 30181.0,
+          "tp_sell": 30081.0,
+          "filled_side": "long",
+          "fill_ts": "2026-06-25 14:30:00+02:00",
+          "fill_price": 30161.0,
+          "exit_ts": "2026-06-25 14:30:00+02:00",
+          "exit_price": 30181.0,
+          "pnl": 20.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -57167,6 +57257,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-06-25",
+          "ts": "2026-06-25T12:30:00+00:00",
+          "entry_price": 30131.0,
+          "X": 30.0,
+          "Y": 25.0,
+          "buy_stop": 30161.0,
+          "sell_stop": 30101.0,
+          "tp_buy": 30186.0,
+          "tp_sell": 30076.0,
+          "filled_side": "long",
+          "fill_ts": "2026-06-25 14:30:00+02:00",
+          "fill_price": 30161.0,
+          "exit_ts": "2026-06-25 14:30:00+02:00",
+          "exit_price": 30186.0,
+          "pnl": 25.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -66695,6 +66803,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-06-25",
+          "ts": "2026-06-25T12:30:00+00:00",
+          "entry_price": 30131.0,
+          "X": 35.0,
+          "Y": 15.0,
+          "buy_stop": 30166.0,
+          "sell_stop": 30096.0,
+          "tp_buy": 30181.0,
+          "tp_sell": 30081.0,
+          "filled_side": "long",
+          "fill_ts": "2026-06-25 14:30:00+02:00",
+          "fill_price": 30166.0,
+          "exit_ts": "2026-06-25 14:30:00+02:00",
+          "exit_price": 30181.0,
+          "pnl": 15.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -76223,6 +76349,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-06-25",
+          "ts": "2026-06-25T12:30:00+00:00",
+          "entry_price": 30131.0,
+          "X": 35.0,
+          "Y": 20.0,
+          "buy_stop": 30166.0,
+          "sell_stop": 30096.0,
+          "tp_buy": 30186.0,
+          "tp_sell": 30076.0,
+          "filled_side": "long",
+          "fill_ts": "2026-06-25 14:30:00+02:00",
+          "fill_price": 30166.0,
+          "exit_ts": "2026-06-25 14:30:00+02:00",
+          "exit_price": 30186.0,
+          "pnl": 20.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -85751,6 +85895,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-06-25",
+          "ts": "2026-06-25T12:30:00+00:00",
+          "entry_price": 30131.0,
+          "X": 35.0,
+          "Y": 25.0,
+          "buy_stop": 30166.0,
+          "sell_stop": 30096.0,
+          "tp_buy": 30191.0,
+          "tp_sell": 30071.0,
+          "filled_side": "long",
+          "fill_ts": "2026-06-25 14:30:00+02:00",
+          "fill_price": 30166.0,
+          "exit_ts": "2026-06-25 14:30:00+02:00",
+          "exit_price": 30191.0,
+          "pnl": 25.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -95279,6 +95441,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-06-25",
+          "ts": "2026-06-25T12:30:00+00:00",
+          "entry_price": 30131.0,
+          "X": 40.0,
+          "Y": 15.0,
+          "buy_stop": 30171.0,
+          "sell_stop": 30091.0,
+          "tp_buy": 30186.0,
+          "tp_sell": 30076.0,
+          "filled_side": "long",
+          "fill_ts": "2026-06-25 14:30:00+02:00",
+          "fill_price": 30171.0,
+          "exit_ts": "2026-06-25 14:30:00+02:00",
+          "exit_price": 30186.0,
+          "pnl": 15.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -104807,6 +104987,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-06-25",
+          "ts": "2026-06-25T12:30:00+00:00",
+          "entry_price": 30131.0,
+          "X": 40.0,
+          "Y": 20.0,
+          "buy_stop": 30171.0,
+          "sell_stop": 30091.0,
+          "tp_buy": 30191.0,
+          "tp_sell": 30071.0,
+          "filled_side": "long",
+          "fill_ts": "2026-06-25 14:30:00+02:00",
+          "fill_price": 30171.0,
+          "exit_ts": "2026-06-25 14:30:00+02:00",
+          "exit_price": 30191.0,
+          "pnl": 20.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -114335,6 +114533,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-06-25",
+          "ts": "2026-06-25T12:30:00+00:00",
+          "entry_price": 30131.0,
+          "X": 40.0,
+          "Y": 25.0,
+          "buy_stop": 30171.0,
+          "sell_stop": 30091.0,
+          "tp_buy": 30196.0,
+          "tp_sell": 30066.0,
+          "filled_side": "long",
+          "fill_ts": "2026-06-25 14:30:00+02:00",
+          "fill_price": 30171.0,
+          "exit_ts": "2026-06-25 14:30:00+02:00",
+          "exit_price": 30196.0,
+          "pnl": 25.0,
+          "outcome": "tp_hit"
         }
       ]
     }

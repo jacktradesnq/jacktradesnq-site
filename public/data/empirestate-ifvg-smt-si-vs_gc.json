@@ -5,7 +5,7 @@
     "date_to": "2026-05-15",
     "n_events_total": 5,
     "n_csv_events": 126,
-    "generated_at": "2026-06-28T17:12:34.438607+00:00",
+    "generated_at": "2026-06-28T21:13:21.827431+00:00",
     "event_filter": "EmpireState",
     "csv": "/Users/angelo/news-cal-official/news_official_2016_2026.csv",
     "tick": "SI_TICK=0.005 (SL fix: range sweep_ts\u2192entry_ts), GC_TICK=0.1 (SMT pair)"
