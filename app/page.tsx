@@ -452,8 +452,8 @@ const CSS = `
   padding: 160px var(--pad-x) 0;
 }
 .jtnq-home .wordmark{
-  font-family: var(--f-serif); font-style: italic; font-weight: 400;
-  font-size: clamp(96px, 14vw, 220px); line-height: .88; letter-spacing: -0.035em;
+  font-family: 'Zodiak', var(--f-serif); font-style: normal; font-weight: 700;
+  font-size: clamp(80px, 12vw, 188px); line-height: .9; letter-spacing: -0.028em;
   margin: 0; color: var(--c-text);
 }
 .jtnq-home .wordmark .dot{
