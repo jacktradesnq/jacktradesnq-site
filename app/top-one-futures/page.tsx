@@ -19,7 +19,7 @@ const TOP = {
     eyebrow: 'PROP FIRM PARTNER',
     title: 'Top One Futures',
     phrase:
-      'A 90/10 split, fast payouts, and several ways to get funded. The prop firm I actually trade.',
+      'A 90/10 split, fast payouts, and several ways to get funded.',
   },
   what: ['FAST PAYOUTS', '90/10 PROFIT SPLIT', '1-STEP & INSTANT', 'UP TO $150K'],
   firm: [
