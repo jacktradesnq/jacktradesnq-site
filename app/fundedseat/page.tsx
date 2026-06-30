@@ -17,13 +17,13 @@ const FS = {
     eyebrow: 'PROP FIRM PARTNER',
     title: 'FundedSeat',
     phrase:
-      'Up to a 90% split, end-of-day drawdown, and daily payouts from day one — funded futures, paid out fast.',
+      'Keep 90% of your profit and withdraw it daily, starting the day you get funded.',
   },
   what: ['UP TO 90% SPLIT', 'DAILY PAYOUTS', 'NO ACTIVATION FEE', '1-STEP & INSTANT', 'EOD DRAWDOWN', 'UP TO $150K'],
   firm: [
     {
       k: 'Funding',
-      v: 'One-step evaluations and instant-funding accounts, in sizes from $25K up to $150K — traded on Rithmic and supported platforms, with no activation fee.',
+      v: 'One-step evaluations and instant-funding accounts, $25K to $150K, on Rithmic and supported platforms. No activation fee.',
     },
     {
       k: 'Payouts',
@@ -31,11 +31,11 @@ const FS = {
     },
     {
       k: 'Rules',
-      v: 'End-of-day drawdown measured on the daily close, not on intraday spikes — plus a clear Path to Live: trade real capital after four payouts.',
+      v: 'End-of-day drawdown, measured on the daily close instead of intraday spikes. After four payouts you move to a live account.',
     },
   ],
   closer: {
-    lead: 'Get funded, and keep more of what you make.',
+    lead: 'Pick a size and get funded. Withdrawals start day one.',
     cta: { label: 'Get funded with JTNQ', url: AFFILIATE_URL },
   },
   legal: {
