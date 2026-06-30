@@ -19,19 +19,19 @@ const FS = {
     phrase:
       'Up to a 90% split, end-of-day drawdown, and daily payouts from day one — funded futures, paid out fast.',
   },
-  what: ['UP TO 90% SPLIT', 'DAILY PAYOUTS', '1-STEP & INSTANT', 'EOD DRAWDOWN', 'UP TO $150K'],
+  what: ['UP TO 90% SPLIT', 'DAILY PAYOUTS', 'NO ACTIVATION FEE', '1-STEP & INSTANT', 'EOD DRAWDOWN', 'UP TO $150K'],
   firm: [
     {
       k: 'Funding',
-      v: 'One-step evaluations and instant-funding accounts, in sizes up to $150K — traded on Rithmic, Volumetrica, Tradesea, Quantower and more.',
+      v: 'One-step evaluations and instant-funding accounts, in sizes from $25K up to $150K — traded on Rithmic and supported platforms, with no activation fee.',
     },
     {
       k: 'Payouts',
-      v: 'Daily payouts from day one of funding, processed inside a guaranteed five-hour window after the end-of-day reconciliation.',
+      v: 'Daily payouts you can request from day one of funding, processed inside a guaranteed five-hour window.',
     },
     {
       k: 'Rules',
-      v: 'End-of-day trailing drawdown — your floor only moves on the daily close, not on intraday spikes — and a clear Path to Live for consistent traders.',
+      v: 'End-of-day drawdown measured on the daily close, not on intraday spikes — plus a clear Path to Live: trade real capital after four payouts.',
     },
   ],
   closer: {
@@ -159,7 +159,7 @@ export default function FundedSeat() {
                 )}
               </span>
             </button>
-            <span className="code-note">Apply {CODE} at checkout for an exclusive discount on FundedSeat.</span>
+            <span className="code-note">Enter code {CODE} at checkout when you get funded with FundedSeat.</span>
           </div>
 
           <a className="cta" href={FS.closer.cta.url} target="_blank" rel="noopener nofollow sponsored">
