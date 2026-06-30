@@ -159,7 +159,7 @@ export default function FundedSeat() {
                 )}
               </span>
             </button>
-            <span className="code-note">Enter code {CODE} at checkout when you get funded with FundedSeat.</span>
+            <span className="code-note">Apply {CODE} at checkout for an exclusive discount on FundedSeat.</span>
           </div>
 
           <a className="cta" href={FS.closer.cta.url} target="_blank" rel="noopener nofollow sponsored">
