@@ -19,7 +19,7 @@ const FS = {
     phrase:
       'Up to a 90% split, with an end-of-day drawdown that only counts at the close.',
   },
-  what: ['UP TO 90% SPLIT', 'DAILY PAYOUTS', 'NO ACTIVATION FEE', '1-STEP & INSTANT', 'EOD DRAWDOWN', 'UP TO $150K'],
+  what: ['UP TO 90% SPLIT', 'FAST PAYOUTS', 'NO ACTIVATION FEE', '1-STEP & INSTANT', 'EOD DRAWDOWN', 'UP TO $150K'],
   firm: [
     {
       k: 'Funding',
@@ -27,7 +27,7 @@ const FS = {
     },
     {
       k: 'Payouts',
-      v: 'Daily payouts you can request from day one of funding, processed inside a guaranteed five-hour window.',
+      v: 'Automated payouts processed inside a guaranteed five-hour window once funded. Daily withdrawals on the daily-payout plans.',
     },
     {
       k: 'Rules',
@@ -35,7 +35,7 @@ const FS = {
     },
   ],
   closer: {
-    lead: 'Pick a size and get funded. Withdrawals start day one.',
+    lead: 'Pick a size and get funded.',
     cta: { label: 'Get funded with JTNQ', url: AFFILIATE_URL },
   },
   legal: {
