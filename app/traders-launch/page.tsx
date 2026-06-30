@@ -18,7 +18,7 @@ const TL = {
     eyebrow: 'PROP FIRM PARTNER',
     title: 'Traders Launch',
     phrase:
-      'Daily payouts, one-step funding, and no consistency rules once you’re in — the firm I put my name behind.',
+      'Daily payouts and no consistency rules once you’re funded. The firm I put my name behind.',
   },
   what: ['1-STEP EVALUATION', 'DAILY PAYOUTS', 'UP TO $300K', '80% PROFIT SPLIT', 'NO CONSISTENCY RULES'],
   firm: [
@@ -28,7 +28,7 @@ const TL = {
     },
     {
       k: 'Payouts',
-      v: 'Paid daily with no caps — first payout in as little as three days, up to an 80% split.',
+      v: 'Paid daily with no caps. First payout in as little as three days, up to an 80% split.',
     },
     {
       k: 'Rules',
@@ -36,7 +36,7 @@ const TL = {
     },
   ],
   closer: {
-    lead: 'Get funded, and keep more of what you make.',
+    lead: 'One step to funded. Then you get paid daily.',
     cta: { label: 'Get funded with JTNQ', url: AFFILIATE_URL },
   },
   legal: {
