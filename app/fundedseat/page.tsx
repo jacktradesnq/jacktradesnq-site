@@ -17,7 +17,7 @@ const FS = {
     eyebrow: 'PROP FIRM PARTNER',
     title: 'FundedSeat',
     phrase:
-      'Keep 90% of your profit and withdraw it daily, starting the day you get funded.',
+      'Up to a 90% split, with an end-of-day drawdown that only counts at the close.',
   },
   what: ['UP TO 90% SPLIT', 'DAILY PAYOUTS', 'NO ACTIVATION FEE', '1-STEP & INSTANT', 'EOD DRAWDOWN', 'UP TO $150K'],
   firm: [
