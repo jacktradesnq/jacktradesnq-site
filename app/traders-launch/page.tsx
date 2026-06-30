@@ -18,7 +18,7 @@ const TL = {
     eyebrow: 'PROP FIRM PARTNER',
     title: 'Traders Launch',
     phrase:
-      'Daily payouts and no consistency rules once you’re funded. The firm I put my name behind.',
+      'Daily payouts and no consistency rules once you’re funded.',
   },
   what: ['1-STEP EVALUATION', 'DAILY PAYOUTS', 'UP TO $300K', '80% PROFIT SPLIT', 'NO CONSISTENCY RULES'],
   firm: [
