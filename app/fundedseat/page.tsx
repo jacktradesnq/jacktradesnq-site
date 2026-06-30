@@ -205,6 +205,13 @@ const CSS = `
   font-display:swap;
   src:url('/fonts/JetBrainsMono.woff2') format('woff2');
 }
+@font-face{
+  font-family:'Zodiak';
+  font-style:normal;
+  font-weight:700;
+  font-display:swap;
+  src:url('/fonts/Zodiak-Bold.woff2') format('woff2');
+}
 .jtnq-fs{
   --c-bg: oklch(0.12 0.008 60);
   --c-bg-raise: oklch(0.16 0.012 58);
@@ -266,8 +273,8 @@ const CSS = `
 }
 .jtnq-fs .eyebrow::before, .jtnq-fs .eyebrow::after{ content: ""; width: 28px; height: 1px; background: var(--c-accent); }
 .jtnq-fs .wordmark{
-  font-family: var(--f-serif); font-style: italic; font-weight: 400;
-  font-size: clamp(56px, 10vw, 150px); line-height: .9; letter-spacing: -0.035em; margin: 0; color: var(--c-text);
+  font-family: 'Zodiak', var(--f-serif); font-style: normal; font-weight: 700;
+  font-size: clamp(54px, 9.4vw, 142px); line-height: .92; letter-spacing: -0.028em; margin: 0; color: var(--c-text);
 }
 .jtnq-fs .wordmark .dot{ color: var(--c-accent); }
 .jtnq-fs .phrase{
