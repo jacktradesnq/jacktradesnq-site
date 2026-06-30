@@ -19,21 +19,21 @@ const TOP = {
     eyebrow: 'PROP FIRM PARTNER',
     title: 'Top One Futures',
     phrase:
-      'A 90/10 split, fast payouts, and several ways to get funded — the prop firm built to actually pay traders.',
+      'A 90/10 split, fast payouts, and several ways to get funded. The prop firm I actually trade.',
   },
   what: ['FAST PAYOUTS', '90/10 PROFIT SPLIT', '1-STEP & INSTANT', 'UP TO $150K'],
   firm: [
     {
       k: 'Funding',
-      v: 'Several ways in — one-step evaluations and instant-funding accounts — across sizes from $25K to $150K.',
+      v: 'Several ways in: one-step evaluations and instant-funding accounts, from $25K to $150K.',
     },
     {
       k: 'Payouts',
-      v: 'Fast payouts across the board — and on the Elite Daily plan you can withdraw roughly every 24 hours once funded.',
+      v: 'Fast payouts across the board. On the Elite Daily plan you can withdraw roughly every 24 hours once funded.',
     },
     {
       k: 'Rules',
-      v: 'On the Elite Daily plan, no consistency rule once funded — trade your way, keep the upside. Other plans run a 15–40% rule.',
+      v: 'On the Elite Daily plan there’s no consistency rule once funded. Other plans run a 15 to 40% rule.',
     },
   ],
   plansIntro: 'Top One sells a few different account types. They all run a 90/10 profit split, so the real choice is how you want to get funded, how fast you can withdraw, and how strict the funded rules are.',
@@ -44,7 +44,7 @@ const TOP = {
       tag: 'Most forgiving eval',
       bestFor: 'you keep blowing evaluations on a bad session, or you swing / trade the news and need room to breathe',
       what:
-        'A one-step evaluation with no daily loss limit during the challenge. You pass a profit target once, then trade funded — and drawdown only updates on the daily close, so an intraday spike won’t end your account.',
+        'A one-step evaluation with no daily loss limit during the challenge. You pass a profit target once, then trade funded. Drawdown only updates on the daily close, so an intraday spike won’t end your account.',
       facts: ['One-step evaluation', 'No daily loss limit on the challenge', 'End-of-day trailing drawdown', 'Loosest funded consistency rule'],
     },
     {
@@ -52,7 +52,7 @@ const TOP = {
       tag: 'Daily payouts',
       bestFor: 'you want frequent withdrawals and would rather not have a consistency rule once funded',
       what:
-        'A one-phase evaluation that, once funded, is built around frequent withdrawals — you can request a payout roughly every 24 hours — and uniquely carries no consistency rule on the funded account. You keep a profit buffer after each withdrawal.',
+        'A one-phase evaluation that, once funded, is built around frequent withdrawals: you can request a payout roughly every 24 hours, and it uniquely carries no consistency rule on the funded account. You keep a profit buffer after each withdrawal.',
       facts: ['One-phase evaluation', 'Withdraw ~every 24h once funded', 'No funded consistency rule'],
     },
     {
@@ -60,7 +60,7 @@ const TOP = {
       tag: 'Skip the eval',
       bestFor: 'you’d rather start trading funded capital today than pass a challenge first',
       what:
-        'Instant funding — there is no evaluation to clear. You trade simulated capital from day one with a mid-tier consistency rule that leaves more headroom than the cheapest instant plan.',
+        'Instant funding, with no evaluation to clear. You trade simulated capital from day one, with a mid-tier consistency rule that leaves more headroom than the cheapest instant plan.',
       facts: ['Instant funding, no evaluation', 'More consistency headroom than IGNITE', 'A breach closes the account'],
     },
     {
@@ -68,12 +68,12 @@ const TOP = {
       tag: 'Most popular',
       bestFor: 'you’re a scalper or high-volume trader who grinds small consistent wins and wants to scale across several accounts',
       what:
-        'The cheapest way to skip the evaluation, designed for running multiple accounts at once. The trade-off is its tight funded rules — one oversized day can set you back — so it rewards discipline.',
+        'The cheapest way to skip the evaluation, designed for running multiple accounts at once. The trade-off is its tight funded rules: one oversized day can set you back, so it rewards discipline.',
       facts: ['Instant funding, no evaluation', 'Strictest funded consistency rule', 'Built to scale multiple accounts'],
     },
   ],
   closer: {
-    lead: 'Get funded, and keep more of what you make.',
+    lead: 'Pick how you want in. Every plan pays 90/10.',
     cta: { label: 'Get funded with JTNQ', url: AFFILIATE_URL },
   },
   legal: {
