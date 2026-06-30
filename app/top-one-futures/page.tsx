@@ -354,8 +354,8 @@ const CSS = `
 }
 .jtnq-top .eyebrow::before, .jtnq-top .eyebrow::after{ content: ""; width: 28px; height: 1px; background: var(--c-accent); }
 .jtnq-top .wordmark{
-  font-family: var(--f-serif); font-style: italic; font-weight: 400;
-  font-size: clamp(52px, 9.5vw, 140px); line-height: .9; letter-spacing: -0.035em; margin: 0; color: var(--c-text);
+  font-family: 'Zodiak', var(--f-serif); font-style: normal; font-weight: 700;
+  font-size: clamp(48px, 8.6vw, 128px); line-height: .92; letter-spacing: -0.028em; margin: 0; color: var(--c-text);
 }
 .jtnq-top .wordmark .dot{ color: var(--c-accent); }
 .jtnq-top .phrase{

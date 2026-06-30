@@ -267,8 +267,8 @@ const CSS = `
 }
 .jtnq-tl .eyebrow::before, .jtnq-tl .eyebrow::after{ content: ""; width: 28px; height: 1px; background: var(--c-accent); }
 .jtnq-tl .wordmark{
-  font-family: var(--f-serif); font-style: italic; font-weight: 400;
-  font-size: clamp(56px, 10vw, 150px); line-height: .9; letter-spacing: -0.035em; margin: 0; color: var(--c-text);
+  font-family: 'Zodiak', var(--f-serif); font-style: normal; font-weight: 700;
+  font-size: clamp(50px, 8.8vw, 132px); line-height: .92; letter-spacing: -0.028em; margin: 0; color: var(--c-text);
 }
 .jtnq-tl .wordmark .dot{ color: var(--c-accent); }
 .jtnq-tl .phrase{
