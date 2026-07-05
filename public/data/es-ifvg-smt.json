@@ -4,8 +4,8 @@
     "date_from": "2016-01-04",
     "date_to": "2026-05-11",
     "n_events_total": 1114,
-    "n_csv_events": 1871,
-    "generated_at": "2026-06-28T20:58:34.195847+00:00",
+    "n_csv_events": 1870,
+    "generated_at": "2026-07-05T20:55:33.184723+00:00",
     "event_filter": "ALL_17_EVENTS",
     "csv": "/Users/angelo/news-cal-official/news_official_2016_2026.csv",
     "events": [
