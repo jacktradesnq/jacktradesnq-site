@@ -3747,7 +3747,7 @@ body:has(.page-legal) { background: oklch(0.15 0.028 165); }
   position: sticky;
   top: 53px; /* matches .v3-topbar height */
   z-index: 40;
-  background: oklch(0.16 0.014 62 / 0.82);
+  background: oklch(0.17 0.03 165 / 0.82);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--c-border);
