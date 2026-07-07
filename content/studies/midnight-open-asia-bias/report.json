@@ -1,0 +1,25 @@
+{
+  "eyebrow": "Midnight open · NQ · 2016–2026",
+  "title": "Most of the time price comes back to the midnight open when Asia was wild",
+  "hero": {
+    "stat": "64%",
+    "caption": "On a wild Asia night, a big overnight range, NQ comes back to the midnight open **64%** of the time. On a quiet night it's only **25%**. I took every day price pushed 75+ points off the level since 2016, and the size of the Asia range is what splits them. The return mostly lands around the NY open."
+  },
+  "chart": {
+    "kind": "hbars",
+    "label": "Price returns to the midnight open — by overnight Asia range",
+    "sub": "Only days where price already pushed 75+ pts off the level · 1,835 days",
+    "rows": [
+      { "name": "Wild Asia (range > 56 pts)", "pct": 64.0, "display": "64%" },
+      { "name": "Average Asia", "pct": 49.0, "display": "49%" },
+      { "name": "Quiet Asia (range < 28 pts)", "pct": 25.0, "display": "25%" }
+    ]
+  },
+  "cards": [
+    { "label": "Quiet Asia", "value": "Back 25%", "sub": "price trends away from the level" },
+    { "label": "Wild Asia", "value": "Back 64%", "sub": "price gets pulled back to it", "hot": true },
+    { "label": "The return", "value": "NY open", "sub": "~half land 8–11 ET, ~2h40 after the push" }
+  ],
+  "useIt": "I check the Asia range before the open. Quiet night, I don't expect the midnight open to come back, so I don't fade toward it. Wild night, it usually gets retested around 9:30, so I keep it as a level on the chart. It's a read on the day, not an entry.",
+  "disclaimer": "Not advice · AI-backtested over 2016–2026 · check it yourself"
+}

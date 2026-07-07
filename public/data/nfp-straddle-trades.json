@@ -1,6 +1,6 @@
 {
   "event": "NFP",
-  "generated_at": "2026-06-28T21:14:32.203460+00:00",
+  "generated_at": "2026-07-05T21:15:11.845060+00:00",
   "combos": [
     {
       "X": 25.0,
@@ -2183,6 +2183,24 @@
           "exit_price": 30055.25,
           "pnl": -85.0,
           "outcome": "expired_long_loss"
+        },
+        {
+          "date": "2026-07-02",
+          "ts": "2026-07-02T12:30:00+00:00",
+          "entry_price": 30182.75,
+          "X": 25.0,
+          "Y": 15.0,
+          "buy_stop": 30207.75,
+          "sell_stop": 30157.75,
+          "tp_buy": 30222.75,
+          "tp_sell": 30142.75,
+          "filled_side": "long",
+          "fill_ts": "2026-07-02 14:30:00+02:00",
+          "fill_price": 30207.75,
+          "exit_ts": "2026-07-02 14:30:00+02:00",
+          "exit_price": 30222.75,
+          "pnl": 15.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -4367,6 +4385,24 @@
           "exit_price": 30055.25,
           "pnl": -85.0,
           "outcome": "expired_long_loss"
+        },
+        {
+          "date": "2026-07-02",
+          "ts": "2026-07-02T12:30:00+00:00",
+          "entry_price": 30182.75,
+          "X": 25.0,
+          "Y": 20.0,
+          "buy_stop": 30207.75,
+          "sell_stop": 30157.75,
+          "tp_buy": 30227.75,
+          "tp_sell": 30137.75,
+          "filled_side": "long",
+          "fill_ts": "2026-07-02 14:30:00+02:00",
+          "fill_price": 30207.75,
+          "exit_ts": "2026-07-02 14:30:00+02:00",
+          "exit_price": 30227.75,
+          "pnl": 20.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -6551,6 +6587,24 @@
           "exit_price": 30055.25,
           "pnl": -85.0,
           "outcome": "expired_long_loss"
+        },
+        {
+          "date": "2026-07-02",
+          "ts": "2026-07-02T12:30:00+00:00",
+          "entry_price": 30182.75,
+          "X": 25.0,
+          "Y": 25.0,
+          "buy_stop": 30207.75,
+          "sell_stop": 30157.75,
+          "tp_buy": 30232.75,
+          "tp_sell": 30132.75,
+          "filled_side": "long",
+          "fill_ts": "2026-07-02 14:30:00+02:00",
+          "fill_price": 30207.75,
+          "exit_ts": "2026-07-02 14:30:00+02:00",
+          "exit_price": 30232.75,
+          "pnl": 25.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -8735,6 +8789,24 @@
           "exit_price": 30055.25,
           "pnl": -90.0,
           "outcome": "expired_long_loss"
+        },
+        {
+          "date": "2026-07-02",
+          "ts": "2026-07-02T12:30:00+00:00",
+          "entry_price": 30182.75,
+          "X": 30.0,
+          "Y": 15.0,
+          "buy_stop": 30212.75,
+          "sell_stop": 30152.75,
+          "tp_buy": 30227.75,
+          "tp_sell": 30137.75,
+          "filled_side": "long",
+          "fill_ts": "2026-07-02 14:30:00+02:00",
+          "fill_price": 30212.75,
+          "exit_ts": "2026-07-02 14:30:00+02:00",
+          "exit_price": 30227.75,
+          "pnl": 15.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -10919,6 +10991,24 @@
           "exit_price": 30055.25,
           "pnl": -90.0,
           "outcome": "expired_long_loss"
+        },
+        {
+          "date": "2026-07-02",
+          "ts": "2026-07-02T12:30:00+00:00",
+          "entry_price": 30182.75,
+          "X": 30.0,
+          "Y": 20.0,
+          "buy_stop": 30212.75,
+          "sell_stop": 30152.75,
+          "tp_buy": 30232.75,
+          "tp_sell": 30132.75,
+          "filled_side": "long",
+          "fill_ts": "2026-07-02 14:30:00+02:00",
+          "fill_price": 30212.75,
+          "exit_ts": "2026-07-02 14:30:00+02:00",
+          "exit_price": 30232.75,
+          "pnl": 20.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -13103,6 +13193,24 @@
           "exit_price": 30055.25,
           "pnl": -90.0,
           "outcome": "expired_long_loss"
+        },
+        {
+          "date": "2026-07-02",
+          "ts": "2026-07-02T12:30:00+00:00",
+          "entry_price": 30182.75,
+          "X": 30.0,
+          "Y": 25.0,
+          "buy_stop": 30212.75,
+          "sell_stop": 30152.75,
+          "tp_buy": 30237.75,
+          "tp_sell": 30127.75,
+          "filled_side": "long",
+          "fill_ts": "2026-07-02 14:30:00+02:00",
+          "fill_price": 30212.75,
+          "exit_ts": "2026-07-02 14:30:00+02:00",
+          "exit_price": 30237.75,
+          "pnl": 25.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -15287,6 +15395,24 @@
           "exit_price": 30055.25,
           "pnl": -95.0,
           "outcome": "expired_long_loss"
+        },
+        {
+          "date": "2026-07-02",
+          "ts": "2026-07-02T12:30:00+00:00",
+          "entry_price": 30182.75,
+          "X": 35.0,
+          "Y": 15.0,
+          "buy_stop": 30217.75,
+          "sell_stop": 30147.75,
+          "tp_buy": 30232.75,
+          "tp_sell": 30132.75,
+          "filled_side": "long",
+          "fill_ts": "2026-07-02 14:30:00+02:00",
+          "fill_price": 30217.75,
+          "exit_ts": "2026-07-02 14:30:00+02:00",
+          "exit_price": 30232.75,
+          "pnl": 15.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -17471,6 +17597,24 @@
           "exit_price": 30055.25,
           "pnl": -95.0,
           "outcome": "expired_long_loss"
+        },
+        {
+          "date": "2026-07-02",
+          "ts": "2026-07-02T12:30:00+00:00",
+          "entry_price": 30182.75,
+          "X": 35.0,
+          "Y": 20.0,
+          "buy_stop": 30217.75,
+          "sell_stop": 30147.75,
+          "tp_buy": 30237.75,
+          "tp_sell": 30127.75,
+          "filled_side": "long",
+          "fill_ts": "2026-07-02 14:30:00+02:00",
+          "fill_price": 30217.75,
+          "exit_ts": "2026-07-02 14:30:00+02:00",
+          "exit_price": 30237.75,
+          "pnl": 20.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -19655,6 +19799,24 @@
           "exit_price": 30055.25,
           "pnl": -95.0,
           "outcome": "expired_long_loss"
+        },
+        {
+          "date": "2026-07-02",
+          "ts": "2026-07-02T12:30:00+00:00",
+          "entry_price": 30182.75,
+          "X": 35.0,
+          "Y": 25.0,
+          "buy_stop": 30217.75,
+          "sell_stop": 30147.75,
+          "tp_buy": 30242.75,
+          "tp_sell": 30122.75,
+          "filled_side": "long",
+          "fill_ts": "2026-07-02 14:30:00+02:00",
+          "fill_price": 30217.75,
+          "exit_ts": "2026-07-02 14:30:00+02:00",
+          "exit_price": 30242.75,
+          "pnl": 25.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -21839,6 +22001,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-07-02",
+          "ts": "2026-07-02T12:30:00+00:00",
+          "entry_price": 30182.75,
+          "X": 40.0,
+          "Y": 15.0,
+          "buy_stop": 30222.75,
+          "sell_stop": 30142.75,
+          "tp_buy": 30237.75,
+          "tp_sell": 30127.75,
+          "filled_side": "long",
+          "fill_ts": "2026-07-02 14:30:00+02:00",
+          "fill_price": 30222.75,
+          "exit_ts": "2026-07-02 14:30:00+02:00",
+          "exit_price": 30237.75,
+          "pnl": 15.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -24023,6 +24203,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-07-02",
+          "ts": "2026-07-02T12:30:00+00:00",
+          "entry_price": 30182.75,
+          "X": 40.0,
+          "Y": 20.0,
+          "buy_stop": 30222.75,
+          "sell_stop": 30142.75,
+          "tp_buy": 30242.75,
+          "tp_sell": 30122.75,
+          "filled_side": "long",
+          "fill_ts": "2026-07-02 14:30:00+02:00",
+          "fill_price": 30222.75,
+          "exit_ts": "2026-07-02 14:30:00+02:00",
+          "exit_price": 30242.75,
+          "pnl": 20.0,
+          "outcome": "tp_hit"
         }
       ]
     },
@@ -26207,6 +26405,24 @@
           "exit_price": null,
           "pnl": 0.0,
           "outcome": "no_fill"
+        },
+        {
+          "date": "2026-07-02",
+          "ts": "2026-07-02T12:30:00+00:00",
+          "entry_price": 30182.75,
+          "X": 40.0,
+          "Y": 25.0,
+          "buy_stop": 30222.75,
+          "sell_stop": 30142.75,
+          "tp_buy": 30247.75,
+          "tp_sell": 30117.75,
+          "filled_side": "long",
+          "fill_ts": "2026-07-02 14:30:00+02:00",
+          "fill_price": 30222.75,
+          "exit_ts": "2026-07-02 14:30:00+02:00",
+          "exit_price": 30247.75,
+          "pnl": 25.0,
+          "outcome": "tp_hit"
         }
       ]
     }

@@ -5,7 +5,7 @@
     "date_to": "2026-05-15",
     "n_events_total": 1,
     "n_csv_events": 127,
-    "generated_at": "2026-06-28T21:13:21.650550+00:00",
+    "generated_at": "2026-07-05T21:13:44.181128+00:00",
     "event_filter": "PCE",
     "csv": "/Users/angelo/news-cal-official/news_official_2016_2026.csv",
     "tick": "SI_TICK=0.005 (SL fix: range sweep_ts\u2192entry_ts), GC_TICK=0.1 (SMT pair)"
