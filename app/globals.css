@@ -3508,7 +3508,7 @@ a { color: inherit; text-decoration: none; }
   border-radius: 16px;
   background:
     radial-gradient(120% 140% at 0% 0%, oklch(0.80 0.135 82 / 0.06), transparent 55%),
-    oklch(0.19 0.014 64);
+    oklch(0.20 0.03 165);
   overflow: hidden;
 }
 .sh-card-head {
@@ -3549,7 +3549,7 @@ a { color: inherit; text-decoration: none; }
   border-radius: 50%;
   background: conic-gradient(
     var(--c-accent) calc(var(--p) * 1%),
-    oklch(0.30 0.014 64) 0
+    oklch(0.30 0.03 165) 0
   );
   display: grid;
   place-items: center;
@@ -3558,7 +3558,7 @@ a { color: inherit; text-decoration: none; }
   width: 112px;
   height: 112px;
   border-radius: 50%;
-  background: oklch(0.19 0.014 64);
+  background: oklch(0.20 0.03 165);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -3643,7 +3643,7 @@ a { color: inherit; text-decoration: none; }
   height: 120px;
   display: flex;
   align-items: flex-end;
-  background: oklch(0.24 0.012 64);
+  background: oklch(0.24 0.028 165);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -3688,7 +3688,7 @@ a { color: inherit; text-decoration: none; }
   padding: 20px;
   background:
     radial-gradient(120% 140% at 0% 0%, oklch(0.80 0.135 82 / 0.07), transparent 55%),
-    oklch(0.19 0.014 64);
+    oklch(0.20 0.03 165);
   transition: border-color 0.15s ease, transform 0.15s ease;
 }
 .idx-edge:hover { border-color: var(--c-accent); transform: translateY(-2px); }
@@ -5222,41 +5222,41 @@ a { color: inherit; text-decoration: none; }
    above by source order. Win = gold, loss = warm clay (no red/green slop).
    ═══════════════════════════════════════════════════════════════════ */
 .bd-root {
-  /* cream primitives → dark, so any direct usage also goes dark (warm brown, not grey) */
-  --p-cream-97:    oklch(0.16 0.014 62);
-  --p-cream-95:    oklch(0.198 0.019 62);
-  --p-cream-94:    oklch(0.218 0.019 60);
-  --p-cream-92:    oklch(0.248 0.018 60);
-  --p-cream-88:    oklch(0.32 0.016 64);
-  --p-cream-85:    oklch(0.255 0.014 62);
-  --p-ink-18:      oklch(0.94 0.028 85);
-  --p-ink-55:      oklch(0.62 0.018 75);
+  /* cream primitives → dark, so any direct usage also goes dark (bottle green, not grey) */
+  --p-cream-97:    oklch(0.17 0.03 165);
+  --p-cream-95:    oklch(0.205 0.032 165);
+  --p-cream-94:    oklch(0.225 0.032 165);
+  --p-cream-92:    oklch(0.255 0.03 165);
+  --p-cream-88:    oklch(0.32 0.03 165);
+  --p-cream-85:    oklch(0.26 0.03 165);
+  --p-ink-18:      oklch(0.95 0.025 95);
+  --p-ink-55:      oklch(0.64 0.03 140);
   --p-gold:        oklch(0.80 0.135 82);
   --p-gold-deep:   oklch(0.72 0.14 80);
 
-  /* semantic — warm brown surfaces (chroma kept up so cards read warm, not grey) */
-  --c-surface:        oklch(0.16 0.014 62);
-  --c-surface-raised: oklch(0.218 0.019 60);
-  --c-surface-hover:  oklch(0.248 0.018 60);
-  --c-surface-card:   oklch(0.198 0.019 62);
-  --c-ink:            oklch(0.94 0.028 85);
-  --c-muted:          oklch(0.62 0.018 75);
-  --c-border:         oklch(0.32 0.016 64);
-  --c-border-soft:    oklch(0.255 0.014 62);
+  /* semantic — bottle green surfaces (chroma kept up so cards read warm, not grey) */
+  --c-surface:        oklch(0.17 0.03 165);
+  --c-surface-raised: oklch(0.225 0.032 165);
+  --c-surface-hover:  oklch(0.255 0.03 165);
+  --c-surface-card:   oklch(0.205 0.032 165);
+  --c-ink:            oklch(0.95 0.025 95);
+  --c-muted:          oklch(0.64 0.03 140);
+  --c-border:         oklch(0.30 0.035 165);
+  --c-border-soft:    oklch(0.26 0.03 165);
   --c-accent:         oklch(0.80 0.135 82);
   --c-accent-deep:    oklch(0.72 0.14 80);
   --c-gold-deep:      oklch(0.80 0.135 82);
-  --cream-bg:         oklch(0.16 0.014 62);
-  --cream-soft:       oklch(0.218 0.019 60);
+  --cream-bg:         oklch(0.17 0.03 165);
+  --cream-soft:       oklch(0.205 0.032 165);
 
-  /* data: win = gold, loss = muted warm clay (desaturated, same warm family — no foreign red) */
+  /* data: win = gold, loss = muted warm clay (desaturated — contrasts the green, no foreign red) */
   --c-sage:       oklch(0.80 0.135 82);
   --c-sage-soft:  oklch(0.30 0.05 82);
   --c-terra:      oklch(0.56 0.082 45);
   --c-terra-soft: oklch(0.28 0.05 45);
 
-  background: oklch(0.16 0.014 62);
-  color: oklch(0.94 0.028 85);
+  background: oklch(0.17 0.03 165);
+  color: oklch(0.95 0.025 95);
   min-height: 100vh;
 }
 

@@ -40,7 +40,7 @@ export default function Home() {
 
   useEffect(() => {
     const prev = document.body.style.background;
-    document.body.style.background = 'oklch(0.16 0.012 60)';
+    document.body.style.background = 'oklch(0.17 0.03 165)';
     return () => {
       document.body.style.background = prev;
     };
@@ -370,16 +370,16 @@ const CSS = `
   src:url('/fonts/JetBrainsMono.woff2') format('woff2');
 }
 .jtnq-home{
-  --c-bg: oklch(0.16 0.012 60);
-  --c-bg-raise: oklch(0.20 0.014 58);
-  --c-bg-deep: oklch(0.12 0.010 60);
-  --c-text: oklch(0.94 0.028 85);
-  --c-text-soft: oklch(0.78 0.022 80);
-  --c-text-mute: oklch(0.52 0.018 75);
-  --c-text-deep: oklch(0.36 0.015 70);
+  --c-bg: oklch(0.17 0.03 165);
+  --c-bg-raise: oklch(0.205 0.035 165);
+  --c-bg-deep: oklch(0.13 0.028 165);
+  --c-text: oklch(0.95 0.025 95);
+  --c-text-soft: oklch(0.78 0.025 120);
+  --c-text-mute: oklch(0.55 0.025 140);
+  --c-text-deep: oklch(0.38 0.02 150);
   --c-accent: oklch(0.80 0.135 82);
-  --c-line: oklch(0.28 0.012 65);
-  --c-line-soft: oklch(0.22 0.010 62);
+  --c-line: oklch(0.29 0.035 165);
+  --c-line-soft: oklch(0.24 0.03 165);
   --f-serif: 'Fraunces', 'Times New Roman', serif;
   --f-sans: 'Satoshi', system-ui, sans-serif;
   --f-mono: 'JetBrains Mono', ui-monospace, monospace;
