@@ -650,7 +650,7 @@ export default async function BacktestedDetail({ params }: PageProps) {
         <h3 className="mb-2 font-semibold uppercase tracking-[0.12em]" style={{ fontFamily: 'var(--f-sans)', fontWeight: 500, fontSize: '0.75rem', color: 'var(--c-muted)' }}>
           Methodology &amp; limitations
         </h3>
-        <p className="max-w-[65ch]" style={{ fontFamily: 'var(--f-sans)', fontWeight: 400, fontSize: '0.875rem', lineHeight: 1.6, color: 'oklch(0.55 0.01 60)' }}>
+        <p className="max-w-[65ch]" style={{ fontFamily: 'var(--f-sans)', fontWeight: 400, fontSize: '0.875rem', lineHeight: 1.6, color: 'var(--c-muted)' }}>
           Results are derived from historical data via AI-assisted backtesting over a 10-year window.
           Past performance does not predict future results — market microstructure evolves, and edges
           captured in historical samples may decay or disappear in live conditions.

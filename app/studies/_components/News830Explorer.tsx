@@ -609,7 +609,7 @@ export default function News830Explorer({ dataUrl, pdfTitle, dataUrlGc, pdfTitle
           background: #1c1812;
           color: var(--c-ink);
           font-weight: 700;
-          box-shadow: 0 1px 2px oklch(0.18 0.005 60 / 0.10), 0 2px 6px oklch(0.18 0.005 60 / 0.06);
+          box-shadow: 0 1px 2px oklch(0.16 0.02 165 / 0.10), 0 2px 6px oklch(0.16 0.02 165 / 0.06);
         }
         .n8-seg-btn--active:hover { background: #1c1812; }
         .n8-seg-btn:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
@@ -635,7 +635,7 @@ export default function News830Explorer({ dataUrl, pdfTitle, dataUrlGc, pdfTitle
           height: 18px;
           border-radius: 999px;
           background: #1c1812;
-          box-shadow: 0 1px 2px oklch(0.18 0.005 60 / 0.20);
+          box-shadow: 0 1px 2px oklch(0.16 0.02 165 / 0.20);
           transition: transform 180ms cubic-bezier(0.34, 1.4, 0.64, 1);
         }
         .n8-switch--on .n8-switch-thumb { transform: translateX(20px); }
@@ -735,8 +735,8 @@ export default function News830Explorer({ dataUrl, pdfTitle, dataUrlGc, pdfTitle
           letter-spacing: 0.1em;
           text-transform: uppercase;
           color: oklch(0.58 0.10 82);
-          background: oklch(0.16 0.014 62);
-          border: 1px solid oklch(0.16 0.014 62);
+          background: oklch(0.17 0.03 165);
+          border: 1px solid oklch(0.17 0.03 165);
           border-radius: 4px;
           padding: 2px 7px;
           margin-left: 8px;
