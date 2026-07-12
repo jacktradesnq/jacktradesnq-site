@@ -4,8 +4,8 @@
     "date_from": "2016-01-04",
     "date_to": "2026-05-11",
     "n_events_total": 69,
-    "n_csv_events": 129,
-    "generated_at": "2026-06-07T20:40:18.027993+00:00",
+    "n_csv_events": 128,
+    "generated_at": "2026-07-05T20:55:32.864800+00:00",
     "event_filter": "ADP",
     "csv": "/Users/angelo/news-cal-official/news_official_2016_2026.csv",
     "variants": {
