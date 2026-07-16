@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/top-one-futures/`, lastModified, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE}/traders-launch/`, lastModified, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE}/fundedseat/`, lastModified, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${BASE}/blue-guardian/`, lastModified, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE}/mentions-legales/`, lastModified, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${BASE}/politique-confidentialite/`, lastModified, changeFrequency: 'yearly', priority: 0.3 },
   ];

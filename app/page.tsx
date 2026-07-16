@@ -15,6 +15,7 @@ const SITE = {
   topOne: { name: 'Top One Futures', url: '/top-one-futures/', tagline: 'Prop firm partner · daily payouts, code JTNQ' },
   tradersLaunch: { name: 'Traders Launch', url: '/traders-launch/', tagline: 'Prop firm partner · 15% off with code JTNQ' },
   fundedSeat: { name: 'FundedSeat', url: '/fundedseat/', tagline: 'Prop firm partner · daily payouts, code JTNQ' },
+  blueGuardian: { name: 'Blue Guardian', url: '/blue-guardian/', tagline: 'Prop firm partner · 90% split, code JTNQ' },
   legal: {
     copyright: '© 2026 JackTradesNQ. All rights reserved.',
     mentionsUrl: '/mentions-legales/',
@@ -327,6 +328,19 @@ export default function Home() {
                 </svg>
               </div>
               <p className="tagline">{SITE.fundedSeat.tagline}</p>
+            </a>
+
+            <a className="hub-card" href={SITE.blueGuardian.url}>
+              <div className="row">
+                <h3 className="title">
+                  {SITE.blueGuardian.name}
+                  <span className="swash">.</span>
+                </h3>
+                <svg className="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 17L17 7M9 7h8v8" />
+                </svg>
+              </div>
+              <p className="tagline">{SITE.blueGuardian.tagline}</p>
             </a>
           </div>
         </section>
