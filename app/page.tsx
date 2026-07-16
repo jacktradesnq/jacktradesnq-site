@@ -12,10 +12,7 @@ const SITE = {
   ],
   studies: { url: '/studies/', tagline: '10 years of 1-minute futures data, every setup backtested' },
   nefarious: { name: 'Nefarious', url: '/nefarious/', tagline: 'Official partner · free Discord community' },
-  topOne: { name: 'Top One Futures', url: '/top-one-futures/', tagline: 'Prop firm partner · daily payouts, code JTNQ' },
-  tradersLaunch: { name: 'Traders Launch', url: '/traders-launch/', tagline: 'Prop firm partner · 15% off with code JTNQ' },
-  fundedSeat: { name: 'FundedSeat', url: '/fundedseat/', tagline: 'Prop firm partner · daily payouts, code JTNQ' },
-  blueGuardian: { name: 'Blue Guardian', url: '/blue-guardian/', tagline: 'Prop firm partner · 90% split, code JTNQ' },
+  propFirms: { name: 'Prop firms', url: '/prop-firms/', tagline: 'Futures partners compared · code JTNQ' },
   legal: {
     copyright: '© 2026 JackTradesNQ. All rights reserved.',
     mentionsUrl: '/mentions-legales/',
@@ -291,56 +288,17 @@ export default function Home() {
               <p className="tagline">{SITE.nefarious.tagline}</p>
             </a>
 
-            <a className="hub-card" href={SITE.topOne.url}>
+            <a className="hub-card" href={SITE.propFirms.url}>
               <div className="row">
                 <h3 className="title">
-                  {SITE.topOne.name}
+                  {SITE.propFirms.name}
                   <span className="swash">.</span>
                 </h3>
                 <svg className="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M7 17L17 7M9 7h8v8" />
                 </svg>
               </div>
-              <p className="tagline">{SITE.topOne.tagline}</p>
-            </a>
-
-            <a className="hub-card" href={SITE.tradersLaunch.url}>
-              <div className="row">
-                <h3 className="title">
-                  {SITE.tradersLaunch.name}
-                  <span className="swash">.</span>
-                </h3>
-                <svg className="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M7 17L17 7M9 7h8v8" />
-                </svg>
-              </div>
-              <p className="tagline">{SITE.tradersLaunch.tagline}</p>
-            </a>
-
-            <a className="hub-card" href={SITE.fundedSeat.url}>
-              <div className="row">
-                <h3 className="title">
-                  {SITE.fundedSeat.name}
-                  <span className="swash">.</span>
-                </h3>
-                <svg className="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M7 17L17 7M9 7h8v8" />
-                </svg>
-              </div>
-              <p className="tagline">{SITE.fundedSeat.tagline}</p>
-            </a>
-
-            <a className="hub-card" href={SITE.blueGuardian.url}>
-              <div className="row">
-                <h3 className="title">
-                  {SITE.blueGuardian.name}
-                  <span className="swash">.</span>
-                </h3>
-                <svg className="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M7 17L17 7M9 7h8v8" />
-                </svg>
-              </div>
-              <p className="tagline">{SITE.blueGuardian.tagline}</p>
+              <p className="tagline">{SITE.propFirms.tagline}</p>
             </a>
           </div>
         </section>
