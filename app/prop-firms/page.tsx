@@ -131,7 +131,7 @@ const META = {
   },
 };
 
-const NOTE = `Figures pulled from each firm's official site. Prices and promo codes auto-checked daily — last sync ${DATA.generatedAt}. Risk rules verified manually 18 Jul 2026. Promos change fast; the live checkout price wins.`;
+const NOTE = `Figures pulled from each firm's official site. Prices and promo codes auto-checked daily — last sync ${DATA.generatedAt}. Risk rules verified manually 19 Jul 2026. Promos change fast; the live checkout price wins.`;
 
 export default function PropFirms() {
   const [size, setSize] = useState(100000);
