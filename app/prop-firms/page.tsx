@@ -291,9 +291,9 @@ function FirmRow({
   const firmMeta = (
     <span className="firm-row-meta">
       {firm.split} split · {firm.payout}
-      {promo.code && (
+      {(promo.code || firm.code !== null) && (
         <span className="promo-chip" title={promo.title || undefined}>
-          code {promo.code}
+          code {firm.code === null ? promo.code : CODE}
         </span>
       )}
     </span>
@@ -367,7 +367,7 @@ function FirmRow({
                         {plan.originalPrice != null && <s className="price-was">{money(plan.originalPrice)}</s>}
                         {subPromo.code && (
                           <span className="promo-chip" title={subPromo.title || undefined}>
-                            code {subPromo.code}
+                            code {firm.code === null ? subPromo.code : CODE}
                           </span>
                         )}
                       </span>
