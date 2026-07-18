@@ -1,0 +1,754 @@
+{
+  "generatedAt": "2026-07-18",
+  "firms": [
+    {
+      "id": "blue-guardian",
+      "name": "Blue Guardian",
+      "split": "90%",
+      "payout": "On-demand",
+      "promo": {
+        "label": "40% OFF",
+        "code": "LAUNCH"
+      },
+      "url": "https://blueguardian.com/?afmc=JTNQ",
+      "lastChecked": "2026-07-18",
+      "stale": false,
+      "programs": [
+        {
+          "name": "Direct",
+          "type": "instant",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 167,
+              "originalPrice": 279,
+              "profitTarget": null,
+              "maxDrawdown": 1500,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "None",
+              "contracts": "1 Mini | 10 Micro"
+            },
+            {
+              "size": 50000,
+              "price": 269,
+              "originalPrice": 449,
+              "profitTarget": null,
+              "maxDrawdown": 2500,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "None",
+              "contracts": "4 Mini | 40 Micro"
+            },
+            {
+              "size": 100000,
+              "price": 359,
+              "originalPrice": 599,
+              "profitTarget": null,
+              "maxDrawdown": 3500,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "None",
+              "contracts": "8 Mini | 80 Micro"
+            },
+            {
+              "size": 150000,
+              "price": 449,
+              "originalPrice": 749,
+              "profitTarget": null,
+              "maxDrawdown": 5000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "None",
+              "contracts": "12 Mini | 120 Micro"
+            }
+          ]
+        },
+        {
+          "name": "Express",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 50000,
+              "price": 97,
+              "originalPrice": 162,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1000,
+              "dailyLossSoft": true,
+              "consistency": "40%",
+              "contracts": "4 Mini | 40 Micro"
+            },
+            {
+              "size": 100000,
+              "price": 154,
+              "originalPrice": 256,
+              "profitTarget": 6000,
+              "maxDrawdown": 3500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 2000,
+              "dailyLossSoft": true,
+              "consistency": "40%",
+              "contracts": "8 Mini | 80 Micro"
+            },
+            {
+              "size": 150000,
+              "price": 211,
+              "originalPrice": 351,
+              "profitTarget": 9000,
+              "maxDrawdown": 5000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 3000,
+              "dailyLossSoft": true,
+              "consistency": "40%",
+              "contracts": "12 Mini | 120 Micro"
+            }
+          ]
+        },
+        {
+          "name": "Reserve",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 60,
+              "originalPrice": 100,
+              "profitTarget": 1500,
+              "maxDrawdown": 1500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "50%",
+              "contracts": "2 Mini | 20 Micro"
+            },
+            {
+              "size": 50000,
+              "price": 84,
+              "originalPrice": 140,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "50%",
+              "contracts": "4 Mini | 40 Micro"
+            },
+            {
+              "size": 100000,
+              "price": 135,
+              "originalPrice": 225,
+              "profitTarget": 6000,
+              "maxDrawdown": 3500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "50%",
+              "contracts": "8 Mini | 80 Micro"
+            },
+            {
+              "size": 150000,
+              "price": 252,
+              "originalPrice": 420,
+              "profitTarget": 9000,
+              "maxDrawdown": 5000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "50%",
+              "contracts": "12 Mini | 120 Micro"
+            }
+          ]
+        },
+        {
+          "name": "Standard",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 84,
+              "originalPrice": 140,
+              "profitTarget": 1500,
+              "maxDrawdown": 1500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "None",
+              "contracts": "1 Mini | 10 Micro"
+            },
+            {
+              "size": 50000,
+              "price": 114,
+              "originalPrice": 190,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1000,
+              "dailyLossSoft": true,
+              "consistency": "None",
+              "contracts": "4 Mini | 40 Micro"
+            },
+            {
+              "size": 100000,
+              "price": 180,
+              "originalPrice": 300,
+              "profitTarget": 6000,
+              "maxDrawdown": 3500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 2000,
+              "dailyLossSoft": true,
+              "consistency": "None",
+              "contracts": "8 Mini | 80 Micro"
+            },
+            {
+              "size": 150000,
+              "price": 231,
+              "originalPrice": 385,
+              "profitTarget": 9000,
+              "maxDrawdown": 5000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 3000,
+              "dailyLossSoft": true,
+              "consistency": "None",
+              "contracts": "12 Mini | 120 Micro"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "traders-launch",
+      "name": "Traders Launch",
+      "split": "80%",
+      "payout": "Daily",
+      "promo": null,
+      "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
+      "lastChecked": "2026-07-18",
+      "stale": false,
+      "programs": [
+        {
+          "name": "1-Step",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 100000,
+              "price": 159,
+              "originalPrice": null,
+              "profitTarget": 2000,
+              "maxDrawdown": 1000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "2 minis / 20 micros"
+            },
+            {
+              "size": 200000,
+              "price": 299,
+              "originalPrice": null,
+              "profitTarget": 4000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "4 minis / 40 micros"
+            },
+            {
+              "size": 300000,
+              "price": 599,
+              "originalPrice": null,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "6 minis / 60 micros"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "top-one-futures",
+      "name": "Top One Futures",
+      "split": "90%",
+      "payout": "On-demand",
+      "promo": {
+        "label": "40-50% OFF",
+        "code": "SUMMER"
+      },
+      "url": "https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures",
+      "lastChecked": "2026-07-18",
+      "stale": false,
+      "programs": [
+        {
+          "name": "Elite Challenge",
+          "type": "eval",
+          "priceType": "monthly",
+          "promoCode": "SUMMER",
+          "promoLabel": "40% OFF",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 41,
+              "originalPrice": 69,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD",
+              "dailyLoss": 625,
+              "dailyLossSoft": false,
+              "consistency": "25%",
+              "contracts": "1 mini / 10 micros"
+            },
+            {
+              "size": 50000,
+              "price": 63,
+              "originalPrice": 105,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD",
+              "dailyLoss": 1250,
+              "dailyLossSoft": false,
+              "consistency": "25%",
+              "contracts": "3 minis / 30 micros"
+            },
+            {
+              "size": 100000,
+              "price": 125,
+              "originalPrice": 209,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD",
+              "dailyLoss": 2500,
+              "dailyLossSoft": false,
+              "consistency": "25%",
+              "contracts": "5 minis / 50 micros"
+            },
+            {
+              "size": 150000,
+              "price": 185,
+              "originalPrice": 309,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "EOD",
+              "dailyLoss": 3750,
+              "dailyLossSoft": false,
+              "consistency": "25%",
+              "contracts": "7 minis / 70 micros"
+            }
+          ]
+        },
+        {
+          "name": "Elite Daily",
+          "type": "eval",
+          "priceType": "monthly",
+          "promoCode": "SUMMER",
+          "promoLabel": "50% OFF",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 89,
+              "originalPrice": 178,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD",
+              "dailyLoss": 500,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "1 mini / 10 micros"
+            },
+            {
+              "size": 50000,
+              "price": 109,
+              "originalPrice": 218,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD",
+              "dailyLoss": 1000,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "3 minis / 30 micros"
+            },
+            {
+              "size": 100000,
+              "price": 199,
+              "originalPrice": 398,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD",
+              "dailyLoss": 1250,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "5 minis / 50 micros"
+            },
+            {
+              "size": 150000,
+              "price": 275,
+              "originalPrice": 549,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "EOD",
+              "dailyLoss": 1850,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "7 minis / 70 micros"
+            }
+          ]
+        },
+        {
+          "name": "Elite Access",
+          "type": "eval",
+          "priceType": "one-time",
+          "promoCode": "ACCESS",
+          "promoLabel": "2 for $19 each",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 139,
+              "originalPrice": 299,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "1 mini / 10 micros"
+            },
+            {
+              "size": 50000,
+              "price": 189,
+              "originalPrice": 499,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "3 minis / 30 micros"
+            },
+            {
+              "size": 100000,
+              "price": 259,
+              "originalPrice": 849,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "5 minis / 50 micros"
+            },
+            {
+              "size": 150000,
+              "price": 359,
+              "originalPrice": 1349,
+              "profitTarget": 9000,
+              "maxDrawdown": 4000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "7 minis / 70 micros"
+            }
+          ]
+        },
+        {
+          "name": "Instant Sim Funded",
+          "type": "instant",
+          "priceType": "one-time",
+          "promoCode": "SUMMER",
+          "promoLabel": "40% OFF",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 251,
+              "originalPrice": 419,
+              "profitTarget": null,
+              "maxDrawdown": 1000,
+              "ddType": "EOD",
+              "dailyLoss": 625,
+              "dailyLossSoft": false,
+              "consistency": "20%",
+              "contracts": "1 mini / 10 micros"
+            },
+            {
+              "size": 50000,
+              "price": 407,
+              "originalPrice": 679,
+              "profitTarget": null,
+              "maxDrawdown": 2000,
+              "ddType": "EOD",
+              "dailyLoss": 1250,
+              "dailyLossSoft": false,
+              "consistency": "20%",
+              "contracts": "3 minis / 30 micros"
+            },
+            {
+              "size": 100000,
+              "price": 493,
+              "originalPrice": 821,
+              "profitTarget": null,
+              "maxDrawdown": 3000,
+              "ddType": "EOD",
+              "dailyLoss": 2500,
+              "dailyLossSoft": false,
+              "consistency": "20%",
+              "contracts": "5 minis / 50 micros"
+            },
+            {
+              "size": 150000,
+              "price": 563,
+              "originalPrice": 939,
+              "profitTarget": null,
+              "maxDrawdown": 4500,
+              "ddType": "EOD",
+              "dailyLoss": 3750,
+              "dailyLossSoft": false,
+              "consistency": "20%",
+              "contracts": "7 minis / 70 micros"
+            }
+          ]
+        },
+        {
+          "name": "S2F Sim Pro",
+          "type": "instant",
+          "priceType": "one-time",
+          "promoCode": "SUMMER",
+          "promoLabel": "40% OFF",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 154,
+              "originalPrice": 257,
+              "profitTarget": null,
+              "maxDrawdown": 1000,
+              "ddType": "Intraday",
+              "dailyLoss": 500,
+              "dailyLossSoft": false,
+              "consistency": "20%",
+              "contracts": "1 mini / 10 micros"
+            },
+            {
+              "size": 50000,
+              "price": 253,
+              "originalPrice": 421,
+              "profitTarget": null,
+              "maxDrawdown": 1625,
+              "ddType": "Intraday",
+              "dailyLoss": 1000,
+              "dailyLossSoft": false,
+              "consistency": "20%",
+              "contracts": "4 minis / 40 micros"
+            },
+            {
+              "size": 100000,
+              "price": 379,
+              "originalPrice": 632,
+              "profitTarget": null,
+              "maxDrawdown": 3250,
+              "ddType": "Intraday",
+              "dailyLoss": 2000,
+              "dailyLossSoft": false,
+              "consistency": "20%",
+              "contracts": "8 minis / 80 micros"
+            },
+            {
+              "size": 150000,
+              "price": 436,
+              "originalPrice": 727,
+              "profitTarget": null,
+              "maxDrawdown": 5000,
+              "ddType": "Intraday",
+              "dailyLoss": 3000,
+              "dailyLossSoft": false,
+              "consistency": "20%",
+              "contracts": "12 minis / 120 micros"
+            }
+          ]
+        },
+        {
+          "name": "Ignite",
+          "type": "instant",
+          "priceType": "one-time",
+          "promoCode": "SUMMER",
+          "promoLabel": "40% OFF",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 131,
+              "originalPrice": 218,
+              "profitTarget": null,
+              "maxDrawdown": 1000,
+              "ddType": "EOD",
+              "dailyLoss": 500,
+              "dailyLossSoft": false,
+              "consistency": "15%",
+              "contracts": "1 mini / 10 micros"
+            },
+            {
+              "size": 50000,
+              "price": 239,
+              "originalPrice": 398,
+              "profitTarget": null,
+              "maxDrawdown": 2000,
+              "ddType": "EOD",
+              "dailyLoss": 1000,
+              "dailyLossSoft": false,
+              "consistency": "15%",
+              "contracts": "3 minis / 30 micros"
+            },
+            {
+              "size": 100000,
+              "price": 338,
+              "originalPrice": 563,
+              "profitTarget": null,
+              "maxDrawdown": 3000,
+              "ddType": "EOD",
+              "dailyLoss": 2000,
+              "dailyLossSoft": false,
+              "consistency": "15%",
+              "contracts": "5 minis / 50 micros"
+            },
+            {
+              "size": 150000,
+              "price": 479,
+              "originalPrice": 799,
+              "profitTarget": null,
+              "maxDrawdown": 4500,
+              "ddType": "EOD",
+              "dailyLoss": 3000,
+              "dailyLossSoft": false,
+              "consistency": "15%",
+              "contracts": "7 minis / 70 micros"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fundedseat",
+      "name": "FundedSeat",
+      "split": "90%",
+      "payout": "Daily \u00b7 5h guaranteed",
+      "promo": {
+        "label": "45% OFF + 50% w/ code",
+        "code": "JULY50",
+        "ends": "2026-07-26"
+      },
+      "url": "https://fundedseat.link/jtnq",
+      "lastChecked": "2026-07-18",
+      "stale": false,
+      "programs": [
+        {
+          "name": "1-Step",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 76.95,
+              "originalPrice": 140,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": true,
+              "consistency": "35%",
+              "contracts": "2 minis / 20 micros"
+            },
+            {
+              "size": 50000,
+              "price": 104.95,
+              "originalPrice": 190,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": true,
+              "consistency": "35%",
+              "contracts": "4 minis / 40 micros"
+            },
+            {
+              "size": 100000,
+              "price": 174.95,
+              "originalPrice": 320,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": true,
+              "consistency": "35%",
+              "contracts": "8 minis / 80 micros"
+            },
+            {
+              "size": 150000,
+              "price": 244.95,
+              "originalPrice": 445,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": true,
+              "consistency": "35%",
+              "contracts": "12 minis / 120 micros"
+            }
+          ]
+        },
+        {
+          "name": "Instant Funding",
+          "type": "instant",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 219.95,
+              "originalPrice": 400,
+              "profitTarget": null,
+              "maxDrawdown": 1000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": true,
+              "consistency": "15% biggest trade",
+              "contracts": "1 mini / 10 micros"
+            },
+            {
+              "size": 50000,
+              "price": 329.95,
+              "originalPrice": 600,
+              "profitTarget": null,
+              "maxDrawdown": 2000,
+              "ddType": "EOD",
+              "dailyLoss": 1500,
+              "dailyLossSoft": true,
+              "consistency": "15% biggest trade",
+              "contracts": "4 minis / 40 micros"
+            },
+            {
+              "size": 100000,
+              "price": 494.95,
+              "originalPrice": 900,
+              "profitTarget": null,
+              "maxDrawdown": 3000,
+              "ddType": "EOD",
+              "dailyLoss": 2500,
+              "dailyLossSoft": true,
+              "consistency": "15% biggest trade",
+              "contracts": "8 minis / 80 micros"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

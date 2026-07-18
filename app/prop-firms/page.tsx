@@ -1,68 +1,61 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import rawData from '@/public/data/prop-firms.json';
 
 // Affiliate code applied on every firm link below.
 const CODE = 'JTNQ';
 
-// Prop firms JackTradesNQ is affiliated with (active JTNQ code).
-// Every figure verified on each firm's own official site (July 2026).
-// Affiliate links carry the JTNQ / referral attribution.
-type Firm = {
-  name: string;
-  eval: string;
-  split: number;
-  funding: number; // max purchasable account, in $K, for numeric sort
-  fundingLabel: string;
-  drawdown: 'Trailing' | 'End-of-day';
-  payout: string;
-  url: string;
+// Every figure on this page comes from public/data/prop-firms.json
+// (scraped from each firm's official site — see scripts/scrape-prop-firms.mjs).
+type DdType = 'EOD' | 'EOD Trailing' | 'Intraday';
+type Plan = {
+  size: number;
+  price: number;
+  originalPrice: number | null;
+  profitTarget: number | null;
+  maxDrawdown: number;
+  ddType: DdType;
+  dailyLoss: number | null;
+  dailyLossSoft: boolean;
+  consistency: string;
+  contracts: string;
 };
+type Program = {
+  name: string;
+  type: 'eval' | 'instant';
+  priceType: 'one-time' | 'monthly';
+  promoCode?: string;
+  promoLabel?: string;
+  plans: Plan[];
+};
+type Firm = {
+  id: string;
+  name: string;
+  split: string;
+  payout: string;
+  promo: { label: string; code: string; ends?: string } | null;
+  url: string;
+  lastChecked: string;
+  stale: boolean;
+  programs: Program[];
+};
+type PropData = { generatedAt: string; firms: Firm[] };
 
-const FIRMS: Firm[] = [
-  {
-    name: 'Blue Guardian',
-    eval: 'Instant + 1–3 step',
-    split: 90,
-    funding: 400,
-    fundingLabel: '$400K',
-    drawdown: 'Trailing',
-    payout: 'On-demand · 24h',
-    url: 'https://blueguardian.com/?afmc=JTNQ',
-  },
-  {
-    name: 'Traders Launch',
-    eval: '1-step',
-    split: 80,
-    funding: 300,
-    fundingLabel: '$300K',
-    drawdown: 'End-of-day',
-    payout: 'Daily',
-    url: 'https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ',
-  },
-  {
-    name: 'Top One Futures',
-    eval: 'Instant + 1-step',
-    split: 90,
-    funding: 150,
-    fundingLabel: '$150K',
-    drawdown: 'Trailing',
-    payout: 'On-demand',
-    url: 'https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures',
-  },
-  {
-    name: 'FundedSeat',
-    eval: 'Instant + 1-step',
-    split: 90,
-    funding: 150,
-    fundingLabel: '$150K',
-    drawdown: 'End-of-day',
-    payout: 'Daily',
-    url: 'https://fundedseat.link/jtnq',
-  },
-];
+const DATA = rawData as unknown as PropData;
 
-type SortKey = 'name' | 'split' | 'funding';
+type Mode = 'eval' | 'instant';
+type SortKey = 'firm' | 'price' | 'target' | 'drawdown';
+type Row = { firm: Firm; program: Program; plan: Plan };
+
+const money = (n: number) => '$' + n.toLocaleString('en-US');
+const sizeLabel = (n: number) => '$' + n / 1000 + 'K';
+
+const DD_LABEL: Record<DdType, string> = {
+  EOD: 'EOD',
+  'EOD Trailing': 'EOD Trail',
+  Intraday: 'Intraday',
+};
 
 const META = {
   backToHome: { label: 'Jacktradesnq', url: '/' },
@@ -70,9 +63,9 @@ const META = {
   hero: {
     eyebrow: 'FUTURES PROP FIRMS',
     title: 'Prop firms',
-    phrase: 'The futures prop firms I’m partnered with, side by side. Every link applies my code JTNQ.',
+    phrase:
+      'Every plan from the firms I’m partnered with — account sizes, prices and risk rules, side by side. Code JTNQ applied on every link.',
   },
-  note: 'Figures verified on each firm’s official site, July 2026. Split is the maximum; drawdown and pricing scale with account size, and promos change — check the live site before buying.',
   legal: {
     copyright: '© 2026 JackTradesNQ. All rights reserved.',
     mentionsUrl: '/mentions-legales/',
@@ -82,8 +75,12 @@ const META = {
   },
 };
 
+const NOTE = `Figures pulled from each firm's official site. Prices and promo codes auto-checked daily — last sync ${DATA.generatedAt}. Risk rules verified manually 18 Jul 2026. Promos change fast; the live checkout price wins.`;
+
 export default function PropFirms() {
-  const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({ key: 'split', dir: 'desc' });
+  const [size, setSize] = useState(100000);
+  const [mode, setMode] = useState<Mode>('eval');
+  const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({ key: 'price', dir: 'asc' });
 
   useEffect(() => {
     const prev = document.body.style.background;
@@ -93,25 +90,51 @@ export default function PropFirms() {
     };
   }, []);
 
+  const sizes = useMemo(() => {
+    const all = new Set<number>();
+    for (const firm of DATA.firms)
+      for (const program of firm.programs) for (const plan of program.plans) all.add(plan.size);
+    return [...all].sort((a, b) => a - b);
+  }, []);
+
   const rows = useMemo(() => {
-    const arr = [...FIRMS];
-    arr.sort((a, b) => {
+    const out: Row[] = [];
+    for (const firm of DATA.firms) {
+      for (const program of firm.programs) {
+        if (program.type !== mode) continue;
+        const plan = program.plans.find((p) => p.size === size);
+        if (plan) out.push({ firm, program, plan });
+      }
+    }
+    out.sort((a, b) => {
       let d: number;
-      if (sort.key === 'name') d = a.name.localeCompare(b.name);
-      else d = a[sort.key] - b[sort.key];
+      if (sort.key === 'firm')
+        d =
+          a.firm.name.localeCompare(b.firm.name) ||
+          a.program.name.localeCompare(b.program.name);
+      else if (sort.key === 'price') d = a.plan.price - b.plan.price;
+      else if (sort.key === 'target')
+        d = (a.plan.profitTarget ?? Infinity) - (b.plan.profitTarget ?? Infinity);
+      else d = a.plan.maxDrawdown - b.plan.maxDrawdown;
       return sort.dir === 'asc' ? d : -d;
     });
-    return arr;
-  }, [sort]);
+    return out;
+  }, [size, mode, sort]);
 
   const toggle = (key: SortKey) =>
     setSort((s) =>
       s.key === key
         ? { key, dir: s.dir === 'asc' ? 'desc' : 'asc' }
-        : { key, dir: key === 'name' ? 'asc' : 'desc' },
+        : { key, dir: key === 'drawdown' ? 'desc' : 'asc' },
     );
 
   const caret = (key: SortKey) => (sort.key === key ? (sort.dir === 'asc' ? '▲' : '▼') : '');
+
+  const sortableHeader = (key: SortKey, label: string) => (
+    <button type="button" className={`h ${sort.key === key ? 'active' : ''}`} onClick={() => toggle(key)}>
+      {label} <span className="caret">{caret(key)}</span>
+    </button>
+  );
 
   return (
     <div className="jtnq-cmp">
@@ -137,57 +160,133 @@ export default function PropFirms() {
         </section>
 
         <section className="table-section">
+          <div className="controls">
+            <div className="size-pills" role="group" aria-label="Account size">
+              {sizes.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  className={`pill ${s === size ? 'active' : ''}`}
+                  onClick={() => setSize(s)}
+                >
+                  {sizeLabel(s)}
+                </button>
+              ))}
+            </div>
+            <div className="mode-toggle" role="group" aria-label="Program type">
+              <button
+                type="button"
+                className={`mode ${mode === 'eval' ? 'active' : ''}`}
+                onClick={() => setMode('eval')}
+              >
+                Evaluation
+              </button>
+              <button
+                type="button"
+                className={`mode ${mode === 'instant' ? 'active' : ''}`}
+                onClick={() => setMode('instant')}
+              >
+                Instant funding
+              </button>
+            </div>
+          </div>
+
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th className="col-firm">
-                    <button type="button" className={`h ${sort.key === 'name' ? 'active' : ''}`} onClick={() => toggle('name')}>
-                      Firm <span className="caret">{caret('name')}</span>
-                    </button>
-                  </th>
-                  <th>
-                    <button type="button" className={`h ${sort.key === 'split' ? 'active' : ''}`} onClick={() => toggle('split')}>
-                      Split <span className="caret">{caret('split')}</span>
-                    </button>
-                  </th>
-                  <th>
-                    <button type="button" className={`h ${sort.key === 'funding' ? 'active' : ''}`} onClick={() => toggle('funding')}>
-                      Max funding <span className="caret">{caret('funding')}</span>
-                    </button>
-                  </th>
-                  <th><span className="h static">Drawdown</span></th>
-                  <th><span className="h static">Payout</span></th>
+                  <th className="col-firm">{sortableHeader('firm', 'Firm')}</th>
+                  <th>{sortableHeader('price', 'Price')}</th>
+                  <th>{sortableHeader('target', 'Profit target')}</th>
+                  <th>{sortableHeader('drawdown', 'Max drawdown')}</th>
+                  <th><span className="h static">Daily loss</span></th>
+                  <th><span className="h static">Split</span></th>
                   <th className="col-cta"><span className="h static">Code {CODE}</span></th>
                 </tr>
               </thead>
               <tbody>
-                {rows.map((f) => (
-                  <tr key={f.name}>
-                    <td className="col-firm">
-                      <span className="firm-name">{f.name}</span>
-                      <span className="firm-eval">{f.eval}</span>
-                    </td>
-                    <td className="num">{f.split}%</td>
-                    <td className="num">{f.fundingLabel}</td>
-                    <td>
-                      <span className={`tag ${f.drawdown === 'Trailing' ? 'tag-trail' : 'tag-eod'}`}>{f.drawdown}</span>
-                    </td>
-                    <td className="soft">{f.payout}</td>
-                    <td className="col-cta">
-                      <a className="row-cta" href={f.url} target="_blank" rel="noopener nofollow sponsored">
-                        Get funded
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M7 17L17 7M9 7h8v8" />
-                        </svg>
-                      </a>
+                {rows.length === 0 && (
+                  <tr className="empty-row">
+                    <td colSpan={7}>
+                      No {mode === 'instant' ? 'instant-funding' : 'evaluation'} plans at this size — try another size.
                     </td>
                   </tr>
-                ))}
+                )}
+                {rows.map(({ firm, program, plan }) => {
+                  const promoCode = program.promoCode ?? firm.promo?.code ?? null;
+                  const promoLabel = program.promoLabel ?? firm.promo?.label ?? null;
+                  const promoEnds = program.promoCode ? undefined : firm.promo?.ends;
+                  const promoTitle = [promoLabel, promoEnds ? `ends ${promoEnds}` : null]
+                    .filter(Boolean)
+                    .join(' — ');
+                  return (
+                    <tr key={`${firm.id}-${program.name}`}>
+                      <td className="col-firm">
+                        <span className="firm-name">{firm.name}</span>
+                        <span className="firm-eval">
+                          {program.name} · {program.type === 'eval' ? 'Eval' : 'Instant'}
+                        </span>
+                      </td>
+                      <td className="num price-cell">
+                        <span className="price-line">
+                          <span className="price-now">
+                            {money(plan.price)}
+                            {program.priceType === 'monthly' && <span className="per">/mo</span>}
+                          </span>
+                          {plan.originalPrice != null && (
+                            <s className="price-was">{money(plan.originalPrice)}</s>
+                          )}
+                        </span>
+                        {promoCode && (
+                          <span className="promo-chip" title={promoTitle || undefined}>
+                            code {promoCode}
+                          </span>
+                        )}
+                      </td>
+                      <td className="num">
+                        {plan.profitTarget != null ? money(plan.profitTarget) : <span className="none">—</span>}
+                      </td>
+                      <td className="num dd-cell">
+                        {money(plan.maxDrawdown)}{' '}
+                        <span className={`tag ${plan.ddType === 'EOD' ? 'tag-eod' : 'tag-trail'}`}>
+                          {DD_LABEL[plan.ddType]}
+                        </span>
+                      </td>
+                      <td className="num">
+                        {plan.dailyLoss != null ? (
+                          <>
+                            {money(plan.dailyLoss)}
+                            {plan.dailyLossSoft && (
+                              <span
+                                className="soft-flag"
+                                title="Soft breach: position flattened, account not lost"
+                              >
+                                soft
+                              </span>
+                            )}
+                          </>
+                        ) : firm.id === 'traders-launch' && !plan.dailyLossSoft ? (
+                          <span className="none">None advertised</span>
+                        ) : (
+                          <span className="none">None</span>
+                        )}
+                      </td>
+                      <td className="num">{firm.split}</td>
+                      <td className="col-cta">
+                        <a className="row-cta" href={firm.url} target="_blank" rel="noopener nofollow sponsored">
+                          Get funded
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M7 17L17 7M9 7h8v8" />
+                          </svg>
+                        </a>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-          <p className="note">{META.note}</p>
+          <p className="note">{NOTE}</p>
         </section>
       </main>
 
@@ -287,11 +386,36 @@ const CSS = `
 .jtnq-cmp .table-section{
   max-width: var(--maxw); margin: 0 auto; padding: clamp(32px, 4vw, 48px) var(--pad-x) clamp(72px, 9vw, 104px);
 }
+
+.jtnq-cmp .controls{
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 16px; margin-bottom: 24px;
+}
+.jtnq-cmp .size-pills{ display: flex; flex-wrap: wrap; gap: 8px; }
+.jtnq-cmp .pill{
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--c-text-soft); background: none; border: 1px solid var(--c-line); border-radius: 999px;
+  padding: 8px 16px; cursor: pointer; transition: color .2s ease, border-color .2s ease, background .2s ease;
+}
+.jtnq-cmp .pill:hover{ color: var(--c-accent); border-color: color-mix(in oklab, var(--c-accent) 45%, var(--c-line)); }
+.jtnq-cmp .pill.active{ color: var(--c-bg); background: var(--c-accent); border-color: var(--c-accent); }
+.jtnq-cmp .mode-toggle{
+  display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--c-line); border-radius: 999px;
+  background: var(--c-bg-raise);
+}
+.jtnq-cmp .mode{
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--c-text-mute); background: none; border: none; border-radius: 999px;
+  padding: 8px 16px; cursor: pointer; transition: color .2s ease, background .2s ease;
+}
+.jtnq-cmp .mode:hover{ color: var(--c-accent); }
+.jtnq-cmp .mode.active{ color: var(--c-bg); background: var(--c-accent); }
+
 .jtnq-cmp .table-wrap{
   overflow-x: auto; border: 1px solid var(--c-line); border-radius: 14px; background: var(--c-bg-raise);
   -webkit-overflow-scrolling: touch;
 }
-.jtnq-cmp table{ width: 100%; min-width: 680px; border-collapse: collapse; }
+.jtnq-cmp table{ width: 100%; min-width: 880px; border-collapse: collapse; }
 .jtnq-cmp thead th{
   text-align: left; padding: 0; border-bottom: 1px solid var(--c-line);
   background: color-mix(in oklab, var(--c-bg-raise) 70%, var(--c-bg-deep) 30%);
@@ -300,7 +424,7 @@ const CSS = `
   display: inline-flex; align-items: center; gap: 7px; width: 100%;
   padding: clamp(16px, 1.8vw, 20px) clamp(16px, 1.8vw, 22px);
   font-family: var(--f-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--c-text-mute);
-  background: none; border: none; cursor: pointer; transition: color .2s ease;
+  background: none; border: none; cursor: pointer; transition: color .2s ease; white-space: nowrap;
 }
 .jtnq-cmp .h.static{ cursor: default; }
 .jtnq-cmp button.h:hover{ color: var(--c-accent); }
@@ -321,16 +445,39 @@ const CSS = `
 }
 .jtnq-cmp .firm-eval{
   display: block; margin-top: 6px; font-family: var(--f-mono); font-size: 10px; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--c-text-mute);
+  text-transform: uppercase; color: var(--c-text-mute); white-space: nowrap;
 }
-.jtnq-cmp td.num{ font-family: var(--f-mono); font-size: clamp(16px, 1.5vw, 19px); font-weight: 500; color: var(--c-text); letter-spacing: .01em; }
+.jtnq-cmp td.num{ font-family: var(--f-mono); font-size: clamp(15px, 1.4vw, 18px); font-weight: 500; color: var(--c-text); letter-spacing: .01em; white-space: nowrap; }
 .jtnq-cmp td.soft{ font-family: var(--f-sans); font-size: 14px; color: var(--c-text-soft); }
+
+.jtnq-cmp .price-cell .price-line{ display: flex; align-items: baseline; gap: 8px; }
+.jtnq-cmp .price-now{ font-size: clamp(16px, 1.5vw, 19px); }
+.jtnq-cmp .price-now .per{ font-size: 11px; color: var(--c-text-mute); }
+.jtnq-cmp .price-was{ font-size: 12px; font-weight: 400; color: var(--c-text-mute); }
+.jtnq-cmp .promo-chip{
+  display: inline-block; margin-top: 4px; font-family: var(--f-mono); font-size: 10px; font-weight: 400;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--c-accent);
+  border: 1px solid color-mix(in oklab, var(--c-accent) 45%, var(--c-line)); border-radius: 999px;
+  padding: 3px 9px; white-space: nowrap; cursor: help;
+}
+.jtnq-cmp .soft-flag{
+  margin-left: 8px; font-size: 10px; font-weight: 400; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--c-text-mute); cursor: help;
+}
+.jtnq-cmp .none{ color: var(--c-text-mute); font-weight: 400; font-size: 13px; }
+.jtnq-cmp .dd-cell .tag{ margin-left: 4px; }
 .jtnq-cmp .tag{
   display: inline-block; font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
   padding: 5px 11px; border-radius: 999px; border: 1px solid var(--c-line); color: var(--c-text-soft); white-space: nowrap;
+  font-weight: 400;
 }
 .jtnq-cmp .tag-trail{ color: var(--c-accent); border-color: color-mix(in oklab, var(--c-accent) 45%, var(--c-line)); }
 .jtnq-cmp .tag-eod{ color: var(--c-text-soft); }
+
+.jtnq-cmp .empty-row td{
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute); text-align: center;
+  padding: clamp(32px, 4vw, 48px) clamp(16px, 1.8vw, 22px);
+}
 
 .jtnq-cmp .col-cta{ text-align: right; white-space: nowrap; }
 .jtnq-cmp .row-cta{
