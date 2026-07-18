@@ -749,6 +749,347 @@
           ]
         }
       ]
+    },
+    {
+      "id": "legends-trading",
+      "name": "LEGENDS Trading",
+      "split": "90%",
+      "payout": "Twice monthly",
+      "promo": {
+        "label": "Apprentice 80% · Elite 35% off",
+        "code": "LTG"
+      },
+      "url": "https://thelegendstrading.com/?ref=JTNQ",
+      "lastChecked": "2026-07-18",
+      "stale": false,
+      "programs": [
+        {
+          "name": "Apprentice",
+          "type": "eval",
+          "priceType": "monthly",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 33,
+              "originalPrice": 165,
+              "profitTarget": 1500,
+              "maxDrawdown": 1500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30%",
+              "contracts": "4 minis / 40 micros",
+              "activationFee": 99
+            },
+            {
+              "size": 50000,
+              "price": 37,
+              "originalPrice": 185,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30%",
+              "contracts": "10 minis / 50 micros",
+              "activationFee": 99
+            },
+            {
+              "size": 100000,
+              "price": 45,
+              "originalPrice": 225,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30%",
+              "contracts": "14 minis / 70 micros",
+              "activationFee": 149
+            },
+            {
+              "size": 150000,
+              "price": 64,
+              "originalPrice": 320,
+              "profitTarget": 9000,
+              "maxDrawdown": 4000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30%",
+              "contracts": "17 minis / 85 micros",
+              "activationFee": 199
+            }
+          ]
+        },
+        {
+          "name": "Elite",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 64.35,
+              "originalPrice": 99,
+              "profitTarget": 1500,
+              "maxDrawdown": 1250,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "2 minis / 20 micros"
+            },
+            {
+              "size": 50000,
+              "price": 96.85,
+              "originalPrice": 149,
+              "profitTarget": 2700,
+              "maxDrawdown": 2200,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "4 minis / 40 micros"
+            },
+            {
+              "size": 100000,
+              "price": 117,
+              "originalPrice": 180,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "8 minis / 80 micros"
+            },
+            {
+              "size": 150000,
+              "price": 149.50,
+              "originalPrice": 230,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "12 minis / 120 micros"
+            }
+          ]
+        },
+        {
+          "name": "Straight to Master",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 239.40,
+              "originalPrice": 399,
+              "profitTarget": 1500,
+              "maxDrawdown": 1500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30%",
+              "contracts": "4 minis / 40 micros"
+            },
+            {
+              "size": 50000,
+              "price": 299.40,
+              "originalPrice": 499,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30%",
+              "contracts": "10 minis / 50 micros"
+            },
+            {
+              "size": 100000,
+              "price": 359.40,
+              "originalPrice": 599,
+              "profitTarget": 4000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30%",
+              "contracts": "14 minis / 70 micros"
+            },
+            {
+              "size": 150000,
+              "price": 419.40,
+              "originalPrice": 699,
+              "profitTarget": 6250,
+              "maxDrawdown": 4000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30%",
+              "contracts": "17 minis / 85 micros"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e8-markets",
+      "name": "E8 Markets",
+      "split": "80%",
+      "payout": "On-demand",
+      "promo": {
+        "label": "Up to 40% off with code E8",
+        "code": "E8"
+      },
+      "code": null,
+      "url": "https://e8markets.com/d/B1770991",
+      "lastChecked": "2026-07-18",
+      "stale": false,
+      "programs": [
+        {
+          "name": "E8 Signature Futures",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 83,
+              "originalPrice": 110,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "None",
+              "contracts": "2 minis / 20 micros"
+            },
+            {
+              "size": 50000,
+              "price": 113,
+              "originalPrice": 150,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "None",
+              "contracts": "4 minis / 40 micros"
+            },
+            {
+              "size": 100000,
+              "price": 195,
+              "originalPrice": 260,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "None",
+              "contracts": "8 minis / 80 micros"
+            },
+            {
+              "size": 150000,
+              "price": 293,
+              "originalPrice": 390,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "None",
+              "contracts": "12 minis / 120 micros"
+            }
+          ]
+        },
+        {
+          "name": "E8 Zero MAX Futures",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 50000,
+              "price": 197,
+              "originalPrice": 328,
+              "profitTarget": 3000,
+              "maxDrawdown": 1500,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "4 minis / 40 micros"
+            },
+            {
+              "size": 100000,
+              "price": 353,
+              "originalPrice": 588,
+              "profitTarget": 6500,
+              "maxDrawdown": 3000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "8 minis / 80 micros"
+            },
+            {
+              "size": 200000,
+              "price": 653,
+              "originalPrice": 1088,
+              "profitTarget": 13500,
+              "maxDrawdown": 6000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "10 minis / 100 micros"
+            }
+          ]
+        },
+        {
+          "name": "E8 Zero Starter Futures",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 50000,
+              "price": 107,
+              "originalPrice": 178,
+              "profitTarget": 3000,
+              "maxDrawdown": 1500,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "4 minis / 40 micros"
+            },
+            {
+              "size": 100000,
+              "price": 167,
+              "originalPrice": 278,
+              "profitTarget": 6500,
+              "maxDrawdown": 3000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "8 minis / 80 micros"
+            },
+            {
+              "size": 200000,
+              "price": 335,
+              "originalPrice": 558,
+              "profitTarget": 13500,
+              "maxDrawdown": 6000,
+              "ddType": "EOD",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "10 minis / 100 micros"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

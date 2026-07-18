@@ -292,6 +292,130 @@ async function scrapeFundedSeat() {
 }
 
 /* ------------------------------------------------------------------ */
+/* LEGENDS Trading — static Webflow HTML on https://thelegendstrading.com/plans */
+/* ------------------------------------------------------------------ */
+
+const LEGENDS_PROGRAMS = ['Apprentice', 'Elite', 'Straight to Master'];
+
+async function scrapeLegends() {
+  const html = await fetchText('https://thelegendstrading.com/plans');
+  const text = html
+    .replace(/<script[\s\S]*?<\/script>/g, ' ')
+    .replace(/<style[\s\S]*?<\/style>/g, ' ')
+    .replace(/<[^>]+>/g, '\n');
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+
+  const sizeRe = /^\$([\d,]+)$/;
+  const priceRe = /^\$([\d,.]+)$/;
+  const updates = [];
+  let programIdx = 0;
+  let cardsInProgram = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const m = sizeRe.exec(lines[i]);
+    if (!m) continue;
+    // Card shape: size, "Max N contracts...", originalPrice, price, "/ per month|one time".
+    const maybeContracts = lines[i + 1] || '';
+    if (!/max/i.test(maybeContracts)) continue; // guard against unrelated "$X" (testimonials etc.)
+    const origM = priceRe.exec(lines[i + 2] || '');
+    const priceM = priceRe.exec(lines[i + 3] || '');
+    if (!origM || !priceM) continue;
+
+    if (cardsInProgram === 4) {
+      programIdx += 1;
+      cardsInProgram = 0;
+    }
+    if (programIdx >= LEGENDS_PROGRAMS.length) break; // page repeats the same 12 cards twice (mobile/desktop)
+
+    updates.push({
+      programName: LEGENDS_PROGRAMS[programIdx],
+      size: num(m[1]),
+      price: num(priceM[1]),
+      originalPrice: num(origM[1]),
+    });
+    cardsInProgram += 1;
+  }
+  if (updates.length === 0) throw new Error('no plan cards parsed from /plans page');
+  return { updates }; // promo stays manual — site banner overstates Elite's discount, see JSON
+}
+
+/* ------------------------------------------------------------------ */
+/* E8 Markets — client-rendered pricing on https://e8futures.com, needs playwright (optional) */
+/* ------------------------------------------------------------------ */
+
+const E8_TABS = {
+  'E8 Signature': 'E8 Signature Futures',
+  'E8 Zero MAX': 'E8 Zero MAX Futures',
+  'E8 Zero Starter': 'E8 Zero Starter Futures',
+};
+
+async function scrapeE8Markets() {
+  let pw;
+  try {
+    pw = await import('playwright');
+  } catch {
+    console.log('e8-markets: playwright not installed, skipped');
+    return null;
+  }
+  const browser = await pw.chromium.launch({ headless: true });
+  try {
+    const page = await browser.newPage({ userAgent: UA });
+    await page.setViewportSize({ width: 1280, height: 1000 });
+    await page.goto('https://e8futures.com', { waitUntil: 'load', timeout: 60000 });
+    await page.waitForTimeout(3000);
+
+    const configBtn = page.getByText('Configure Challenge', { exact: true }).first();
+    await configBtn.scrollIntoViewIfNeeded();
+    await configBtn.click();
+    await page.waitForTimeout(2000);
+
+    const updates = [];
+    for (const [tabText, programName] of Object.entries(E8_TABS)) {
+      await page.locator('button', { hasText: tabText }).first().click({ timeout: 15000 });
+      await page.waitForTimeout(1200);
+
+      const cardsText = await page.evaluate(() => {
+        const all = Array.from(document.querySelectorAll('p, span, div, h1, h2, h3, h4'));
+        const labels = all.filter(
+          (el) => el.children.length === 0 && el.textContent.trim().toLowerCase() === 'account size',
+        );
+        const cards = [];
+        for (const label of labels) {
+          let node = label;
+          let container = null;
+          for (let i = 0; i < 10 && node.parentElement; i++) {
+            node = node.parentElement;
+            const t = node.textContent.toLowerCase();
+            if (t.includes('challenge rules') && t.includes('get started')) {
+              container = node;
+              break;
+            }
+          }
+          if (container) cards.push(container.innerText);
+        }
+        return cards;
+      });
+
+      for (const cardText of cardsText) {
+        const sizeM = /\$(\d+)K/i.exec(cardText);
+        const priceM = /PRICE\s*\n*\$([\d.]+)\s*\n*\$([\d.,]+)/.exec(cardText);
+        if (!sizeM || !priceM) continue;
+        updates.push({
+          programName,
+          size: parseInt(sizeM[1], 10) * 1000,
+          price: num(priceM[1]),
+          originalPrice: num(priceM[2]),
+        });
+      }
+    }
+    if (updates.length === 0) throw new Error('no plan cards parsed from Configure Challenge widget');
+    return { updates }; // promo stays manual — site banner label is vaguer than the curated JSON copy
+  } finally {
+    await browser.close();
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* Guards + apply                                                      */
 /* ------------------------------------------------------------------ */
 
@@ -361,6 +485,8 @@ const SCRAPERS = {
   'top-one-futures': scrapeTopOne,
   'traders-launch': scrapeTradersLaunch,
   fundedseat: scrapeFundedSeat,
+  'legends-trading': scrapeLegends,
+  'e8-markets': scrapeE8Markets,
 };
 
 async function main() {
