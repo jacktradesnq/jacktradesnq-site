@@ -78,6 +78,12 @@ function candidatesAt(programs: Program[], size: number): Candidate[] {
     .filter((c): c is Candidate => c.plan != null);
 }
 
+// Which code to show on a firm's chip: an explicit firm-level code wins
+// (e.g. E8's temporary tracking id), firms without the field use Angelo's
+// global code, and code:null falls back to the firm's public promo code.
+const chipCode = (firm: Firm, promoCode: string | null) =>
+  firm.code === undefined ? CODE : firm.code ?? promoCode;
+
 function ddTag(plan: Plan) {
   return <span className={`tag ${plan.ddType === 'EOD' ? 'tag-eod' : 'tag-trail'}`}>{DD_LABEL[plan.ddType]}</span>;
 }
@@ -291,9 +297,9 @@ function FirmRow({
   const firmMeta = (
     <span className="firm-row-meta">
       {firm.split} split · {firm.payout}
-      {(promo.code || firm.code !== null) && (
+      {chipCode(firm, promo.code) && (
         <span className="promo-chip" title={promo.title || undefined}>
-          code {firm.code === null ? promo.code : CODE}
+          code {chipCode(firm, promo.code)}
         </span>
       )}
     </span>
@@ -367,7 +373,7 @@ function FirmRow({
                         {plan.originalPrice != null && <s className="price-was">{money(plan.originalPrice)}</s>}
                         {subPromo.code && (
                           <span className="promo-chip" title={subPromo.title || undefined}>
-                            code {firm.code === null ? subPromo.code : CODE}
+                            code {chipCode(firm, subPromo.code)}
                           </span>
                         )}
                       </span>

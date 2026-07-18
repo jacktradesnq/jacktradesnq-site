@@ -640,7 +640,7 @@
       "id": "fundedseat",
       "name": "FundedSeat",
       "split": "90%",
-      "payout": "Daily \u00b7 5h guaranteed",
+      "payout": "Daily · 5h guaranteed",
       "promo": {
         "label": "45% OFF + 50% w/ code",
         "code": "JULY50",
@@ -865,7 +865,7 @@
             },
             {
               "size": 150000,
-              "price": 149.50,
+              "price": 149.5,
               "originalPrice": 230,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
@@ -884,7 +884,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 239.40,
+              "price": 239.4,
               "originalPrice": 399,
               "profitTarget": 1500,
               "maxDrawdown": 1500,
@@ -896,7 +896,7 @@
             },
             {
               "size": 50000,
-              "price": 299.40,
+              "price": 299.4,
               "originalPrice": 499,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -908,7 +908,7 @@
             },
             {
               "size": 100000,
-              "price": 359.40,
+              "price": 359.4,
               "originalPrice": 599,
               "profitTarget": 4000,
               "maxDrawdown": 3000,
@@ -920,7 +920,7 @@
             },
             {
               "size": 150000,
-              "price": 419.40,
+              "price": 419.4,
               "originalPrice": 699,
               "profitTarget": 6250,
               "maxDrawdown": 4000,
@@ -943,7 +943,7 @@
         "label": "Up to 40% off with code E8",
         "code": "E8"
       },
-      "code": null,
+      "code": "B1770991",
       "url": "https://e8markets.com/d/B1770991",
       "lastChecked": "2026-07-18",
       "stale": false,
