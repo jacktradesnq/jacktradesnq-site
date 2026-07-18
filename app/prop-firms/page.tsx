@@ -20,6 +20,7 @@ type Plan = {
   dailyLossSoft: boolean;
   consistency: string;
   contracts: string;
+  activationFee?: number;
 };
 type Program = {
   name: string;
@@ -35,6 +36,7 @@ type Firm = {
   split: string;
   payout: string;
   promo: { label: string; code: string; ends?: string } | null;
+  code?: string | null;
   url: string;
   lastChecked: string;
   stale: boolean;
@@ -74,7 +76,7 @@ const META = {
     eyebrow: 'FUTURES PROP FIRMS',
     title: 'Prop firms',
     phrase:
-      'Every plan from the firms I’m partnered with — account sizes, prices and risk rules, side by side. Code JTNQ applied on every link.',
+      'Every plan from the firms I’m partnered with — account sizes, prices and risk rules, side by side. My code JTNQ or tracked link applied on every button.',
   },
   legal: {
     copyright: '© 2026 JackTradesNQ. All rights reserved.',
@@ -461,6 +463,13 @@ function FirmCard({ firm, mode }: { firm: Firm; mode: Mode }) {
               </>
             }
           />
+          {plan.activationFee != null && (
+            <StatRow
+              label="Activation fee"
+              value={money(plan.activationFee)}
+              sub="one-time at funding"
+            />
+          )}
           <StatRow
             label="Daily loss"
             value={
@@ -486,7 +495,7 @@ function FirmCard({ firm, mode }: { firm: Firm; mode: Mode }) {
       </div>
 
       <a className="card-cta" href={firm.url} target="_blank" rel="noopener nofollow sponsored">
-        Get funded — code {CODE}
+        {firm.code === null ? 'Get funded' : `Get funded — code ${CODE}`}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M7 17L17 7M9 7h8v8" />
         </svg>
