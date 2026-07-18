@@ -367,143 +367,122 @@ function StatRow({
   );
 }
 
-// A single firm card: program tabs (if >1 for this mode) + account size pills
-// + the real numbers for whichever plan is selected. Remounted (via key) on
-// every mode change so its local program/size selection always resets.
+// A single firm card: account size pills only (no program tabs) + the
+// cheapest-at-that-size plan across every program in this mode. Remounted
+// (via key) on every mode change so its local size selection always resets.
 function FirmCard({ firm, mode }: { firm: Firm; mode: Mode }) {
   const programs = firm.programs.filter((p) => p.type === mode);
-  const [programIdx, setProgramIdx] = useState(0);
-  const program = programs[programIdx] ?? programs[0];
-  const sizes = program.plans.map((p) => p.size);
+  const sizes = [...new Set(programs.flatMap((p) => p.plans.map((pl) => pl.size)))].sort((a, b) => a - b);
   const [planSize, setPlanSize] = useState<number>(() => (sizes.includes(100000) ? 100000 : sizes[0]));
 
-  const selectProgram = (idx: number) => {
-    setProgramIdx(idx);
-    const nextSizes = programs[idx].plans.map((p) => p.size);
-    setPlanSize((cur) => (nextSizes.includes(cur) ? cur : nextSizes.includes(100000) ? 100000 : nextSizes[0]));
-  };
-
-  const plan = program.plans.find((p) => p.size === planSize) ?? program.plans[0];
+  const candidates = programs
+    .map((program) => ({ program, plan: program.plans.find((pl) => pl.size === planSize) }))
+    .filter((c): c is { program: Program; plan: Plan } => c.plan != null);
+  const cheapest =
+    candidates.length > 0
+      ? candidates.reduce((best, c) => (c.plan.price < best.plan.price ? c : best))
+      : { program: programs[0], plan: programs[0].plans[0] };
+  const { program, plan } = cheapest;
+  const cheapestOfMany = candidates.length > 1;
   const promo = promoFor(firm, program);
 
   return (
     <article className="firm-card">
-      <header className="card-head">
-        <h2 className="card-firm-name">{firm.name}</h2>
-        <span className="card-meta">
-          {firm.split} split · {firm.payout} payout
-        </span>
-      </header>
+      <div className="card-top">
+        <header className="card-head">
+          <h2 className="card-firm-name">{firm.name}</h2>
+          <span className="card-meta">
+            {firm.split} split · {firm.payout} payout
+          </span>
+          {promo.code && (
+            <span className="promo-chip card-promo" title={promo.title || undefined}>
+              code {promo.code}
+            </span>
+          )}
+        </header>
 
-      {promo.code && (
-        <span className="promo-chip card-promo" title={promo.title || undefined}>
-          code {promo.code}
-        </span>
-      )}
-
-      {programs.length > 1 && (
-        <div className="card-tabs" role="group" aria-label={`${firm.name} program type`}>
-          {programs.map((p, idx) => (
+        <div className="card-sizes" role="group" aria-label={`${firm.name} account size`}>
+          {sizes.map((s) => (
             <button
-              key={p.name}
+              key={s}
               type="button"
-              className={`card-tab ${idx === programIdx ? 'active' : ''}`}
-              aria-pressed={idx === programIdx}
-              onClick={() => selectProgram(idx)}
+              className={`pill ${s === planSize ? 'active' : ''}`}
+              aria-pressed={s === planSize}
+              onClick={() => setPlanSize(s)}
             >
-              {p.name}
+              {sizeLabel(s)}
             </button>
           ))}
         </div>
-      )}
 
-      <div className="card-sizes" role="group" aria-label={`${firm.name} account size`}>
-        {sizes.map((s) => (
-          <button
-            key={s}
-            type="button"
-            className={`pill ${s === planSize ? 'active' : ''}`}
-            aria-pressed={s === planSize}
-            onClick={() => setPlanSize(s)}
-          >
-            {sizeLabel(s)}
-          </button>
-        ))}
+        <a className="card-cta" href={firm.url} target="_blank" rel="noopener nofollow sponsored">
+          {firm.code === null ? 'Get funded' : `Get funded — code ${CODE}`}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M7 17L17 7M9 7h8v8" />
+          </svg>
+        </a>
       </div>
 
       <div className="card-stats">
-        <div className="card-stats-hero">
-          <StatRow
-            hero
-            label="Max profit target"
-            value={plan.profitTarget != null ? money(plan.profitTarget) : <span className="none">None</span>}
-            sub={plan.profitTarget == null ? 'instant funded — no target' : undefined}
-          />
-          <StatRow
-            hero
-            label="Max loss limit"
-            value={
+        <StatRow
+          hero
+          label="Max profit target"
+          value={plan.profitTarget != null ? money(plan.profitTarget) : <span className="none">None</span>}
+          sub={plan.profitTarget == null ? 'instant funded — no target' : undefined}
+        />
+        <StatRow
+          hero
+          label="Max loss limit"
+          value={
+            <>
+              {money(plan.maxDrawdown)}{' '}
+              <span className={`tag ${plan.ddType === 'EOD' ? 'tag-eod' : 'tag-trail'}`}>
+                {DD_LABEL[plan.ddType]}
+              </span>
+            </>
+          }
+        />
+        <StatRow
+          label="Price today"
+          value={
+            <>
+              {cheapestOfMany && <span className="price-from">from </span>}
+              {money(plan.price)}
+              {program.priceType === 'monthly' && <span className="per">/mo</span>}
+              {plan.originalPrice != null && <s className="price-was">{money(plan.originalPrice)}</s>}
+            </>
+          }
+        />
+        <StatRow
+          label="Daily loss"
+          value={
+            plan.dailyLoss != null ? (
               <>
-                {money(plan.maxDrawdown)}{' '}
-                <span className={`tag ${plan.ddType === 'EOD' ? 'tag-eod' : 'tag-trail'}`}>
-                  {DD_LABEL[plan.ddType]}
-                </span>
+                {money(plan.dailyLoss)}
+                {plan.dailyLossSoft && (
+                  <span className="soft-flag" title="Soft breach: position flattened, account not lost">
+                    soft
+                  </span>
+                )}
               </>
-            }
-          />
-        </div>
-
-        <div className="card-stats-secondary">
-          <StatRow
-            label="Price today"
-            value={
-              <>
-                {money(plan.price)}
-                {program.priceType === 'monthly' && <span className="per">/mo</span>}
-                {plan.originalPrice != null && <s className="price-was">{money(plan.originalPrice)}</s>}
-              </>
-            }
-          />
-          {plan.activationFee != null && (
-            <StatRow
-              label="Activation fee"
-              value={money(plan.activationFee)}
-              sub="one-time at funding"
-            />
-          )}
-          <StatRow
-            label="Daily loss"
-            value={
-              plan.dailyLoss != null ? (
-                <>
-                  {money(plan.dailyLoss)}
-                  {plan.dailyLossSoft && (
-                    <span className="soft-flag" title="Soft breach: position flattened, account not lost">
-                      soft
-                    </span>
-                  )}
-                </>
-              ) : firm.id === 'traders-launch' && !plan.dailyLossSoft ? (
-                <span className="none">None advertised</span>
-              ) : (
-                <span className="none">None</span>
-              )
-            }
-          />
-          <StatRow label="Contracts" value={plan.contracts} />
-          <StatRow label="Consistency" value={plan.consistency} />
-        </div>
+            ) : firm.id === 'traders-launch' && !plan.dailyLossSoft ? (
+              <span className="none">None advertised</span>
+            ) : (
+              <span className="none">None</span>
+            )
+          }
+        />
+        <StatRow label="Contracts" value={plan.contracts} />
+        <StatRow label="Consistency" value={plan.consistency} />
+        {plan.activationFee != null && (
+          <StatRow label="Activation fee" value={money(plan.activationFee)} sub="one-time at funding" />
+        )}
       </div>
 
-      <a className="card-cta" href={firm.url} target="_blank" rel="noopener nofollow sponsored">
-        {firm.code === null ? 'Get funded' : `Get funded — code ${CODE}`}
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M7 17L17 7M9 7h8v8" />
-        </svg>
-      </a>
-
       <p className="card-footnote">
-        Rules shown: {sizeLabel(planSize)} {program.name} · checked {firm.lastChecked}
+        {cheapestOfMany
+          ? `Cheapest ${mode} plan at ${sizeLabel(planSize)} · checked ${firm.lastChecked}`
+          : `Rules at ${sizeLabel(planSize)} · checked ${firm.lastChecked}`}
       </p>
     </article>
   );
@@ -726,9 +705,8 @@ const CSS = `
 .jtnq-cmp .mode-toggle-row{ display: flex; justify-content: center; margin-bottom: 32px; }
 
 .jtnq-cmp .cards-grid{
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: clamp(48px, 6vw, 64px);
+  display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: clamp(48px, 6vw, 64px);
 }
-@media (max-width: 720px){ .jtnq-cmp .cards-grid{ grid-template-columns: 1fr; } }
 
 .jtnq-cmp .firm-card{
   display: flex; flex-direction: column; gap: 24px; min-width: 0;
@@ -737,7 +715,8 @@ const CSS = `
 }
 .jtnq-cmp .firm-card:hover{ border-color: color-mix(in oklab, var(--c-accent) 35%, var(--c-line)); }
 
-.jtnq-cmp .card-head{ display: flex; flex-direction: column; gap: 8px; }
+.jtnq-cmp .card-top{ display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.jtnq-cmp .card-head{ display: flex; flex-direction: column; gap: 8px; flex: 1 1 240px; min-width: 0; }
 .jtnq-cmp .card-firm-name{
   font-family: var(--f-serif); font-style: italic; font-weight: 400; margin: 0;
   font-size: clamp(24px, 2.4vw, 28px); letter-spacing: -0.01em; color: var(--c-text); line-height: 1.1;
@@ -747,51 +726,47 @@ const CSS = `
 }
 .jtnq-cmp .card-promo{ align-self: flex-start; margin-top: 0; }
 
-.jtnq-cmp .card-tabs{ display: flex; flex-wrap: wrap; gap: 8px; }
-.jtnq-cmp .card-tab{
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--c-text-mute); background: none; border: 1px solid var(--c-line); border-radius: 999px;
-  padding: 8px 14px; cursor: pointer; transition: color .2s ease, background .2s ease, border-color .2s ease;
-}
-.jtnq-cmp .card-tab:hover{ color: var(--c-accent); border-color: color-mix(in oklab, var(--c-accent) 45%, var(--c-line)); }
-.jtnq-cmp .card-tab.active{ color: var(--c-bg); background: var(--c-accent); border-color: var(--c-accent); }
+.jtnq-cmp .card-sizes{ display: flex; flex-wrap: wrap; gap: 8px; flex: 0 1 auto; }
 
-.jtnq-cmp .card-sizes{ display: flex; flex-wrap: wrap; gap: 8px; }
-
-.jtnq-cmp .card-stats{ display: flex; flex-direction: column; gap: 8px; }
-.jtnq-cmp .card-stats-hero{
-  display: flex; flex-direction: column;
-  background: color-mix(in oklab, var(--c-bg) 88%, var(--c-accent) 5%);
-  border: 1px solid var(--c-line-soft); border-radius: 12px; padding: 4px 16px;
+.jtnq-cmp .card-stats{
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px 24px;
 }
-.jtnq-cmp .card-stats-secondary{ display: flex; flex-direction: column; }
+@media (max-width: 900px){ .jtnq-cmp .card-stats{ grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 720px){ .jtnq-cmp .card-stats{ grid-template-columns: repeat(2, 1fr); gap: 16px; } }
 
-.jtnq-cmp .stat-row{
-  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
-  padding: 12px 0; border-bottom: 1px solid var(--c-line-soft);
-}
-.jtnq-cmp .stat-row:last-child{ border-bottom: none; }
+.jtnq-cmp .stat-row{ display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .jtnq-cmp .stat-label{
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
-  color: var(--c-text-mute); white-space: nowrap;
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--c-text-mute);
 }
 .jtnq-cmp .stat-value{
-  font-family: var(--f-mono); font-size: clamp(15px, 1.5vw, 16px); font-weight: 500; color: var(--c-text); text-align: right;
+  font-family: var(--f-mono); font-size: clamp(15px, 1.5vw, 16px); font-weight: 500; color: var(--c-text); text-align: left;
 }
-.jtnq-cmp .stat-hero .stat-value{ font-size: clamp(21px, 2.2vw, 24px); }
+.jtnq-cmp .stat-hero{
+  background: color-mix(in oklab, var(--c-bg) 88%, var(--c-accent) 5%);
+  border-radius: 12px; padding: 8px 16px;
+}
+.jtnq-cmp .stat-hero .stat-value{ font-size: clamp(21px, 2.2vw, 22px); }
+.jtnq-cmp .price-from{ font-size: 11px; font-weight: 400; color: var(--c-text-mute); }
 .jtnq-cmp .stat-sub{
   display: block; margin-top: 4px; font-family: var(--f-sans); font-size: 11px; font-style: italic;
-  font-weight: 400; color: var(--c-text-mute); white-space: nowrap;
+  font-weight: 400; color: var(--c-text-mute);
 }
 
 .jtnq-cmp .card-cta{
-  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: auto;
-  font-family: var(--f-sans); font-weight: 500; font-size: 14px; color: var(--c-accent);
+  display: flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0;
+  font-family: var(--f-sans); font-weight: 500; font-size: 14px; color: var(--c-accent); white-space: nowrap;
   border: 1px solid var(--c-accent); border-radius: 999px; padding: 16px 24px;
   transition: background .2s ease, color .2s ease, transform .2s ease;
 }
 .jtnq-cmp .card-cta svg{ width: 14px; height: 14px; }
 .jtnq-cmp .card-cta:hover{ background: var(--c-accent); color: var(--c-bg); transform: translateY(-1px); }
+
+@media (max-width: 720px){
+  .jtnq-cmp .card-top{ flex-direction: column; align-items: stretch; }
+  .jtnq-cmp .card-head{ flex-basis: auto; }
+  .jtnq-cmp .card-cta{ width: 100%; }
+}
 
 .jtnq-cmp .card-footnote{
   margin: 0; font-family: var(--f-mono); font-size: 10px; letter-spacing: .08em; color: var(--c-text-deep);
