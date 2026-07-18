@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import rawData from '@/public/data/prop-firms.json';
 
 // Affiliate code applied on every firm link below.
@@ -57,6 +57,16 @@ const DD_LABEL: Record<DdType, string> = {
   Intraday: 'Intraday',
 };
 
+// Same promo fallback logic used by the table rows and the firm cards:
+// a program-level promo wins, otherwise fall back to the firm-level promo.
+function promoFor(firm: Firm, program: Program): { code: string | null; title: string } {
+  const code = program.promoCode ?? firm.promo?.code ?? null;
+  const label = program.promoLabel ?? firm.promo?.label ?? null;
+  const ends = program.promoCode ? undefined : firm.promo?.ends;
+  const title = [label, ends ? `ends ${ends}` : null].filter(Boolean).join(' — ');
+  return { code, title };
+}
+
 const META = {
   backToHome: { label: 'Jacktradesnq', url: '/' },
   brand: 'Jacktradesnq',
@@ -96,6 +106,12 @@ export default function PropFirms() {
       for (const program of firm.programs) for (const plan of program.plans) all.add(plan.size);
     return [...all].sort((a, b) => a - b);
   }, []);
+
+  // Firms with at least one program in the current mode — drives the cards grid.
+  const cardFirms = useMemo(
+    () => DATA.firms.filter((firm) => firm.programs.some((p) => p.type === mode)),
+    [mode],
+  );
 
   const rows = useMemo(() => {
     const out: Row[] = [];
@@ -159,24 +175,13 @@ export default function PropFirms() {
           <p className="phrase">{META.hero.phrase}</p>
         </section>
 
-        <section className="table-section">
-          <div className="controls">
-            <div className="size-pills" role="group" aria-label="Account size">
-              {sizes.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  className={`pill ${s === size ? 'active' : ''}`}
-                  onClick={() => setSize(s)}
-                >
-                  {sizeLabel(s)}
-                </button>
-              ))}
-            </div>
+        <section className="cards-section">
+          <div className="mode-toggle-row">
             <div className="mode-toggle" role="group" aria-label="Program type">
               <button
                 type="button"
                 className={`mode ${mode === 'eval' ? 'active' : ''}`}
+                aria-pressed={mode === 'eval'}
                 onClick={() => setMode('eval')}
               >
                 Evaluation
@@ -184,10 +189,40 @@ export default function PropFirms() {
               <button
                 type="button"
                 className={`mode ${mode === 'instant' ? 'active' : ''}`}
+                aria-pressed={mode === 'instant'}
                 onClick={() => setMode('instant')}
               >
                 Instant funding
               </button>
+            </div>
+          </div>
+
+          <div className="cards-grid">
+            {cardFirms.map((firm) => (
+              <FirmCard key={`${firm.id}-${mode}`} firm={firm} mode={mode} />
+            ))}
+          </div>
+        </section>
+
+        <section className="table-section">
+          <div className="table-eyebrow">
+            <span className="eyebrow-sm">COMPARE EVERY PLAN</span>
+            <p className="table-subtitle">Every plan, every size, side by side.</p>
+          </div>
+
+          <div className="controls">
+            <div className="size-pills" role="group" aria-label="Account size">
+              {sizes.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  className={`pill ${s === size ? 'active' : ''}`}
+                  aria-pressed={s === size}
+                  onClick={() => setSize(s)}
+                >
+                  {sizeLabel(s)}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -213,12 +248,7 @@ export default function PropFirms() {
                   </tr>
                 )}
                 {rows.map(({ firm, program, plan }) => {
-                  const promoCode = program.promoCode ?? firm.promo?.code ?? null;
-                  const promoLabel = program.promoLabel ?? firm.promo?.label ?? null;
-                  const promoEnds = program.promoCode ? undefined : firm.promo?.ends;
-                  const promoTitle = [promoLabel, promoEnds ? `ends ${promoEnds}` : null]
-                    .filter(Boolean)
-                    .join(' — ');
+                  const promo = promoFor(firm, program);
                   return (
                     <tr key={`${firm.id}-${program.name}`}>
                       <td className="col-firm">
@@ -237,9 +267,9 @@ export default function PropFirms() {
                             <s className="price-was">{money(plan.originalPrice)}</s>
                           )}
                         </span>
-                        {promoCode && (
-                          <span className="promo-chip" title={promoTitle || undefined}>
-                            code {promoCode}
+                        {promo.code && (
+                          <span className="promo-chip" title={promo.title || undefined}>
+                            code {promo.code}
                           </span>
                         )}
                       </td>
@@ -307,6 +337,165 @@ export default function PropFirms() {
         <p className="footer-disclaimer">{META.legal.disclaimer}</p>
       </footer>
     </div>
+  );
+}
+
+// One label/value row inside a firm card's stats block. `hero` renders the
+// two headline stats (max profit target, max loss limit) bigger.
+function StatRow({
+  label,
+  value,
+  sub,
+  hero,
+}: {
+  label: string;
+  value: ReactNode;
+  sub?: string;
+  hero?: boolean;
+}) {
+  return (
+    <div className={`stat-row${hero ? ' stat-hero' : ''}`}>
+      <span className="stat-label">{label}</span>
+      <span className="stat-value">
+        {value}
+        {sub && <span className="stat-sub">{sub}</span>}
+      </span>
+    </div>
+  );
+}
+
+// A single firm card: program tabs (if >1 for this mode) + account size pills
+// + the real numbers for whichever plan is selected. Remounted (via key) on
+// every mode change so its local program/size selection always resets.
+function FirmCard({ firm, mode }: { firm: Firm; mode: Mode }) {
+  const programs = firm.programs.filter((p) => p.type === mode);
+  const [programIdx, setProgramIdx] = useState(0);
+  const program = programs[programIdx] ?? programs[0];
+  const sizes = program.plans.map((p) => p.size);
+  const [planSize, setPlanSize] = useState<number>(() => (sizes.includes(100000) ? 100000 : sizes[0]));
+
+  const selectProgram = (idx: number) => {
+    setProgramIdx(idx);
+    const nextSizes = programs[idx].plans.map((p) => p.size);
+    setPlanSize((cur) => (nextSizes.includes(cur) ? cur : nextSizes.includes(100000) ? 100000 : nextSizes[0]));
+  };
+
+  const plan = program.plans.find((p) => p.size === planSize) ?? program.plans[0];
+  const promo = promoFor(firm, program);
+
+  return (
+    <article className="firm-card">
+      <header className="card-head">
+        <h2 className="card-firm-name">{firm.name}</h2>
+        <span className="card-meta">
+          {firm.split} split · {firm.payout} payout
+        </span>
+      </header>
+
+      {promo.code && (
+        <span className="promo-chip card-promo" title={promo.title || undefined}>
+          code {promo.code}
+        </span>
+      )}
+
+      {programs.length > 1 && (
+        <div className="card-tabs" role="group" aria-label={`${firm.name} program type`}>
+          {programs.map((p, idx) => (
+            <button
+              key={p.name}
+              type="button"
+              className={`card-tab ${idx === programIdx ? 'active' : ''}`}
+              aria-pressed={idx === programIdx}
+              onClick={() => selectProgram(idx)}
+            >
+              {p.name}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="card-sizes" role="group" aria-label={`${firm.name} account size`}>
+        {sizes.map((s) => (
+          <button
+            key={s}
+            type="button"
+            className={`pill ${s === planSize ? 'active' : ''}`}
+            aria-pressed={s === planSize}
+            onClick={() => setPlanSize(s)}
+          >
+            {sizeLabel(s)}
+          </button>
+        ))}
+      </div>
+
+      <div className="card-stats">
+        <div className="card-stats-hero">
+          <StatRow
+            hero
+            label="Max profit target"
+            value={plan.profitTarget != null ? money(plan.profitTarget) : <span className="none">None</span>}
+            sub={plan.profitTarget == null ? 'instant funded — no target' : undefined}
+          />
+          <StatRow
+            hero
+            label="Max loss limit"
+            value={
+              <>
+                {money(plan.maxDrawdown)}{' '}
+                <span className={`tag ${plan.ddType === 'EOD' ? 'tag-eod' : 'tag-trail'}`}>
+                  {DD_LABEL[plan.ddType]}
+                </span>
+              </>
+            }
+          />
+        </div>
+
+        <div className="card-stats-secondary">
+          <StatRow
+            label="Price today"
+            value={
+              <>
+                {money(plan.price)}
+                {program.priceType === 'monthly' && <span className="per">/mo</span>}
+                {plan.originalPrice != null && <s className="price-was">{money(plan.originalPrice)}</s>}
+              </>
+            }
+          />
+          <StatRow
+            label="Daily loss"
+            value={
+              plan.dailyLoss != null ? (
+                <>
+                  {money(plan.dailyLoss)}
+                  {plan.dailyLossSoft && (
+                    <span className="soft-flag" title="Soft breach: position flattened, account not lost">
+                      soft
+                    </span>
+                  )}
+                </>
+              ) : firm.id === 'traders-launch' && !plan.dailyLossSoft ? (
+                <span className="none">None advertised</span>
+              ) : (
+                <span className="none">None</span>
+              )
+            }
+          />
+          <StatRow label="Contracts" value={plan.contracts} />
+          <StatRow label="Consistency" value={plan.consistency} />
+        </div>
+      </div>
+
+      <a className="card-cta" href={firm.url} target="_blank" rel="noopener nofollow sponsored">
+        Get funded — code {CODE}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M7 17L17 7M9 7h8v8" />
+        </svg>
+      </a>
+
+      <p className="card-footnote">
+        Rules shown: {sizeLabel(planSize)} {program.name} · checked {firm.lastChecked}
+      </p>
+    </article>
   );
 }
 
@@ -514,5 +703,97 @@ const CSS = `
 .jtnq-cmp .footer-disclaimer{
   max-width: var(--maxw); margin: 40px auto 0; padding-top: 28px; border-top: 1px solid var(--c-line-soft);
   font-size: 12px; line-height: 1.7; color: var(--c-text-deep); text-wrap: pretty;
+}
+
+/* ===== firm cards (v3) ===== */
+@media (prefers-reduced-motion: reduce){
+  .jtnq-cmp *{ transition: none !important; }
+}
+
+.jtnq-cmp .cards-section{
+  max-width: var(--maxw); margin: 0 auto; padding: clamp(32px, 4vw, 48px) var(--pad-x) 0;
+}
+.jtnq-cmp .mode-toggle-row{ display: flex; justify-content: center; margin-bottom: 32px; }
+
+.jtnq-cmp .cards-grid{
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: clamp(48px, 6vw, 64px);
+}
+@media (max-width: 720px){ .jtnq-cmp .cards-grid{ grid-template-columns: 1fr; } }
+
+.jtnq-cmp .firm-card{
+  display: flex; flex-direction: column; gap: 24px; min-width: 0;
+  background: var(--c-bg-raise); border: 1px solid var(--c-line); border-radius: 14px;
+  padding: clamp(24px, 3vw, 32px); transition: border-color .2s ease;
+}
+.jtnq-cmp .firm-card:hover{ border-color: color-mix(in oklab, var(--c-accent) 35%, var(--c-line)); }
+
+.jtnq-cmp .card-head{ display: flex; flex-direction: column; gap: 8px; }
+.jtnq-cmp .card-firm-name{
+  font-family: var(--f-serif); font-style: italic; font-weight: 400; margin: 0;
+  font-size: clamp(24px, 2.4vw, 28px); letter-spacing: -0.01em; color: var(--c-text); line-height: 1.1;
+}
+.jtnq-cmp .card-meta{
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--c-text-mute);
+}
+.jtnq-cmp .card-promo{ align-self: flex-start; margin-top: 0; }
+
+.jtnq-cmp .card-tabs{ display: flex; flex-wrap: wrap; gap: 8px; }
+.jtnq-cmp .card-tab{
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--c-text-mute); background: none; border: 1px solid var(--c-line); border-radius: 999px;
+  padding: 8px 14px; cursor: pointer; transition: color .2s ease, background .2s ease, border-color .2s ease;
+}
+.jtnq-cmp .card-tab:hover{ color: var(--c-accent); border-color: color-mix(in oklab, var(--c-accent) 45%, var(--c-line)); }
+.jtnq-cmp .card-tab.active{ color: var(--c-bg); background: var(--c-accent); border-color: var(--c-accent); }
+
+.jtnq-cmp .card-sizes{ display: flex; flex-wrap: wrap; gap: 8px; }
+
+.jtnq-cmp .card-stats{ display: flex; flex-direction: column; gap: 8px; }
+.jtnq-cmp .card-stats-hero{
+  display: flex; flex-direction: column;
+  background: color-mix(in oklab, var(--c-bg) 88%, var(--c-accent) 5%);
+  border: 1px solid var(--c-line-soft); border-radius: 12px; padding: 4px 16px;
+}
+.jtnq-cmp .card-stats-secondary{ display: flex; flex-direction: column; }
+
+.jtnq-cmp .stat-row{
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+  padding: 12px 0; border-bottom: 1px solid var(--c-line-soft);
+}
+.jtnq-cmp .stat-row:last-child{ border-bottom: none; }
+.jtnq-cmp .stat-label{
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--c-text-mute); white-space: nowrap;
+}
+.jtnq-cmp .stat-value{
+  font-family: var(--f-mono); font-size: clamp(15px, 1.5vw, 16px); font-weight: 500; color: var(--c-text); text-align: right;
+}
+.jtnq-cmp .stat-hero .stat-value{ font-size: clamp(21px, 2.2vw, 24px); }
+.jtnq-cmp .stat-sub{
+  display: block; margin-top: 4px; font-family: var(--f-sans); font-size: 11px; font-style: italic;
+  font-weight: 400; color: var(--c-text-mute); white-space: nowrap;
+}
+
+.jtnq-cmp .card-cta{
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+  font-family: var(--f-sans); font-weight: 500; font-size: 14px; color: var(--c-accent);
+  border: 1px solid var(--c-accent); border-radius: 999px; padding: 16px 24px;
+  transition: background .2s ease, color .2s ease, transform .2s ease;
+}
+.jtnq-cmp .card-cta svg{ width: 14px; height: 14px; }
+.jtnq-cmp .card-cta:hover{ background: var(--c-accent); color: var(--c-bg); transform: translateY(-1px); }
+
+.jtnq-cmp .card-footnote{
+  margin: 0; font-family: var(--f-mono); font-size: 10px; letter-spacing: .08em; color: var(--c-text-deep);
+}
+
+.jtnq-cmp .table-eyebrow{ margin-bottom: 24px; }
+.jtnq-cmp .eyebrow-sm{
+  display: block; margin-bottom: 8px; font-family: var(--f-mono); font-size: 11px; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--c-accent);
+}
+.jtnq-cmp .table-subtitle{
+  margin: 0; font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-size: clamp(16px, 1.6vw, 19px); color: var(--c-text-soft);
 }
 `;
