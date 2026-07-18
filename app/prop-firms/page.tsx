@@ -37,6 +37,7 @@ type Firm = {
   payout: string;
   promo: { label: string; code: string; ends?: string } | null;
   code?: string | null;
+  codeDiscountPct?: number;
   url: string;
   lastChecked: string;
   stale: boolean;
@@ -88,6 +89,16 @@ function candidatesAt(programs: Program[], size: number): Candidate[] {
 // global code, and code:null falls back to the firm's public promo code.
 const chipCode = (firm: Firm, promoCode: string | null) =>
   firm.code === undefined ? CODE : firm.code ?? promoCode;
+
+// Price actually paid through Angelo's link/code. His permanent code discount
+// (e.g. Traders Launch -15%) only applies when the firm shows no public promo
+// of its own (originalPrice == null) — public promos already discount `price`.
+function effectivePrice(firm: Firm, plan: Plan): { now: number; was: number | null; viaCode: boolean } {
+  if (firm.codeDiscountPct != null && plan.originalPrice == null) {
+    return { now: plan.price * (1 - firm.codeDiscountPct / 100), was: plan.price, viaCode: true };
+  }
+  return { now: plan.price, was: plan.originalPrice, viaCode: false };
+}
 
 function ddTag(plan: Plan) {
   return (
@@ -302,6 +313,7 @@ function FirmRow({
 
   if (!winner) return null;
   const promo = promoFor(firm, winner.program);
+  const rowPrice = effectivePrice(firm, winner.plan);
 
   const firmMeta = (
     <span className="firm-row-meta">
@@ -338,10 +350,13 @@ function FirmRow({
         <td className="num cell-price">
               <span className="price-line">
                 {cheapestOfMany && <span className="price-from">from </span>}
-                {money(winner.plan.price)}
+                {money(rowPrice.now)}
                 {winner.program.priceType === 'monthly' && <span className="per">/mo</span>}
-                {winner.plan.originalPrice != null && <s className="price-was">{money(winner.plan.originalPrice)}</s>}
+                {rowPrice.was != null && <s className="price-was">{money(rowPrice.was)}</s>}
               </span>
+              {rowPrice.viaCode && (
+                <span className="activation-note">code {chipCode(firm, promo.code)} −{firm.codeDiscountPct}%</span>
+              )}
               {winner.plan.activationFee != null && (
                 <span className="activation-note">+ {money(winner.plan.activationFee)} activation</span>
               )}
@@ -377,9 +392,11 @@ function FirmRow({
                         {program.name} · {program.type}
                       </span>
                       <span className="sub-price">
-                        {money(plan.price)}
+                        {money(effectivePrice(firm, plan).now)}
                         {program.priceType === 'monthly' && <span className="per">/mo</span>}
-                        {plan.originalPrice != null && <s className="price-was">{money(plan.originalPrice)}</s>}
+                        {effectivePrice(firm, plan).was != null && (
+                          <s className="price-was">{money(effectivePrice(firm, plan).was as number)}</s>
+                        )}
                         {subPromo.code && (
                           <span className="promo-chip" title={subPromo.title || undefined}>
                             code {chipCode(firm, subPromo.code)}

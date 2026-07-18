@@ -277,7 +277,8 @@
             }
           ]
         }
-      ]
+      ],
+      "codeDiscountPct": 15
     },
     {
       "id": "top-one-futures",
