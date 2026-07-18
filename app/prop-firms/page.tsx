@@ -775,7 +775,7 @@ const CSS = `
 }
 
 .jtnq-cmp .card-cta{
-  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: auto;
   font-family: var(--f-sans); font-weight: 500; font-size: 14px; color: var(--c-accent);
   border: 1px solid var(--c-accent); border-radius: 999px; padding: 16px 24px;
   transition: background .2s ease, color .2s ease, transform .2s ease;
