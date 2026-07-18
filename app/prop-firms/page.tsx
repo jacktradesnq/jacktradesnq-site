@@ -50,7 +50,8 @@ type Mode = 'eval' | 'instant';
 type SortKey = 'firm' | 'price' | 'target' | 'drawdown';
 type Row = { firm: Firm; program: Program; plan: Plan };
 
-const money = (n: number) => '$' + n.toLocaleString('en-US');
+const money = (n: number) =>
+  '$' + n.toLocaleString('en-US', Number.isInteger(n) ? undefined : { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const sizeLabel = (n: number) => '$' + n / 1000 + 'K';
 
 const DD_LABEL: Record<DdType, string> = {
