@@ -82,7 +82,7 @@ function ddTag(plan: Plan) {
   return <span className={`tag ${plan.ddType === 'EOD' ? 'tag-eod' : 'tag-trail'}`}>{DD_LABEL[plan.ddType]}</span>;
 }
 
-function dailyLossValue(firm: Firm, plan: Plan) {
+function dailyLossValue(plan: Plan) {
   if (plan.dailyLoss != null) {
     return (
       <>
@@ -95,7 +95,6 @@ function dailyLossValue(firm: Firm, plan: Plan) {
       </>
     );
   }
-  if (firm.id === 'traders-launch' && !plan.dailyLossSoft) return <span className="none">None advertised</span>;
   return <span className="none">None</span>;
 }
 
@@ -145,10 +144,13 @@ export default function PropFirms() {
     return [...all].sort((a, b) => a - b);
   }, []);
 
-  // Firms with at least one program in the current mode — drives the table rows.
+  // Firms with at least one plan at the selected mode + size — drives the table rows.
   const tableFirms = useMemo(
-    () => DATA.firms.filter((firm) => firm.programs.some((p) => p.type === mode)),
-    [mode],
+    () =>
+      DATA.firms.filter(
+        (firm) => candidatesAt(firm.programs.filter((p) => p.type === mode), size).length > 0,
+      ),
+    [mode, size],
   );
 
   return (
@@ -277,13 +279,14 @@ function FirmRow({
   onToggle: () => void;
 }) {
   const programs = firm.programs.filter((p) => p.type === mode);
-  const availableSizes = [...new Set(programs.flatMap((p) => p.plans.map((pl) => pl.size)))].sort((a, b) => a - b);
   const candidates = candidatesAt(programs, size);
   const cheapestOfMany = candidates.length > 1;
   const winner =
     candidates.length > 0 ? candidates.reduce((best, c) => (c.plan.price < best.plan.price ? c : best)) : null;
-  const promo = promoFor(firm, winner ? winner.program : programs[0]);
   const expandId = `expand-${firm.id}`;
+
+  if (!winner) return null;
+  const promo = promoFor(firm, winner.program);
 
   const firmMeta = (
     <span className="firm-row-meta">
@@ -298,10 +301,9 @@ function FirmRow({
 
   return (
     <>
-      <tr className={`firm-row${winner ? '' : ' firm-row-empty'}`}>
+      <tr className="firm-row">
         <td className="col-firm">
-          {winner ? (
-            <button
+          <button
               type="button"
               className="row-expand-btn"
               aria-expanded={expanded}
@@ -315,18 +317,10 @@ function FirmRow({
                 <span className="firm-row-name">{firm.name}</span>
                 {firmMeta}
               </span>
-            </button>
-          ) : (
-            <div className="firm-row-id firm-row-static">
-              <span className="firm-row-name">{firm.name}</span>
-              {firmMeta}
-            </div>
-          )}
+          </button>
         </td>
 
-        {winner ? (
-          <>
-            <td className="num cell-price">
+        <td className="num cell-price">
               <span className="price-line">
                 {cheapestOfMany && <span className="price-from">from </span>}
                 {money(winner.plan.price)}
@@ -337,20 +331,13 @@ function FirmRow({
                 <span className="activation-note">+ {money(winner.plan.activationFee)} activation</span>
               )}
             </td>
-            <td className="num cell-target">
-              {winner.plan.profitTarget != null ? money(winner.plan.profitTarget) : <span className="none">None</span>}
-            </td>
-            <td className="num cell-loss">
-              {money(winner.plan.maxDrawdown)} {ddTag(winner.plan)}
-            </td>
-            <td className="num cell-daily">{dailyLossValue(firm, winner.plan)}</td>
-          </>
-        ) : (
-          <td className="row-noplan" colSpan={4}>
-            No {sizeLabel(size)} {mode === 'eval' ? 'evaluation' : 'instant'} plan — available:{' '}
-            {availableSizes.map(sizeLabel).join(' · ')}
-          </td>
-        )}
+        <td className="num cell-target">
+          {winner.plan.profitTarget != null ? money(winner.plan.profitTarget) : <span className="none">None</span>}
+        </td>
+        <td className="num cell-loss">
+          {money(winner.plan.maxDrawdown)} {ddTag(winner.plan)}
+        </td>
+        <td className="num cell-daily">{dailyLossValue(winner.plan)}</td>
 
         <td className="col-cta">
           <a className="row-cta" href={firm.url} target="_blank" rel="noopener nofollow sponsored">
@@ -390,7 +377,7 @@ function FirmRow({
                       <span className="sub-loss">
                         {money(plan.maxDrawdown)} {ddTag(plan)}
                       </span>
-                      <span className="sub-daily">{dailyLossValue(firm, plan)}</span>
+                      <span className="sub-daily">{dailyLossValue(plan)}</span>
                       <span className="sub-consistency">{plan.consistency} consistency</span>
                       <span className="sub-contracts">{plan.contracts}</span>
                       {plan.activationFee != null && (
@@ -549,12 +536,10 @@ const CSS = `
 .jtnq-cmp .row-expand-btn[aria-expanded="true"] .chevron{ transform: rotate(90deg); color: var(--c-accent); }
 
 .jtnq-cmp .firm-row-id{ display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.jtnq-cmp .firm-row-static{ padding-left: 24px; }
 .jtnq-cmp .firm-row-name{
   display: block; font-family: var(--f-serif); font-style: italic; font-weight: 400;
   font-size: clamp(19px, 1.8vw, 23px); letter-spacing: -0.01em; color: var(--c-text); line-height: 1.1;
 }
-.jtnq-cmp .firm-row-empty .firm-row-name{ color: var(--c-text-mute); }
 .jtnq-cmp .firm-row-meta{
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--c-text-mute);
@@ -591,9 +576,6 @@ const CSS = `
 .jtnq-cmp .tag-trail{ color: var(--c-accent); border-color: color-mix(in oklab, var(--c-accent) 45%, var(--c-line)); }
 .jtnq-cmp .tag-eod{ color: var(--c-text-soft); }
 
-.jtnq-cmp td.row-noplan{
-  font-family: var(--f-sans); font-size: 13px; color: var(--c-text-mute); text-wrap: pretty; white-space: normal;
-}
 
 .jtnq-cmp .col-cta{ text-align: right; white-space: nowrap; }
 .jtnq-cmp .row-cta{
