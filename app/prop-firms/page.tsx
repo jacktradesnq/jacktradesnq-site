@@ -54,9 +54,14 @@ const money = (n: number) =>
 const sizeLabel = (n: number) => '$' + n / 1000 + 'K';
 
 const DD_LABEL: Record<DdType, string> = {
-  EOD: 'EOD',
+  EOD: 'No trail',
   'EOD Trailing': 'EOD Trail',
-  Intraday: 'Intraday',
+  Intraday: 'Intraday Trail',
+};
+const DD_TITLE: Record<DdType, string> = {
+  EOD: 'Static drawdown — fixed loss limit from your starting balance',
+  'EOD Trailing': 'Trailing drawdown — the limit follows your end-of-day balance highs',
+  Intraday: 'Trailing drawdown — the limit follows your equity in real time',
 };
 
 // Same promo fallback logic used everywhere on this page: a program-level
@@ -85,7 +90,11 @@ const chipCode = (firm: Firm, promoCode: string | null) =>
   firm.code === undefined ? CODE : firm.code ?? promoCode;
 
 function ddTag(plan: Plan) {
-  return <span className={`tag ${plan.ddType === 'EOD' ? 'tag-eod' : 'tag-trail'}`}>{DD_LABEL[plan.ddType]}</span>;
+  return (
+    <span className={`tag ${plan.ddType === 'EOD' ? 'tag-eod' : 'tag-trail'}`} title={DD_TITLE[plan.ddType]}>
+      {DD_LABEL[plan.ddType]}
+    </span>
+  );
 }
 
 function dailyLossValue(plan: Plan) {
