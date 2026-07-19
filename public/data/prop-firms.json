@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-18",
+  "generatedAt": "2026-07-19",
   "firms": [
     {
       "id": "blue-guardian",
@@ -11,7 +11,7 @@
         "code": "LAUNCH"
       },
       "url": "https://blueguardian.com/?afmc=JTNQ",
-      "lastChecked": "2026-07-18",
+      "lastChecked": "2026-07-19",
       "stale": false,
       "programs": [
         {
@@ -28,7 +28,7 @@
               "ddType": "EOD",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "None",
+              "consistency": "20→30% payouts",
               "contracts": "1 Mini | 10 Micro"
             },
             {
@@ -40,7 +40,7 @@
               "ddType": "EOD",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "None",
+              "consistency": "20→30% payouts",
               "contracts": "4 Mini | 40 Micro"
             },
             {
@@ -52,7 +52,7 @@
               "ddType": "EOD",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "None",
+              "consistency": "20→30% payouts",
               "contracts": "8 Mini | 80 Micro"
             },
             {
@@ -64,7 +64,7 @@
               "ddType": "EOD",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "None",
+              "consistency": "20→30% payouts",
               "contracts": "12 Mini | 120 Micro"
             }
           ]
@@ -231,7 +231,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-07-18",
+      "lastChecked": "2026-07-19",
       "stale": false,
       "programs": [
         {
@@ -290,7 +290,7 @@
         "code": "SUMMER"
       },
       "url": "https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures",
-      "lastChecked": "2026-07-18",
+      "lastChecked": "2026-07-19",
       "stale": false,
       "programs": [
         {
@@ -309,7 +309,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": 625,
               "dailyLossSoft": false,
-              "consistency": "25%",
+              "consistency": "None",
               "contracts": "1 mini / 10 micros"
             },
             {
@@ -321,7 +321,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": 1250,
               "dailyLossSoft": false,
-              "consistency": "25%",
+              "consistency": "None",
               "contracts": "3 minis / 30 micros"
             },
             {
@@ -333,7 +333,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": 2500,
               "dailyLossSoft": false,
-              "consistency": "25%",
+              "consistency": "None",
               "contracts": "5 minis / 50 micros"
             },
             {
@@ -345,7 +345,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": 3750,
               "dailyLossSoft": false,
-              "consistency": "25%",
+              "consistency": "None",
               "contracts": "7 minis / 70 micros"
             }
           ]
@@ -416,50 +416,50 @@
           "plans": [
             {
               "size": 25000,
-              "price": 139,
-              "originalPrice": 299,
+              "price": 19,
+              "originalPrice": null,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "40%",
+              "consistency": "None",
               "contracts": "1 mini / 10 micros"
             },
             {
               "size": 50000,
-              "price": 189,
-              "originalPrice": 499,
+              "price": 19,
+              "originalPrice": null,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "40%",
+              "consistency": "None",
               "contracts": "3 minis / 30 micros"
             },
             {
               "size": 100000,
-              "price": 259,
-              "originalPrice": 849,
+              "price": 19,
+              "originalPrice": null,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "40%",
+              "consistency": "None",
               "contracts": "5 minis / 50 micros"
             },
             {
               "size": 150000,
-              "price": 359,
-              "originalPrice": 1349,
+              "price": 19,
+              "originalPrice": null,
               "profitTarget": 9000,
               "maxDrawdown": 4000,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "40%",
+              "consistency": "None",
               "contracts": "7 minis / 70 micros"
             }
           ]
@@ -500,7 +500,7 @@
               "price": 493,
               "originalPrice": 821,
               "profitTarget": null,
-              "maxDrawdown": 3000,
+              "maxDrawdown": 4000,
               "ddType": "EOD Trailing",
               "dailyLoss": 2500,
               "dailyLossSoft": false,
@@ -512,7 +512,7 @@
               "price": 563,
               "originalPrice": 939,
               "profitTarget": null,
-              "maxDrawdown": 4500,
+              "maxDrawdown": 6000,
               "ddType": "EOD Trailing",
               "dailyLoss": 3750,
               "dailyLossSoft": false,
@@ -614,7 +614,7 @@
               "price": 338,
               "originalPrice": 563,
               "profitTarget": null,
-              "maxDrawdown": 3000,
+              "maxDrawdown": 4000,
               "ddType": "EOD Trailing",
               "dailyLoss": 2000,
               "dailyLossSoft": false,
@@ -626,7 +626,7 @@
               "price": 479,
               "originalPrice": 799,
               "profitTarget": null,
-              "maxDrawdown": 4500,
+              "maxDrawdown": 6000,
               "ddType": "EOD Trailing",
               "dailyLoss": 3000,
               "dailyLossSoft": false,
@@ -648,7 +648,7 @@
         "ends": "2026-07-26"
       },
       "url": "https://fundedseat.link/jtnq",
-      "lastChecked": "2026-07-18",
+      "lastChecked": "2026-07-19",
       "stale": false,
       "programs": [
         {
@@ -761,7 +761,7 @@
         "code": "LTG"
       },
       "url": "https://thelegendstrading.com/?ref=JTNQ",
-      "lastChecked": "2026-07-18",
+      "lastChecked": "2026-07-19",
       "stale": false,
       "programs": [
         {
@@ -946,7 +946,7 @@
       },
       "code": "B1770991",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-07-18",
+      "lastChecked": "2026-07-19",
       "stale": false,
       "programs": [
         {
@@ -1095,8 +1095,8 @@
     {
       "id": "fundednext",
       "name": "FundedNext",
-      "split": "90%",
-      "payout": "Daily",
+      "split": "80–95%",
+      "payout": "Daily–5 days",
       "promo": {
         "label": "Rapid Pro and Rapid Daily: 50% Off (Futures)",
         "code": "RAPID50"

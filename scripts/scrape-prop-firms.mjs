@@ -157,6 +157,9 @@ async function scrapeTopOne() {
     while ((m = re.exec(block))) pairs.push({ price: num(m[1]), originalPrice: num(m[3]) });
     if (pairs.length !== TOPONE_SIZES.length)
       throw new Error(`${tab}: expected ${TOPONE_SIZES.length} price pairs, got ${pairs.length}`);
+    // Elite Access: the site's price__prev slot holds the funded reset fee,
+    // not a struck-through price (2026-07-19 audit) — never publish it.
+    if (programName === 'Elite Access') pairs.forEach((p) => (p.originalPrice = null));
     pairs.forEach((p, i) => updates.push({ programName, size: TOPONE_SIZES[i], ...p }));
 
     // Promo code: "w. Code:" followed by the copy-code block text.
@@ -168,8 +171,9 @@ async function scrapeTopOne() {
     if (codeM) {
       // Program label: N% OFF only when at least 3 of 4 plans agree on the
       // rounded discount (Elite Access style bundle deals keep their manual label).
-      const { value: pct, count } = mode(pairs.map((p) => pctOff(p.price, p.originalPrice)));
-      const label = count >= 3 ? `${pct}% OFF` : null;
+      const valid = pairs.filter((p) => p.originalPrice != null);
+      const { value: pct, count } = valid.length ? mode(valid.map((p) => pctOff(p.price, p.originalPrice))) : { value: null, count: 0 };
+      const label = valid.length >= 3 && count >= 3 ? `${pct}% OFF` : null;
       programPromos[programName] = { code: codeM[1], label };
       codeCounts.push(codeM[1]);
       if (label) programPcts.push(pct);
