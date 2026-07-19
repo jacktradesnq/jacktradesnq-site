@@ -1,0 +1,123 @@
+[
+  {
+    "firm": "Blue Guardian",
+    "program": "Direct",
+    "size": "all",
+    "field": "consistency",
+    "ours": "None",
+    "official": "No eval-phase consistency rule (correct, instant funding = no eval) BUT an escalating PAYOUT consistency rule applies from first withdrawal: 20% (1st payout), 25% (2nd), 30% (3rd+) of total profit as max single-day share.",
+    "verdict": "DIVERGENT",
+    "quote": "{\"label\":\"1st Payout Consistency\",\"value\":\"20%\",...} {\"label\":\"2nd Payout Consistency\",\"value\":\"25%\",...} {\"label\":\"3rd+ Payout Consistency\",\"value\":\"30%\",...}",
+    "source": "blueguardian.html (buy-screen/configurator RSC payload, Direct plan fundedRules, captured 2026-07-18)"
+  },
+  {
+    "firm": "Traders Launch",
+    "program": "1-Step",
+    "size": "all",
+    "field": "codeDiscountPct",
+    "ours": 15,
+    "official": "not published on public homepage (private/affiliate code arrangement, JTNQ coupon param not present in generic site capture)",
+    "verdict": "UNVERIFIABLE",
+    "quote": "no occurrence of \"15%\", \"coupon\", or \"JTNQ\" in traderslaunch.html public homepage capture",
+    "source": "traderslaunch.html (public homepage, no coupon param) — codeDiscountPct is a private affiliate term between Angelo and Traders Launch, not a publicly documented rule"
+  },
+  {
+    "firm": "Top One Futures",
+    "program": "Instant Sim Funded",
+    "size": 100000,
+    "field": "maxDrawdown",
+    "ours": 3000,
+    "official": 4000,
+    "verdict": "DIVERGENT",
+    "quote": "pricing table live site: \"Trailing max drawdown\" row shows struck-through $3,000 then current $4,000 for the $100,000 tier (site increased the drawdown room; old value still crossed out on page)",
+    "source": "toponefutures.com live homepage pricing table, INSTANT Sim Funded tab, screenshot 2026-07-19 (topone_instant_pane2.png) — buy-screen, checkout.toponefutures.com links per plan"
+  },
+  {
+    "firm": "Top One Futures",
+    "program": "Instant Sim Funded",
+    "size": 150000,
+    "field": "maxDrawdown",
+    "ours": 4500,
+    "official": 6000,
+    "verdict": "DIVERGENT",
+    "quote": "same pricing table: $150,000 tier shows struck-through $4,500 then current $6,000",
+    "source": "toponefutures.com live homepage pricing table, INSTANT Sim Funded tab, screenshot 2026-07-19 (topone_instant_pane2.png)"
+  },
+  {
+    "firm": "Top One Futures",
+    "program": "Ignite",
+    "size": 100000,
+    "field": "maxDrawdown",
+    "ours": 3000,
+    "official": 4000,
+    "verdict": "DIVERGENT",
+    "quote": "pricing table live site: Ignite AF tab, $100,000 tier shows struck-through $3,000 then current $4,000",
+    "source": "toponefutures.com live homepage pricing table, Ignite AF tab, screenshot 2026-07-19 (topone_ignite_pane.png)"
+  },
+  {
+    "firm": "Top One Futures",
+    "program": "Ignite",
+    "size": 150000,
+    "field": "maxDrawdown",
+    "ours": 4500,
+    "official": 6000,
+    "verdict": "DIVERGENT",
+    "quote": "same table: $150,000 tier shows struck-through $4,500 then current $6,000",
+    "source": "toponefutures.com live homepage pricing table, Ignite AF tab, screenshot 2026-07-19 (topone_ignite_pane.png)"
+  },
+  {
+    "firm": "Top One Futures",
+    "program": "Elite Access",
+    "size": "all",
+    "field": "originalPrice",
+    "ours": "299/499/849/1349 (25k/50k/100k/150k)",
+    "official": "no such \"original price\" appears anywhere in the real checkout flow; these numbers exactly match the site's separate \"Reset Fee on Funded\" column (a different rule, the cost to reset the account after failing once already funded), not a pre-discount list price",
+    "verdict": "DIVERGENT",
+    "quote": "Live checkout.toponefutures.com Elite Access $50,000: \"Base Price $189.00 / Subtotal $189.00 / Total $189.00\" — no $499 anywhere. Homepage table row \"Reset Fee on Funded\" = $299/$499/$849/$1,349 for 25k/50k/100k/150k, exactly matching our originalPrice field.",
+    "source": "checkout.toponefutures.com/?type=elite-access&size=50 live checkout (topone_checkout_ea50_c.txt) + topone.html buy-screen table (Elite Access tab)"
+  },
+  {
+    "firm": "Top One Futures",
+    "program": "Elite Challenge",
+    "size": "all",
+    "field": "consistency",
+    "ours": "25%",
+    "official": "\"Consistency on Challenge\": None (no consistency rule to pass the eval) — the 25% figure is the \"Consistency on Funded\" rule instead, which applies only after being funded",
+    "verdict": "DIVERGENT",
+    "quote": "buy-screen row values: Consistency on Challenge=\"None\", Consistency on Funded=\"25%\" (25k plan; same pattern all 4 sizes)",
+    "source": "topone.html buy-screen table, 1-Step ELITE Challange tab"
+  },
+  {
+    "firm": "Top One Futures",
+    "program": "Elite Access",
+    "size": "all",
+    "field": "consistency",
+    "ours": "40%",
+    "official": "\"Consistency on Challenge\": None! (no consistency rule to pass the eval) — the 40% figure is the \"Consistency on Funded\" rule instead",
+    "verdict": "DIVERGENT",
+    "quote": "buy-screen row values: Consistency on Challenge=\"None!\", Consistency on Funded=\"40%\" (all 4 sizes identical)",
+    "source": "topone.html buy-screen table, Elite Access tab"
+  },
+  {
+    "firm": "FundedNext",
+    "program": "all (firm-level field)",
+    "size": "all",
+    "field": "split",
+    "ours": "90%",
+    "official": "varies by program: Flex = \"Up to 95%\" (labelBadge \"95% Reward share-Limited Time Offer\"), Legacy = \"80%\", Rapid Pro = \"90%\", Rapid Daily = \"90%\" — the firm-level 90% only matches 2 of 4 programs",
+    "verdict": "DIVERGENT",
+    "quote": "{\"id\":\"split\",\"label\":\"Reward Share\",\"value\":\"80%\"} (Legacy, all 3 sizes) vs {\"value\":\"Up to 95%\",\"labelBadge\":{\"tooltipContent\":\"95% Reward share-Limited Time Offer\"}} (Flex, all 3 sizes)",
+    "source": "fundednext/chunk52_parsed.json — official Next.js RSC buy-screen payload, fundedRewardRules per package, captured 2026-07-19"
+  },
+  {
+    "firm": "FundedNext",
+    "program": "all (firm-level field)",
+    "size": "all",
+    "field": "payout",
+    "ours": "Daily",
+    "official": "varies by program: Flex = \"5 Days\", Legacy = \"5 Days\", Rapid Pro = \"3 Days\", Rapid Daily = \"Daily\" — \"Daily\" is only accurate for the Rapid Daily program (true to its name); the other 3 programs have a 3-5 day reward cadence, not daily",
+    "verdict": "DIVERGENT",
+    "quote": "{\"id\":\"payoutIn\",\"label\":\"Get Rewards In\",\"value\":\"5 Days\"} (Flex $150K/$100K/$50K and Legacy, all sizes) vs {\"value\":\"3 Days\"} (Rapid Pro) vs {\"value\":\"Daily\"} (Rapid Daily only)",
+    "source": "fundednext/chunk52_parsed.json — official buy-screen payload, fundedRewardRules per package"
+  }
+]

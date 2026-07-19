@@ -59,3 +59,22 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy out --project-name=jacktradesnq --branch=main --commit-dirty=true
+
+      - name: Discord alert — stale firms
+        if: always()
+        run: |
+          STALE=$(python3 -c "import json; d=json.load(open('public/data/prop-firms.json')); print(', '.join(f['name'] for f in d['firms'] if f.get('stale')))")
+          if [ -n "$STALE" ]; then
+            curl -sS -H "Content-Type: application/json" -d "{\"content\": \"⚠️ **prop-firms sync** — firmes STALE (site illisible, anciennes données conservées) : $STALE\"}" "${{ secrets.DISCORD_WEBHOOK }}" > /dev/null
+          fi
+
+      - name: Discord alert — price changes applied
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          SUMMARY=$(git show --stat --oneline HEAD | head -3 | tr '\n' ' ' | cut -c1-300)
+          curl -sS -H "Content-Type: application/json" -d "{\"content\": \"✅ **prop-firms sync** — prix mis à jour et déployés : $SUMMARY\"}" "${{ secrets.DISCORD_WEBHOOK }}" > /dev/null
+
+      - name: Discord alert — workflow failed
+        if: failure()
+        run: |
+          curl -sS -H "Content-Type: application/json" -d "{\"content\": \"🔴 **prop-firms sync** — le workflow a ÉCHOUÉ : https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "${{ secrets.DISCORD_WEBHOOK }}" > /dev/null
