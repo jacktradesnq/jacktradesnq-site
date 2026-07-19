@@ -1091,6 +1091,193 @@
           ]
         }
       ]
+    },
+    {
+      "id": "fundednext",
+      "name": "FundedNext",
+      "split": "90%",
+      "payout": "Daily",
+      "promo": {
+        "label": "Rapid Pro and Rapid Daily: 50% Off (Futures)",
+        "code": "RAPID50"
+      },
+      "url": "https://fundednext.com?fpr=jtnq",
+      "lastChecked": "2026-07-19",
+      "stale": false,
+      "programs": [
+        {
+          "name": "Flex",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 150000,
+              "price": 249.99,
+              "originalPrice": 483.99,
+              "profitTarget": 8000,
+              "maxDrawdown": 4000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "8 minis / 80 micros"
+            },
+            {
+              "size": 100000,
+              "price": 129.99,
+              "originalPrice": 249.99,
+              "profitTarget": 5000,
+              "maxDrawdown": 2500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "5 minis / 50 micros"
+            },
+            {
+              "size": 50000,
+              "price": 69.99,
+              "originalPrice": 133.99,
+              "profitTarget": 2500,
+              "maxDrawdown": 1500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "3 minis / 30 micros"
+            }
+          ]
+        },
+        {
+          "name": "Legacy",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 100000,
+              "price": 239.99,
+              "originalPrice": null,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "5 minis / 50 micros"
+            },
+            {
+              "size": 50000,
+              "price": 199.99,
+              "originalPrice": null,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "3 minis / 30 micros"
+            },
+            {
+              "size": 25000,
+              "price": 79.99,
+              "originalPrice": null,
+              "profitTarget": 1250,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "2 minis / 20 micros"
+            }
+          ]
+        },
+        {
+          "name": "Rapid Pro",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 100000,
+              "price": 249.99,
+              "originalPrice": 499.98,
+              "profitTarget": 5000,
+              "maxDrawdown": 2500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "None",
+              "contracts": "6 minis / 60 micros"
+            },
+            {
+              "size": 50000,
+              "price": 149.99,
+              "originalPrice": 299.98,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "None",
+              "contracts": "4 minis / 40 micros"
+            },
+            {
+              "size": 25000,
+              "price": 79.99,
+              "originalPrice": 159.98,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "None",
+              "contracts": "2 minis / 20 micros"
+            }
+          ]
+        },
+        {
+          "name": "Rapid Daily",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 100000,
+              "price": 249.99,
+              "originalPrice": 499.98,
+              "profitTarget": 5000,
+              "maxDrawdown": 2500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1250,
+              "dailyLossSoft": true,
+              "consistency": "None",
+              "contracts": "6 minis / 60 micros"
+            },
+            {
+              "size": 50000,
+              "price": 149.99,
+              "originalPrice": 299.98,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1000,
+              "dailyLossSoft": true,
+              "consistency": "None",
+              "contracts": "4 minis / 40 micros"
+            },
+            {
+              "size": 25000,
+              "price": 79.99,
+              "originalPrice": 159.98,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 500,
+              "dailyLossSoft": true,
+              "consistency": "None",
+              "contracts": "2 minis / 20 micros"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
