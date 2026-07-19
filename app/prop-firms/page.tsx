@@ -340,7 +340,7 @@ function FirmRow({
               <svg className="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 6l6 6-6 6" />
               </svg>
-              <span className="plan-count">{candidates.length} plans</span>
+              <span className="plan-count">{candidates.length} plan{candidates.length > 1 ? 's' : ''}</span>
               <span className="firm-row-id">
                 <span className="firm-row-name">{firm.name}</span>
                 {firmMeta}
