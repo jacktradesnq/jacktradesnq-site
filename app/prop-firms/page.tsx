@@ -263,6 +263,12 @@ export default function PropFirms() {
               </tbody>
             </table>
           </div>
+          <div className="legend">
+            <p>No trail — fixed loss limit, never moves</p>
+            <p>EOD Trail — limit follows your end-of-day balance</p>
+            <p>Intraday Trail — limit follows your equity in real time</p>
+            <p>soft — position flattened, account survives · "from $X" — cheapest plan at this size</p>
+          </div>
           <p className="note">{NOTE}</p>
         </section>
       </main>
@@ -340,6 +346,7 @@ function FirmRow({
               <svg className="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 6l6 6-6 6" />
               </svg>
+              <span className="plan-count">{candidates.length} plans</span>
               <span className="firm-row-id">
                 <span className="firm-row-name">{firm.name}</span>
                 {firmMeta}
@@ -347,7 +354,7 @@ function FirmRow({
           </button>
         </td>
 
-        <td className="num cell-price">
+        <td className="num cell-price" data-label="Price today">
               <span className="price-line">
                 {cheapestOfMany && <span className="price-from">from </span>}
                 {money(rowPrice.now)}
@@ -361,13 +368,13 @@ function FirmRow({
                 <span className="activation-note">+ {money(winner.plan.activationFee)} activation</span>
               )}
             </td>
-        <td className="num cell-target">
+        <td className="num cell-target" data-label="Max profit">
           {winner.plan.profitTarget != null ? money(winner.plan.profitTarget) : <span className="none">None</span>}
         </td>
-        <td className="num cell-loss">
+        <td className="num cell-loss" data-label="Max loss limit">
           {money(winner.plan.maxDrawdown)} {ddTag(winner.plan)}
         </td>
-        <td className="num cell-daily">{dailyLossValue(winner.plan)}</td>
+        <td className="num cell-daily" data-label="Daily loss">{dailyLossValue(winner.plan)}</td>
 
         <td className="col-cta">
           <a className="row-cta" href={firm.url} target="_blank" rel="noopener nofollow sponsored">
@@ -562,10 +569,14 @@ const CSS = `
   font: inherit; color: inherit; background: none; border: none; padding: 0; cursor: pointer;
 }
 .jtnq-cmp .chevron{
-  width: 14px; height: 14px; flex-shrink: 0; color: var(--c-text-mute); transition: transform .2s ease, color .2s ease;
+  width: 14px; height: 14px; flex-shrink: 0; color: var(--c-accent); transition: transform .2s ease, color .2s ease;
 }
 .jtnq-cmp .row-expand-btn:hover .chevron{ color: var(--c-accent); }
 .jtnq-cmp .row-expand-btn[aria-expanded="true"] .chevron{ transform: rotate(90deg); color: var(--c-accent); }
+.jtnq-cmp .plan-count{
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--c-text-mute); white-space: nowrap;
+}
 
 .jtnq-cmp .firm-row-id{ display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .jtnq-cmp .firm-row-name{
@@ -644,6 +655,13 @@ const CSS = `
 .jtnq-cmp .sub-name{ color: var(--c-text); font-weight: 500; }
 .jtnq-cmp .sub-activation{ color: var(--c-text-mute); font-style: italic; }
 
+.jtnq-cmp .legend{
+  display: flex; flex-direction: column; gap: 6px; margin: 16px 0 0;
+}
+.jtnq-cmp .legend p{
+  margin: 0; font-family: var(--f-mono); font-size: 11px; line-height: 1.5; color: var(--c-text-mute);
+}
+
 .jtnq-cmp .note{
   margin: clamp(24px, 3vw, 32px) 0 0; max-width: 78ch;
   font-family: var(--f-sans); font-size: 13px; line-height: 1.6; color: var(--c-text-mute); text-wrap: pretty;
@@ -669,5 +687,51 @@ const CSS = `
 .jtnq-cmp .footer-disclaimer{
   max-width: var(--maxw); margin: 40px auto 0; padding-top: 28px; border-top: 1px solid var(--c-line-soft);
   font-size: 12px; line-height: 1.7; color: var(--c-text-deep); text-wrap: pretty;
+}
+
+@media (max-width: 720px){
+  .jtnq-cmp .hero{ padding: 72px var(--pad-x) 32px; }
+  .jtnq-cmp .wordmark{ font-size: clamp(40px, 13vw, 60px); }
+  .jtnq-cmp .phrase{ font-size: 14px; margin-top: 20px; }
+
+  .jtnq-cmp .table-wrap{ border: none; background: none; border-radius: 0; overflow: visible; }
+  .jtnq-cmp table, .jtnq-cmp tbody, .jtnq-cmp tr, .jtnq-cmp td{ display: block; width: 100%; }
+  .jtnq-cmp table{ min-width: 0; }
+  .jtnq-cmp thead{ display: none; }
+
+  .jtnq-cmp tr.firm-row{
+    display: grid; grid-template-columns: 1fr 1fr;
+    grid-template-areas: "firm firm" "target loss" "price daily" "cta cta";
+    column-gap: 16px; row-gap: 16px;
+    background: var(--c-bg-raise); border: 1px solid var(--c-line); border-radius: 14px;
+    padding: 18px; margin-bottom: 12px;
+  }
+  .jtnq-cmp tr.firm-row td{ padding: 0; }
+
+  .jtnq-cmp td.col-firm{ grid-area: firm; position: static; background: none; }
+  .jtnq-cmp td.cell-target{ grid-area: target; }
+  .jtnq-cmp td.cell-loss{ grid-area: loss; }
+  .jtnq-cmp td.cell-price{ grid-area: price; }
+  .jtnq-cmp td.cell-daily{ grid-area: daily; }
+  .jtnq-cmp td.col-cta{ grid-area: cta; text-align: center; }
+
+  .jtnq-cmp tr.firm-row td.num{ white-space: normal; }
+  .jtnq-cmp td.cell-target, .jtnq-cmp td.cell-loss{ font-size: 20px; }
+  .jtnq-cmp td.cell-price, .jtnq-cmp td.cell-daily{ font-size: 15px; }
+
+  .jtnq-cmp td[data-label]::before{
+    content: attr(data-label); display: block; margin-bottom: 4px;
+    font-family: var(--f-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--c-text-mute);
+  }
+
+  .jtnq-cmp .row-cta{ width: 100%; justify-content: center; padding: 14px 20px; }
+
+  .jtnq-cmp tr.expand-row{ margin-bottom: 0; }
+  .jtnq-cmp tr.expand-row:has(.is-open){ margin-bottom: 12px; }
+  .jtnq-cmp .expand-cell{ padding: 0; }
+  .jtnq-cmp .expand-wrap.is-open .expand-panel{
+    border: 1px solid var(--c-line); border-radius: 14px; padding: 16px;
+  }
 }
 `;
