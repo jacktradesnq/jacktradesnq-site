@@ -310,7 +310,8 @@
               "dailyLoss": 625,
               "dailyLossSoft": false,
               "consistency": "None",
-              "contracts": "1 mini / 10 micros"
+              "contracts": "1 mini / 10 micros",
+              "activationFee": 149
             },
             {
               "size": 50000,
@@ -322,7 +323,8 @@
               "dailyLoss": 1250,
               "dailyLossSoft": false,
               "consistency": "None",
-              "contracts": "3 minis / 30 micros"
+              "contracts": "3 minis / 30 micros",
+              "activationFee": 149
             },
             {
               "size": 100000,
@@ -334,7 +336,8 @@
               "dailyLoss": 2500,
               "dailyLossSoft": false,
               "consistency": "None",
-              "contracts": "5 minis / 50 micros"
+              "contracts": "5 minis / 50 micros",
+              "activationFee": 149
             },
             {
               "size": 150000,
@@ -346,7 +349,8 @@
               "dailyLoss": 3750,
               "dailyLossSoft": false,
               "consistency": "None",
-              "contracts": "7 minis / 70 micros"
+              "contracts": "7 minis / 70 micros",
+              "activationFee": 149
             }
           ]
         },
@@ -424,7 +428,8 @@
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "None",
-              "contracts": "1 mini / 10 micros"
+              "contracts": "1 mini / 10 micros",
+              "activationFee": 139
             },
             {
               "size": 50000,
@@ -436,7 +441,8 @@
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "None",
-              "contracts": "3 minis / 30 micros"
+              "contracts": "3 minis / 30 micros",
+              "activationFee": 189
             },
             {
               "size": 100000,
@@ -448,7 +454,8 @@
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "None",
-              "contracts": "5 minis / 50 micros"
+              "contracts": "5 minis / 50 micros",
+              "activationFee": 259
             },
             {
               "size": 150000,
@@ -460,7 +467,8 @@
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "None",
-              "contracts": "7 minis / 70 micros"
+              "contracts": "7 minis / 70 micros",
+              "activationFee": 359
             }
           ]
         },
