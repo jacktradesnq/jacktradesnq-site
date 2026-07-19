@@ -157,12 +157,6 @@ export default function PropFirms() {
     };
   }, []);
 
-  // Collapse any open expand panel whenever the comparison context changes,
-  // so it never shows stale plans for the wrong size/mode.
-  useEffect(() => {
-    setExpandedFirmId(null);
-  }, [mode, size]);
-
   const sizes = useMemo(() => {
     const all = new Set<number>();
     for (const firm of DATA.firms)
