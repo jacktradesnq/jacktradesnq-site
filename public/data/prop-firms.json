@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-19",
+  "generatedAt": "2026-07-20",
   "firms": [
     {
       "id": "blue-guardian",
@@ -7,11 +7,11 @@
       "split": "90%",
       "payout": "On-demand",
       "promo": {
-        "label": "40% OFF",
+        "label": "35% OFF",
         "code": "LAUNCH"
       },
       "url": "https://blueguardian.com/?afmc=JTNQ",
-      "lastChecked": "2026-07-19",
+      "lastChecked": "2026-07-20",
       "stale": false,
       "programs": [
         {
@@ -21,8 +21,8 @@
           "plans": [
             {
               "size": 25000,
-              "price": 167,
-              "originalPrice": 279,
+              "price": 199,
+              "originalPrice": 307,
               "profitTarget": null,
               "maxDrawdown": 1500,
               "ddType": "EOD",
@@ -33,8 +33,8 @@
             },
             {
               "size": 50000,
-              "price": 269,
-              "originalPrice": 449,
+              "price": 321,
+              "originalPrice": 494,
               "profitTarget": null,
               "maxDrawdown": 2500,
               "ddType": "EOD",
@@ -45,8 +45,8 @@
             },
             {
               "size": 100000,
-              "price": 359,
-              "originalPrice": 599,
+              "price": 428,
+              "originalPrice": 659,
               "profitTarget": null,
               "maxDrawdown": 3500,
               "ddType": "EOD",
@@ -57,8 +57,8 @@
             },
             {
               "size": 150000,
-              "price": 449,
-              "originalPrice": 749,
+              "price": 536,
+              "originalPrice": 824,
               "profitTarget": null,
               "maxDrawdown": 5000,
               "ddType": "EOD",
@@ -76,8 +76,8 @@
           "plans": [
             {
               "size": 50000,
-              "price": 97,
-              "originalPrice": 162,
+              "price": 116,
+              "originalPrice": 178,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -88,8 +88,8 @@
             },
             {
               "size": 100000,
-              "price": 154,
-              "originalPrice": 256,
+              "price": 183,
+              "originalPrice": 282,
               "profitTarget": 6000,
               "maxDrawdown": 3500,
               "ddType": "EOD Trailing",
@@ -100,8 +100,8 @@
             },
             {
               "size": 150000,
-              "price": 211,
-              "originalPrice": 351,
+              "price": 251,
+              "originalPrice": 386,
               "profitTarget": 9000,
               "maxDrawdown": 5000,
               "ddType": "EOD Trailing",
@@ -119,8 +119,8 @@
           "plans": [
             {
               "size": 25000,
-              "price": 60,
-              "originalPrice": 100,
+              "price": 72,
+              "originalPrice": 110,
               "profitTarget": 1500,
               "maxDrawdown": 1500,
               "ddType": "EOD Trailing",
@@ -131,8 +131,8 @@
             },
             {
               "size": 50000,
-              "price": 84,
-              "originalPrice": 140,
+              "price": 100,
+              "originalPrice": 154,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -143,8 +143,8 @@
             },
             {
               "size": 100000,
-              "price": 135,
-              "originalPrice": 225,
+              "price": 161,
+              "originalPrice": 248,
               "profitTarget": 6000,
               "maxDrawdown": 3500,
               "ddType": "EOD Trailing",
@@ -155,8 +155,8 @@
             },
             {
               "size": 150000,
-              "price": 252,
-              "originalPrice": 420,
+              "price": 300,
+              "originalPrice": 462,
               "profitTarget": 9000,
               "maxDrawdown": 5000,
               "ddType": "EOD Trailing",
@@ -174,8 +174,8 @@
           "plans": [
             {
               "size": 25000,
-              "price": 84,
-              "originalPrice": 140,
+              "price": 100,
+              "originalPrice": 154,
               "profitTarget": 1500,
               "maxDrawdown": 1500,
               "ddType": "EOD Trailing",
@@ -186,8 +186,8 @@
             },
             {
               "size": 50000,
-              "price": 114,
-              "originalPrice": 190,
+              "price": 136,
+              "originalPrice": 209,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -198,8 +198,8 @@
             },
             {
               "size": 100000,
-              "price": 180,
-              "originalPrice": 300,
+              "price": 215,
+              "originalPrice": 330,
               "profitTarget": 6000,
               "maxDrawdown": 3500,
               "ddType": "EOD Trailing",
@@ -210,8 +210,8 @@
             },
             {
               "size": 150000,
-              "price": 231,
-              "originalPrice": 385,
+              "price": 275,
+              "originalPrice": 424,
               "profitTarget": 9000,
               "maxDrawdown": 5000,
               "ddType": "EOD Trailing",
@@ -231,7 +231,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-07-19",
+      "lastChecked": "2026-07-20",
       "stale": false,
       "programs": [
         {
@@ -290,7 +290,7 @@
         "code": "SUMMER"
       },
       "url": "https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures",
-      "lastChecked": "2026-07-19",
+      "lastChecked": "2026-07-20",
       "stale": false,
       "programs": [
         {
@@ -656,7 +656,7 @@
         "ends": "2026-07-26"
       },
       "url": "https://fundedseat.link/jtnq",
-      "lastChecked": "2026-07-19",
+      "lastChecked": "2026-07-20",
       "stale": false,
       "programs": [
         {
@@ -769,7 +769,7 @@
         "code": "LTG"
       },
       "url": "https://thelegendstrading.com/?ref=JTNQ",
-      "lastChecked": "2026-07-19",
+      "lastChecked": "2026-07-20",
       "stale": false,
       "programs": [
         {
@@ -954,7 +954,7 @@
       },
       "code": "B1770991",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-07-19",
+      "lastChecked": "2026-07-20",
       "stale": false,
       "programs": [
         {
@@ -1110,7 +1110,7 @@
         "code": "RAPID50"
       },
       "url": "https://fundednext.com?fpr=jtnq",
-      "lastChecked": "2026-07-19",
+      "lastChecked": "2026-07-20",
       "stale": false,
       "programs": [
         {
