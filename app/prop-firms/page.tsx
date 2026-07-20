@@ -45,6 +45,16 @@ type Firm = {
 };
 type PropData = { generatedAt: string; firms: Firm[] };
 
+const FIRM_LOGOS: Record<string, string> = {
+  'blue-guardian': '/logos/blue-guardian.svg',
+  'traders-launch': '/logos/traders-launch.png',
+  'top-one-futures': '/logos/top-one-futures.png',
+  'fundedseat': '/logos/fundedseat.png',
+  'legends-trading': '/logos/legends-trading.png',
+  'e8-markets': '/logos/e8-markets.svg',
+  'fundednext': '/logos/fundednext.png',
+};
+
 const DATA = rawData as unknown as PropData;
 
 type Mode = 'eval' | 'instant';
@@ -342,6 +352,9 @@ function FirmRow({
               </svg>
               <span className="plan-count">{candidates.length} plan{candidates.length > 1 ? 's' : ''}</span>
               <span className="firm-row-id">
+                {FIRM_LOGOS[firm.id] && (
+                  <img className="firm-logo" src={FIRM_LOGOS[firm.id]} alt="" width={22} height={22} loading="lazy" />
+                )}
                 <span className="firm-row-name">{firm.name}</span>
                 {firmMeta}
               </span>
@@ -572,13 +585,16 @@ const CSS = `
   color: var(--c-text-mute); white-space: nowrap;
 }
 
-.jtnq-cmp .firm-row-id{ display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.jtnq-cmp .firm-row-id{ display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 8px; row-gap: 4px; min-width: 0; }
+.jtnq-cmp .firm-logo{
+  grid-row: 1 / -1; width: 22px; height: 22px; border-radius: 5px; object-fit: contain; flex-shrink: 0;
+}
 .jtnq-cmp .firm-row-name{
-  display: block; font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  grid-column: 2; display: block; font-family: var(--f-serif); font-style: italic; font-weight: 400;
   font-size: clamp(19px, 1.8vw, 23px); letter-spacing: -0.01em; color: var(--c-text); line-height: 1.1;
 }
 .jtnq-cmp .firm-row-meta{
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  grid-column: 2; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--c-text-mute);
 }
 
