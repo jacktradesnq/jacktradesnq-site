@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-20",
+  "generatedAt": "2026-07-21",
   "firms": [
     {
       "id": "blue-guardian",
@@ -8,10 +8,10 @@
       "payout": "On-demand",
       "promo": {
         "label": "35% OFF",
-        "code": "LAUNCH"
+        "code": "BG35"
       },
       "url": "https://blueguardian.com/?afmc=JTNQ",
-      "lastChecked": "2026-07-20",
+      "lastChecked": "2026-07-21",
       "stale": false,
       "programs": [
         {
@@ -231,7 +231,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-07-20",
+      "lastChecked": "2026-07-21",
       "stale": false,
       "programs": [
         {
@@ -290,7 +290,7 @@
         "code": "SUMMER"
       },
       "url": "https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures",
-      "lastChecked": "2026-07-20",
+      "lastChecked": "2026-07-21",
       "stale": false,
       "programs": [
         {
@@ -656,7 +656,7 @@
         "ends": "2026-07-26"
       },
       "url": "https://fundedseat.link/jtnq",
-      "lastChecked": "2026-07-20",
+      "lastChecked": "2026-07-21",
       "stale": false,
       "programs": [
         {
@@ -769,7 +769,7 @@
         "code": "LTG"
       },
       "url": "https://thelegendstrading.com/?ref=JTNQ",
-      "lastChecked": "2026-07-20",
+      "lastChecked": "2026-07-21",
       "stale": false,
       "programs": [
         {
@@ -954,7 +954,7 @@
       },
       "code": "B1770991",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-07-20",
+      "lastChecked": "2026-07-21",
       "stale": false,
       "programs": [
         {
@@ -1111,7 +1111,7 @@
       },
       "url": "https://fundednext.com?fpr=jtnq",
       "lastChecked": "2026-07-20",
-      "stale": false,
+      "stale": true,
       "programs": [
         {
           "name": "Flex",
