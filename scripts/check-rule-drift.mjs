@@ -1,0 +1,752 @@
+#!/usr/bin/env node
+/**
+ * Daily RULE-drift check for public/data/prop-firms.json.
+ *
+ * Independent of scripts/scrape-prop-firms.mjs (its own fetch / playwright /
+ * per-firm rule extractors). It NEVER writes the JSON — the JSON is treated as
+ * the source of truth and this script only *reads* the live sites to see whether
+ * our manually-maintained risk rules still match.
+ *
+ * Fields compared: profitTarget, maxDrawdown, dailyLoss, consistency, contracts.
+ * ddType / drawdown nature are deliberately NOT compared (ambiguous on buy-screens).
+ *
+ * Every anomaly is classified in one of two buckets:
+ *   - DRIFT   : the field was read cleanly from the site but differs from our JSON
+ *               (our data may be stale — a human should confirm & update the JSON).
+ *   - BROKEN  : the field/plan could not be read (structure changed) — the *scraper*
+ *               is what needs fixing here, this is NOT a real drift.
+ * Fields that are not published on the buy-screen (manual-only) are SKIPPED and logged.
+ *
+ * Output: always a readable report on stdout; the same report appended to
+ * $GITHUB_STEP_SUMMARY when running in CI. No Discord ping (see postAlert stub).
+ * Exit code is ALWAYS 0 — this check must never break the price-sync workflow.
+ *
+ * Usage:
+ *   node scripts/check-rule-drift.mjs              # live check, all firms
+ *   node scripts/check-rule-drift.mjs --self-test  # inject a fake value, prove DRIFT classification
+ */
+
+import fs from 'node:fs';
+
+const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
+const UA =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
+
+const FIELDS = ['profitTarget', 'maxDrawdown', 'dailyLoss', 'consistency', 'contracts'];
+const BROKEN = Symbol('broken'); // rules[field] === BROKEN => anchor present-but-unreadable
+
+/* ------------------------------------------------------------------ */
+/* Normalizers (task §4)                                               */
+/* ------------------------------------------------------------------ */
+
+// Money: strip $, $$ (BG/FundedNext double the sign), thousands separators
+// (both "." and ","), "soft breach" wording. "None"/"—" => null.
+function money(v) {
+  if (v == null) return null;
+  if (typeof v === 'number') return v;
+  let s = String(v).toLowerCase().replace(/soft breach/g, '');
+  if (!/\d/.test(s)) return null; // "None", "—", "N/A", ...
+  const m = s.match(/[\d.,]+/);
+  if (!m) return null;
+  const d = m[0].replace(/[.,](?=\d{3}(\D|$))/g, '').replace(/,/g, '');
+  const n = parseFloat(d);
+  return Number.isFinite(n) ? n : null;
+}
+
+// Consistency: extract the leading percentage. "40%" => "40%",
+// "15% biggest trade" => "15%", "None"/null => null.
+function consistency(v) {
+  if (v == null) return null;
+  const s = String(v).toLowerCase().trim();
+  const m = s.match(/(\d+)\s*%/);
+  if (m) return `${m[1]}%`;
+  if (s === '' || s.includes('none') || s === 'n/a') return null;
+  return s;
+}
+
+// Contracts: pull the two integers (minis, micros) regardless of format
+// (site "4 Mini | 40 Micro" / "1 mini (10 micros)" vs JSON "4 minis / 40 micros").
+function contracts(v) {
+  if (v == null) return null;
+  if (typeof v === 'object') return v;
+  const nums = String(v).match(/\d+/g);
+  if (!nums || !nums.length) return null;
+  return { minis: parseInt(nums[0], 10), micros: nums[1] != null ? parseInt(nums[1], 10) : null };
+}
+
+function contractsEqual(a, b) {
+  a = contracts(a);
+  b = contracts(b);
+  if (a == null && b == null) return true;
+  if (a == null || b == null) return false;
+  if (a.minis !== b.minis) return false;
+  // Compare micros only when BOTH sides expose it (E8 card shows minis only).
+  if (a.micros != null && b.micros != null && a.micros !== b.micros) return false;
+  return true;
+}
+
+function fieldEqual(field, ours, site) {
+  if (field === 'consistency') return consistency(ours) === consistency(site);
+  if (field === 'contracts') return contractsEqual(ours, site);
+  return money(ours) === money(site); // profitTarget, maxDrawdown, dailyLoss
+}
+
+function show(field, v) {
+  if (field === 'contracts') {
+    const c = contracts(v);
+    return c == null ? 'null' : `${c.minis}m/${c.micros == null ? '?' : c.micros}µ`;
+  }
+  if (field === 'consistency') return consistency(v) == null ? 'None' : consistency(v);
+  const m = money(v);
+  return m == null ? 'null' : String(m);
+}
+
+/* ------------------------------------------------------------------ */
+/* Fetch + generic HTML helpers                                         */
+/* ------------------------------------------------------------------ */
+
+async function fetchText(url) {
+  const res = await fetch(url, {
+    headers: { 'user-agent': UA, accept: 'text/html,application/xhtml+xml' },
+    redirect: 'follow',
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  return res.text();
+}
+
+// Strip scripts/styles/tags, one trimmed non-empty string per surviving text node.
+function htmlToLines(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/g, ' ')
+    .replace(/<style[\s\S]*?<\/style>/g, ' ')
+    .replace(/<[^>]+>/g, '\n')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
+}
+
+const HTML_ENTITIES = { '&amp;': '&', '&quot;': '"', '&lt;': '<', '&gt;': '>', '&#x27;': "'", '&#39;': "'" };
+function decodePayloadHtml(html) {
+  let s = html;
+  let prev;
+  do {
+    prev = s;
+    s = s.replace(/&(amp|quot|lt|gt|#x27|#39);/g, (m) => HTML_ENTITIES[m]);
+  } while (s !== prev);
+  s = s.replace(/\\u([0-9a-fA-F]{4})/g, (_, h) => String.fromCharCode(parseInt(h, 16)));
+  s = s.split('\\"').join('"');
+  return s;
+}
+
+function extractBalancedArray(s, start) {
+  let depth = 0;
+  let inStr = false;
+  let esc = false;
+  for (let i = start; i < s.length; i++) {
+    const c = s[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (c === '\\') esc = true;
+      else if (c === '"') inStr = false;
+      continue;
+    }
+    if (c === '"') inStr = true;
+    else if (c === '[') depth++;
+    else if (c === ']') {
+      depth--;
+      if (depth === 0) return s.slice(start, i + 1);
+    }
+  }
+  return null;
+}
+
+/* ================================================================== */
+/* Per-firm rule extractors                                            */
+/* Each returns [{ programName, size, rules }] where rules maps a       */
+/* compared field to a value (number/string/null) or BROKEN. A field    */
+/* absent from rules = "not auto-verified for this firm/program" (skip). */
+/* ================================================================== */
+
+/* ---- Blue Guardian — structured RSC payload ---- */
+const BG_PROGRAMS = { direct: 'Direct', express: 'Express', reserve: 'Reserve', standard: 'Standard' };
+async function extractBlueGuardian() {
+  const s = decodePayloadHtml(await fetchText('https://www.blueguardian.com/futures'));
+  const idx = s.indexOf('"plans":[');
+  if (idx === -1) throw new Error('"plans":[ payload not found');
+  const arrText = extractBalancedArray(s, s.indexOf('[', idx));
+  if (!arrText) throw new Error('unbalanced plans array');
+  const payload = JSON.parse(arrText);
+  const futures = payload.filter((p) => p && p.market === 'futures');
+  if (futures.length === 0) throw new Error('no futures entries in payload');
+
+  const out = [];
+  for (const entry of futures) {
+    const programName = BG_PROGRAMS[entry.key];
+    if (!programName) continue;
+    const instant = entry.key === 'direct';
+    for (const size of entry.sizes ?? []) {
+      const list = size.challengeRules?.length ? size.challengeRules : size.fundedRules ?? [];
+      const byLabel = (label) => list.find((r) => r.label === label)?.value;
+      const rules = {
+        maxDrawdown: byLabel('Max Drawdown') != null ? money(byLabel('Max Drawdown')) : BROKEN,
+        dailyLoss: byLabel('Daily Loss Limit') != null ? money(byLabel('Daily Loss Limit')) : null,
+        contracts: byLabel('Max Position') != null ? contracts(byLabel('Max Position')) : BROKEN,
+      };
+      if (!instant) {
+        // Eval programs advertise Profit Target + a single Consistency Rule.
+        rules.profitTarget = byLabel('Profit Target') != null ? money(byLabel('Profit Target')) : BROKEN;
+        rules.consistency = byLabel('Consistency Rule') != null ? consistency(byLabel('Consistency Rule')) : null;
+      }
+      // Direct (instant): profitTarget has no equivalent, consistency is a hand
+      // summary ("20→30% payouts") of per-payout rows => intentionally not emitted.
+      out.push({ programName, size: size.amount, rules });
+    }
+  }
+  return out;
+}
+
+/* ---- Traders Launch — server-rendered cards ---- */
+async function extractTradersLaunch() {
+  const lines = htmlToLines(await fetchText('https://traderslaunch.com'));
+  const out = [];
+  for (const size of [100000, 200000, 300000]) {
+    const label = `$${size.toLocaleString('en-US')}`;
+    const i = lines.findIndex((l) => l === label && /Starting Capital/i.test(lines[lines.indexOf(l) + 1] || ''));
+    if (i === -1) continue; // plan not found => reported as BROKEN plan
+    const win = lines.slice(i, i + 30);
+    const after = (labels) => {
+      const j = win.findIndex((l) => labels.some((lb) => new RegExp(lb, 'i').test(l)));
+      return j === -1 ? undefined : win[j + 1];
+    };
+    const pt = after(['^Profit Target'] );
+    const dd = after(['^Max Drawdown']);
+    const ct = after(['^Starting Size']);
+    out.push({
+      programName: '1-Step',
+      size,
+      rules: {
+        profitTarget: pt != null ? money(pt) : BROKEN,
+        maxDrawdown: dd != null ? money(dd) : BROKEN,
+        contracts: ct != null ? contracts(ct) : BROKEN,
+        // consistency (FAQ-only "40% rule") + dailyLoss (not advertised) stay manual.
+      },
+    });
+  }
+  return out;
+}
+
+/* ---- Top One Futures — Webflow tab panes ---- */
+const TOPONE_TABS = {
+  '1-Step ELITE Challange': 'Elite Challenge',
+  'Elite Daily': 'Elite Daily',
+  'Elite Access': 'Elite Access',
+  'INSTANT Sim Funded': 'Instant Sim Funded',
+  'S2F Sim Funded': 'S2F Sim Pro',
+  'Ignite AF': 'Ignite',
+};
+const TOPONE_INSTANT = new Set(['Instant Sim Funded', 'S2F Sim Pro', 'Ignite']);
+const TOPONE_SIZES = [25000, 50000, 100000, 150000];
+async function extractTopOne() {
+  const html = await fetchText('https://toponefutures.com');
+  const out = [];
+  for (const [tab, programName] of Object.entries(TOPONE_TABS)) {
+    const marker = `data-w-tab="${tab}"`;
+    const last = html.lastIndexOf(marker);
+    if (last === -1) throw new Error(`tab pane not found: ${tab}`);
+    const next = html.indexOf('data-w-tab="', last + marker.length);
+    const lines = htmlToLines(html.slice(last, next === -1 ? undefined : next));
+    const instant = TOPONE_INSTANT.has(programName);
+
+    for (const size of TOPONE_SIZES) {
+      const sizeLabel = `$${size.toLocaleString('en-US')}`;
+      const start = lines.indexOf(sizeLabel);
+      if (start === -1) continue; // plan not found => BROKEN plan
+      let end = lines.findIndex((l, k) => k > start && /^Get Funded$/i.test(l));
+      if (end === -1) end = lines.length;
+      const noise = /^(Copied!|Get Funded|Most Popular|.*w\. Code:|SUMMER|ACCESS|Buy 2 and Save.*|Only \$.*|\/ .*|Save)$/i;
+      const row = lines.slice(start, end).filter((l) => !noise.test(l));
+      const ddIdx = row.findIndex((l) => /^(end of day|intraday)$/i.test(l));
+      const isMoney = (t) => /^\$[\d,]+$/.test(t);
+      const pre = ddIdx > 0 ? row.slice(1, ddIdx).filter(isMoney) : [];
+      const ctToken = row.find((t) => /\d+\s*minis?\s*\(\d+\s*micros?\)/i.test(t));
+
+      const rules = {
+        maxDrawdown: pre.length ? money(pre[pre.length - 1]) : BROKEN, // last DD cell (handles extra-cell rows)
+        contracts: ctToken ? contracts(ctToken) : BROKEN,
+      };
+      if (instant) {
+        rules.dailyLoss = pre.length ? money(pre[0]) : BROKEN;
+        const after = ddIdx === -1 ? [] : row.slice(ddIdx + 1);
+        const cons = after.find((t) => /^(\d+%|none!?|none)$/i.test(t));
+        rules.consistency = cons != null ? consistency(cons) : null;
+        // instant has no Profit Target column => not emitted (JSON is null).
+      }
+      // Eval tabs (Elite *): profitTarget / dailyLoss / consistency live in
+      // tab-specific column orders (reset-fee-first, split labels, missing
+      // consistency header) => not safely column-parsed, kept manual.
+      out.push({ programName, size, rules });
+    }
+  }
+  return out;
+}
+
+/* ---- Legends Trading — static cards, two formats ---- */
+const LEGENDS_PROGRAMS = ['Apprentice', 'Elite', 'Straight to Master'];
+async function extractLegends() {
+  const lines = htmlToLines(await fetchText('https://thelegendstrading.com/plans'));
+  const starts = [];
+  for (let i = 0; i < lines.length; i++)
+    if (/^\$[\d,.]+$/.test(lines[i]) && /max/i.test(lines[i + 1] || '')) starts.push(i);
+
+  const out = [];
+  for (let c = 0; c < Math.min(starts.length, 12); c++) {
+    const programName = LEGENDS_PROGRAMS[Math.floor(c / 4)];
+    const i = starts[c];
+    const size = money(lines[i]);
+    const card = lines.slice(i, i + 18);
+    const find = (re) => {
+      const l = card.find((x) => re.test(x));
+      return l ? l.match(re) : null;
+    };
+    const pt = find(/\$?([\d.,]+)\s*(?:profit goal|profit target)/i);
+    const dd = find(/\$?([\d.,]+)[^\n]*trailing max loss/i);
+    const cons = find(/consistency:?\s*(\d+)\s*%/i);
+    const daily = find(/daily loss limit:?\s*(none|\$?[\d.,]+)/i);
+    out.push({
+      programName,
+      size,
+      rules: {
+        profitTarget: pt ? money(pt[1]) : BROKEN,
+        maxDrawdown: dd ? money(dd[1]) : BROKEN,
+        contracts: contracts(lines[i + 1]) ?? BROKEN, // header "Max N contracts / M micros"
+        consistency: cons ? `${cons[1]}%` : null,
+        dailyLoss: daily ? money(daily[1]) : null,
+      },
+    });
+  }
+  return out;
+}
+
+/* ---- FundedSeat — playwright (client-rendered) ---- */
+const FUNDEDSEAT_PRIMARY = '1 Step';
+const FUNDEDSEAT_PROGRAMS = [
+  { programName: 'Daily', sub: 'Daily' },
+  { programName: 'Flex', sub: 'Flex' },
+  { programName: 'Sprint', sub: 'Sprint' },
+  { programName: 'Instant Funding', sub: null },
+];
+async function extractFundedSeat() {
+  let pw;
+  try {
+    pw = await import('playwright');
+  } catch {
+    throw new Error('playwright not installed');
+  }
+  const browser = await pw.chromium.launch({ headless: true });
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  try {
+    const page = await browser.newPage({ userAgent: UA, viewport: { width: 1440, height: 900 } });
+    await page.goto('https://fundedseat.com', { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await page.waitForSelector('#pricing-section', { timeout: 30000 });
+    await page.evaluate(() => document.querySelector('#pricing-section')?.scrollIntoView({ block: 'center' }));
+    await sleep(5000);
+
+    const readCards = () =>
+      page.evaluate(() => {
+        const sec = document.querySelector('#pricing-section');
+        const out = [];
+        for (const h3 of sec.querySelectorAll('h3')) {
+          if (!/\$[\d,]+\s*Account/i.test(h3.innerText || '')) continue;
+          let el = h3.parentElement;
+          while (el && !/Add to Cart/i.test(el.innerText || '')) el = el.parentElement;
+          if (el) out.push(el.innerText);
+        }
+        return out;
+      });
+    const buttonPresent = (label) =>
+      page.evaluate((lbl) => {
+        const sec = document.querySelector('#pricing-section');
+        return [...sec.querySelectorAll('button')].some((b) => (b.innerText || '').trim() === lbl);
+      }, label);
+    const clickTab = (label) => {
+      const rx = new RegExp('^' + label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$');
+      return page.locator('#pricing-section button', { hasText: rx }).first().click({ timeout: 8000 });
+    };
+
+    const out = [];
+    for (const { programName, sub } of FUNDEDSEAT_PROGRAMS) {
+      const target = sub ?? programName;
+      if (sub && !(await buttonPresent(sub))) {
+        await clickTab(FUNDEDSEAT_PRIMARY).catch(() => {});
+        await sleep(700);
+      }
+      await clickTab(target).catch(() => {});
+      await sleep(1400);
+      const cards = await readCards();
+      for (const text of cards) {
+        const sizeM = text.match(/\$([\d,]+)\s*Account/i);
+        if (!sizeM) continue;
+        const after = (re) => {
+          const m = text.match(re);
+          return m ? m[1] : undefined;
+        };
+        const pt = after(/Profit Target\s*\n\s*\$([\d,]+)/i);
+        const dd = after(/EOD Drawdown\s*\n\s*\$([\d,]+)/i);
+        const daily = after(/Daily Loss Limit[^\n]*\n\s*(None|\$[\d,]+)/i);
+        // Daily/Flex/Sprint label it "Consistency"; Instant Funding labels the
+        // same rule "Biggest trade rule" (JSON stores it as "15% biggest trade").
+        const cons = after(/(?:Consistency|Biggest trade rule)\s*\n\s*(\d+%|None)/i);
+        const ct = after(/Max Contracts\s*\n\s*([\d]+\s*minis?\s*\/\s*[\d]+\s*micros?)/i);
+        out.push({
+          programName,
+          size: money(sizeM[1]),
+          rules: {
+            profitTarget: pt != null ? money(pt) : null, // Instant Funding has no PT line
+            maxDrawdown: dd != null ? money(dd) : BROKEN,
+            dailyLoss: daily != null ? money(daily) : null,
+            consistency: cons != null ? consistency(cons) : null,
+            contracts: ct != null ? contracts(ct) : BROKEN,
+          },
+        });
+      }
+    }
+    return out;
+  } finally {
+    await browser.close();
+  }
+}
+
+/* ---- E8 Markets — playwright (Configure Challenge widget) ---- */
+const E8_TABS = {
+  'E8 Signature': 'E8 Signature Futures',
+  'E8 Zero MAX': 'E8 Zero MAX Futures',
+  'E8 Zero Starter': 'E8 Zero Starter Futures',
+};
+const E8_ZERO = new Set(['E8 Zero MAX Futures', 'E8 Zero Starter Futures']);
+async function extractE8() {
+  let pw;
+  try {
+    pw = await import('playwright');
+  } catch {
+    throw new Error('playwright not installed');
+  }
+  const browser = await pw.chromium.launch({ headless: true });
+  try {
+    const page = await browser.newPage({ userAgent: UA });
+    await page.setViewportSize({ width: 1280, height: 1000 });
+    await page.goto('https://e8futures.com', { waitUntil: 'load', timeout: 60000 });
+    await page.waitForTimeout(3000);
+    const cfg = page.getByText('Configure Challenge', { exact: true }).first();
+    await cfg.scrollIntoViewIfNeeded();
+    await cfg.click();
+    await page.waitForTimeout(2000);
+
+    const readCards = () =>
+      page.evaluate(() => {
+        const all = Array.from(document.querySelectorAll('p, span, div, h1, h2, h3, h4'));
+        const labels = all.filter(
+          (el) => el.children.length === 0 && el.textContent.trim().toLowerCase() === 'account size',
+        );
+        const cards = [];
+        for (const label of labels) {
+          let node = label;
+          let container = null;
+          for (let i = 0; i < 10 && node.parentElement; i++) {
+            node = node.parentElement;
+            const t = node.textContent.toLowerCase();
+            if (t.includes('challenge rules') && t.includes('get started')) {
+              container = node;
+              break;
+            }
+          }
+          if (container) cards.push(container.innerText);
+        }
+        return cards;
+      });
+
+    const out = [];
+    for (const [tabText, programName] of Object.entries(E8_TABS)) {
+      await page.locator('button', { hasText: tabText }).first().click({ timeout: 15000 });
+      await page.waitForTimeout(1500);
+      const cards = await readCards();
+      for (const text of cards) {
+        const sizeM = /\$(\d+)K/i.exec(text);
+        if (!sizeM) continue;
+        const after = (re) => {
+          const m = text.match(re);
+          return m ? m[1] : undefined;
+        };
+        const pt = after(/Profit Target\s*\n\s*\$([\d,]+)/i);
+        const dd = after(/Max drawdown\s*\n\s*\$([\d,]+)/i);
+        const cons = after(/Consistency rule\s*\n\s*(\d+%)/i);
+        const ct = after(/Max contracts\s*\n\s*(\d+)/i);
+        const rules = {
+          profitTarget: pt != null ? money(pt) : BROKEN,
+          maxDrawdown: dd != null ? money(dd) : BROKEN,
+          consistency: cons != null ? consistency(cons) : null, // Signature shows none => None
+          // dailyLoss never shown on E8 cards => not emitted (manual, JSON null).
+        };
+        // Zero cards omit the contract limit; only Signature carries it.
+        if (!E8_ZERO.has(programName)) rules.contracts = ct != null ? { minis: parseInt(ct, 10), micros: null } : BROKEN;
+        out.push({ programName, size: parseInt(sizeM[1], 10) * 1000, rules });
+      }
+    }
+    return out;
+  } finally {
+    await browser.close();
+  }
+}
+
+/* ---- FundedNext — structured Next.js flight payload ---- */
+function findMarkets(node) {
+  if (Array.isArray(node)) {
+    for (const v of node) {
+      const r = findMarkets(v);
+      if (r) return r;
+    }
+    return null;
+  }
+  if (node && typeof node === 'object') {
+    if (Array.isArray(node.markets)) return node.markets;
+    for (const v of Object.values(node)) {
+      const r = findMarkets(v);
+      if (r) return r;
+    }
+  }
+  return null;
+}
+async function extractFundedNext() {
+  const html = await fetchText('https://fundednext.com/futures');
+  const marker = 'self.__next_f.push(';
+  let markets = null;
+  let idx = 0;
+  while (markets == null) {
+    const start = html.indexOf(marker, idx);
+    if (start === -1) break;
+    const arrStart = html.indexOf('[', start + marker.length);
+    const arrText = extractBalancedArray(html, arrStart);
+    if (!arrText) break;
+    idx = arrStart + arrText.length;
+    let call;
+    try {
+      call = JSON.parse(arrText);
+    } catch {
+      continue;
+    }
+    if (!Array.isArray(call) || typeof call[1] !== 'string') continue;
+    const sep = call[1].indexOf(':');
+    if (sep === -1) continue;
+    try {
+      markets = findMarkets(JSON.parse(call[1].slice(sep + 1)));
+    } catch {
+      /* not JSON */
+    }
+  }
+  if (!markets) throw new Error('"markets" node not found in flight payload');
+  const fut = markets.find((m) => m && m.id === 'futures');
+  if (!fut) throw new Error('futures market not found');
+
+  const out = [];
+  for (const pkg of fut.packages ?? []) {
+    for (const sv of pkg.challengesSubVariant ?? []) {
+      const programName = pkg.id === 'rapid' ? `Rapid ${sv.label ?? ''}`.trim() : pkg.title;
+      for (const ch of sv.challenges ?? []) {
+        const list = ch.details?.challengeRules ?? [];
+        const byId = (id) => list.find((r) => r.id === id)?.value;
+        out.push({
+          programName,
+          size: ch.numericAccountSize,
+          rules: {
+            profitTarget: byId('target') != null ? money(byId('target')) : BROKEN,
+            maxDrawdown: byId('maxDD') != null ? money(byId('maxDD')) : BROKEN,
+            dailyLoss: byId('dailyDD') != null ? money(byId('dailyDD')) : null,
+            consistency: byId('consistency') != null ? consistency(byId('consistency')) : null,
+            contracts: byId('contract') != null ? contracts(byId('contract')) : BROKEN,
+          },
+        });
+      }
+    }
+  }
+  return out;
+}
+
+const EXTRACTORS = {
+  'blue-guardian': extractBlueGuardian,
+  'traders-launch': extractTradersLaunch,
+  'top-one-futures': extractTopOne,
+  fundedseat: extractFundedSeat,
+  'legends-trading': extractLegends,
+  'e8-markets': extractE8,
+  fundednext: extractFundedNext,
+};
+
+// Human-readable reason for the fields we knowingly do not auto-verify.
+function skipReason(firmId, programName, field) {
+  if (firmId === 'traders-launch' && field === 'consistency') return 'FAQ-only "40% rule" (not on card)';
+  if (firmId === 'traders-launch' && field === 'dailyLoss') return 'not advertised (manual null)';
+  if (firmId === 'e8-markets' && field === 'dailyLoss') return 'never shown on E8 cards (manual null)';
+  if (firmId === 'e8-markets' && field === 'contracts') return 'Zero cards omit contract limit (manual)';
+  if (firmId === 'blue-guardian' && field === 'profitTarget') return 'instant: no profit-target rule';
+  if (firmId === 'blue-guardian' && field === 'consistency') return 'instant: hand summary of per-payout rows';
+  if (firmId === 'top-one-futures' && field === 'profitTarget') return 'instant: no profit-target column';
+  if (firmId === 'top-one-futures') return 'eval tab: column order tab-specific, kept manual';
+  return 'not published on buy-screen (manual)';
+}
+
+/* ------------------------------------------------------------------ */
+/* Compare engine                                                       */
+/* ------------------------------------------------------------------ */
+
+async function runChecks(data, only) {
+  const drifts = [];
+  const broken = [];
+  const skips = [];
+
+  for (const firm of data.firms) {
+    if (only && firm.id !== only) continue;
+    const extractor = EXTRACTORS[firm.id];
+    if (!extractor) {
+      broken.push({ firm: firm.name, program: '(all)', size: null, field: '(firm)', detail: 'no extractor defined' });
+      continue;
+    }
+    let plans;
+    try {
+      plans = await extractor();
+    } catch (e) {
+      broken.push({ firm: firm.name, program: '(all)', size: null, field: '(firm)', detail: `extractor failed: ${e.message}` });
+      continue;
+    }
+    if (firm.stale) console.log(`  note: ${firm.id} is stale:true (price sync) — rules still checked below`);
+
+    for (const program of firm.programs) {
+      for (const plan of program.plans) {
+        const match = plans.find((p) => p.programName === program.name && p.size === plan.size);
+        if (!match) {
+          broken.push({ firm: firm.name, program: program.name, size: plan.size, field: '(plan)', detail: 'plan not found on site' });
+          continue;
+        }
+        for (const field of FIELDS) {
+          const rv = match.rules[field];
+          if (rv === undefined) {
+            skips.push({ firm: firm.name, program: program.name, size: plan.size, field, reason: skipReason(firm.id, program.name, field) });
+            continue;
+          }
+          if (rv === BROKEN) {
+            broken.push({ firm: firm.name, program: program.name, size: plan.size, field, detail: 'field present on site but unreadable' });
+            continue;
+          }
+          if (!fieldEqual(field, plan[field], rv)) {
+            drifts.push({ firm: firm.name, program: program.name, size: plan.size, field, ours: show(field, plan[field]), site: show(field, rv) });
+          }
+        }
+      }
+    }
+  }
+  return { drifts, broken, skips };
+}
+
+/* ------------------------------------------------------------------ */
+/* Reporting                                                            */
+/* ------------------------------------------------------------------ */
+
+function buildReport({ drifts, broken, skips }) {
+  const L = [];
+  L.push('# prop-firms rule-drift check');
+  L.push('');
+  L.push(`- REAL DRIFTS (our JSON may be stale): **${drifts.length}**`);
+  L.push(`- SCRAPER BROKEN (fix the extractor, not the data): **${broken.length}**`);
+  L.push(`- skipped fields (manual-only, not auto-verified): ${skips.length}`);
+  L.push('');
+
+  if (drifts.length) {
+    L.push('## ⚠️ REAL DRIFTS');
+    L.push('| firm | program | size | field | ours | site |');
+    L.push('|---|---|---|---|---|---|');
+    for (const d of drifts) L.push(`| ${d.firm} | ${d.program} | ${d.size / 1000}k | ${d.field} | ${d.ours} | ${d.site} |`);
+    L.push('');
+  } else {
+    L.push('## ✅ No real drift — every auto-verified rule matches the JSON.');
+    L.push('');
+  }
+
+  if (broken.length) {
+    L.push('## 🔧 SCRAPER BROKEN');
+    L.push('| firm | program | size | field | detail |');
+    L.push('|---|---|---|---|---|');
+    for (const b of broken) L.push(`| ${b.firm} | ${b.program} | ${b.size == null ? '-' : b.size / 1000 + 'k'} | ${b.field} | ${b.detail} |`);
+    L.push('');
+  }
+
+  if (skips.length) {
+    // Collapse the per-plan skips into one row per firm/field.
+    const seen = new Map();
+    for (const s of skips) {
+      const key = `${s.firm} · ${s.field}`;
+      if (!seen.has(key)) seen.set(key, s.reason);
+    }
+    L.push('## ⏭️ Skipped (manual-only, logged)');
+    L.push('| firm · field | reason |');
+    L.push('|---|---|');
+    for (const [k, reason] of seen) L.push(`| ${k} | ${reason} |`);
+    L.push('');
+  }
+  return L.join('\n');
+}
+
+/* Discord alert — DISABLED for now. Wire the real webhook here later in one line:
+ *   await fetch(process.env.DISCORD_WEBHOOK, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ content: report }) });
+ */
+async function postAlert(report) {
+  // TODO: activer Discord canal HEALTH via process.env.DISCORD_WEBHOOK
+  console.log('[rule-drift] Discord alert disabled');
+}
+
+/* ------------------------------------------------------------------ */
+
+async function main() {
+  const selfTest = process.argv.includes('--self-test');
+  const data = JSON.parse(fs.readFileSync(DATA_URL, 'utf8'));
+
+  if (selfTest) {
+    // Inject a fake truth on a known, reliably-scraped plan (BG Express 50k
+    // profitTarget: 3000 -> 99999) WITHOUT writing the file, and prove the
+    // engine classifies it as a REAL DRIFT.
+    const prog = data.firms.find((f) => f.id === 'blue-guardian').programs.find((p) => p.name === 'Express');
+    const plan = prog.plans.find((p) => p.size === 50000);
+    const original = plan.profitTarget;
+    plan.profitTarget = 99999;
+    console.log(`[self-test] injected fake BG Express 50k profitTarget: ${original} -> 99999 (in memory only)`);
+    const { drifts } = await runChecks(data, 'blue-guardian');
+    const hit = drifts.find(
+      (d) => d.firm === 'Blue Guardian' && d.program === 'Express' && d.size === 50000 && d.field === 'profitTarget',
+    );
+    console.log('\n[self-test] drifts detected:', drifts.length);
+    for (const d of drifts) console.log(`  DRIFT ${d.firm}/${d.program}/${d.size / 1000}k ${d.field}: ours=${d.ours} site=${d.site}`);
+    if (hit && hit.site === '3000') {
+      console.log('\n[self-test] PASS — injected value classified as REAL DRIFT (ours=99999, site=3000).');
+    } else {
+      console.log('\n[self-test] FAIL — injected drift was not detected/classified correctly.');
+    }
+    return;
+  }
+
+  console.log('[rule-drift] reading live sites (rules only, never writes the JSON)…');
+  const result = await runChecks(data);
+  const report = buildReport(result);
+  console.log('\n' + report);
+
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    try {
+      fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '\n' + report + '\n');
+      console.log('\n[rule-drift] report appended to GITHUB_STEP_SUMMARY');
+    } catch (e) {
+      console.log(`[rule-drift] could not write GITHUB_STEP_SUMMARY: ${e.message}`);
+    }
+  }
+
+  if (result.drifts.length) await postAlert(report);
+}
+
+main().catch((e) => {
+  console.error(`[rule-drift] unexpected error (ignored, exit 0): ${e.stack || e.message}`);
+});

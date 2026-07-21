@@ -26,7 +26,7 @@
               "profitTarget": null,
               "maxDrawdown": 1500,
               "ddType": "EOD",
-              "dailyLoss": null,
+              "dailyLoss": 1000,
               "dailyLossSoft": false,
               "consistency": "20→30% payouts",
               "contracts": "1 Mini | 10 Micro"
@@ -38,7 +38,7 @@
               "profitTarget": null,
               "maxDrawdown": 2500,
               "ddType": "EOD",
-              "dailyLoss": null,
+              "dailyLoss": 1500,
               "dailyLossSoft": false,
               "consistency": "20→30% payouts",
               "contracts": "4 Mini | 40 Micro"
@@ -50,7 +50,7 @@
               "profitTarget": null,
               "maxDrawdown": 3500,
               "ddType": "EOD",
-              "dailyLoss": null,
+              "dailyLoss": 2500,
               "dailyLossSoft": false,
               "consistency": "20→30% payouts",
               "contracts": "8 Mini | 80 Micro"
@@ -62,7 +62,7 @@
               "profitTarget": null,
               "maxDrawdown": 5000,
               "ddType": "EOD",
-              "dailyLoss": null,
+              "dailyLoss": 3000,
               "dailyLossSoft": false,
               "consistency": "20→30% payouts",
               "contracts": "12 Mini | 120 Micro"

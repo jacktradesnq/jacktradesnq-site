@@ -60,6 +60,11 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy out --project-name=jacktradesnq --branch=main --commit-dirty=true
 
+      - name: Check rule drift (report only, non-blocking)
+        if: always()
+        continue-on-error: true
+        run: node scripts/check-rule-drift.mjs
+
       - name: Discord alert — stale firms
         if: always()
         run: |
