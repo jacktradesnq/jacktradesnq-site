@@ -215,7 +215,19 @@ async function scrapeTradersLaunch() {
 /* FundedSeat — client-rendered pricing, needs playwright (optional)   */
 /* ------------------------------------------------------------------ */
 
-const FUNDEDSEAT_TABS = { '1 Step': '1-Step', 'Instant Funding': 'Instant Funding' };
+// FundedSeat's pricing tab row has two INDEPENDENT axes:
+//   primary  = { "1 Step", "Instant Funding" }  (challenge type)
+//   variants = { "Daily", "Flex", "Sprint" }     (payout variant, only shown under "1 Step")
+// The variant buttons are removed from the DOM whenever "Instant Funding" is active, so the
+// primary "1 Step" tab must be re-clicked to restore them before selecting Daily/Flex/Sprint.
+// programName here must match the JSON program names exactly ("1 Step" default = the Daily variant).
+const FUNDEDSEAT_PRIMARY = '1 Step';
+const FUNDEDSEAT_PROGRAMS = [
+  { programName: 'Daily', sub: 'Daily' },
+  { programName: 'Flex', sub: 'Flex' },
+  { programName: 'Sprint', sub: 'Sprint' },
+  { programName: 'Instant Funding', sub: null }, // top-level tab, no payout sub-variant
+];
 const MONTHS = { JANUARY: 1, FEBRUARY: 2, MARCH: 3, APRIL: 4, MAY: 5, JUNE: 6, JULY: 7, AUGUST: 8, SEPTEMBER: 9, OCTOBER: 10, NOVEMBER: 11, DECEMBER: 12 };
 
 async function scrapeFundedSeat() {
@@ -227,31 +239,82 @@ async function scrapeFundedSeat() {
     return null;
   }
   const browser = await pw.chromium.launch({ headless: true });
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // Helpers ported from the verified reference scraper — all scoped to #pricing-section.
+  const readCards = (page) =>
+    page.evaluate(() => {
+      const sec = document.querySelector('#pricing-section');
+      const out = [];
+      for (const h3 of sec.querySelectorAll('h3')) {
+        if (!/\$[\d,]+ Account/i.test(h3.innerText || '')) continue;
+        let el = h3.parentElement;
+        while (el && !/Add to Cart/i.test(el.innerText || '')) el = el.parentElement;
+        if (el) out.push(el.innerText);
+      }
+      return out;
+    });
+  const sizeButtonCount = (page) =>
+    page.evaluate(() => {
+      const sec = document.querySelector('#pricing-section');
+      return [...sec.querySelectorAll('button')].filter((b) => /^\$[\d,]+$/.test((b.innerText || '').trim())).length;
+    });
+  const isActive = (page, label) =>
+    page.evaluate((lbl) => {
+      const sec = document.querySelector('#pricing-section');
+      const t = [...sec.querySelectorAll('button')].find((b) => (b.innerText || '').trim() === lbl);
+      return t ? /active/i.test(t.className) : null; // null => button not present
+    }, label);
+  const buttonPresent = (page, label) =>
+    page.evaluate((lbl) => {
+      const sec = document.querySelector('#pricing-section');
+      return [...sec.querySelectorAll('button')].some((b) => (b.innerText || '').trim() === lbl);
+    }, label);
+  const clickTab = (page, label) => {
+    const rx = new RegExp('^' + label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$');
+    return page.locator('#pricing-section button', { hasText: rx }).first().click({ timeout: 8000 });
+  };
+  // Anti-"Bolt" guard: after clicking a tab, wait until cards truly reflect it and are stable.
+  const waitStableCards = async (page, targetLabel) => {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      const activeOk = (await isActive(page, targetLabel)) === true;
+      const read1 = await readCards(page);
+      await sleep(450);
+      const read2 = await readCards(page);
+      const stable = read1.length > 0 && read1.join('|||') === read2.join('|||');
+      const sizes = read2.map((c) => (c.match(/\$([\d,]+)\s*Account/i) || [])[1]);
+      const dup = sizes.length !== new Set(sizes).size;
+      const bolt = read2.some((c) => /bolt/i.test(c));
+      const allCart = read2.every((c) => /Add to Cart/i.test(c));
+      const expected = await sizeButtonCount(page);
+      const countOk = expected === 0 ? read2.length > 0 : read2.length === expected;
+      if (activeOk && stable && !dup && !bolt && allCart && read2.length > 0 && countOk) return read2;
+      console.log(`  fundedseat: "${targetLabel}" unstable attempt ${attempt} (active=${activeOk} stable=${stable} dup=${dup} count=${read2.length}/${expected}) — retrying`);
+      await clickTab(page, targetLabel).catch(() => {});
+      await sleep(900 + attempt * 400);
+    }
+    return await readCards(page); // best-effort read after exhausting retries
+  };
+
   try {
-    const page = await browser.newPage({ userAgent: UA });
+    const page = await browser.newPage({ userAgent: UA, viewport: { width: 1440, height: 900 } });
     await page.goto('https://fundedseat.com', { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForSelector('#pricing-section', { timeout: 30000 });
+    await page.evaluate(() => document.querySelector('#pricing-section')?.scrollIntoView({ block: 'center' }));
+    await sleep(2500); // let styled-components / lazy render settle
 
     const updates = [];
-    for (const [tabText, programName] of Object.entries(FUNDEDSEAT_TABS)) {
-      await page
-        .locator('#pricing-section')
-        .getByText(tabText, { exact: true })
-        .first()
-        .click({ timeout: 15000 });
-      await page.waitForTimeout(600);
+    for (const { programName, sub } of FUNDEDSEAT_PROGRAMS) {
+      const target = sub ?? programName; // Instant Funding is a primary tab, no sub-variant
+      // Restore the Daily/Flex/Sprint variant row if a prior "Instant Funding" click removed it.
+      if (sub && !(await buttonPresent(page, sub))) {
+        await clickTab(page, FUNDEDSEAT_PRIMARY).catch(() => {});
+        await sleep(700);
+      }
+      await clickTab(page, target).catch((e) => console.log(`  fundedseat: click "${target}" failed: ${e.message.split('\n')[0]}`));
+      await sleep(600);
 
-      const cardTexts = await page.evaluate(() => {
-        const out = new Set();
-        for (const h3 of document.querySelectorAll('#pricing-section h3')) {
-          if (!/Account/i.test(h3.textContent ?? '')) continue;
-          let el = h3.parentElement;
-          while (el && !/Add to Cart/i.test(el.innerText ?? '')) el = el.parentElement;
-          if (el) out.add(el.innerText);
-        }
-        return [...out];
-      });
-
+      const cardTexts = await waitStableCards(page, target);
       for (const text of cardTexts) {
         const sizeM = text.match(/\$([\d\s,]+)\s*Account/);
         const priceM = text.match(/Add to Cart\s*\$([\d.,]+)\s*\$([\d.,]+)/); // (original, promo)

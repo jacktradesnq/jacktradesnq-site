@@ -660,7 +660,7 @@
       "stale": false,
       "programs": [
         {
-          "name": "1-Step",
+          "name": "Daily",
           "type": "eval",
           "priceType": "one-time",
           "plans": [
@@ -754,6 +754,116 @@
               "dailyLossSoft": true,
               "consistency": "15% biggest trade",
               "contracts": "8 minis / 80 micros"
+            }
+          ]
+        },
+        {
+          "name": "Flex",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 71.45,
+              "originalPrice": 130,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "2 minis / 20 micros"
+            },
+            {
+              "size": 50000,
+              "price": 93.45,
+              "originalPrice": 170,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "4 minis / 40 micros"
+            },
+            {
+              "size": 100000,
+              "price": 148.45,
+              "originalPrice": 270,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "6 minis / 60 micros"
+            },
+            {
+              "size": 150000,
+              "price": 274.95,
+              "originalPrice": 500,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "10 minis / 100 micros"
+            }
+          ]
+        },
+        {
+          "name": "Sprint",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 74.95,
+              "originalPrice": 135,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "None",
+              "contracts": "2 minis / 20 micros"
+            },
+            {
+              "size": 50000,
+              "price": 109.95,
+              "originalPrice": 200,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1200,
+              "dailyLossSoft": true,
+              "consistency": "None",
+              "contracts": "4 minis / 40 micros"
+            },
+            {
+              "size": 100000,
+              "price": 164.95,
+              "originalPrice": 300,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1800,
+              "dailyLossSoft": true,
+              "consistency": "None",
+              "contracts": "8 minis / 80 micros"
+            },
+            {
+              "size": 150000,
+              "price": 259.95,
+              "originalPrice": 475,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 2700,
+              "dailyLossSoft": true,
+              "consistency": "None",
+              "contracts": "12 minis / 120 micros"
             }
           ]
         }
