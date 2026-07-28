@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-27",
+  "generatedAt": "2026-07-28",
   "firms": [
     {
       "id": "blue-guardian",
@@ -7,11 +7,11 @@
       "split": "90%",
       "payout": "On-demand",
       "promo": {
-        "label": "35% OFF",
-        "code": "BG35"
+        "label": "25% OFF",
+        "code": "BG25"
       },
       "url": "https://blueguardian.com/?afmc=JTNQ",
-      "lastChecked": "2026-07-27",
+      "lastChecked": "2026-07-28",
       "stale": false,
       "programs": [
         {
@@ -21,7 +21,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 199,
+              "price": 230,
               "originalPrice": 307,
               "profitTarget": null,
               "maxDrawdown": 1500,
@@ -33,7 +33,7 @@
             },
             {
               "size": 50000,
-              "price": 321,
+              "price": 371,
               "originalPrice": 494,
               "profitTarget": null,
               "maxDrawdown": 2500,
@@ -45,7 +45,7 @@
             },
             {
               "size": 100000,
-              "price": 428,
+              "price": 494,
               "originalPrice": 659,
               "profitTarget": null,
               "maxDrawdown": 3500,
@@ -57,7 +57,7 @@
             },
             {
               "size": 150000,
-              "price": 536,
+              "price": 618,
               "originalPrice": 824,
               "profitTarget": null,
               "maxDrawdown": 5000,
@@ -76,7 +76,7 @@
           "plans": [
             {
               "size": 50000,
-              "price": 116,
+              "price": 134,
               "originalPrice": 178,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -88,7 +88,7 @@
             },
             {
               "size": 100000,
-              "price": 183,
+              "price": 212,
               "originalPrice": 282,
               "profitTarget": 6000,
               "maxDrawdown": 3500,
@@ -100,7 +100,7 @@
             },
             {
               "size": 150000,
-              "price": 251,
+              "price": 290,
               "originalPrice": 386,
               "profitTarget": 9000,
               "maxDrawdown": 5000,
@@ -119,7 +119,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 72,
+              "price": 83,
               "originalPrice": 110,
               "profitTarget": 1500,
               "maxDrawdown": 1500,
@@ -131,7 +131,7 @@
             },
             {
               "size": 50000,
-              "price": 100,
+              "price": 116,
               "originalPrice": 154,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -143,7 +143,7 @@
             },
             {
               "size": 100000,
-              "price": 161,
+              "price": 186,
               "originalPrice": 248,
               "profitTarget": 6000,
               "maxDrawdown": 3500,
@@ -155,7 +155,7 @@
             },
             {
               "size": 150000,
-              "price": 300,
+              "price": 347,
               "originalPrice": 462,
               "profitTarget": 9000,
               "maxDrawdown": 5000,
@@ -174,7 +174,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 100,
+              "price": 116,
               "originalPrice": 154,
               "profitTarget": 1500,
               "maxDrawdown": 1500,
@@ -186,7 +186,7 @@
             },
             {
               "size": 50000,
-              "price": 136,
+              "price": 157,
               "originalPrice": 209,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -198,7 +198,7 @@
             },
             {
               "size": 100000,
-              "price": 215,
+              "price": 248,
               "originalPrice": 330,
               "profitTarget": 6000,
               "maxDrawdown": 3500,
@@ -210,7 +210,7 @@
             },
             {
               "size": 150000,
-              "price": 275,
+              "price": 318,
               "originalPrice": 424,
               "profitTarget": 9000,
               "maxDrawdown": 5000,
@@ -231,7 +231,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-07-27",
+      "lastChecked": "2026-07-28",
       "stale": false,
       "programs": [
         {
@@ -291,7 +291,7 @@
       },
       "url": "https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures",
       "lastChecked": "2026-07-27",
-      "stale": false,
+      "stale": true,
       "programs": [
         {
           "name": "Elite Challenge",
@@ -656,7 +656,7 @@
         "ends": "2026-07-26"
       },
       "url": "https://fundedseat.link/jtnq",
-      "lastChecked": "2026-07-27",
+      "lastChecked": "2026-07-28",
       "stale": false,
       "programs": [
         {
@@ -879,7 +879,7 @@
         "code": "LTG"
       },
       "url": "https://thelegendstrading.com/?ref=JTNQ",
-      "lastChecked": "2026-07-27",
+      "lastChecked": "2026-07-28",
       "stale": false,
       "programs": [
         {
@@ -1064,7 +1064,7 @@
       },
       "code": "JTNQ",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-07-27",
+      "lastChecked": "2026-07-28",
       "stale": false,
       "programs": [
         {
@@ -1220,7 +1220,7 @@
         "code": "RAPID50"
       },
       "url": "https://fundednext.com?fpr=jtnq",
-      "lastChecked": "2026-07-27",
+      "lastChecked": "2026-07-28",
       "stale": false,
       "programs": [
         {
