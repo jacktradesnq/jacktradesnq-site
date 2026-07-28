@@ -1,16 +1,16 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const SITE = {
   brand: 'Jacktradesnq',
   socials: [
-    { name: 'TikTok', url: 'https://www.tiktok.com/@jack.tradesnq' },
-    { name: 'YouTube', url: 'https://www.youtube.com/@jack.tradesnq' },
-    { name: 'Twitch', url: 'https://www.twitch.tv/jacktradesnq' },
-    { name: 'Kick', url: 'https://kick.com/jacktradesnq' },
-    { name: 'Instagram', url: 'https://www.instagram.com/jack.tradesnq' },
-    { name: 'X', url: 'https://x.com/jacktradesnq' },
+    { name: 'YouTube', url: 'https://www.youtube.com/@jack.tradesnq', handle: '@jack.tradesnq' },
+    { name: 'Twitch', url: 'https://www.twitch.tv/jacktradesnq', handle: 'jacktradesnq' },
+    { name: 'Kick', url: 'https://kick.com/jacktradesnq', handle: 'jacktradesnq' },
+    { name: 'TikTok', url: 'https://www.tiktok.com/@jack.tradesnq', handle: '@jack.tradesnq' },
+    { name: 'Instagram', url: 'https://www.instagram.com/jack.tradesnq', handle: '@jack.tradesnq' },
+    { name: 'X', url: 'https://x.com/jacktradesnq', handle: '@jacktradesnq' },
   ],
   studies: { url: '/studies/', tagline: '10 years of 1-minute futures data, every setup backtested' },
   nefarious: { name: 'Nefarious', url: '/nefarious/', tagline: 'Official partner · free Discord community' },
@@ -40,6 +40,24 @@ const ICONS: Record<string, string> = {
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const headerRef = useRef<HTMLElement>(null);
+  const socialsRef = useRef<HTMLDivElement>(null);
+  const [socialsOpen, setSocialsOpen] = useState(false);
+
+  useEffect(() => {
+    if (!socialsOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (!socialsRef.current?.contains(e.target as Node)) setSocialsOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSocialsOpen(false);
+    };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [socialsOpen]);
 
   useEffect(() => {
     const prev = document.body.style.background;
@@ -236,6 +254,38 @@ export default function Home() {
         </a>
         <nav className="nav" aria-label="Primary">
           <a href={SITE.nefarious.url}>Nefarious</a>
+          <div className={`nav-socials${socialsOpen ? ' is-open' : ''}`} ref={socialsRef}>
+            <button
+              type="button"
+              className="nav-socials-trigger"
+              aria-expanded={socialsOpen}
+              aria-controls="socials-menu"
+              onClick={() => setSocialsOpen((v) => !v)}
+            >
+              Socials
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            <div className="socials-menu" id="socials-menu" hidden={!socialsOpen}>
+              {SITE.socials.map((s, i) => (
+                <a
+                  key={s.name}
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener"
+                  style={{ ['--i' as string]: i }}
+                  onClick={() => setSocialsOpen(false)}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d={ICONS[s.name.toLowerCase()]} />
+                  </svg>
+                  <span className="sm-name">{s.name}</span>
+                  <span className="sm-handle">{s.handle}</span>
+                </a>
+              ))}
+            </div>
+          </div>
           <a className="nav-cta" href={SITE.studies.url}>
             Studies
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
@@ -408,6 +458,63 @@ const CSS = `
 }
 .jtnq-home .nav .nav-cta svg{ width: 11px; height: 11px; }
 .jtnq-home .nav .nav-cta:hover{ background: var(--c-accent); color: var(--c-bg); transform: translateY(-1px); }
+
+.jtnq-home .nav-socials{ position: relative; }
+.jtnq-home .nav-socials-trigger{
+  font-family: inherit; font-size: 13px; color: var(--c-text-soft);
+  background: none; border: 0; cursor: pointer;
+  padding: 8px 14px; border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: color .18s ease;
+}
+.jtnq-home .nav-socials-trigger:hover,
+.jtnq-home .nav-socials.is-open .nav-socials-trigger{ color: var(--c-text); }
+.jtnq-home .nav-socials-trigger svg{
+  width: 11px; height: 11px; opacity: .7;
+  transition: transform .22s ease;
+}
+.jtnq-home .nav-socials.is-open .nav-socials-trigger svg{ transform: rotate(180deg); }
+.jtnq-home .socials-menu{
+  position: absolute; top: calc(100% + 12px); right: 0; z-index: 70;
+  min-width: 248px; padding: 8px; border-radius: 12px;
+  background: color-mix(in oklab, var(--c-bg-raise) 92%, transparent);
+  backdrop-filter: blur(16px) saturate(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
+  border: 1px solid var(--c-line);
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, var(--c-text) 6%, transparent) inset,
+    0 12px 32px -12px color-mix(in oklab, var(--c-bg-deep) 90%, transparent),
+    0 32px 64px -24px color-mix(in oklab, var(--c-bg-deep) 80%, transparent);
+  display: flex; flex-direction: column; gap: 2px;
+  animation: sm-in .18s ease both;
+}
+@keyframes sm-in{ from{ opacity: 0; transform: translateY(-6px); } to{ opacity: 1; transform: none; } }
+.jtnq-home .socials-menu a{
+  display: grid; grid-template-columns: 16px 1fr auto; align-items: center; gap: 12px;
+  padding: 8px 12px; border-radius: 4px; color: var(--c-text-soft);
+  animation: sm-row .22s ease both; animation-delay: calc(var(--i) * 28ms);
+  transition: background .16s ease, color .16s ease;
+}
+@keyframes sm-row{ from{ opacity: 0; transform: translateX(-4px); } to{ opacity: 1; transform: none; } }
+.jtnq-home .socials-menu a svg{ width: 16px; height: 16px; fill: currentColor; color: var(--c-text-mute); transition: color .16s ease; }
+.jtnq-home .socials-menu .sm-name{ font-size: 13px; }
+.jtnq-home .socials-menu .sm-handle{
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em;
+  color: var(--c-text-deep); transition: color .16s ease;
+}
+.jtnq-home .socials-menu a:hover{ background: color-mix(in oklab, var(--c-accent) 10%, transparent); color: var(--c-text); }
+.jtnq-home .socials-menu a:hover svg{ color: var(--c-accent); }
+.jtnq-home .socials-menu a:hover .sm-handle{ color: var(--c-text-mute); }
+@media (prefers-reduced-motion: reduce){
+  .jtnq-home .socials-menu,
+  .jtnq-home .socials-menu a{ animation: none; }
+  .jtnq-home .nav-socials-trigger svg{ transition: none; }
+}
+@media (max-width: 520px){
+  .jtnq-home .nav a, .jtnq-home .nav-socials-trigger{ font-size: 12px; padding: 8px 8px; }
+  .jtnq-home .nav .nav-cta{ margin-left: 4px; padding: 8px 12px; }
+  .jtnq-home .socials-menu{ min-width: 216px; }
+}
 
 .jtnq-home .hero{
   position: relative; min-height: 100vh; width: 100%; overflow: hidden;
