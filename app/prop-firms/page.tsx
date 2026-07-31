@@ -54,7 +54,6 @@ const FIRM_LOGOS: Record<string, string> = {
   'e8-markets': '/logos/e8-markets.svg',
   'fundednext': '/logos/fundednext.png',
   'tradeday': '/logos/tradeday.png',
-  'fxify-futures': '/logos/fxify-futures.png',
 };
 
 const DATA = rawData as unknown as PropData;
