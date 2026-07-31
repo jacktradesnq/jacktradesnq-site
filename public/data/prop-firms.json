@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-28",
+  "generatedAt": "2026-08-01",
   "firms": [
     {
       "id": "blue-guardian",
@@ -1392,6 +1392,316 @@
               "dailyLossSoft": true,
               "consistency": "None",
               "contracts": "2 minis / 20 micros"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tradeday",
+      "name": "TradeDay",
+      "split": "50→90%",
+      "payout": "Day 1 (Quick Pay)",
+      "promo": {
+        "label": "55% OFF sitewide",
+        "code": "JTNQ"
+      },
+      "url": "https://www.tradeday.com/?a_aid=JTNQ",
+      "lastChecked": "2026-08-01",
+      "stale": false,
+      "programs": [
+        {
+          "name": "Quick Pay Intraday",
+          "type": "eval",
+          "priceType": "monthly",
+          "plans": [
+            {
+              "size": 150000,
+              "price": 162,
+              "originalPrice": 360,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "Intraday",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30% (eval only)",
+              "contracts": "15 contracts (50 micros)"
+            },
+            {
+              "size": 100000,
+              "price": 108,
+              "originalPrice": 240,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "Intraday",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30% (eval only)",
+              "contracts": "10 contracts (50 micros)"
+            },
+            {
+              "size": 50000,
+              "price": 59,
+              "originalPrice": 131,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "Intraday",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30% (eval only)",
+              "contracts": "5 contracts (50 micros)"
+            }
+          ]
+        },
+        {
+          "name": "Quick Pay EOD",
+          "type": "eval",
+          "priceType": "monthly",
+          "plans": [
+            {
+              "size": 150000,
+              "price": 180,
+              "originalPrice": 400,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30% (eval only)",
+              "contracts": "15 contracts (50 micros)"
+            },
+            {
+              "size": 100000,
+              "price": 129,
+              "originalPrice": 285,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30% (eval only)",
+              "contracts": "10 contracts (50 micros)"
+            },
+            {
+              "size": 50000,
+              "price": 79,
+              "originalPrice": 175,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30% (eval only)",
+              "contracts": "5 contracts (50 micros)"
+            }
+          ]
+        },
+        {
+          "name": "Fast Pass",
+          "type": "eval",
+          "priceType": "monthly",
+          "plans": [
+            {
+              "size": 150000,
+              "price": 225,
+              "originalPrice": 500,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "45%",
+              "contracts": "15 contracts eval / 4 funded, +1 per $2k"
+            },
+            {
+              "size": 100000,
+              "price": 149,
+              "originalPrice": 330,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "45%",
+              "contracts": "10 contracts eval / 3 funded, +1 per $2k"
+            },
+            {
+              "size": 50000,
+              "price": 85,
+              "originalPrice": 189,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "45%",
+              "contracts": "5 contracts eval / 2 funded, +1 per $2k"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fxify-futures",
+      "name": "FXIFY Futures",
+      "split": "80–90%",
+      "payout": "14 days",
+      "promo": {
+        "label": "Matches the best active discount",
+        "code": "JTNQ"
+      },
+      "url": "https://fxifyfutures.com/",
+      "lastChecked": "2026-08-01",
+      "stale": false,
+      "programs": [
+        {
+          "name": "Standard",
+          "type": "eval",
+          "priceType": "monthly",
+          "plans": [
+            {
+              "size": 150000,
+              "price": 225,
+              "originalPrice": null,
+              "profitTarget": 9000,
+              "maxDrawdown": 6000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 3000,
+              "dailyLossSoft": false,
+              "consistency": "30% (challenge + live)",
+              "contracts": "12 contracts",
+              "activationFee": 125
+            },
+            {
+              "size": 100000,
+              "price": 149,
+              "originalPrice": null,
+              "profitTarget": 6000,
+              "maxDrawdown": 4000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 2000,
+              "dailyLossSoft": false,
+              "consistency": "30% (challenge + live)",
+              "contracts": "7 contracts",
+              "activationFee": 125
+            },
+            {
+              "size": 50000,
+              "price": 89,
+              "originalPrice": null,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1000,
+              "dailyLossSoft": false,
+              "consistency": "30% (challenge + live)",
+              "contracts": "3 contracts",
+              "activationFee": 125
+            }
+          ]
+        },
+        {
+          "name": "Expert",
+          "type": "eval",
+          "priceType": "monthly",
+          "plans": [
+            {
+              "size": 150000,
+              "price": 349,
+              "originalPrice": null,
+              "profitTarget": 10000,
+              "maxDrawdown": 6000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 4500,
+              "dailyLossSoft": false,
+              "consistency": "40% (live)",
+              "contracts": "15 contracts",
+              "activationFee": 0
+            },
+            {
+              "size": 100000,
+              "price": 249,
+              "originalPrice": null,
+              "profitTarget": 7000,
+              "maxDrawdown": 4500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 3000,
+              "dailyLossSoft": false,
+              "consistency": "40% (live)",
+              "contracts": "10 contracts",
+              "activationFee": 0
+            },
+            {
+              "size": 50000,
+              "price": 149,
+              "originalPrice": null,
+              "profitTarget": 3500,
+              "maxDrawdown": 2500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1500,
+              "dailyLossSoft": false,
+              "consistency": "40% (live)",
+              "contracts": "5 contracts",
+              "activationFee": 0
+            }
+          ]
+        },
+        {
+          "name": "Direct to Sim Live",
+          "type": "instant",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 80000,
+              "price": 799,
+              "originalPrice": null,
+              "profitTarget": null,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 2000,
+              "dailyLossSoft": false,
+              "consistency": "20%",
+              "contracts": "5 contracts",
+              "activationFee": 0
+            },
+            {
+              "size": 60000,
+              "price": 649,
+              "originalPrice": null,
+              "profitTarget": null,
+              "maxDrawdown": 2400,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1500,
+              "dailyLossSoft": false,
+              "consistency": "20%",
+              "contracts": "3 contracts",
+              "activationFee": 0
+            },
+            {
+              "size": 30000,
+              "price": 399,
+              "originalPrice": null,
+              "profitTarget": null,
+              "maxDrawdown": 1200,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 750,
+              "dailyLossSoft": false,
+              "consistency": "20%",
+              "contracts": "2 contracts",
+              "activationFee": 0
+            },
+            {
+              "size": 15000,
+              "price": 199,
+              "originalPrice": null,
+              "profitTarget": null,
+              "maxDrawdown": 600,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 375,
+              "dailyLossSoft": false,
+              "consistency": "20%",
+              "contracts": "1 contract",
+              "activationFee": 0
             }
           ]
         }
