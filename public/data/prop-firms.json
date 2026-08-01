@@ -1396,6 +1396,150 @@
           ]
         }
       ]
+    },
+    {
+      "id": "tradeday",
+      "name": "TradeDay",
+      "split": "50→90%",
+      "payout": "Day 1 (Quick Pay)",
+      "promo": {
+        "label": "Public 55% off already applied",
+        "code": "JTNQ"
+      },
+      "url": "https://www.tradeday.com/?a_aid=JTNQ",
+      "lastChecked": "2026-08-01",
+      "stale": false,
+      "programs": [
+        {
+          "name": "Quick Pay Intraday",
+          "type": "eval",
+          "priceType": "monthly",
+          "plans": [
+            {
+              "size": 150000,
+              "price": 162,
+              "originalPrice": 360,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "Intraday",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30% (eval only)",
+              "contracts": "15 contracts (50 micros)"
+            },
+            {
+              "size": 100000,
+              "price": 108,
+              "originalPrice": 240,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "Intraday",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30% (eval only)",
+              "contracts": "10 contracts (50 micros)"
+            },
+            {
+              "size": 50000,
+              "price": 59,
+              "originalPrice": 131,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "Intraday",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30% (eval only)",
+              "contracts": "5 contracts (50 micros)"
+            }
+          ]
+        },
+        {
+          "name": "Quick Pay EOD",
+          "type": "eval",
+          "priceType": "monthly",
+          "plans": [
+            {
+              "size": 150000,
+              "price": 180,
+              "originalPrice": 400,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30% (eval only)",
+              "contracts": "15 contracts (50 micros)"
+            },
+            {
+              "size": 100000,
+              "price": 129,
+              "originalPrice": 285,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30% (eval only)",
+              "contracts": "10 contracts (50 micros)"
+            },
+            {
+              "size": 50000,
+              "price": 79,
+              "originalPrice": 175,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "30% (eval only)",
+              "contracts": "5 contracts (50 micros)"
+            }
+          ]
+        },
+        {
+          "name": "Fast Pass",
+          "type": "eval",
+          "priceType": "monthly",
+          "plans": [
+            {
+              "size": 150000,
+              "price": 225,
+              "originalPrice": 500,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "45%",
+              "contracts": "15 contracts eval / 4 funded, +1 per $2k"
+            },
+            {
+              "size": 100000,
+              "price": 149,
+              "originalPrice": 330,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "45%",
+              "contracts": "10 contracts eval / 3 funded, +1 per $2k"
+            },
+            {
+              "size": 50000,
+              "price": 85,
+              "originalPrice": 189,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "45%",
+              "contracts": "5 contracts eval / 2 funded, +1 per $2k"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
