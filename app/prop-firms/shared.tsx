@@ -257,6 +257,13 @@ export const CSS = `
   grid-column: 2; font-family: var(--f-sans); font-size: 12px; font-style: italic;
   color: var(--c-text-mute); line-height: 1.35;
 }
+/* Everything stacks in column 2 next to the logo — left in column 1 the chip
+   would sit alone under the icon with a dead gap above it. */
+.jtnq-cmp .cfd-firm-label{
+  grid-column: 2; font-family: var(--f-mono); font-size: 10px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--c-accent);
+}
+.jtnq-cmp .cfd-row-id .promo-chip{ grid-column: 2; justify-self: start; }
 
 
 .jtnq-cmp .col-cta{ text-align: right; white-space: nowrap; }

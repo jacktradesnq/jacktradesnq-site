@@ -158,9 +158,10 @@ export default function PropFirmsCfd() {
                     <td className="cell-firm" data-label="Program">
                       <span className="firm-row-id cfd-row-id">
                         <img className="firm-logo" src={firm.logo} alt="" width={22} height={22} loading="lazy" />
+                        <span className="cfd-firm-label">{firm.name}</span>
                         <span className="firm-row-name">{program.name}</span>
                         <span className="firm-row-meta">
-                          {[firm.name, program.steps, `${program.split} split`, program.leverage].join(' · ')}
+                          {[program.steps, `${program.split} split`, program.leverage].join(' · ')}
                         </span>
                         <span className="cfd-note">{program.note}</span>
                         {firm.promo && (
