@@ -20,9 +20,14 @@ export const META = {
       'Every plan from the firms I\u2019m partnered with \u2014 account sizes, prices and risk rules, side by side. My code JTNQ or tracked link applied on every button.',
   },
   heroCfd: {
-    eyebrow: 'CFD & CRYPTO PROP FIRMS',
+    eyebrow: 'CFD PROP FIRMS',
     phrase:
-      'The forex, indices and crypto programs I\u2019m partnered with \u2014 targets, drawdown and daily loss as a percentage of your balance, side by side. My tracked link on every button.',
+      'The forex and indices programs I\u2019m partnered with \u2014 targets, drawdown and daily loss as a percentage of your balance, side by side. My tracked link on every button.',
+  },
+  heroCrypto: {
+    eyebrow: 'CRYPTO PROP FIRMS',
+    phrase:
+      'The crypto programs I\u2019m partnered with \u2014 targets, drawdown and daily loss as a percentage of your balance, leverage per coin, side by side. My tracked link on every button.',
   },
   legal: {
     copyright: '\u00a9 2026 JackTradesNQ. All rights reserved.',
@@ -33,17 +38,29 @@ export const META = {
   },
 };
 
-// Same segmented control on both pages, but each half is a link: two URLs means
-// each asset class can be shared and indexed on its own.
-export function AssetNav({ current }: { current: 'futures' | 'cfd' }) {
+// Same segmented control on every page, but each entry is a link: one URL per
+// asset class means each can be shared and indexed on its own.
+export type AssetClass = 'futures' | 'cfd' | 'crypto';
+
+const ASSET_TABS: { id: AssetClass; label: string; href: string }[] = [
+  { id: 'futures', label: 'Futures', href: '/prop-firms/' },
+  { id: 'cfd', label: 'CFD', href: '/prop-firms/cfd/' },
+  { id: 'crypto', label: 'Crypto', href: '/prop-firms/crypto/' },
+];
+
+export function AssetNav({ current }: { current: AssetClass }) {
   return (
     <div className="class-toggle" role="group" aria-label="Asset class">
-      <a className={`mode ${current === 'futures' ? 'active' : ''}`} href="/prop-firms/" aria-current={current === 'futures' ? 'page' : undefined}>
-        Futures
-      </a>
-      <a className={`mode ${current === 'cfd' ? 'active' : ''}`} href="/prop-firms/cfd/" aria-current={current === 'cfd' ? 'page' : undefined}>
-        CFD &amp; crypto
-      </a>
+      {ASSET_TABS.map((tab) => (
+        <a
+          key={tab.id}
+          className={`mode ${current === tab.id ? 'active' : ''}`}
+          href={tab.href}
+          aria-current={current === tab.id ? 'page' : undefined}
+        >
+          {tab.label}
+        </a>
+      ))}
     </div>
   );
 }
