@@ -1,0 +1,166 @@
+{
+  "generatedAt": "2026-08-01",
+  "firms": [
+    {
+      "id": "fxify",
+      "name": "FXIFY",
+      "logo": "/logos/fxify.png",
+      "payout": "On demand, then every 14 or 30 days",
+      "promo": {
+        "label": "Affiliate code — matches the best active discount",
+        "code": "FXIFYYJLC5W"
+      },
+      "url": "https://trader.fxify.com/purchasechallenge?affiliateId=8369",
+      "lastChecked": "2026-08-01",
+      "stale": false,
+      "programs": [
+        {
+          "name": "One Phase",
+          "market": "cfd",
+          "steps": "1 step",
+          "profitTarget": "10%",
+          "dailyLoss": "3%",
+          "maxDrawdown": "6%",
+          "ddType": "Trailing",
+          "minDays": "5 days",
+          "split": "up to 90%",
+          "leverage": "up to 50:1",
+          "note": "Fee refunded 100% with the first payout",
+          "plans": [
+            { "size": 5000, "price": 59 },
+            { "size": 10000, "price": 89 },
+            { "size": 15000, "price": 119 },
+            { "size": 25000, "price": 199 },
+            { "size": 50000, "price": 379 },
+            { "size": 100000, "price": 549 },
+            { "size": 200000, "price": 1049 },
+            { "size": 400000, "price": 2950 }
+          ]
+        },
+        {
+          "name": "Two Phase",
+          "market": "cfd",
+          "steps": "2 steps",
+          "profitTarget": "5% per phase",
+          "dailyLoss": "4%",
+          "maxDrawdown": "10%",
+          "ddType": "Static",
+          "minDays": "4 days",
+          "split": "up to 100%",
+          "leverage": "up to 30:1",
+          "note": "Classic variant · payouts every 14 or 30 days",
+          "plans": [
+            { "size": 5000, "price": 59 },
+            { "size": 10000, "price": 89 },
+            { "size": 15000, "price": 119 },
+            { "size": 25000, "price": 199 },
+            { "size": 50000, "price": 379 },
+            { "size": 100000, "price": 549 }
+          ]
+        },
+        {
+          "name": "Three Phase",
+          "market": "cfd",
+          "steps": "3 steps",
+          "profitTarget": "5% per phase",
+          "dailyLoss": "5%",
+          "maxDrawdown": "5%",
+          "ddType": "Static",
+          "minDays": "5 days",
+          "split": "up to 90%",
+          "leverage": "up to 50:1",
+          "note": "Cheapest way in · fee refunded 100%",
+          "plans": [
+            { "size": 5000, "price": 39 },
+            { "size": 10000, "price": 59 },
+            { "size": 15000, "price": 79 },
+            { "size": 25000, "price": 149 },
+            { "size": 50000, "price": 249 },
+            { "size": 100000, "price": 399 },
+            { "size": 200000, "price": 799 },
+            { "size": 400000, "price": 1599 }
+          ]
+        },
+        {
+          "name": "Lightning",
+          "market": "cfd",
+          "steps": "1 step",
+          "profitTarget": "5%",
+          "dailyLoss": "3%",
+          "maxDrawdown": "4%",
+          "ddType": "Trailing",
+          "minDays": "3 days, 5 max",
+          "split": "up to 90%",
+          "leverage": "up to 30:1",
+          "note": "30% consistency · stop loss mandatory on every trade",
+          "plans": [
+            { "size": 10000, "price": 59 },
+            { "size": 25000, "price": 149 },
+            { "size": 50000, "price": 249 },
+            { "size": 100000, "price": 399 }
+          ]
+        },
+        {
+          "name": "Instant Funding",
+          "market": "cfd",
+          "steps": "No evaluation",
+          "profitTarget": null,
+          "dailyLoss": null,
+          "maxDrawdown": null,
+          "ddType": null,
+          "minDays": null,
+          "split": "up to 90%",
+          "leverage": "up to 30:1",
+          "note": "Payouts every 14 days · risk limits not published per size",
+          "plans": [
+            { "size": 2500, "price": 19 },
+            { "size": 5000, "price": 44 },
+            { "size": 10000, "price": 85 },
+            { "size": 25000, "price": 169 },
+            { "size": 50000, "price": 289 }
+          ]
+        },
+        {
+          "name": "Crypto One Phase",
+          "market": "crypto",
+          "steps": "1 step",
+          "profitTarget": "9%",
+          "dailyLoss": null,
+          "maxDrawdown": null,
+          "ddType": null,
+          "minDays": "4 days, then 7 funded",
+          "split": "up to 90%",
+          "leverage": "5:1 BTC/ETH/SOL · 2:1 others",
+          "note": "Risk limits not published per size on FXIFY's site",
+          "plans": [
+            { "size": 5000, "price": 59 },
+            { "size": 10000, "price": 99 },
+            { "size": 25000, "price": 249 },
+            { "size": 50000, "price": 499 },
+            { "size": 100000, "price": 999 }
+          ]
+        },
+        {
+          "name": "Crypto Instant Funding",
+          "market": "crypto",
+          "steps": "No evaluation",
+          "profitTarget": null,
+          "dailyLoss": "3%",
+          "maxDrawdown": "6%",
+          "ddType": "Trailing",
+          "minDays": "7 days",
+          "split": "80% bi-weekly",
+          "leverage": "5:1 BTC/ETH/SOL · 2:1 others",
+          "note": "25% consistency · no trading 5 min around news · drawdown locks on payout",
+          "plans": [
+            { "size": 5000, "price": 125 },
+            { "size": 10000, "price": 250 },
+            { "size": 25000, "price": 525 },
+            { "size": 50000, "price": 999 },
+            { "size": 100000, "price": 1999 }
+          ]
+        }
+      ]
+    }
+  ]
+}
