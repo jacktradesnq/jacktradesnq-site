@@ -11,6 +11,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/`, lastModified, changeFrequency: 'weekly', priority: 1.0 },
     { url: `${BASE}/studies/`, lastModified, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE}/prop-firms/`, lastModified, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${BASE}/prop-firms/cfd/`, lastModified, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${BASE}/prop-firms/crypto/`, lastModified, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE}/mentions-legales/`, lastModified, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${BASE}/politique-confidentialite/`, lastModified, changeFrequency: 'yearly', priority: 0.3 },
   ];
