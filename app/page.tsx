@@ -11,7 +11,7 @@ const SITE = {
     { name: 'TikTok', url: 'https://www.tiktok.com/@jack.tradesnq', handle: '@jack.tradesnq' },
     { name: 'Instagram', url: 'https://www.instagram.com/jack.tradesnq', handle: '@jack.tradesnq' },
     { name: 'X', url: 'https://x.com/jacktradesnq', handle: '@jacktradesnq' },
-    { name: 'Discord', url: 'https://discord.gg/PrmVsX4zGC', handle: 'Join the server' },
+    { name: 'Discord', url: 'https://discord.gg/wpddBCAAU2', handle: 'Join the server' },
   ],
   studies: { url: '/studies/', tagline: '10 years of 1-minute futures data, every setup backtested' },
   nefarious: { name: 'Nefarious', url: '/nefarious/', tagline: 'Official partner · free Discord community' },
