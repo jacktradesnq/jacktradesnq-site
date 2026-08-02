@@ -185,7 +185,9 @@ export default function MarketComparator({ market }: { market: CfdMarket }) {
           <div className="legend">
             <p>Every limit is a percentage of your starting balance, the way {market === 'crypto' ? 'crypto' : 'CFD'} firms publish them</p>
             <p>Static — the loss limit never moves · Trailing — it follows your closed balance until you bank the profit</p>
-            <p>n/c — the firm does not publish that limit per program</p>
+            {rows.some((r) => !r.program.maxDrawdown || !r.program.dailyLoss) && (
+              <p>n/c — the firm does not publish that limit per program</p>
+            )}
           </div>
           <p className="note">{NOTE}</p>
         </section>
