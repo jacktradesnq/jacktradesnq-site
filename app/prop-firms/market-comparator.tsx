@@ -40,7 +40,7 @@ type CfdData = { generatedAt: string; firms: CfdFirm[] };
 
 const DATA = rawCfdData as unknown as CfdData;
 
-const NOTE = `Prices and rules read on each firm's own program pages and checkout on ${DATA.generatedAt}, not auto-synced yet. Every link carries my affiliate ID and the code applies the best discount live at checkout.`;
+const NOTE = `Prices and rules read on each firm's own program pages and checkout on ${DATA.generatedAt}, not auto-synced yet. Every button opens the checkout with my affiliate code already filled in — the live checkout price wins.`;
 
 const DEFAULT_SIZE: Record<CfdMarket, number> = { cfd: 25000, crypto: 25000 };
 
@@ -134,7 +134,7 @@ export default function MarketComparator({ market }: { market: CfdMarket }) {
               <tbody>
                 {rows.map(({ firm, program, plan }) => (
                   <tr key={`${firm.id}-${program.name}`} className="firm-row">
-                    <td className="cell-firm" data-label="Program">
+                    <td className="col-firm" data-label="Program">
                       <span className="firm-row-id cfd-row-id">
                         <img className="firm-logo" src={firm.logo} alt="" width={22} height={22} loading="lazy" />
                         <span className="cfd-firm-label">{firm.name}</span>

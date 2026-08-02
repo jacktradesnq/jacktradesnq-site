@@ -7,7 +7,7 @@
       "logo": "/logos/fxify.png",
       "payout": "On demand, then every 14 or 30 days",
       "promo": {
-        "label": "Affiliate code — matches the best active discount",
+        "label": "Affiliate code — filled in automatically by this link",
         "code": "FXIFYYJLC5W"
       },
       "url": "https://trader.fxify.com/purchasechallenge?affiliateId=8369",

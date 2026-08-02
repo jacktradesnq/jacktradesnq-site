@@ -388,6 +388,11 @@ export const CSS = `
     color: var(--c-text-mute);
   }
 
+  /* The CFD table pins its first column on desktop to keep the CTA in view —
+     on a phone the row is a card, so let it take the full width instead. */
+  .jtnq-cmp .cfd-table .col-firm{ width: auto; }
+  .jtnq-cmp .cfd-row-id{ max-width: none; }
+
   .jtnq-cmp .row-cta{ width: 100%; justify-content: center; padding: 14px 20px; }
 
   .jtnq-cmp tr.expand-row{ margin-bottom: 0; }
