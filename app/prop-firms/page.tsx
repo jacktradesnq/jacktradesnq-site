@@ -247,6 +247,14 @@ export default function PropFirms() {
                     onToggle={() => setExpandedFirmId((cur) => (cur === firm.id ? null : firm.id))}
                   />
                 ))}
+                {tableFirms.length === 0 && (
+                  <tr className="empty-row">
+                    <td colSpan={6}>
+                      No {mode === 'eval' ? 'evaluation' : 'instant funding'} plan at {sizeLabel(size)} from any
+                      partner firm — switch the program type or pick another size.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

@@ -245,6 +245,8 @@ export const CSS = `
   color: var(--c-text-mute); cursor: help;
 }
 .jtnq-cmp .none{ color: var(--c-text-mute); font-weight: 400; font-size: 13px; }
+.jtnq-cmp tr.empty-row td{ padding: 28px 16px; text-align: center; font-family: var(--f-mono); font-size: 12px; color: var(--c-text-mute); }
+.jtnq-cmp tbody tr.empty-row:hover{ background: none; }
 .jtnq-cmp .tag{
   display: inline-block; font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
   padding: 5px 11px; border-radius: 999px; border: 1px solid var(--c-line); color: var(--c-text-soft); white-space: nowrap;
