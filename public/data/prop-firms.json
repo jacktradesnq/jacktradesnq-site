@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-15",
+  "generatedAt": "2026-08-16",
   "firms": [
     {
       "id": "blue-guardian",
@@ -11,7 +11,7 @@
         "code": "BG25"
       },
       "url": "https://blueguardian.com/?afmc=JTNQ",
-      "lastChecked": "2026-08-15",
+      "lastChecked": "2026-08-16",
       "stale": false,
       "programs": [
         {
@@ -231,7 +231,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-08-15",
+      "lastChecked": "2026-08-16",
       "stale": false,
       "programs": [
         {
@@ -656,7 +656,7 @@
         "ends": "2026-08-16"
       },
       "url": "https://fundedseat.link/jtnq",
-      "lastChecked": "2026-08-15",
+      "lastChecked": "2026-08-16",
       "stale": false,
       "programs": [
         {
@@ -764,8 +764,8 @@
           "plans": [
             {
               "size": 25000,
-              "price": 74.95,
-              "originalPrice": 136,
+              "price": 76.95,
+              "originalPrice": 140,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
@@ -776,8 +776,8 @@
             },
             {
               "size": 50000,
-              "price": 98.95,
-              "originalPrice": 180,
+              "price": 104.95,
+              "originalPrice": 190,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -788,8 +788,8 @@
             },
             {
               "size": 100000,
-              "price": 162.95,
-              "originalPrice": 296,
+              "price": 174.95,
+              "originalPrice": 320,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
@@ -800,8 +800,8 @@
             },
             {
               "size": 150000,
-              "price": 289.95,
-              "originalPrice": 527,
+              "price": 244.95,
+              "originalPrice": 445,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
               "ddType": "EOD Trailing",
@@ -879,7 +879,7 @@
         "code": "LTG"
       },
       "url": "https://thelegendstrading.com/?ref=JTNQ",
-      "lastChecked": "2026-08-15",
+      "lastChecked": "2026-08-16",
       "stale": false,
       "programs": [
         {
@@ -1064,7 +1064,7 @@
       },
       "code": "JTNQ",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-08-15",
+      "lastChecked": "2026-08-16",
       "stale": false,
       "programs": [
         {
@@ -1220,7 +1220,7 @@
         "code": "RAPID50"
       },
       "url": "https://fundednext.com?fpr=jtnq",
-      "lastChecked": "2026-08-15",
+      "lastChecked": "2026-08-16",
       "stale": false,
       "programs": [
         {
