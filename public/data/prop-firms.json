@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-17",
+  "generatedAt": "2026-08-18",
   "firms": [
     {
       "id": "blue-guardian",
@@ -11,7 +11,7 @@
         "code": "BG25"
       },
       "url": "https://blueguardian.com/?afmc=JTNQ",
-      "lastChecked": "2026-08-17",
+      "lastChecked": "2026-08-18",
       "stale": false,
       "programs": [
         {
@@ -231,7 +231,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-08-17",
+      "lastChecked": "2026-08-18",
       "stale": false,
       "programs": [
         {
@@ -653,10 +653,10 @@
       "promo": {
         "label": "45% OFF + 50% w/ code",
         "code": "ULTRA50",
-        "ends": "2026-08-16"
+        "ends": "2026-08-23"
       },
       "url": "https://fundedseat.link/jtnq",
-      "lastChecked": "2026-08-17",
+      "lastChecked": "2026-08-18",
       "stale": false,
       "programs": [
         {
@@ -879,7 +879,7 @@
         "code": "LTG"
       },
       "url": "https://thelegendstrading.com/?ref=JTNQ",
-      "lastChecked": "2026-08-17",
+      "lastChecked": "2026-08-18",
       "stale": false,
       "programs": [
         {
@@ -1064,7 +1064,7 @@
       },
       "code": "JTNQ",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-08-17",
+      "lastChecked": "2026-08-18",
       "stale": false,
       "programs": [
         {
@@ -1074,7 +1074,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 88,
+              "price": 99,
               "originalPrice": 110,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
@@ -1086,7 +1086,7 @@
             },
             {
               "size": 50000,
-              "price": 120,
+              "price": 135,
               "originalPrice": 150,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -1098,7 +1098,7 @@
             },
             {
               "size": 100000,
-              "price": 208,
+              "price": 234,
               "originalPrice": 260,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
@@ -1110,7 +1110,7 @@
             },
             {
               "size": 150000,
-              "price": 312,
+              "price": 351,
               "originalPrice": 390,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
@@ -1220,7 +1220,7 @@
         "code": "RAPID50"
       },
       "url": "https://fundednext.com?fpr=jtnq",
-      "lastChecked": "2026-08-17",
+      "lastChecked": "2026-08-18",
       "stale": false,
       "programs": [
         {
