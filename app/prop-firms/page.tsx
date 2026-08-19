@@ -53,7 +53,6 @@ const FIRM_LOGOS: Record<string, string> = {
   'fundedseat': '/logos/fundedseat.png',
   'legends-trading': '/logos/legends-trading.png',
   'e8-markets': '/logos/e8-markets.svg',
-  'fundednext': '/logos/fundednext.png',
   'tradeday': '/logos/tradeday.png',
 };
 
