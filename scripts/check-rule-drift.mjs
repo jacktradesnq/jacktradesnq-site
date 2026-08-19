@@ -39,7 +39,7 @@ const BROKEN = Symbol('broken'); // rules[field] === BROKEN => anchor present-bu
 /* Normalizers (task §4)                                               */
 /* ------------------------------------------------------------------ */
 
-// Money: strip $, $$ (BG/FundedNext double the sign), thousands separators
+// Money: strip $, $$ (Blue Guardian double le signe), thousands separators
 // (both "." and ","), "soft breach" wording. "None"/"—" => null.
 function money(v) {
   if (v == null) return null;
@@ -497,79 +497,6 @@ async function extractE8() {
   }
 }
 
-/* ---- FundedNext — structured Next.js flight payload ---- */
-function findMarkets(node) {
-  if (Array.isArray(node)) {
-    for (const v of node) {
-      const r = findMarkets(v);
-      if (r) return r;
-    }
-    return null;
-  }
-  if (node && typeof node === 'object') {
-    if (Array.isArray(node.markets)) return node.markets;
-    for (const v of Object.values(node)) {
-      const r = findMarkets(v);
-      if (r) return r;
-    }
-  }
-  return null;
-}
-async function extractFundedNext() {
-  const html = await fetchText('https://fundednext.com/futures');
-  const marker = 'self.__next_f.push(';
-  let markets = null;
-  let idx = 0;
-  while (markets == null) {
-    const start = html.indexOf(marker, idx);
-    if (start === -1) break;
-    const arrStart = html.indexOf('[', start + marker.length);
-    const arrText = extractBalancedArray(html, arrStart);
-    if (!arrText) break;
-    idx = arrStart + arrText.length;
-    let call;
-    try {
-      call = JSON.parse(arrText);
-    } catch {
-      continue;
-    }
-    if (!Array.isArray(call) || typeof call[1] !== 'string') continue;
-    const sep = call[1].indexOf(':');
-    if (sep === -1) continue;
-    try {
-      markets = findMarkets(JSON.parse(call[1].slice(sep + 1)));
-    } catch {
-      /* not JSON */
-    }
-  }
-  if (!markets) throw new Error('"markets" node not found in flight payload');
-  const fut = markets.find((m) => m && m.id === 'futures');
-  if (!fut) throw new Error('futures market not found');
-
-  const out = [];
-  for (const pkg of fut.packages ?? []) {
-    for (const sv of pkg.challengesSubVariant ?? []) {
-      const programName = pkg.id === 'rapid' ? `Rapid ${sv.label ?? ''}`.trim() : pkg.title;
-      for (const ch of sv.challenges ?? []) {
-        const list = ch.details?.challengeRules ?? [];
-        const byId = (id) => list.find((r) => r.id === id)?.value;
-        out.push({
-          programName,
-          size: ch.numericAccountSize,
-          rules: {
-            profitTarget: byId('target') != null ? money(byId('target')) : BROKEN,
-            maxDrawdown: byId('maxDD') != null ? money(byId('maxDD')) : BROKEN,
-            dailyLoss: byId('dailyDD') != null ? money(byId('dailyDD')) : null,
-            consistency: byId('consistency') != null ? consistency(byId('consistency')) : null,
-            contracts: byId('contract') != null ? contracts(byId('contract')) : BROKEN,
-          },
-        });
-      }
-    }
-  }
-  return out;
-}
-
 const EXTRACTORS = {
   'blue-guardian': extractBlueGuardian,
   'traders-launch': extractTradersLaunch,
@@ -577,7 +504,6 @@ const EXTRACTORS = {
   fundedseat: extractFundedSeat,
   'legends-trading': extractLegends,
   'e8-markets': extractE8,
-  fundednext: extractFundedNext,
 };
 
 // Human-readable reason for the fields we knowingly do not auto-verify.

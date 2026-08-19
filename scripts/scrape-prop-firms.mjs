@@ -483,105 +483,6 @@ async function scrapeE8Markets() {
 }
 
 /* ------------------------------------------------------------------ */
-/* FundedNext — Next.js flight payload embedded in https://fundednext.com/futures */
-/* ------------------------------------------------------------------ */
-
-const money = (s) => (s == null ? null : parseFloat(String(s).replace(/[$,]/g, '')));
-
-// Every self.__next_f.push([id, "chunkId:payload"]) call in the page. `payload` may be
-// JSON, plain text, or CSS depending on the chunk — callers decide what to do with each.
-function extractFlightChunks(html) {
-  const marker = 'self.__next_f.push(';
-  const chunks = [];
-  let idx = 0;
-  while (true) {
-    const start = html.indexOf(marker, idx);
-    if (start === -1) break;
-    const arrStart = html.indexOf('[', start + marker.length);
-    if (arrStart === -1) throw new Error('malformed self.__next_f.push( call');
-    const arrText = extractBalancedArray(html, arrStart);
-    if (!arrText) throw new Error('unbalanced self.__next_f.push( argument');
-    idx = arrStart + arrText.length;
-    let call;
-    try {
-      call = JSON.parse(arrText);
-    } catch {
-      continue; // not a JSON-parseable push call (shouldn't happen, skip defensively)
-    }
-    if (Array.isArray(call) && typeof call[1] === 'string') chunks.push(call[1]);
-  }
-  return chunks;
-}
-
-// Recursively search a decoded flight chunk for the pricing tree's { markets: [...] } node.
-function findMarkets(node) {
-  if (Array.isArray(node)) {
-    for (const v of node) {
-      const r = findMarkets(v);
-      if (r) return r;
-    }
-    return null;
-  }
-  if (node && typeof node === 'object') {
-    if (Array.isArray(node.markets)) return node.markets;
-    for (const v of Object.values(node)) {
-      const r = findMarkets(v);
-      if (r) return r;
-    }
-  }
-  return null;
-}
-
-// The "markets" node's chunk id shifts across deploys, so scan every chunk's JSON payload
-// for it instead of assuming a fixed id (mirrors scrapeBlueGuardian's marker search).
-function findFuturesMarkets(html) {
-  const chunks = extractFlightChunks(html);
-  if (chunks.length === 0) throw new Error('no self.__next_f.push chunks found');
-  for (const chunkStr of chunks) {
-    const sep = chunkStr.indexOf(':');
-    if (sep === -1) continue;
-    let payload;
-    try {
-      payload = JSON.parse(chunkStr.slice(sep + 1));
-    } catch {
-      continue; // chunk isn't JSON (CSS, plain text, module map, ...)
-    }
-    const markets = findMarkets(payload);
-    if (markets) return markets;
-  }
-  throw new Error('"markets" node not found in any flight chunk — page structure likely changed');
-}
-
-async function scrapeFundedNext() {
-  const html = await fetchText('https://fundednext.com/futures');
-  const markets = findFuturesMarkets(html);
-  const futuresMarket = markets.find((m) => m && m.id === 'futures');
-  if (!futuresMarket) throw new Error('futures market not found in markets payload');
-
-  const updates = [];
-  for (const pkg of futuresMarket.packages ?? []) {
-    for (const subvariant of pkg.challengesSubVariant ?? []) {
-      // "Flex" / "Legacy" straight from the package title; "rapid" splits into two
-      // programs via its subvariant label: "Rapid Pro" / "Rapid Daily".
-      const programName = pkg.id === 'rapid' ? `Rapid ${subvariant.label ?? ''}`.trim() : pkg.title;
-      for (const ch of subvariant.challenges ?? []) {
-        updates.push({
-          programName,
-          size: ch.numericAccountSize,
-          price: money(ch.discountedPrice),
-          originalPrice: money(ch.originalPrice),
-        });
-      }
-    }
-  }
-  if (updates.length === 0) throw new Error('no challenges parsed from futures market payload');
-  // Promo stays manual: Flex (code JLFLEX, 47% off) and Rapid (code RAPID50, 50% off Pro
-  // + Daily) run two distinct concurrent codes — no single generic label/code without
-  // inventing prose, so firmPromo is omitted here on purpose.
-  return { updates };
-}
-
-/* ------------------------------------------------------------------ */
 /* Guards + apply                                                      */
 /* ------------------------------------------------------------------ */
 
@@ -653,7 +554,6 @@ const SCRAPERS = {
   fundedseat: scrapeFundedSeat,
   'legends-trading': scrapeLegends,
   'e8-markets': scrapeE8Markets,
-  fundednext: scrapeFundedNext,
 };
 
 async function main() {
