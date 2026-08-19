@@ -286,84 +286,23 @@
       "split": "90%",
       "payout": "On-demand",
       "promo": {
-        "label": "40-50% OFF",
-        "code": "SUMMER"
+        "label": "55% OFF",
+        "code": "2.0"
       },
       "url": "https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures",
-      "lastChecked": "2026-07-27",
-      "stale": true,
+      "lastChecked": "2026-08-19",
+      "stale": false,
       "programs": [
-        {
-          "name": "Elite Challenge",
-          "type": "eval",
-          "priceType": "monthly",
-          "promoCode": "SUMMER",
-          "promoLabel": "40% OFF",
-          "plans": [
-            {
-              "size": 25000,
-              "price": 41,
-              "originalPrice": 69,
-              "profitTarget": 1500,
-              "maxDrawdown": 1000,
-              "ddType": "EOD Trailing",
-              "dailyLoss": 625,
-              "dailyLossSoft": false,
-              "consistency": "None",
-              "contracts": "1 mini / 10 micros",
-              "activationFee": 149
-            },
-            {
-              "size": 50000,
-              "price": 63,
-              "originalPrice": 105,
-              "profitTarget": 3000,
-              "maxDrawdown": 2000,
-              "ddType": "EOD Trailing",
-              "dailyLoss": 1250,
-              "dailyLossSoft": false,
-              "consistency": "None",
-              "contracts": "3 minis / 30 micros",
-              "activationFee": 149
-            },
-            {
-              "size": 100000,
-              "price": 125,
-              "originalPrice": 209,
-              "profitTarget": 6000,
-              "maxDrawdown": 3000,
-              "ddType": "EOD Trailing",
-              "dailyLoss": 2500,
-              "dailyLossSoft": false,
-              "consistency": "None",
-              "contracts": "5 minis / 50 micros",
-              "activationFee": 149
-            },
-            {
-              "size": 150000,
-              "price": 185,
-              "originalPrice": 309,
-              "profitTarget": 9000,
-              "maxDrawdown": 4500,
-              "ddType": "EOD Trailing",
-              "dailyLoss": 3750,
-              "dailyLossSoft": false,
-              "consistency": "None",
-              "contracts": "7 minis / 70 micros",
-              "activationFee": 149
-            }
-          ]
-        },
         {
           "name": "Elite Daily",
           "type": "eval",
           "priceType": "monthly",
-          "promoCode": "SUMMER",
-          "promoLabel": "50% OFF",
+          "promoCode": "2.0",
+          "promoLabel": "55% OFF",
           "plans": [
             {
               "size": 25000,
-              "price": 89,
+              "price": 80,
               "originalPrice": 178,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
@@ -375,7 +314,7 @@
             },
             {
               "size": 50000,
-              "price": 109,
+              "price": 98,
               "originalPrice": 218,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -387,7 +326,7 @@
             },
             {
               "size": 100000,
-              "price": 199,
+              "price": 179,
               "originalPrice": 398,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
@@ -399,7 +338,7 @@
             },
             {
               "size": 150000,
-              "price": 275,
+              "price": 247,
               "originalPrice": 549,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
@@ -415,13 +354,13 @@
           "name": "Elite Access",
           "type": "eval",
           "priceType": "one-time",
-          "promoCode": "ACCESS",
-          "promoLabel": "2 for $19 each",
+          "promoCode": "BOGO",
+          "promoLabel": "BUY 1, GET 1 FREE",
           "plans": [
             {
               "size": 25000,
-              "price": 19,
-              "originalPrice": null,
+              "price": 39,
+              "originalPrice": 139,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
@@ -433,8 +372,8 @@
             },
             {
               "size": 50000,
-              "price": 19,
-              "originalPrice": null,
+              "price": 39,
+              "originalPrice": 218,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -446,8 +385,8 @@
             },
             {
               "size": 100000,
-              "price": 19,
-              "originalPrice": null,
+              "price": 39,
+              "originalPrice": 259,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
@@ -459,8 +398,8 @@
             },
             {
               "size": 150000,
-              "price": 19,
-              "originalPrice": null,
+              "price": 39,
+              "originalPrice": 359,
               "profitTarget": 9000,
               "maxDrawdown": 4000,
               "ddType": "EOD Trailing",
@@ -476,12 +415,12 @@
           "name": "Instant Sim Funded",
           "type": "instant",
           "priceType": "one-time",
-          "promoCode": "SUMMER",
-          "promoLabel": "40% OFF",
+          "promoCode": "2.0",
+          "promoLabel": "55% OFF",
           "plans": [
             {
               "size": 25000,
-              "price": 251,
+              "price": 189,
               "originalPrice": 419,
               "profitTarget": null,
               "maxDrawdown": 1000,
@@ -493,7 +432,7 @@
             },
             {
               "size": 50000,
-              "price": 407,
+              "price": 306,
               "originalPrice": 679,
               "profitTarget": null,
               "maxDrawdown": 2000,
@@ -505,7 +444,7 @@
             },
             {
               "size": 100000,
-              "price": 493,
+              "price": 369,
               "originalPrice": 821,
               "profitTarget": null,
               "maxDrawdown": 4000,
@@ -517,7 +456,7 @@
             },
             {
               "size": 150000,
-              "price": 563,
+              "price": 423,
               "originalPrice": 939,
               "profitTarget": null,
               "maxDrawdown": 6000,
@@ -530,72 +469,15 @@
           ]
         },
         {
-          "name": "S2F Sim Pro",
-          "type": "instant",
-          "priceType": "one-time",
-          "promoCode": "SUMMER",
-          "promoLabel": "40% OFF",
-          "plans": [
-            {
-              "size": 25000,
-              "price": 154,
-              "originalPrice": 257,
-              "profitTarget": null,
-              "maxDrawdown": 1000,
-              "ddType": "Intraday",
-              "dailyLoss": 500,
-              "dailyLossSoft": false,
-              "consistency": "20%",
-              "contracts": "1 mini / 10 micros"
-            },
-            {
-              "size": 50000,
-              "price": 253,
-              "originalPrice": 421,
-              "profitTarget": null,
-              "maxDrawdown": 1625,
-              "ddType": "Intraday",
-              "dailyLoss": 1000,
-              "dailyLossSoft": false,
-              "consistency": "20%",
-              "contracts": "4 minis / 40 micros"
-            },
-            {
-              "size": 100000,
-              "price": 379,
-              "originalPrice": 632,
-              "profitTarget": null,
-              "maxDrawdown": 3250,
-              "ddType": "Intraday",
-              "dailyLoss": 2000,
-              "dailyLossSoft": false,
-              "consistency": "20%",
-              "contracts": "8 minis / 80 micros"
-            },
-            {
-              "size": 150000,
-              "price": 436,
-              "originalPrice": 727,
-              "profitTarget": null,
-              "maxDrawdown": 5000,
-              "ddType": "Intraday",
-              "dailyLoss": 3000,
-              "dailyLossSoft": false,
-              "consistency": "20%",
-              "contracts": "12 minis / 120 micros"
-            }
-          ]
-        },
-        {
           "name": "Ignite",
           "type": "instant",
           "priceType": "one-time",
-          "promoCode": "SUMMER",
-          "promoLabel": "40% OFF",
+          "promoCode": "2.0",
+          "promoLabel": "55% OFF",
           "plans": [
             {
               "size": 25000,
-              "price": 131,
+              "price": 98,
               "originalPrice": 218,
               "profitTarget": null,
               "maxDrawdown": 1000,
@@ -607,7 +489,7 @@
             },
             {
               "size": 50000,
-              "price": 239,
+              "price": 179,
               "originalPrice": 398,
               "profitTarget": null,
               "maxDrawdown": 2000,
@@ -619,7 +501,7 @@
             },
             {
               "size": 100000,
-              "price": 338,
+              "price": 253,
               "originalPrice": 563,
               "profitTarget": null,
               "maxDrawdown": 4000,
@@ -631,7 +513,7 @@
             },
             {
               "size": 150000,
-              "price": 479,
+              "price": 360,
               "originalPrice": 799,
               "profitTarget": null,
               "maxDrawdown": 6000,
@@ -1220,7 +1102,7 @@
         "code": "JTNQ"
       },
       "url": "https://www.tradeday.com/?a_aid=JTNQ",
-      "lastChecked": "2026-08-01",
+      "lastChecked": "2026-08-19",
       "stale": false,
       "programs": [
         {

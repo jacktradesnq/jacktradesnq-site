@@ -240,6 +240,14 @@ export const CSS = `
   border: 1px solid color-mix(in oklab, var(--c-accent) 45%, var(--c-line)); border-radius: 999px;
   padding: 3px 9px; white-space: nowrap; cursor: help;
 }
+/* Firm whose prices did not come from the last daily sync: muted, not accent —
+   it is a caveat, not an offer. */
+.jtnq-cmp .stale-chip{
+  display: inline-block; font-family: var(--f-mono); font-size: 10px; font-weight: 400;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--c-text-mute);
+  border: 1px dashed var(--c-line); border-radius: 999px;
+  padding: 3px 9px; white-space: nowrap; cursor: help;
+}
 .jtnq-cmp .soft-flag{
   margin-left: 8px; font-size: 10px; font-weight: 400; letter-spacing: .1em; text-transform: uppercase;
   color: var(--c-text-mute); cursor: help;

@@ -127,66 +127,85 @@ async function scrapeBlueGuardian() {
 /* Top One Futures — Webflow server-rendered tabs on https://toponefutures.com */
 /* ------------------------------------------------------------------ */
 
+/* Their pricing markup was rebuilt in Aug 2026 (v3-pricing-*). The old
+ * `price__text` / `price__prev` pairs are gone, the tab keys changed, and two
+ * programs disappeared from the site altogether (1-Step Elite Challenge and
+ * S2F Sim Funded) — which is why the scraper had been failing, and the page
+ * quietly serving July prices, since 2026-07-27.
+ *
+ * Key = the `data-w-tab` attribute; the visible label can differ (the "Elite"
+ * tab is labelled "Elite Daily" on screen). Value = our program name. */
 const TOPONE_TABS = {
-  '1-Step ELITE Challange': 'Elite Challenge', // typo is on their site
-  'Elite Daily': 'Elite Daily',
+  Elite: 'Elite Daily',
   'Elite Access': 'Elite Access',
-  'INSTANT Sim Funded': 'Instant Sim Funded',
-  'S2F Sim Funded': 'S2F Sim Pro',
-  'Ignite AF': 'Ignite',
+  'Instant Sim Funded': 'Instant Sim Funded',
+  'Ignite Instant Funding': 'Ignite',
 };
 const TOPONE_SIZES = [25000, 50000, 100000, 150000];
+
+// Each pricing tab is one <div data-w-tab="X" class="acc__content__pane v3-pricing-swiper …">.
+function topOnePane(html, tab) {
+  const panes = [...html.matchAll(/data-w-tab="([^"]+)" class="acc__content__pane v3-pricing-swiper[^"]*"/g)];
+  const i = panes.findIndex((m) => m[1] === tab);
+  if (i === -1) throw new Error(`pricing tab pane not found: ${tab}`);
+  const from = panes[i].index;
+  const to = i + 1 < panes.length ? panes[i + 1].index : html.length;
+  return html.slice(from, to);
+}
+
+// What a given pricing tab actually offers: the code shown inside the tab, and
+// a label. The card badge is the label when it is a percentage ("55% OFF");
+// Elite Access shows "SAVE NOW" instead, so fall back to the sentence the page
+// attaches to that same code ("Buy 1, Get 1 FREE with Code: BOGO").
+function topOneOffer(html, pane) {
+  const codeM = pane.match(/v2-copy-text">([A-Z0-9.]{2,15})</);
+  if (!codeM) return null;
+  const code = codeM[1];
+  const badge = pane.match(/v3-pricing-discount[^>]*><div>([^<]+)</);
+  const badgeTxt = badge ? badge[1].trim() : '';
+  if (/^\d+% off$/i.test(badgeTxt)) return { code, label: badgeTxt.toUpperCase() };
+  const escaped = code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const phrase = html.match(
+    new RegExp(`>([^<]{5,40}) w(?:ith|\\.) Code:</div>[\\s\\S]{0,400}?v2-copy-text">${escaped}<`, 'i'),
+  );
+  return phrase ? { code, label: phrase[1].trim().toUpperCase() } : { code, label: null };
+}
 
 async function scrapeTopOne() {
   const html = await fetchText('https://toponefutures.com');
   const updates = [];
   const programPromos = {};
-  const codeCounts = [];
-  const programPcts = [];
 
   for (const [tab, programName] of Object.entries(TOPONE_TABS)) {
-    const marker = `data-w-tab="${tab}"`;
-    const last = html.lastIndexOf(marker);
-    if (last === -1) throw new Error(`tab pane not found: ${tab}`);
-    const next = html.indexOf('data-w-tab="', last + marker.length);
-    const block = html.slice(last, next === -1 ? undefined : next);
+    const pane = topOnePane(html, tab);
+    const offer = topOneOffer(html, pane);
+    if (offer && offer.label) programPromos[programName] = offer;
+    // One card per size: title carries the size ("$25K Evaluation" / "$25K Account"),
+    // then the struck-through list price and the price you pay today.
+    const cards = [...pane.matchAll(
+      /v3-pricing-title">\$(\d+)K[^<]*<\/div>[\s\S]{0,3000}?<div class="v3-price-current">\$([\d,]+)/g,
+    )];
+    if (cards.length !== TOPONE_SIZES.length)
+      throw new Error(`${tab}: expected ${TOPONE_SIZES.length} pricing cards, got ${cards.length}`);
 
-    const re = /price__text[^>]*">\$([\d,]+)(\/mo)?<\/div><div class="price__prev">\$([\d,]+)/g;
-    const pairs = [];
-    let m;
-    while ((m = re.exec(block))) pairs.push({ price: num(m[1]), originalPrice: num(m[3]) });
-    if (pairs.length !== TOPONE_SIZES.length)
-      throw new Error(`${tab}: expected ${TOPONE_SIZES.length} price pairs, got ${pairs.length}`);
-    // Elite Access: the site's price__prev slot holds the funded reset fee,
-    // not a struck-through price (2026-07-19 audit) — never publish it.
-    if (programName === 'Elite Access') pairs.forEach((p) => (p.originalPrice = null));
-    pairs.forEach((p, i) => updates.push({ programName, size: TOPONE_SIZES[i], ...p }));
+    const olds = [...pane.matchAll(/v3-price-old">\$([\d,]+)/g)].map((m) => num(m[1]));
+    if (olds.length !== cards.length)
+      throw new Error(`${tab}: ${cards.length} cards but ${olds.length} struck-through prices`);
 
-    // Promo code: "w. Code:" followed by the copy-code block text.
-    const codeIdx = block.indexOf('w. Code:');
-    const codeM =
-      codeIdx === -1
-        ? null
-        : block.slice(codeIdx, codeIdx + 600).match(/copy-code__bot is--idle"><div>([A-Z0-9]+)<\/div>/);
-    if (codeM) {
-      // Program label: N% OFF only when at least 3 of 4 plans agree on the
-      // rounded discount (Elite Access style bundle deals keep their manual label).
-      const valid = pairs.filter((p) => p.originalPrice != null);
-      const { value: pct, count } = valid.length ? mode(valid.map((p) => pctOff(p.price, p.originalPrice))) : { value: null, count: 0 };
-      const label = valid.length >= 3 && count >= 3 ? `${pct}% OFF` : null;
-      programPromos[programName] = { code: codeM[1], label };
-      codeCounts.push(codeM[1]);
-      if (label) programPcts.push(pct);
-    }
+    cards.forEach((m, i) => {
+      const size = num(m[1]) * 1000;
+      if (size !== TOPONE_SIZES[i])
+        throw new Error(`${tab}: card ${i} is $${size / 1000}K, expected $${TOPONE_SIZES[i] / 1000}K`);
+      updates.push({ programName, size, price: num(m[2]), originalPrice: olds[i] });
+    });
   }
 
+  // Site-wide banner: "55% off EVERYTHING w. code: 2.0". It is the code that
+  // produces the prices above — the per-card badges only repeat the percentage.
   let firmPromo;
-  if (codeCounts.length > 0 && programPcts.length > 0) {
-    const code = mode(codeCounts).value;
-    const min = Math.min(...programPcts);
-    const max = Math.max(...programPcts);
-    firmPromo = { label: min === max ? `${min}% OFF` : `${min}-${max}% OFF`, code };
-  }
+  const banner = html.match(/<strong>(\d+)% off[^<]*w\. code:<\/strong><\/div>[\s\S]{0,400}?v2-copy-text">([A-Z0-9.]{2,15})</i);
+  if (banner) firmPromo = { label: `${banner[1]}% OFF`, code: banner[2] };
+
   return { updates, programPromos, firmPromo };
 }
 
@@ -547,11 +566,61 @@ function apply(firm, res, changes) {
 
 /* ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ */
+/* TradeDay — Webflow CMS cards on https://www.tradeday.com, filtered      */
+/* client-side by fs-list-field attributes (drawdown / platform / account) */
+/* ------------------------------------------------------------------ */
+
+// account + drawdown -> our program name. Every card is duplicated per trading
+// platform, so the same (program, size) shows up more than once; the prices
+// must agree or we refuse the update.
+const TRADEDAY_PROGRAMS = {
+  'Quick Pay|Intraday': 'Quick Pay Intraday',
+  'Quick Pay|End of Day': 'Quick Pay EOD',
+  'Fast Pass|End of Day': 'Fast Pass',
+};
+
+async function scrapeTradeDay() {
+  const html = await fetchText('https://www.tradeday.com');
+  const starts = [...html.matchAll(/class="pricing_dyn w-dyn-item"/g)].map((m) => m.index);
+  if (starts.length === 0) throw new Error('no pricing cards found');
+
+  const seen = new Map(); // "program|size" -> { price, originalPrice }
+  for (let i = 0; i < starts.length; i++) {
+    const card = html.slice(starts[i], i + 1 < starts.length ? starts[i + 1] : undefined);
+    const drawdown = card.match(/fs-list-field="drawdown"[^>]*>([^<]+)</)?.[1].trim();
+    const account = card.match(/fs-list-field="account"[^>]*>([^<]+)</)?.[1].trim();
+    const programName = TRADEDAY_PROGRAMS[`${account}|${drawdown}`];
+    if (!programName) continue; // a product we do not list
+
+    const sizeM = card.match(/text-color-primary">(\d+)k</i);
+    const prices = [...card.matchAll(/display-inline">\$<\/div><div class="display-inline">([\d,]+)</g)].map((m) => num(m[1]));
+    if (!sizeM || prices.length !== 2)
+      throw new Error(`${programName}: card ${i} has no size or ${prices.length} prices (expected 2)`);
+
+    const key = `${programName}|${num(sizeM[1]) * 1000}`;
+    const found = { originalPrice: prices[0], price: prices[1] };
+    const prev = seen.get(key);
+    if (prev && (prev.price !== found.price || prev.originalPrice !== found.originalPrice))
+      throw new Error(`${key}: two cards disagree ($${prev.price}/$${prev.originalPrice} vs $${found.price}/$${found.originalPrice})`);
+    seen.set(key, found);
+  }
+
+  const updates = [...seen.entries()].map(([key, v]) => {
+    const [programName, size] = key.split('|');
+    return { programName, size: Number(size), ...v };
+  });
+  return { updates };
+}
+
+/* ------------------------------------------------------------------ */
+
 const SCRAPERS = {
   'blue-guardian': scrapeBlueGuardian,
   'top-one-futures': scrapeTopOne,
   'traders-launch': scrapeTradersLaunch,
   fundedseat: scrapeFundedSeat,
+  tradeday: scrapeTradeDay,
   'legends-trading': scrapeLegends,
   'e8-markets': scrapeE8Markets,
 };

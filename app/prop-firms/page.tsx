@@ -131,7 +131,23 @@ function dailyLossValue(plan: Plan) {
   return <span className="none">None</span>;
 }
 
-const NOTE = `Figures pulled from each firm's official site. Prices and promo codes auto-checked daily — last sync ${DATA.generatedAt}. Risk rules verified manually 19 Jul 2026. Promos change fast; the live checkout price wins.`;
+// A firm whose scraper failed (or that has none) keeps its old prices while the
+// file's generatedAt still says today — the page used to advertise that date for
+// everyone, so Top One served 3-week-old prices under a "synced today" line.
+// Say the truth instead: name the firms that are behind, and mark their rows.
+// "2026-08-01" -> "1 Aug 2026", the same way the manual date below is written.
+const humanDate = (iso: string) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC',
+  });
+const behindFirms = DATA.firms.filter((f) => f.lastChecked !== DATA.generatedAt);
+const SYNC_NOTE =
+  behindFirms.length === 0
+    ? `Prices and promo codes auto-checked daily — last sync ${humanDate(DATA.generatedAt)}.`
+    : `Prices and promo codes auto-checked daily — last sync ${humanDate(DATA.generatedAt)}, except ${behindFirms
+        .map((f) => `${f.name}, checked ${humanDate(f.lastChecked)}`)
+        .join('; ')}.`;
+const NOTE = `Figures pulled from each firm's official site. ${SYNC_NOTE} Risk rules verified manually 19 Jul 2026. Promos change fast; the live checkout price wins.`;
 
 export default function PropFirms() {
   const [size, setSize] = useState(100000);
@@ -321,6 +337,14 @@ function FirmRow({
       {chipCode(firm, promo.code) && (
         <span className="promo-chip" title={promo.title || undefined}>
           code {chipCode(firm, promo.code)}
+        </span>
+      )}
+      {firm.lastChecked !== DATA.generatedAt && (
+        <span
+          className="stale-chip"
+          title={`Prices last verified on ${humanDate(firm.lastChecked)}, not at the last daily sync (${humanDate(DATA.generatedAt)}). Check the live checkout price.`}
+        >
+          prices {humanDate(firm.lastChecked)}
         </span>
       )}
     </span>
