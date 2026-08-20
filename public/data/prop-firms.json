@@ -459,9 +459,9 @@
               "price": 423,
               "originalPrice": 939,
               "profitTarget": null,
-              "maxDrawdown": 6000,
+              "maxDrawdown": 5250,
               "ddType": "EOD Trailing",
-              "dailyLoss": 3750,
+              "dailyLoss": 3000,
               "dailyLossSoft": false,
               "consistency": "20%",
               "contracts": "7 minis / 70 micros"

@@ -235,57 +235,161 @@ async function extractTradersLaunch() {
   return out;
 }
 
-/* ---- Top One Futures — Webflow tab panes ---- */
+/* ---- Top One Futures — Webflow v3 pricing panes ---- */
+/* Their pricing markup was rebuilt in Aug 2026: one pane per tab
+ * (`data-w-tab="X" class="acc__content__pane v3-pricing-swiper …"`, same anchors
+ * as scripts/scrape-prop-firms.mjs), the tab keys changed, and two programs
+ * (1-Step Elite Challenge, S2F Sim Funded) disappeared from the site.
+ * Key = the `data-w-tab` attribute; the visible label can differ (the "Elite"
+ * tab is labelled "Elite Daily" on screen). Value = our program name. */
 const TOPONE_TABS = {
-  '1-Step ELITE Challange': 'Elite Challenge',
-  'Elite Daily': 'Elite Daily',
+  Elite: 'Elite Daily',
   'Elite Access': 'Elite Access',
-  'INSTANT Sim Funded': 'Instant Sim Funded',
-  'S2F Sim Funded': 'S2F Sim Pro',
-  'Ignite AF': 'Ignite',
+  'Instant Sim Funded': 'Instant Sim Funded',
+  'Ignite Instant Funding': 'Ignite',
 };
-const TOPONE_INSTANT = new Set(['Instant Sim Funded', 'S2F Sim Pro', 'Ignite']);
 const TOPONE_SIZES = [25000, 50000, 100000, 150000];
+// Rules now live in labelled rows, one per rule:
+//   <div class="v3-table-row-info"><div>Profit Target</div></div>
+//   <div class="v3-table-row-value"><div>$1,500</div></div>
+// Label (lowercased) -> compared field. The challenge tabs and the instant tabs
+// word the same rules differently ("Max Drawdown (EOD)" vs "Trailing max
+// drawdown", "Consistency on Eval" vs "Consistency"), hence both spellings.
+const TOPONE_ROWS = {
+  'profit target': 'profitTarget',
+  'max drawdown (eod)': 'maxDrawdown',
+  'trailing max drawdown': 'maxDrawdown',
+  'daily loss limit': 'dailyLoss',
+  'consistency on eval': 'consistency',
+  consistency: 'consistency',
+  'max contracts': 'contracts',
+};
+const TOPONE_NORMALIZE = {
+  profitTarget: money,
+  maxDrawdown: money,
+  dailyLoss: money,
+  consistency,
+  contracts,
+};
+// A promoted row keeps the superseded figure in an <em> and prints the current
+// one after it ("<em>$3,000 </em>$4,000", "<em>5 </em>10"), the same old/new
+// pattern as v3-price-old + v3-price-current. Drop the <em>, keep the rest;
+// "None!" survives as text and the normalizers turn it into null.
+function topOneRowValue(raw) {
+  return raw
+    .replace(/<em>[\s\S]*?<\/em>/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 async function extractTopOne() {
   const html = await fetchText('https://toponefutures.com');
+  const panes = [...html.matchAll(/data-w-tab="([^"]+)" class="acc__content__pane v3-pricing-swiper[^"]*"/g)];
   const out = [];
   for (const [tab, programName] of Object.entries(TOPONE_TABS)) {
-    const marker = `data-w-tab="${tab}"`;
-    const last = html.lastIndexOf(marker);
-    if (last === -1) throw new Error(`tab pane not found: ${tab}`);
-    const next = html.indexOf('data-w-tab="', last + marker.length);
-    const lines = htmlToLines(html.slice(last, next === -1 ? undefined : next));
-    const instant = TOPONE_INSTANT.has(programName);
+    const i = panes.findIndex((m) => m[1] === tab);
+    if (i === -1) throw new Error(`pricing tab pane not found: ${tab}`);
+    const pane = html.slice(panes[i].index, i + 1 < panes.length ? panes[i + 1].index : html.length);
+    const titles = [...pane.matchAll(/v3-pricing-title">\$(\d+)K/g)];
 
-    for (const size of TOPONE_SIZES) {
-      const sizeLabel = `$${size.toLocaleString('en-US')}`;
-      const start = lines.indexOf(sizeLabel);
-      if (start === -1) continue; // plan not found => BROKEN plan
-      let end = lines.findIndex((l, k) => k > start && /^Get Funded$/i.test(l));
-      if (end === -1) end = lines.length;
-      const noise = /^(Copied!|Get Funded|Most Popular|.*w\. Code:|SUMMER|ACCESS|Buy 2 and Save.*|Only \$.*|\/ .*|Save)$/i;
-      const row = lines.slice(start, end).filter((l) => !noise.test(l));
-      const ddIdx = row.findIndex((l) => /^(end of day|intraday)$/i.test(l));
-      const isMoney = (t) => /^\$[\d,]+$/.test(t);
-      const pre = ddIdx > 0 ? row.slice(1, ddIdx).filter(isMoney) : [];
-      const ctToken = row.find((t) => /\d+\s*minis?\s*\(\d+\s*micros?\)/i.test(t));
+    for (let c = 0; c < titles.length; c++) {
+      const size = parseInt(titles[c][1], 10) * 1000;
+      if (!TOPONE_SIZES.includes(size)) continue;
+      const card = pane.slice(titles[c].index, c + 1 < titles.length ? titles[c + 1].index : pane.length);
+      // Every card holds an "Evaluation rules" and a "Funded rules" table. The
+      // one flagged w--tab-active is what the page shows by default and the
+      // phase our JSON stores: Eval on the challenges, Funded on the instants
+      // (which have no eval at all — their two tables are identical anyway).
+      const active = card.match(/data-w-tab="(?:Eval|Funded)" class="rules-tab-content w-tab-pane w--tab-active"/);
+      if (!active) continue; // no rules table => reported as "plan not found"
+      let block = card.slice(active.index);
+      const sibling = block.indexOf('class="rules-tab-content w-tab-pane"');
+      if (sibling !== -1) block = block.slice(0, sibling);
 
-      const rules = {
-        maxDrawdown: pre.length ? money(pre[pre.length - 1]) : BROKEN, // last DD cell (handles extra-cell rows)
-        contracts: ctToken ? contracts(ctToken) : BROKEN,
-      };
-      if (instant) {
-        rules.dailyLoss = pre.length ? money(pre[0]) : BROKEN;
-        const after = ddIdx === -1 ? [] : row.slice(ddIdx + 1);
-        const cons = after.find((t) => /^(\d+%|none!?|none)$/i.test(t));
-        rules.consistency = cons != null ? consistency(cons) : null;
-        // instant has no Profit Target column => not emitted (JSON is null).
+      const rules = {};
+      const rows = block.matchAll(
+        /v3-table-row-info"><div>([^<]*)<\/div><\/div><div class="v3-table-row-value"><div>([\s\S]*?)<\/div><\/div>/g,
+      );
+      for (const [, label, raw] of rows) {
+        // "Daily Loss Limit" is typed with a non-breaking space on the instant
+        // tabs (…Loss Limit), hence the whitespace collapse before lookup.
+        const field = TOPONE_ROWS[label.replace(/\s+/g, ' ').trim().toLowerCase()];
+        if (!field || field in rules) continue; // first row wins
+        const value = topOneRowValue(raw);
+        rules[field] = value === '' ? BROKEN : TOPONE_NORMALIZE[field](value);
       }
-      // Eval tabs (Elite *): profitTarget / dailyLoss / consistency live in
-      // tab-specific column orders (reset-fee-first, split labels, missing
-      // consistency header) => not safely column-parsed, kept manual.
+      // Instant tabs carry no Profit Target row => not emitted (JSON is null).
       out.push({ programName, size, rules });
     }
+  }
+  return out;
+}
+
+/* ---- TradeDay — server-rendered Webflow/Finsweet pricing cards ---- */
+/* Every card is one `role="listitem" class="pricing_dyn w-dyn-item"` block with
+ * a hidden metadata pair the client-side filter reads:
+ *   <div fs-list-field="platform">Tradovate</div>
+ *   <div fs-list-field="account">Quick Pay</div>
+ * plus the drawdown flavour in the header title
+ * (<p fs-list-field="drawdown" class="pricing_card-title">Intraday</p>).
+ * account + drawdown identify the program, so the two "End of Day" programs
+ * (Quick Pay EOD and Fast Pass) can't be confused. Each program/size exists
+ * twice, once per platform (Tradovate, Rithmic), with the same risk rules. */
+const TRADEDAY_PROGRAMS = {
+  'Quick Pay|Intraday': 'Quick Pay Intraday',
+  'Quick Pay|End of Day': 'Quick Pay EOD',
+  'Fast Pass|End of Day': 'Fast Pass',
+};
+async function extractTradeDay() {
+  const html = await fetchText('https://www.tradeday.com');
+  const marks = [...html.matchAll(/role="listitem" class="pricing_dyn w-dyn-item"/g)];
+  if (marks.length === 0) throw new Error('no pricing_dyn cards found');
+
+  const out = [];
+  const seen = new Set();
+  for (let i = 0; i < marks.length; i++) {
+    const card = html.slice(marks[i].index, i + 1 < marks.length ? marks[i + 1].index : html.length);
+    const account = card.match(/fs-list-field="account">([^<]+)</);
+    const flavour = card.match(/fs-list-field="drawdown" class="pricing_card-title">([^<]+)</);
+    if (!account || !flavour) continue;
+    const programName = TRADEDAY_PROGRAMS[`${account[1].trim()}|${flavour[1].trim()}`];
+    if (!programName) continue;
+
+    // Header: … class="text-size-large text-weight-bold text-color-primary">50k</p>
+    const header = card.slice(0, card.indexOf('pricing-card_list"'));
+    const sizeM = header.match(/class="text-size-large[^"]*">(\d+)k</i);
+    if (!sizeM) continue;
+    const size = parseInt(sizeM[1], 10) * 1000;
+    const key = `${programName}|${size}`;
+    if (seen.has(key)) continue; // same card again for the other platform
+    seen.add(key);
+
+    // Two bullet lists per card, "Eval Rules" then "Funded Rules". Our JSON
+    // stores the eval phase (that is why Quick Pay consistency reads
+    // "30% (eval only)"), so only the first list is compared.
+    const from = card.indexOf('pricing-card_list"');
+    const end = card.indexOf('</ul>', from);
+    const bullets = htmlToLines(card.slice(from, end === -1 ? undefined : end));
+    const find = (re) => {
+      const l = bullets.find((b) => re.test(b));
+      return l ? l.match(re) : null;
+    };
+    const pt = find(/^Profit Target:?\s*\$?([\d,]+)/i);
+    const dd = find(/Trailing Max Drawdown:?\s*\$?([\d,]+)/i);
+    const cons = find(/^Consistency:?\s*(\d+\s*%|None)/i);
+    const ct = find(/Position Limits?\s*[-:]?\s*(\d+\s*Contracts?\s*\(\d+\s*Micros?\))/i);
+
+    const rules = {
+      profitTarget: pt ? money(pt[1]) : BROKEN,
+      maxDrawdown: dd ? money(dd[1]) : BROKEN,
+      consistency: cons ? consistency(cons[1]) : BROKEN,
+      // dailyLoss: no such row on the cards => not emitted (manual null).
+    };
+    // Fast Pass allows fewer contracts once funded and our JSON keeps both in
+    // one string ("15 contracts eval / 4 funded, +1 per $2k"), which the shared
+    // contracts() normalizer would read as "4 micros" => left to a human.
+    if (programName !== 'Fast Pass') rules.contracts = ct ? contracts(ct[1]) : BROKEN;
+    out.push({ programName, size, rules });
   }
   return out;
 }
@@ -504,6 +608,7 @@ const EXTRACTORS = {
   fundedseat: extractFundedSeat,
   'legends-trading': extractLegends,
   'e8-markets': extractE8,
+  tradeday: extractTradeDay,
 };
 
 // Human-readable reason for the fields we knowingly do not auto-verify.
@@ -514,8 +619,10 @@ function skipReason(firmId, programName, field) {
   if (firmId === 'e8-markets' && field === 'contracts') return 'Zero cards omit contract limit (manual)';
   if (firmId === 'blue-guardian' && field === 'profitTarget') return 'instant: no profit-target rule';
   if (firmId === 'blue-guardian' && field === 'consistency') return 'instant: hand summary of per-payout rows';
-  if (firmId === 'top-one-futures' && field === 'profitTarget') return 'instant: no profit-target column';
-  if (firmId === 'top-one-futures') return 'eval tab: column order tab-specific, kept manual';
+  if (firmId === 'top-one-futures' && field === 'profitTarget') return 'instant: no profit-target row on the card';
+  if (firmId === 'tradeday' && field === 'dailyLoss') return 'no daily-loss row on the cards (manual null)';
+  if (firmId === 'tradeday' && field === 'contracts' && programName === 'Fast Pass')
+    return 'card shows the eval limit; ours bundles eval + funded ("15 eval / 4 funded")';
   return 'not published on buy-screen (manual)';
 }
 
