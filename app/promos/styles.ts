@@ -82,8 +82,9 @@ export const PROMOS_CSS = `
   color: var(--c-bg); background: var(--c-accent); border-radius: 999px; padding: 4px 10px;
 }
 
-/* A precision under the price, not a catch: LEGENDS' 50K Elite is $49 on a
-   first order and $98 after, and hiding that would be lying by omission. */
+/* A precision under the price, not a catch: what changes what you pay, such as
+   monthly billing or an activation fee due on passing. Hiding those next to a
+   headline price would be lying by omission. */
 .jtnq-cmp .promo-note{
   margin-top: -4px; font-size: 13px; line-height: 1.5; color: var(--c-text-mute);
 }
