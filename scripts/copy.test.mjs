@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import { parseCopy, fill, useCopy, resetCopy, loadCopy, assertComplete, parseLabels } from './lib/copy.mjs';
-import { pickDeal, renderTweet, renderDiscord, renderEmail } from './lib/deal-of-day.mjs';
+import { pickDeal, renderTweet, renderDiscord, renderEmail, auditDiscountClaims } from './lib/deal-of-day.mjs';
 
 const DATA = JSON.parse(readFileSync(new URL('../public/data/prop-firms.json', import.meta.url), 'utf8'));
 const SHIPPED = readFileSync(new URL('../content/newsletter/messages.md', import.meta.url), 'utf8');
@@ -119,6 +119,70 @@ test('stars become bold in the email and are left alone for Discord', () => {
 
   // Discord's own bold is **, which must survive untouched.
   assert.match(renderDiscord(deal()), /^\*\*FundedSeat, deal of the day\*\*/);
+});
+
+// ── discounts never stack ────────────────────────────────────────────────────
+
+test('a firm advertising two discounts never gets them added up', () => {
+  // FundedSeat's real label. 45 and 50 are alternatives: the public price, or
+  // the coupon. 95% off does not exist anywhere on earth.
+  const fs = DATA.firms.find((f) => f.id === 'fundedseat');
+  assert.match(fs.promo.label, /45% OFF \+ 50% w\/ code/, 'the label under test changed');
+
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
+  const rendered = [renderTweet(d), renderDiscord(d), renderEmail(d, {}).text, renderEmail(d, {}).html].join('\n');
+
+  for (const forbidden of ['95%', '95 %']) {
+    assert.ok(!rendered.includes(forbidden), `${forbidden} appeared in a message`);
+  }
+  // The only discount stated is the one computed from that plan's two prices.
+  const claims = [...rendered.matchAll(/(\d+)\s*%\s*off/gi)].map((m) => m[1]);
+  assert.deepEqual([...new Set(claims)], ['45'], `claims found: ${claims.join(', ')}`);
+  assert.equal(d.headline.discountPct, Math.round((1 - 104.95 / 190) * 100));
+});
+
+test("the firm's own promo text never reaches a message", () => {
+  // It is free marketing prose ("45% OFF + 50% w/ code ULTRA50") and it moves
+  // without warning, so it is deliberately not a placeholder.
+  for (const firm of DATA.firms) {
+    if (!firm.promo?.label) continue;
+    const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: firm.id });
+    const rendered = [renderTweet(d), renderDiscord(d), renderEmail(d, {}).html].join('\n');
+    assert.ok(!rendered.includes(firm.promo.label), `${firm.id}: the promo label leaked into a message`);
+  }
+});
+
+test('a percentage typed by hand into the copy file is refused', () => {
+  useCopy(
+    SHIPPED.replace(
+      '## email.sub\n[{discount}% off on the {plan} plan.]',
+      '## email.sub\n[{discount}% off, and 50% off with the code.]'
+    ),
+    TAKES
+  );
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const problems = auditDiscountClaims(d, { email: renderEmail(d, {}).text });
+  assert.equal(problems.length, 1, `expected one problem, got ${problems.length}`);
+  assert.match(problems[0], /claims "50% off"/);
+  assert.match(problems[0], /only discount computed from the data is 45%/);
+});
+
+test('the shipped copy passes the audit on every firm', () => {
+  for (const firm of DATA.firms) {
+    const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: firm.id });
+    if (!d) continue;
+    const email = renderEmail(d, {});
+    assert.deepEqual(
+      auditDiscountClaims(d, {
+        subject: email.subject,
+        email: email.text,
+        discord: renderDiscord(d),
+        tweet: renderTweet(d),
+      }),
+      [],
+      `${firm.id} failed the audit`
+    );
+  }
 });
 
 test('the shipped file passes its own completeness check', () => {

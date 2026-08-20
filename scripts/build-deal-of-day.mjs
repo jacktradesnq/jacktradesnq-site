@@ -15,7 +15,14 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { pickDeal, snapshotOf, renderEmail, renderDiscord, renderTweet } from './lib/deal-of-day.mjs';
+import {
+  pickDeal,
+  snapshotOf,
+  renderEmail,
+  renderDiscord,
+  renderTweet,
+  auditDiscountClaims,
+} from './lib/deal-of-day.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DATA_FILE = join(ROOT, 'public/data/prop-firms.json');
@@ -41,12 +48,28 @@ const history = readJson(HISTORY_FILE, []);
 const prevSnapshot = readJson(SNAPSHOT_FILE, null);
 
 function build(deal) {
-  return {
+  const built = {
     deal,
     email: renderEmail(deal, { generatedAt: data.generatedAt }),
     discord: renderDiscord(deal),
     tweet: renderTweet(deal),
   };
+
+  // Nothing leaves this script claiming a discount the data cannot back. Two
+  // firms advertise "X% off + Y% with a code"; those never add up, and a
+  // hand-typed percentage in the copy file is caught here too.
+  const problems = auditDiscountClaims(deal, {
+    subject: built.email.subject,
+    email: built.email.text,
+    discord: built.discord,
+    tweet: built.tweet,
+  });
+  if (problems.length) {
+    console.error('refusing to emit, discount claim does not match the data:');
+    for (const p of problems) console.error(`  ${p}`);
+    process.exit(1);
+  }
+  return built;
 }
 
 function writePreview(built, tag) {

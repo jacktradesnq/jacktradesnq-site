@@ -370,6 +370,35 @@ export function renderDiscord(deal) {
   return lines.join('\n');
 }
 
+// ── the no-stacking audit ────────────────────────────────────────────────────
+
+// A firm's own promo text brags things like "45% OFF + 50% w/ code ULTRA50".
+// Those two numbers are alternatives, not a sum: no prop firm stacks discounts.
+// So the only discount this engine will ever state is the one it can do the
+// arithmetic for, on a single plan's own two prices. This walks the finished
+// messages and refuses anything else, including a percentage typed by hand into
+// the copy file.
+//
+// It also cannot vouch for a coupon: the scraper reads the PUBLIC price off the
+// pricing page ("Add to Cart $original $promo"), and a code applies at the
+// checkout, which nothing here can observe. The price we print is the public
+// one, and the copy sends the reader to the checkout with the code.
+export function auditDiscountClaims(deal, renderings) {
+  const computed = deal.headline.discountPct ? String(deal.headline.discountPct) : null;
+  const problems = [];
+  for (const [channel, text] of Object.entries(renderings)) {
+    for (const [, pct] of String(text ?? '').matchAll(/(\d+)\s*%\s*off/gi)) {
+      if (pct !== computed) {
+        problems.push(
+          `${channel}: claims "${pct}% off" but the only discount computed from the data is ` +
+            `${computed ? `${computed}%` : 'none'} (${deal.firmName}, ${deal.programName})`
+        );
+      }
+    }
+  }
+  return problems;
+}
+
 // ── email ────────────────────────────────────────────────────────────────────
 
 // Same dark editorial palette as the site (.bd-root in app/globals.css): warm

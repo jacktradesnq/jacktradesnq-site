@@ -123,3 +123,21 @@ Consistency rule: {consistency}.
 | `{take}` | ta phrase a toi, ecrite dans takes.md |
 
 Ton avis par firme se met dans `takes.md`, pas ici.
+
+## Ce qui n'existe volontairement PAS
+
+**Le texte promo de la firme** (genre « 45% OFF + 50% w/ code ULTRA50 ») n'est
+pas un trou disponible. Deux raisons :
+
+1. Ces deux pourcentages sont des alternatives, pas une addition. Aucune firme
+   ne laisse cumuler deux remises. L'imprimer a cote de notre chiffre calcule
+   ferait croire a un cumul qui n'existe pas.
+2. C'est de la prose marketing qui bouge sans prevenir (leur page annoncait
+   70% le 20/08 alors que notre donnee disait 45%). Les deux seuls chiffres
+   fiables sont le prix et le prix barre du plan.
+
+`{discount}` est donc TOUJOURS calcule sur ces deux prix, sur un seul plan. Si
+tu ecris un autre pourcentage a la main dans une phrase, la machine refuse
+d'emettre et te dit lequel ne colle pas. Elle ne peut pas non plus deviner ce
+que fait un code au panier : le prix affiche est le prix public, et le lecteur
+part au checkout avec le code.
