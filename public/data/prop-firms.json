@@ -653,7 +653,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "40%",
+              "consistency": "35%",
               "contracts": "2 minis / 20 micros"
             },
             {
@@ -665,7 +665,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "40%",
+              "consistency": "35%",
               "contracts": "4 minis / 40 micros"
             },
             {
@@ -677,8 +677,8 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "40%",
-              "contracts": "6 minis / 60 micros"
+              "consistency": "35%",
+              "contracts": "8 minis / 80 micros"
             },
             {
               "size": 150000,
@@ -689,8 +689,8 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "40%",
-              "contracts": "10 minis / 100 micros"
+              "consistency": "35%",
+              "contracts": "12 minis / 120 micros"
             }
           ]
         },

@@ -39,6 +39,14 @@ export const PROMOS_CSS = `
 /* The one expiring promo is the only thing on the page allowed to shout. */
 .jtnq-cmp .promo-card.is-urgent{ border-color: oklch(0.52 0.09 45); }
 
+/* One link per firm: /promos#legends-trading lands on their card and marks it,
+   so a post can point at one deal instead of the whole page. */
+.jtnq-cmp .promo-card{ scroll-margin-top: 24px; }
+.jtnq-cmp .promo-card:target{
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 1px var(--c-accent), 0 24px 48px oklch(0.13 0.028 165 / 0.6);
+}
+
 .jtnq-cmp .promo-head{ display: flex; align-items: flex-start; gap: 12px; }
 .jtnq-cmp .promo-logo{
   width: 40px; height: 40px; border-radius: 4px; flex: 0 0 auto; object-fit: contain;

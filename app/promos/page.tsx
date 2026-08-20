@@ -115,7 +115,11 @@ export default function PromosPage() {
 
           <div className="promo-grid">
             {promos.map((p) => (
-              <article key={p.firmId} className={`promo-card${p.expiring ? ' is-urgent' : ''}`}>
+              <article
+                key={p.firmId}
+                id={p.firmId}
+                className={`promo-card${p.expiring ? ' is-urgent' : ''}`}
+              >
                 <header className="promo-head">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img className="promo-logo" src={p.logo} alt="" width={40} height={40} />
