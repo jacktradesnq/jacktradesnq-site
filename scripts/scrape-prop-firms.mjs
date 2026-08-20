@@ -466,7 +466,7 @@ const LEGENDS_PROMO = {
   programName: 'Elite',
   size: 50000,
   price: 49,
-  until: '2026-09-01',
+  until: '2026-08-22', // leur mail: promo jusqu'au vendredi 21 aout 23h59 ET
   source: 'August promotion asset, "$49 FIRST ORDER, $98 OTHER ORDERS", code JTNQ',
 };
 

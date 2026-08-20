@@ -18,11 +18,16 @@ const DATA = JSON.parse(readFileSync(new URL('../public/data/prop-firms.json', i
 // ── selection ────────────────────────────────────────────────────────────────
 
 test('a firm whose promo expires within 96h wins over a bigger discount', () => {
-  // FundedSeat promo ends 2026-08-23; Top One has the biggest raw discount (89%).
+  // Which firm that is depends on the day: LEGENDS ends 21 August, FundedSeat
+  // ends the 23rd, and Top One has the fattest standing discount. So the
+  // assertion is the rule, and the winner must be the soonest to end.
   const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
-  assert.equal(deal.firmId, 'fundedseat');
-  assert.ok(deal.signals.includes('expiring'), `signals=${deal.signals}`);
+  assert.ok(deal.signals.includes('expiring'), `${deal.firmId} signals=${deal.signals}`);
   assert.ok(deal.hoursLeft > 0 && deal.hoursLeft <= 96, `hoursLeft=${deal.hoursLeft}`);
+
+  const expiring = analyzeFirms(DATA, { today: '2026-08-20' }).filter((c) => c.signals.includes('expiring'));
+  const soonest = expiring.reduce((a, b) => (b.hoursLeft < a.hoursLeft ? b : a));
+  assert.equal(deal.firmId, soonest.firmId);
 });
 
 test('an activation fee beats a headline percentage', () => {
@@ -164,7 +169,7 @@ test('tweet stays under 280 chars for every firm, with code and link', () => {
 });
 
 test('discord message fits the 2000 char limit and carries the offer', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const msg = renderDiscord(deal);
   assert.ok(msg.length <= 2000, `${msg.length} chars`);
   assert.ok(msg.includes(deal.firmName));
@@ -173,7 +178,7 @@ test('discord message fits the 2000 char limit and carries the offer', () => {
 });
 
 test('email carries subject, real prices, the code, and an unsubscribe slot', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const mail = renderEmail(deal, { generatedAt: DATA.generatedAt });
   assert.ok(mail.subject.length > 0 && mail.subject.length <= 70, `subject: ${mail.subject}`);
   assert.ok(mail.preheader.length > 0);
@@ -259,7 +264,7 @@ test('every firm has an email-safe raster logo that exists on disk', () => {
 });
 
 test('the email shows the logo once, sized and described', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const { html } = renderEmail(deal, {});
   const imgs = html.match(/<img[^>]*>/g) ?? [];
   assert.equal(imgs.length, 1, `expected one image, got ${imgs.length}`);
@@ -273,7 +278,7 @@ test('the email shows the logo once, sized and described', () => {
 // ── spacing ──────────────────────────────────────────────────────────────────
 
 test('every spacing value sits on the 4pt grid', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const { html } = renderEmail(deal, {});
   const offenders = [];
   for (const [, prop, value] of html.matchAll(/(padding|margin)(?:-[a-z]+)?:([^;"]+)/g)) {
@@ -304,14 +309,14 @@ test('an evaluation is called a challenge, instant funding is called funded', ()
 });
 
 test('the drawdown type is stated once, not twice', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const { html } = renderEmail(deal, {});
   const hits = html.match(/EOD Trailing/g) ?? [];
   assert.equal(hits.length, 1, `"EOD Trailing" appears ${hits.length} times`);
 });
 
 test('the button says what it costs', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const { html } = renderEmail(deal, {});
   const cta = html.match(/<a href="[^"]*"[^>]*>([^<]+)<\/a>/)?.[1] ?? '';
   assert.match(cta, /Get the 50K at \$104\.95/, `cta reads "${cta}"`);
@@ -327,7 +332,7 @@ test('email html is pure ASCII, a stray byte shows up as mojibake in clients', (
 });
 
 test('the email uses the site palette, warm black and gold, not cream', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const { html } = renderEmail(deal, {});
   assert.ok(html.includes('#02130C'), 'warm black surface missing');
   assert.ok(html.includes('#E9B44B'), 'gold accent missing');

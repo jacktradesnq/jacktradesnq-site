@@ -757,8 +757,9 @@
       "split": "90%",
       "payout": "Twice monthly",
       "promo": {
-        "label": "Apprentice 80% · Elite 35% off",
-        "code": "LTG"
+        "label": "50K Elite $49 - 35% off other Elites",
+        "code": "JTNQ",
+        "ends": "2026-08-21"
       },
       "url": "https://thelegendstrading.com/?ref=JTNQ",
       "lastChecked": "2026-08-20",
