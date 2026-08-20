@@ -419,48 +419,77 @@ async function scrapeFundedSeat() {
 /* LEGENDS Trading — static Webflow HTML on https://thelegendstrading.com/plans */
 /* ------------------------------------------------------------------ */
 
-const LEGENDS_PROGRAMS = ['Apprentice', 'Elite', 'Straight to Master'];
+// Their Webflow page serves a STALE price table to any HTTP client: verified
+// 2026-08-20 with this scraper's own user-agent and a cache-buster, the HTML
+// said Apprentice 50K was $185 -> $37/mo while the rendered page said
+// $59 -> $29.50. The string "29.50" appears nowhere in that HTML. The old
+// extractor happily "verified 12 plans, no changes" against numbers no visitor
+// ever sees.
+//
+// The rendered page gets its prices from their own public shop API, which is
+// plain HTTP and needs no browser. That is what we read now.
+//
+// Field trap: `price` is the STRUCK price and `strikeThroughPrice` is what the
+// buyer pays. Their names are inverted, confirmed against the rendered card
+// showing "$59 $29.50" for price 59 / strikeThroughPrice 29.5.
+const LEGENDS_API =
+  'https://api.thelegendstrading.com/shop/plans?purchasableOnly=true&broker=Tradovate';
+
+// "$50,000" and "$50,000 Elite" both mean the 50K account.
+function legendsSize(storeDisplayName) {
+  const m = /\$([\d,]+)/.exec(String(storeDisplayName ?? ''));
+  return m ? num(m[1]) : null;
+}
+
+// The description carries the rules and the fee, one per line:
+//   "$99 Activation Fee" (Apprentice) or "Activation Fee: None" (Elite)
+export function legendsActivationFee(description) {
+  const text = String(description ?? '');
+  if (/activation fee\s*:\s*none/i.test(text)) return null;
+  const m = /\$([\d,.]+)\s*activation fee/i.exec(text);
+  if (!m) return null;
+  const fee = num(m[1]);
+  if (!Number.isFinite(fee) || fee <= 0 || fee > 6000) {
+    throw new Error(`unreadable LEGENDS activation fee: "${m[0]}"`);
+  }
+  return fee;
+}
+
+export function legendsUpdatesFrom(payload) {
+  const plans = payload?.data;
+  if (!Array.isArray(plans) || plans.length === 0) throw new Error('LEGENDS API returned no plans');
+
+  const updates = [];
+  for (const plan of plans) {
+    if (plan.isPublic === false) continue;
+    const size = legendsSize(plan.storeDisplayName);
+    const paid = plan.strikeThroughPrice; // what the buyer pays, despite the name
+    const listed = plan.price; // the struck-through one
+    if (!size || !Number.isFinite(paid) || !Number.isFinite(listed)) {
+      throw new Error(`LEGENDS plan unreadable: ${JSON.stringify(plan.storeDisplayName)}`);
+    }
+    if (paid > listed) {
+      throw new Error(
+        `LEGENDS ${plan.productCategory} ${size}: paid ${paid} > listed ${listed}, the two fields may have been swapped back`,
+      );
+    }
+    updates.push({
+      programName: plan.productCategory,
+      size,
+      price: paid,
+      originalPrice: listed,
+      activationFee: legendsActivationFee(plan.description),
+    });
+  }
+  return updates;
+}
 
 async function scrapeLegends() {
-  const html = await fetchText('https://thelegendstrading.com/plans');
-  const text = html
-    .replace(/<script[\s\S]*?<\/script>/g, ' ')
-    .replace(/<style[\s\S]*?<\/style>/g, ' ')
-    .replace(/<[^>]+>/g, '\n');
-  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
-
-  const sizeRe = /^\$([\d,]+)$/;
-  const priceRe = /^\$([\d,.]+)$/;
-  const updates = [];
-  let programIdx = 0;
-  let cardsInProgram = 0;
-
-  for (let i = 0; i < lines.length; i++) {
-    const m = sizeRe.exec(lines[i]);
-    if (!m) continue;
-    // Card shape: size, "Max N contracts...", originalPrice, price, "/ per month|one time".
-    const maybeContracts = lines[i + 1] || '';
-    if (!/max/i.test(maybeContracts)) continue; // guard against unrelated "$X" (testimonials etc.)
-    const origM = priceRe.exec(lines[i + 2] || '');
-    const priceM = priceRe.exec(lines[i + 3] || '');
-    if (!origM || !priceM) continue;
-
-    if (cardsInProgram === 4) {
-      programIdx += 1;
-      cardsInProgram = 0;
-    }
-    if (programIdx >= LEGENDS_PROGRAMS.length) break; // page repeats the same 12 cards twice (mobile/desktop)
-
-    updates.push({
-      programName: LEGENDS_PROGRAMS[programIdx],
-      size: num(m[1]),
-      price: num(priceM[1]),
-      originalPrice: num(origM[1]),
-    });
-    cardsInProgram += 1;
-  }
-  if (updates.length === 0) throw new Error('no plan cards parsed from /plans page');
-  return { updates }; // promo stays manual — site banner overstates Elite's discount, see JSON
+  const res = await fetch(LEGENDS_API, {
+    headers: { 'user-agent': UA, accept: 'application/json' },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for the LEGENDS shop API`);
+  return { updates: legendsUpdatesFrom(await res.json()) }; // promo label stays manual
 }
 
 /* ------------------------------------------------------------------ */

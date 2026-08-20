@@ -23,9 +23,24 @@ const today = process.argv.find((a) => a.startsWith('--today='))?.split('=')[1]
 const data = JSON.parse(readFileSync(DATA_URL, 'utf8'));
 const candidates = analyzeFirms(data, { today });
 
+// Firms whose live prices are NOT in the HTML we scrape would go here: our
+// figures would be known wrong, and publishing a stale price on a promo page is
+// worse than publishing nothing.
+//
+// legends-trading was held back on 2026-08-20 for exactly that reason, and is
+// back: scrapeLegends now reads their own public shop API instead of a Webflow
+// page that served a stale table to every HTTP client.
+const NEEDS_RENDERED_SCRAPE = new Set();
+
 // A promo is worth a card when there is something to show: a real discount, or
 // a code of his that unlocks one.
-const live = candidates.filter((c) => c.headline.discountPct > 0);
+const live = candidates.filter(
+  (c) => c.headline.discountPct > 0 && !NEEDS_RENDERED_SCRAPE.has(c.firmId)
+);
+
+for (const id of NEEDS_RENDERED_SCRAPE) {
+  console.log(`  held back: ${id} (prices need a rendered scrape, see the comment above)`);
+}
 
 const promos = live
   .sort((a, b) => {

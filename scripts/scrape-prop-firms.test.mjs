@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { topOneActivationFees } from './scrape-prop-firms.mjs';
+import { topOneActivationFees, legendsUpdatesFrom, legendsActivationFee } from './scrape-prop-firms.mjs';
 
 const fixture = (name) =>
   readFileSync(new URL(`./__fixtures__/${name}`, import.meta.url), 'utf8');
@@ -63,4 +63,51 @@ test('what the parser reads matches what the published JSON says', () => {
     .sort((a, b) => a.size - b.size)
     .map((p) => p.activationFee ?? null);
   assert.deepEqual(published, topOneActivationFees(ELITE_ACCESS));
+});
+
+// ── LEGENDS Trading, read from their own shop API ───────────────────────────
+// Captured 2026-08-20 from
+// api.thelegendstrading.com/shop/plans?purchasableOnly=true&broker=Tradovate
+
+const LEGENDS = JSON.parse(fixture('legends-shop-plans.json'));
+
+test('their API field names are inverted, and we read the price the buyer pays', () => {
+  // The card renders "$59 $29.50": price is the struck one, strikeThroughPrice
+  // is what you pay. Getting this backwards would advertise double.
+  const apprentice50 = legendsUpdatesFrom(LEGENDS).find(
+    (u) => u.programName === 'Apprentice' && u.size === 50000
+  );
+  assert.equal(apprentice50.price, 29.5);
+  assert.equal(apprentice50.originalPrice, 59);
+  assert.equal(apprentice50.activationFee, 99);
+});
+
+test('only what they actually sell comes back, seven plans over two programs', () => {
+  const updates = legendsUpdatesFrom(LEGENDS);
+  assert.equal(updates.length, 7);
+  assert.deepEqual([...new Set(updates.map((u) => u.programName))].sort(), ['Apprentice', 'Elite']);
+  // Elite pays nothing on activation, which is why it beats Apprentice on the
+  // cost to get funded even at a smaller headline percentage.
+  for (const u of updates.filter((x) => x.programName === 'Elite')) {
+    assert.equal(u.activationFee, null, `Elite ${u.size} should have no activation fee`);
+  }
+});
+
+test('a swap of those two fields is caught, not published', () => {
+  const broken = structuredClone(LEGENDS);
+  const plan = broken.data.find((p) => p.productCategory === 'Apprentice');
+  [plan.price, plan.strikeThroughPrice] = [plan.strikeThroughPrice, plan.price];
+  assert.throws(() => legendsUpdatesFrom(broken), /may have been swapped back/);
+});
+
+test('the activation fee is read from their wording, both shapes', () => {
+  assert.equal(legendsActivationFee('Code: LTG\n$99 Activation Fee'), 99);
+  assert.equal(legendsActivationFee('Activation Fee: None'), null);
+  assert.equal(legendsActivationFee(''), null);
+  assert.throws(() => legendsActivationFee('$99999 Activation Fee'), /unreadable/);
+});
+
+test('an empty API answer is a failure, never an empty price list', () => {
+  assert.throws(() => legendsUpdatesFrom({ data: [] }), /returned no plans/);
+  assert.throws(() => legendsUpdatesFrom({}), /returned no plans/);
 });

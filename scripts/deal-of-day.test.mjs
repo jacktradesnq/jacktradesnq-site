@@ -188,9 +188,18 @@ test('LEGENDS leads with Elite, the plan with no activation fee', () => {
   const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'legends-trading' });
   assert.equal(deal.headline.size, 50000);
   assert.equal(deal.programLabel, 'Elite');
-  assert.equal(deal.headline.price, 96.85);
   assert.equal(deal.rules.activationFee, null);
   assert.equal(deal.priceType, 'one-time');
+
+  // The prices move every few weeks, so the assertion is the rule and not a
+  // number: Elite all in must stay under Apprentice all in at that size.
+  const firm = DATA.firms.find((f) => f.id === 'legends-trading');
+  const allIn = (name) => {
+    const plan = firm.programs.find((p) => p.name === name).plans.find((pl) => pl.size === 50000);
+    return plan.price + (plan.activationFee ?? 0);
+  };
+  assert.ok(allIn('Elite') < allIn('Apprentice'), `Elite ${allIn('Elite')} vs Apprentice ${allIn('Apprentice')}`);
+  assert.equal(deal.headline.price, allIn('Elite'));
 });
 
 test('a monthly plan marks BOTH prices per month, never just the new one', () => {
