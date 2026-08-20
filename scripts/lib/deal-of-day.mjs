@@ -449,6 +449,10 @@ export function auditDiscountClaims(deal, renderings) {
 export function auditCodeClaims(deal, renderings) {
   const problems = [];
   if (!deal.publicCode || deal.publicCode === deal.code) return problems;
+  // Some firms publish HIS code as their site-wide promo (E8, TradeDay, and
+  // LEGENDS since their August asset). That is not a firm-specific code being
+  // printed instead of his, it IS his, so there is nothing to flag.
+  if (deal.publicCode === AFFILIATE_CODE) return problems;
 
   const needle = deal.publicCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const boundary = new RegExp(`(^|[^A-Za-z0-9])${needle}([^A-Za-z0-9]|$)`);

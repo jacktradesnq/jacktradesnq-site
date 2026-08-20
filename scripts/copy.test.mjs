@@ -22,7 +22,10 @@ const CODES = readFileSync(new URL('../content/newsletter/codes.md', import.meta
 
 afterEach(resetCopy);
 
-const deal = () => pickDeal(DATA, { today: '2026-08-20', history: [] });
+// Named on purpose: these tests are about how FundedSeat renders, not about
+// which firm happens to win the day. LEGENDS' promo ending sooner used to
+// silently take that slot and break eight of them.
+const deal = () => pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
 
 // ── the parser ───────────────────────────────────────────────────────────────
 
@@ -168,7 +171,7 @@ test('a percentage typed by hand into the copy file is refused', () => {
     ),
     TAKES
   );
-  const d = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const email = renderEmail(d, {});
   const problems = auditDiscountClaims(d, { email: email.text });
   assert.equal(problems.length, 1, `expected one problem, got ${problems.length}`);
