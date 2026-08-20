@@ -79,9 +79,28 @@ test('every figure in a candidate comes from the JSON, never computed prose', ()
     assert.ok(program, `${c.firmId}: program ${c.programName} not in data`);
     const plan = program.plans.find((p) => p.size === c.headline.size);
     assert.ok(plan, `${c.firmId}: size ${c.headline.size} not in ${c.programName}`);
-    assert.equal(c.headline.price, plan.price);
-    assert.equal(c.headline.originalPrice, plan.originalPrice);
+
+    if (c.headline.discountSource === 'firm.codeDiscountPct') {
+      // Same rule as the comparison page: the affiliate code comes off the
+      // listed price, which becomes the struck-through one.
+      assert.equal(c.headline.price, Math.round(plan.price * (1 - firm.codeDiscountPct / 100) * 100) / 100);
+      assert.equal(c.headline.originalPrice, plan.price);
+    } else {
+      assert.equal(c.headline.price, plan.price);
+      assert.equal(c.headline.originalPrice, plan.originalPrice);
+    }
   }
+});
+
+test('a firm priced by affiliate code shows the same price as the site', () => {
+  // Traders Launch has no struck price in the data, it has codeDiscountPct 15,
+  // and app/prop-firms/page.tsx renders $135.15 instead of $159 for the 100K.
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'traders-launch' });
+  assert.equal(deal.headline.size, 100000);
+  assert.equal(deal.headline.price, 135.15);
+  assert.equal(deal.headline.originalPrice, 159);
+  assert.equal(deal.headline.discountPct, 15);
+  assert.match(renderTweet(deal), /\$135\.15 instead of \$159/);
 });
 
 // ── renderers ────────────────────────────────────────────────────────────────

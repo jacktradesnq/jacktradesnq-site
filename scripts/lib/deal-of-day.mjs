@@ -121,12 +121,20 @@ function headlineOf(firm) {
       }
     }
     if (!cheapest) return null;
-    return {
-      program: cheapest.program,
-      plan: cheapest.plan,
-      pct: firm.codeDiscountPct ?? 0,
-      pctSource: firm.codeDiscountPct ? 'firm.codeDiscountPct' : null,
-    };
+
+    // Same rule as effectivePrice() in app/prop-firms/page.tsx: the code comes
+    // off the listed price, so the newsletter and the page never disagree.
+    if (firm.codeDiscountPct != null && cheapest.plan.originalPrice == null) {
+      return {
+        program: cheapest.program,
+        plan: cheapest.plan,
+        pct: firm.codeDiscountPct,
+        pctSource: 'firm.codeDiscountPct',
+        priceOverride: Math.round(cheapest.plan.price * (1 - firm.codeDiscountPct / 100) * 100) / 100,
+        wasOverride: cheapest.plan.price,
+      };
+    }
+    return { program: cheapest.program, plan: cheapest.plan, pct: 0, pctSource: null };
   }
   return { program: best.program, plan: best.plan, pct: best.pct, pctSource: 'plan.originalPrice' };
 }
@@ -188,10 +196,19 @@ function candidateFor(firm, { today, prevSnapshot }) {
     score += 300 + Math.min(100, dropPct);
   }
 
+  const viaCode = head.pctSource === 'firm.codeDiscountPct';
   const ladder = (program.plans ?? [])
     .slice()
     .sort((a, b) => a.size - b.size)
-    .map((p) => ({ size: p.size, price: p.price, originalPrice: p.originalPrice }));
+    .map((p) =>
+      viaCode
+        ? {
+            size: p.size,
+            price: Math.round(p.price * (1 - firm.codeDiscountPct / 100) * 100) / 100,
+            originalPrice: p.price,
+          }
+        : { size: p.size, price: p.price, originalPrice: p.originalPrice }
+    );
 
   return {
     firmId: firm.id,
@@ -211,8 +228,8 @@ function candidateFor(firm, { today, prevSnapshot }) {
     hoursLeft,
     headline: {
       size: plan.size,
-      price: plan.price,
-      originalPrice: plan.originalPrice,
+      price: head.priceOverride ?? plan.price,
+      originalPrice: head.wasOverride ?? plan.originalPrice,
       discountPct: head.pct,
       discountSource: head.pctSource,
       priceType: program.priceType,
