@@ -640,61 +640,6 @@
           ]
         },
         {
-          "name": "Flex",
-          "type": "eval",
-          "priceType": "one-time",
-          "plans": [
-            {
-              "size": 25000,
-              "price": 76.95,
-              "originalPrice": 140,
-              "profitTarget": 1500,
-              "maxDrawdown": 1000,
-              "ddType": "EOD Trailing",
-              "dailyLoss": null,
-              "dailyLossSoft": false,
-              "consistency": "35%",
-              "contracts": "2 minis / 20 micros"
-            },
-            {
-              "size": 50000,
-              "price": 104.95,
-              "originalPrice": 190,
-              "profitTarget": 3000,
-              "maxDrawdown": 2000,
-              "ddType": "EOD Trailing",
-              "dailyLoss": null,
-              "dailyLossSoft": false,
-              "consistency": "35%",
-              "contracts": "4 minis / 40 micros"
-            },
-            {
-              "size": 100000,
-              "price": 174.95,
-              "originalPrice": 320,
-              "profitTarget": 6000,
-              "maxDrawdown": 3000,
-              "ddType": "EOD Trailing",
-              "dailyLoss": null,
-              "dailyLossSoft": false,
-              "consistency": "35%",
-              "contracts": "8 minis / 80 micros"
-            },
-            {
-              "size": 150000,
-              "price": 244.95,
-              "originalPrice": 445,
-              "profitTarget": 9000,
-              "maxDrawdown": 4500,
-              "ddType": "EOD Trailing",
-              "dailyLoss": null,
-              "dailyLossSoft": false,
-              "consistency": "35%",
-              "contracts": "12 minis / 120 micros"
-            }
-          ]
-        },
-        {
           "name": "Sprint",
           "type": "eval",
           "priceType": "one-time",
@@ -708,7 +653,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "None",
+              "consistency": "25% (1st payout)",
               "contracts": "2 minis / 20 micros"
             },
             {
@@ -720,7 +665,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": 1200,
               "dailyLossSoft": true,
-              "consistency": "None",
+              "consistency": "25% (1st payout)",
               "contracts": "4 minis / 40 micros"
             },
             {
@@ -732,7 +677,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": 1800,
               "dailyLossSoft": true,
-              "consistency": "None",
+              "consistency": "25% (1st payout)",
               "contracts": "8 minis / 80 micros"
             },
             {
@@ -744,12 +689,13 @@
               "ddType": "EOD Trailing",
               "dailyLoss": 2700,
               "dailyLossSoft": true,
-              "consistency": "None",
+              "consistency": "25% (1st payout)",
               "contracts": "12 minis / 120 micros"
             }
           ]
         }
-      ]
+      ],
+      "rulesCheckedAt": "2026-08-21"
     },
     {
       "id": "legends-trading",
@@ -1024,7 +970,8 @@
             }
           ]
         }
-      ]
+      ],
+      "rulesCheckedAt": "2026-08-21"
     },
     {
       "id": "tradeday",

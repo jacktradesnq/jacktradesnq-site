@@ -7,14 +7,17 @@
  * Their catalogue carries families we do not list, whose names CONTAIN ours:
  *
  *   "1 Step Daily (35%) - 50K"        $104.95   <- our "Daily" 50K
- *   "1 Step Daily Ultra (35%) - 50K"  $229.95   <- a different product
- *   "1 Step Daily Ultra (25%) - 50K"  $199.95   <- a third one, same size
+ *   "1 Step Daily Ultra (35%) - 50K"  $179.95   <- a different product
+ *   "1 Step Daily Ultra (35%) - 50K"  $279.95   <- same name again, other price
+ *   "1 Step Daily Ultra (25%) - 50K"  $229.95   <- a third one, same size
  *   "Instant Funding Direct - 100K"   $494.95   <- our "Instant Funding" 100K
  *   "Instant Funding Bolt - 100K "    $439.95   <- another product (note the
  *                                                  trailing space in their name)
  *
- * A substring or regex read ("Daily", "Instant Funding") publishes $229.95 for a
- * plan their page sells at $104.95. So the name we look for is BUILT from each
+ * A substring or regex read ("Daily", "Instant Funding") publishes $179.95 or
+ * worse for a plan their page sells at $104.95 — and "Ultra (35%) - 100K" is
+ * active three times, at $239.95, $269.95 and $409.95, so there is no "pick the
+ * first match" that is defensible. So the name we look for is BUILT from each
  * row's own account_size and compared for equality, trimmed. Nothing else matches.
  *
  * Two more traps this module refuses to fall into:
@@ -25,7 +28,11 @@
  *     rule". Instant Funding has a 15%-biggest-trade rule the API leaves null.
  *     Null therefore yields NO CLAIM (undefined), never an asserted null.
  *
- * Our "Flex" program has no counterpart here: it stays on the rendered cards.
+ * Their catalogue is the authority on what exists at all: "Flex" was in this
+ * endpoint and on their tab row until Aug 2026 and is in neither today (their
+ * variant tabs read Daily / Sprint / Daily Ultra, and the word does not appear
+ * once on their page), so it was dropped from prop-firms.json rather than kept
+ * as a plan nobody can buy.
  */
 
 export const FUNDEDSEAT_API = 'https://fundedseat.com/api/pullchallenges';
@@ -37,9 +44,9 @@ const PROGRAM_NAMES = {
   'Instant Funding': (k) => `Instant Funding Direct - ${k}K`,
 };
 
-// Programs we list that this endpoint does not sell. Kept explicit so a reader
-// sees the hole instead of wondering why the count is 11 and not 15.
-export const FUNDEDSEAT_API_UNCOVERED = ['Flex'];
+// Programs we list that this endpoint does not sell. Empty since Flex was
+// dropped; kept so a future hole is stated instead of silently uncovered.
+export const FUNDEDSEAT_API_UNCOVERED = [];
 
 const asNumber = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
 
@@ -93,10 +100,10 @@ export function fundedseatPlansFrom(payload) {
     claim('consistency', asNumber(challenge.consistency_percentage) == null ? null : `${challenge.consistency_percentage}%`);
     // They expose the mini limit only; micros stay unclaimed rather than derived.
     claim('contracts', asNumber(row.contracts) == null ? null : { minis: row.contracts, micros: null });
-    // Consistency the API attaches to the FUNDED step, which their buy-screen
-    // card does not show: Sprint cards read "Consistency: None" while every
-    // Sprint funded step carries 25%. Reported, never published — two of the
-    // firm's own sources disagree, so a human decides what the page says.
+    // Consistency the API attaches to the FUNDED step. Their card carries it too,
+    // but only behind its "Funded Rules" toggle ("Consistency 1st payout 25%" on
+    // Sprint) while the "Evaluation Rules" face reads None — read by hand on
+    // 2026-08-21, which is where our Sprint "25% (1st payout)" comes from.
     const funded = (row.steps ?? []).find((s) => s.funded === true && asNumber(s.consistency_percentage) != null);
     return {
       programName,

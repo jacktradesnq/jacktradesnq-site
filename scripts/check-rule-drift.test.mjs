@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { legendsRulesFrom, BROKEN } from './check-rule-drift.mjs';
+import { legendsRulesFrom, handCheck, BROKEN } from './check-rule-drift.mjs';
 
 // Captured 2026-08-20 from api.thelegendstrading.com/shop/plans
 const LEGENDS = JSON.parse(readFileSync(new URL('./__fixtures__/legends-shop-plans.json', import.meta.url), 'utf8'));
@@ -97,4 +97,27 @@ test('what their API says matches the published JSON, field by field', () => {
     }
   }
   assert.equal(checked, 7);
+});
+
+/* ------- rules read by hand: how long that reading is worth trusting ------- */
+
+test('a firm read by hand recently is not a broken scraper', () => {
+  const r = handCheck({ rulesCheckedAt: '2026-08-21' }, '2026-09-10');
+  assert.equal(r.days, 20);
+  assert.equal(r.expired, false);
+});
+
+test('an old reading stops covering for an unreadable site', () => {
+  const r = handCheck({ rulesCheckedAt: '2026-08-21' }, '2026-10-30');
+  assert.equal(r.days, 70);
+  assert.equal(r.expired, true);
+});
+
+test('a stamp written one day ahead of UTC reads as today, not as the future', () => {
+  assert.equal(handCheck({ rulesCheckedAt: '2026-08-21' }, '2026-08-20').days, 0);
+});
+
+test('no reading at all is no excuse', () => {
+  assert.equal(handCheck({}, '2026-08-21'), null);
+  assert.equal(handCheck({ rulesCheckedAt: 'un jour' }, '2026-08-21').expired, true);
 });

@@ -283,14 +283,13 @@ async function scrapeTradersLaunch() {
 const FUNDEDSEAT_PRIMARY = '1 Step';
 const FUNDEDSEAT_PROGRAMS = [
   { programName: 'Daily', sub: 'Daily' },
-  { programName: 'Flex', sub: 'Flex' },
   { programName: 'Sprint', sub: 'Sprint' },
   { programName: 'Instant Funding', sub: null }, // top-level tab, no payout sub-variant
 ];
 const MONTHS = { JANUARY: 1, FEBRUARY: 2, MARCH: 3, APRIL: 4, MAY: 5, JUNE: 6, JULY: 7, AUGUST: 8, SEPTEMBER: 9, OCTOBER: 10, NOVEMBER: 11, DECEMBER: 12 };
 
 async function scrapeFundedSeat() {
-  // Their own backend answers for 11 of our 15 plans. It is the second witness:
+  // Their own catalogue answers for every plan we list. It is the second witness:
   // the cards are what a buyer is shown, the API is what their system charges,
   // and a disagreement between the two is not ours to resolve silently.
   const apiPlans = fundedseatPlansFrom(JSON.parse(await fetchText(FUNDEDSEAT_API)));
@@ -299,8 +298,8 @@ async function scrapeFundedSeat() {
   try {
     pw = await import('playwright');
   } catch {
-    // Flex has no API counterpart, so 11/15 plans cannot satisfy the full-coverage
-    // guard: skip the firm exactly as before rather than write a partial update.
+    // The cards still carry the promo banner and are the second opinion on every
+    // price, so without them the firm is skipped rather than written from one source.
     console.log(`fundedseat: ${apiPlans.length} plans read from their API, but Flex needs playwright — skipped`);
     return null;
   }

@@ -119,15 +119,17 @@ test('an empty API answer is a failure, never an empty price list', () => {
 const FS_API = JSON.parse(fixture('fundedseat-pullchallenges.json'));
 const fsPlan = (plans, programName, size) => plans.find((p) => p.programName === programName && p.size === size);
 
-test('their 24 products resolve to the 11 plans we list, Flex aside', () => {
+test('their 24 products resolve to the 11 plans we list, and to nothing else', () => {
   const plans = fundedseatPlansFrom(FS_API);
   assert.equal(plans.length, 11);
   assert.deepEqual(
     [...new Set(plans.map((p) => p.programName))].sort(),
     ['Daily', 'Instant Funding', 'Sprint'],
   );
-  assert.deepEqual(FUNDEDSEAT_API_UNCOVERED, ['Flex']);
-  assert.equal(plans.some((p) => p.programName === 'Flex'), false);
+  // Flex was dropped on 2026-08-21: gone from this endpoint AND from their tab
+  // row, so nothing we list is left uncovered.
+  assert.deepEqual(FUNDEDSEAT_API_UNCOVERED, []);
+  assert.equal(FS_API.some((r) => /flex/i.test(r.name)), false);
 });
 
 test('the price is the one their page sells, not the Ultra product of the same size', () => {
@@ -179,12 +181,16 @@ test('a rule the API leaves null is no claim at all, not a claimed absence', () 
   assert.deepEqual(daily.rules.contracts, { minis: 4, micros: null });
 });
 
-test('the consistency their card hides is reported, never published', () => {
+test('the consistency that only shows once funded is kept apart from the eval one', () => {
   const plans = fundedseatPlansFrom(FS_API);
-  // Sprint cards read "Consistency: None"; every Sprint funded step says 25%.
+  // A Sprint card reads "Consistency: None" under Evaluation Rules and
+  // "Consistency 1st payout 25%" under Funded Rules (read on their page,
+  // 2026-08-21). The two must never be merged into one number.
   assert.equal(fsPlan(plans, 'Sprint', 50000).payoutConsistency, '25%');
   assert.equal('consistency' in fsPlan(plans, 'Sprint', 50000).rules, false);
+  // Daily is the mirror image: 35% during the evaluation, nothing once funded.
   assert.equal(fsPlan(plans, 'Daily', 50000).payoutConsistency, null);
+  assert.equal(fsPlan(plans, 'Daily', 50000).rules.consistency, '35%');
 });
 
 test('a renamed family stops the sync instead of keeping stale prices', () => {

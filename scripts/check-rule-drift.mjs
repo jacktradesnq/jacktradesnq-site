@@ -447,7 +447,6 @@ export function legendsRulesFrom(payload) {
 const FUNDEDSEAT_PRIMARY = '1 Step';
 const FUNDEDSEAT_PROGRAMS = [
   { programName: 'Daily', sub: 'Daily' },
-  { programName: 'Flex', sub: 'Flex' },
   { programName: 'Sprint', sub: 'Sprint' },
   { programName: 'Instant Funding', sub: null },
 ];
@@ -462,8 +461,8 @@ async function extractFundedSeat() {
   for (const p of api) {
     if (p.payoutConsistency)
       console.log(
-        `  note: fundedseat ${p.programName} $${p.size / 1000}K — the card shows no consistency rule, ` +
-          `their API puts ${p.payoutConsistency} on the funded step`,
+        `  note: fundedseat ${p.programName} $${p.size / 1000}K — ${p.payoutConsistency} consistency once funded ` +
+          `(their card only shows it behind its "Funded Rules" toggle)`,
       );
   }
 
@@ -472,8 +471,8 @@ async function extractFundedSeat() {
     cards = await readFundedSeatCards();
   } catch (e) {
     console.log(
-      `  note: fundedseat cards unread (${e.message}) — API only, ` +
-        `${api.length} plans checked, ${FUNDEDSEAT_API_UNCOVERED.join('/')} left unverified`,
+      `  note: fundedseat cards unread (${e.message}) — API only, ${api.length} plans checked` +
+        (FUNDEDSEAT_API_UNCOVERED.length ? `, ${FUNDEDSEAT_API_UNCOVERED.join('/')} left unverified` : ''),
     );
     return api.map(({ programName, size, rules }) => ({ programName, size, rules }));
   }
@@ -683,8 +682,6 @@ function skipReason(firmId, programName, field) {
   if (firmId === 'blue-guardian' && field === 'profitTarget') return 'instant: no profit-target rule';
   if (firmId === 'blue-guardian' && field === 'consistency') return 'instant: hand summary of per-payout rows';
   if (firmId === 'top-one-futures' && field === 'profitTarget') return 'instant: no profit-target row on the card';
-  if (firmId === 'fundedseat' && FUNDEDSEAT_API_UNCOVERED.includes(programName))
-    return 'not sold through their API; card read needs playwright';
   if (firmId === 'tradeday' && field === 'dailyLoss') return 'no daily-loss row on the cards (manual null)';
   if (firmId === 'tradeday' && field === 'contracts' && programName === 'Fast Pass')
     return 'card shows the eval limit; ours bundles eval + funded ("15 eval / 4 funded")';
@@ -695,7 +692,22 @@ function skipReason(firmId, programName, field) {
 /* Compare engine                                                       */
 /* ------------------------------------------------------------------ */
 
-async function runChecks(data, only) {
+// Rules do not move daily; prices do. A firm whose rules were read by hand on a
+// rendered page carries `rulesCheckedAt`, and an unreadable extractor for that
+// firm is then a note with an age, not a broken scraper — until the reading gets
+// old enough to be worth redoing.
+const HAND_CHECK_VALID_DAYS = 45;
+
+export function handCheck(firm, today) {
+  const at = firm.rulesCheckedAt;
+  if (!at) return null;
+  const days = Math.floor((Date.parse(today) - Date.parse(at)) / 86400000);
+  if (!Number.isFinite(days)) return { at, days: null, expired: true };
+  // A stamp can read one day ahead: it is written in local time, this runs in UTC.
+  return { at, days: Math.max(0, days), expired: days > HAND_CHECK_VALID_DAYS };
+}
+
+async function runChecks(data, only, today = new Date().toISOString().slice(0, 10)) {
   const drifts = [];
   const broken = [];
   const skips = [];
@@ -707,11 +719,18 @@ async function runChecks(data, only) {
       broken.push({ firm: firm.name, program: '(all)', size: null, field: '(firm)', detail: 'no extractor defined' });
       continue;
     }
+    const hand = handCheck(firm, today);
     let plans;
     try {
       plans = await extractor();
     } catch (e) {
-      broken.push({ firm: firm.name, program: '(all)', size: null, field: '(firm)', detail: `extractor failed: ${e.message}` });
+      if (hand && !hand.expired) {
+        skips.push({ firm: firm.name, program: '(all)', size: null, field: '(firm)',
+          reason: `read by hand on ${hand.at} (${hand.days}d ago), site unreadable today: ${e.message}` });
+        continue;
+      }
+      broken.push({ firm: firm.name, program: '(all)', size: null, field: '(firm)',
+        detail: `extractor failed: ${e.message}` + (hand ? ` — and the hand check of ${hand.at} is over ${HAND_CHECK_VALID_DAYS}d old` : '') });
       continue;
     }
     if (firm.stale) console.log(`  note: ${firm.id} is stale:true (price sync) — rules still checked below`);
