@@ -267,6 +267,7 @@ export default function Home() {
         </a>
         <nav className="nav" aria-label="Primary">
           <a href={SITE.nefarious.url}>Nefarious</a>
+          <a href={SITE.propFirms.url}>Prop firms</a>
           <div className={`nav-socials${socialsOpen ? ' is-open' : ''}`} ref={socialsRef}>
             <button
               type="button"
@@ -474,6 +475,9 @@ const CSS = `
 .jtnq-home .nav a{
   font-size: 13px; color: var(--c-text-soft); padding: 8px 14px;
   border-radius: 999px; transition: color .18s ease;
+  /* "Prop firms" is the first two-word entry: without this it breaks onto two
+     lines at phone width and the whole bar looks squeezed. */
+  white-space: nowrap;
 }
 .jtnq-home .nav a:hover{ color: var(--c-text); }
 .jtnq-home .nav .nav-cta{
