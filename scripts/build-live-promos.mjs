@@ -23,9 +23,28 @@ const today = process.argv.find((a) => a.startsWith('--today='))?.split('=')[1]
 const data = JSON.parse(readFileSync(DATA_URL, 'utf8'));
 const candidates = analyzeFirms(data, { today });
 
+// Firms whose live prices are NOT in the HTML we scrape, so our figures are
+// known to be wrong until the extractor renders the page. Publishing a stale
+// price on a promo page is worse than publishing nothing.
+//
+// legends-trading (2026-08-20): thelegendstrading.com/plans serves a stale
+// price table to any HTTP client, verified with the scraper's own Chrome
+// user-agent and a cache-buster: the HTML says Apprentice 50K is $185 -> $37
+// and its banner says "80% off Apprentice", while the rendered page says
+// $59 -> $29.50, its banner says "50% OFF APPRENTICE / $49 50K ELITE", and an
+// Elite card shows three prices at once. The scraper "verified 12 plans, no
+// changes" against numbers no visitor ever sees.
+const NEEDS_RENDERED_SCRAPE = new Set(['legends-trading']);
+
 // A promo is worth a card when there is something to show: a real discount, or
 // a code of his that unlocks one.
-const live = candidates.filter((c) => c.headline.discountPct > 0);
+const live = candidates.filter(
+  (c) => c.headline.discountPct > 0 && !NEEDS_RENDERED_SCRAPE.has(c.firmId)
+);
+
+for (const id of NEEDS_RENDERED_SCRAPE) {
+  console.log(`  held back: ${id} (prices need a rendered scrape, see the comment above)`);
+}
 
 const promos = live
   .sort((a, b) => {
