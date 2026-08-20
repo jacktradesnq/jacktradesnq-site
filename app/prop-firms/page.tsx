@@ -201,6 +201,12 @@ export default function PropFirms() {
             <span className="dot">.</span>
           </h1>
           <p className="phrase">{META.hero.phrase}</p>
+          <a className="hero-promos" href="/promos/">
+            See what is on promo today
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M7 17L17 7M9 7h8v8" />
+            </svg>
+          </a>
         </section>
 
         <section className="table-section">

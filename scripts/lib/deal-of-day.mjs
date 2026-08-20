@@ -100,39 +100,38 @@ function diffAgainst(prevSnapshot, firm) {
 
 // ── candidate building ───────────────────────────────────────────────────────
 
-// The headline plan is the deepest discount of the firm. When several sizes
-// share that discount, lead with the 50K account (the one traders compare) and
-// then with the cheaper price, so the hook is relatable instead of just big.
+// The size comes first, the discount second.
+//
+// Top One prices every Elite Access size at $39, so the percentage off is just
+// an artefact of the list price and "biggest % off" pointed at the 150K, the
+// size nobody quotes. So: pick the reference size the firm actually sells
+// (50K, or the closest it has), then the best deal within that size.
 function headlineOf(firm) {
-  let best = null;
+  const pairs = [];
   for (const program of firm.programs ?? []) {
-    for (const plan of program.plans ?? []) {
-      const pct = discountPct(plan.price, plan.originalPrice);
-      const distance = Math.abs(plan.size - REFERENCE_SIZE);
-      const cand = { program, plan, pct, distance };
-      if (
-        !best ||
-        cand.pct > best.pct ||
-        (cand.pct === best.pct &&
-          (cand.distance < best.distance ||
-            (cand.distance === best.distance && cand.plan.price < best.plan.price)))
-      ) {
-        best = cand;
-      }
+    for (const plan of program.plans ?? []) pairs.push({ program, plan });
+  }
+  if (pairs.length === 0) return null;
+
+  const sizes = [...new Set(pairs.map((p) => p.plan.size))];
+  const targetSize = sizes.reduce((a, b) =>
+    Math.abs(b - REFERENCE_SIZE) < Math.abs(a - REFERENCE_SIZE) ? b : a
+  );
+
+  let best = null;
+  for (const { program, plan } of pairs.filter((p) => p.plan.size === targetSize)) {
+    const pct = discountPct(plan.price, plan.originalPrice);
+    const cand = { program, plan, pct };
+    if (!best || cand.pct > best.pct || (cand.pct === best.pct && cand.plan.price < best.plan.price)) {
+      best = cand;
     }
   }
   if (!best) return null;
 
-  // No struck-through price anywhere: the firm still has an affiliate discount
-  // (codeDiscountPct) or a flat price. Lead with the cheapest entry instead.
+  // No struck-through price at that size: the firm still has an affiliate
+  // discount (codeDiscountPct) or a flat price.
   if (best.pct === 0) {
-    let cheapest = null;
-    for (const program of firm.programs ?? []) {
-      for (const plan of program.plans ?? []) {
-        if (!cheapest || plan.price < cheapest.plan.price) cheapest = { program, plan };
-      }
-    }
-    if (!cheapest) return null;
+    const cheapest = best;
 
     // Same rule as effectivePrice() in app/prop-firms/page.tsx: the code comes
     // off the listed price, so the newsletter and the page never disagree.

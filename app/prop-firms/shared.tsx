@@ -362,6 +362,16 @@ export const CSS = `
   font-size: 12px; line-height: 1.7; color: var(--c-text-deep); text-wrap: pretty;
 }
 
+/* ── hero link to /promos/ ── */
+.jtnq-cmp .hero-promos{
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 28px;
+  font-family: var(--f-sans); font-size: 14px; font-weight: 700; color: var(--c-bg);
+  background: var(--c-accent); border-radius: 999px; padding: 12px 24px;
+  transition: transform .18s ease;
+}
+.jtnq-cmp .hero-promos svg{ width: 14px; height: 14px; }
+.jtnq-cmp .hero-promos:hover{ transform: translateY(-1px); }
+
 /* ── daily deal signup (DealSignup.tsx) ── */
 .jtnq-cmp .signup{ padding: 0 var(--pad-x) clamp(48px, 6vw, 80px); }
 .jtnq-cmp .signup-card{

@@ -28,7 +28,22 @@ test('a firm whose promo expires within 96h wins over a bigger discount', () => 
 test('without urgency, the biggest real discount wins', () => {
   const deal = pickDeal(DATA, { today: '2026-09-30', history: [] }); // FundedSeat promo long expired
   assert.equal(deal.firmId, 'top-one-futures');
-  assert.equal(deal.headline.discountPct, 89);
+  // 50K Elite Access: $39 instead of $218. The 150K is 89% off, but nobody
+  // quotes the 150K, so the reference size is what gets the headline.
+  assert.equal(deal.headline.size, 50000);
+  assert.equal(deal.headline.discountPct, 82);
+});
+
+test('the reference size wins over a bigger percentage elsewhere', () => {
+  for (const firm of DATA.firms) {
+    const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: firm.id });
+    if (!deal) continue;
+    const sizes = new Set(firm.programs.flatMap((p) => p.plans.map((pl) => pl.size)));
+    const expected = sizes.has(50000)
+      ? 50000
+      : [...sizes].reduce((a, b) => (Math.abs(b - 50000) < Math.abs(a - 50000) ? b : a));
+    assert.equal(deal.headline.size, expected, `${firm.id} headlined ${deal.headline.size}`);
+  }
 });
 
 test('a firm sent in the last 7 days is not picked again', () => {

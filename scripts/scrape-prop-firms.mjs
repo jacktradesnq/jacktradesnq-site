@@ -2,10 +2,14 @@
 /**
  * Daily price sync for public/data/prop-firms.json.
  *
- * Updates ONLY: plan price / originalPrice, program promoCode / promoLabel,
- * firm promo, firm lastChecked / stale, top-level generatedAt.
+ * Updates ONLY: plan price / originalPrice / activationFee, program promoCode /
+ * promoLabel, firm promo, firm lastChecked / stale, top-level generatedAt.
  * Risk rules (profit target, drawdown, daily loss, consistency, contracts)
  * are maintained manually and never touched here.
+ *
+ * activationFee is money the buyer pays, so it is scraped like a price, but
+ * only for the firms whose scraper reports it (Top One today). For the others
+ * the key is left exactly as it is.
  *
  * Per-firm guards: numeric price, 10 <= price <= 6000, price <= originalPrice,
  * scraped plan count must cover every plan already in the JSON for that firm.
@@ -143,8 +147,32 @@ const TOPONE_TABS = {
 };
 const TOPONE_SIZES = [25000, 50000, 100000, 150000];
 
+// The activation fee is money, not a risk rule: on Elite Access you pay $39 to
+// start and the activation fee once you pass, so leaving it hand-maintained
+// meant a public page quoting a figure nobody re-checked. One row per card:
+//   <div class="v3-table-row-info"><div>Activation Fee</div></div>
+//   <div class="v3-table-row-value"><div>$139</div></div>
+// "None!" (Elite Daily) means there is none. Fixtures for both shapes live in
+// scripts/__fixtures__/, see scripts/scrape-prop-firms.test.mjs.
+export function topOneActivationFees(pane) {
+  const rows = [
+    ...pane.matchAll(
+      /v3-table-row-info"><div>Activation Fee<\/div><\/div><div class="v3-table-row-value"><div>([^<]+)<\/div>/g,
+    ),
+  ];
+  return rows.map(([, raw]) => {
+    const value = raw.trim();
+    if (/^(none!?|no|n\/a|free)$/i.test(value)) return null;
+    const amount = num(value.replace(/[^\d.,]/g, ''));
+    if (!Number.isFinite(amount) || amount <= 0 || amount > 6000) {
+      throw new Error(`unreadable activation fee: "${value}"`);
+    }
+    return amount;
+  });
+}
+
 // Each pricing tab is one <div data-w-tab="X" class="acc__content__pane v3-pricing-swiper …">.
-function topOnePane(html, tab) {
+export function topOnePane(html, tab) {
   const panes = [...html.matchAll(/data-w-tab="([^"]+)" class="acc__content__pane v3-pricing-swiper[^"]*"/g)];
   const i = panes.findIndex((m) => m[1] === tab);
   if (i === -1) throw new Error(`pricing tab pane not found: ${tab}`);
@@ -192,11 +220,21 @@ async function scrapeTopOne() {
     if (olds.length !== cards.length)
       throw new Error(`${tab}: ${cards.length} cards but ${olds.length} struck-through prices`);
 
+    const activations = topOneActivationFees(pane);
+    if (activations.length !== cards.length)
+      throw new Error(`${tab}: ${cards.length} cards but ${activations.length} activation fee rows`);
+
     cards.forEach((m, i) => {
       const size = num(m[1]) * 1000;
       if (size !== TOPONE_SIZES[i])
         throw new Error(`${tab}: card ${i} is $${size / 1000}K, expected $${TOPONE_SIZES[i] / 1000}K`);
-      updates.push({ programName, size, price: num(m[2]), originalPrice: olds[i] });
+      updates.push({
+        programName,
+        size,
+        price: num(m[2]),
+        originalPrice: olds[i],
+        activationFee: activations[i],
+      });
     });
   }
 
@@ -531,6 +569,16 @@ function apply(firm, res, changes) {
     for (const plan of program.plans) {
       const u = res.updates.find((x) => x.programName === program.name && x.size === plan.size);
       const tag = `${firm.name} / ${program.name} $${plan.size / 1000}K`;
+      // Only firms whose scraper reports the field carry the key: for everyone
+      // else it stays hand-maintained, untouched.
+      if ('activationFee' in u) {
+        const before = plan.activationFee ?? null;
+        if (before !== u.activationFee) {
+          changes.push(`${tag}: activationFee ${before} -> ${u.activationFee}`);
+          if (u.activationFee == null) delete plan.activationFee;
+          else plan.activationFee = u.activationFee;
+        }
+      }
       if (plan.price !== u.price) {
         changes.push(`${tag}: price ${plan.price} -> ${u.price}`);
         plan.price = u.price;
@@ -669,4 +717,5 @@ async function main() {
   }
 }
 
-main();
+// Importable for tests without running the sync.
+if (process.argv[1] && process.argv[1].endsWith('scrape-prop-firms.mjs')) main();

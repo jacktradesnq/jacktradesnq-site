@@ -34,12 +34,31 @@ node scripts/build-deal-of-day.mjs --dry
 | `scripts/lib/copy.mjs` | Lit tes deux fichiers de texte, remplit les trous, refuse une variable inventée |
 | `scripts/lib/deal-of-day.mjs` | Choisit la firme du jour et passe les chiffres à tes phrases |
 | `scripts/build-deal-of-day.mjs` | CLI : rend les messages, tient l'état de rotation |
+| `scripts/build-live-promos.mjs` | Sort la liste des promos en cours pour la page publique |
+| `public/data/live-promos.json` | Le fichier que cette page lit, refait chaque matin |
 | `functions/api/subscribe.js` | POST du formulaire, stocke en "pending", envoie le mail de confirmation |
 | `functions/api/newsletter/confirm.js` | Le clic qui met l'adresse sur la liste |
 | `functions/api/newsletter/unsubscribe.js` | Désinscription en un clic |
 | `functions/api/newsletter/send.js` | Envoie l'email du jour aux adresses confirmées |
 | `app/prop-firms/DealSignup.tsx` | Le formulaire, en bas de la page prop firms |
 | `.github/workflows/newsletter-daily-deal.yml` | Le job (manuel pour l'instant, aucun cron) |
+
+## La page publique des promos
+
+`public/data/live-promos.json` est écrit par `node scripts/build-live-promos.mjs`,
+qui lit les mêmes chiffres et la même mécanique que la newsletter. La page
+publique et les mails sortent donc du même moteur : ils ne peuvent pas se
+contredire, une promo morte disparaît des deux en même temps.
+
+Ce fichier est refait chaque matin par le job qui scrape les prix, puis commité
+avec `public/data/prop-firms.json`, parce que la page est construite à partir de
+lui.
+
+Pour le regarder en local sans rien écrire :
+
+```
+node scripts/build-live-promos.mjs --dry
+```
 
 ## Comment la firme du jour est choisie
 
