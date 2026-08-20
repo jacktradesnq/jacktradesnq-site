@@ -53,21 +53,17 @@ const humanDate = (iso: string) =>
 
 const per = (p: Promo) => (p.priceType === 'monthly' ? '/mo' : '');
 
-// What the buyer still has to swallow. Only claims each firm publishes itself
-// and that the daily drift check can read back: the billing period, the
-// activation fee and the consistency rule.
-//
-// Deliberately NOT here: whether the drawdown trails. FundedSeat's card says
-// "EOD Drawdown" and the word trailing appears nowhere on their site, while
-// Blue Guardian's own tooltip spells out "EOD, static, no trailing". The
-// meaning of the label is firm by firm, so the page shows the label and the
-// amount and stops there instead of asserting a behaviour.
-function catches(p: Promo): string[] {
+// No "catch" block on a promo page: Angelo's call, and it is his page. What
+// stays is only what changes the price you pay, stated flatly under it, because
+// showing "$37/mo" next to a hidden "$99 once funded" is the kind of half-truth
+// this whole page exists to avoid. Trading constraints such as the consistency
+// rule live on the full comparison table instead.
+function priceFacts(p: Promo): string[] {
   const out: string[] = [];
-  if (p.priceType === 'monthly') out.push('Billed monthly, not once');
+  if (p.priceNote) out.push(p.priceNote);
+  if (p.priceType === 'monthly') out.push('billed monthly');
   if (p.activationFee) out.push(`${money(p.activationFee)} activation once funded`);
-  if (p.consistency && !/^(none|no|n\/a)$/i.test(p.consistency)) out.push(`Consistency ${p.consistency}`);
-  return out.slice(0, 2);
+  return out;
 }
 
 export default function PromosPage() {
@@ -151,7 +147,9 @@ export default function PromosPage() {
                   )}
                   <span className="promo-off">{p.discountPct}% off</span>
                 </div>
-                {p.priceNote && <p className="promo-note">{p.priceNote}</p>}
+                {priceFacts(p).length > 0 && (
+                  <p className="promo-note">{priceFacts(p).join(' \u00b7 ')}</p>
+                )}
 
                 <dl className="promo-specs">
                   <div>
@@ -174,14 +172,14 @@ export default function PromosPage() {
                       <dd>{money(p.profitTarget)}</dd>
                     </div>
                   )}
+                  {p.consistency && !/^(none|no|n\/a)$/i.test(p.consistency) && (
+                    <div>
+                      <dt>Consistency</dt>
+                      <dd>{p.consistency}</dd>
+                    </div>
+                  )}
                 </dl>
 
-                {catches(p).length > 0 && (
-                  <p className="promo-catch">
-                    <span className="promo-catch-label">The catch</span>
-                    {catches(p).join('. ')}.
-                  </p>
-                )}
 
                 <div className="promo-foot">
                   <a className="promo-cta" href={p.url} target="_blank" rel="noopener nofollow sponsored">

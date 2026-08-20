@@ -85,7 +85,7 @@ export const PROMOS_CSS = `
 /* A precision under the price, not a catch: LEGENDS' 50K Elite is $49 on a
    first order and $98 after, and hiding that would be lying by omission. */
 .jtnq-cmp .promo-note{
-  margin-top: -8px; font-size: 13px; color: var(--c-text-mute);
+  margin-top: -4px; font-size: 13px; line-height: 1.5; color: var(--c-text-mute);
 }
 
 .jtnq-cmp .promo-specs{
@@ -97,15 +97,6 @@ export const PROMOS_CSS = `
   color: var(--c-text-deep);
 }
 .jtnq-cmp .promo-specs dd{ margin-top: 4px; font-size: 14px; color: var(--c-text-soft); }
-
-.jtnq-cmp .promo-catch{
-  font-size: 13px; line-height: 1.6; color: var(--c-text-soft);
-  background: var(--c-bg-deep); border-radius: 12px; padding: 12px 16px;
-}
-.jtnq-cmp .promo-catch-label{
-  display: block; font-family: var(--f-mono); font-size: 10px; letter-spacing: .14em;
-  text-transform: uppercase; color: var(--c-accent); margin-bottom: 4px;
-}
 
 .jtnq-cmp .promo-foot{
   margin-top: auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
