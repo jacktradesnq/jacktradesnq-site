@@ -25,13 +25,38 @@ test('a firm whose promo expires within 96h wins over a bigger discount', () => 
   assert.ok(deal.hoursLeft > 0 && deal.hoursLeft <= 96, `hoursLeft=${deal.hoursLeft}`);
 });
 
-test('without urgency, the biggest real discount wins', () => {
-  const deal = pickDeal(DATA, { today: '2026-09-30', history: [] }); // FundedSeat promo long expired
-  assert.equal(deal.firmId, 'top-one-futures');
-  // 50K Elite Access: $39 instead of $218. The 150K is 89% off, but nobody
-  // quotes the 150K, so the reference size is what gets the headline.
+test('an activation fee beats a headline percentage', () => {
+  // Top One Elite Access 50K is $39 with a $189 activation fee: $228 to get
+  // funded, more than the $218 it strikes through while claiming 82% off.
+  // Elite Daily is $98 all in. The cheaper path wins even though it shows a
+  // smaller percentage.
+  const deal = pickDeal(DATA, { today: '2026-09-30', history: [], forceFirmId: 'top-one-futures' });
+  assert.equal(deal.programLabel, 'Elite Daily');
   assert.equal(deal.headline.size, 50000);
-  assert.equal(deal.headline.discountPct, 82);
+  assert.equal(deal.headline.price, 98);
+  assert.equal(deal.headline.discountPct, 55);
+  assert.equal(deal.rules.activationFee, null);
+});
+
+test('the cheapest path to funded is what gets picked, fees included', () => {
+  for (const firm of DATA.firms) {
+    const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: firm.id });
+    if (!deal) continue;
+    const size = deal.headline.size;
+    // Same effective price the engine uses: a firm with codeDiscountPct and no
+    // struck price is discounted by the code (Traders Launch, -15%).
+    const effective = (pl) =>
+      firm.codeDiscountPct != null && pl.originalPrice == null
+        ? Math.round(pl.price * (1 - firm.codeDiscountPct / 100) * 100) / 100
+        : pl.price;
+    const cheapest = Math.min(
+      ...firm.programs.flatMap((p) =>
+        p.plans.filter((pl) => pl.size === size).map((pl) => effective(pl) + (pl.activationFee ?? 0))
+      )
+    );
+    const picked = deal.headline.price + (deal.rules.activationFee ?? 0);
+    assert.equal(picked, cheapest, `${firm.id}: picked ${picked}, cheapest at that size is ${cheapest}`);
+  }
 });
 
 test('the reference size wins over a bigger percentage elsewhere', () => {
@@ -156,12 +181,16 @@ test('email carries subject, real prices, the code, and an unsubscribe slot', ()
   assert.ok(mail.text.includes(deal.url), 'plain-text part must carry the link');
 });
 
-test('at equal discount the 50K account is the one put forward', () => {
-  // LEGENDS Apprentice is 80% off on 25K, 50K and 100K alike: 50K is the size
-  // traders actually compare, so that is the one the copy must lead with.
+test('LEGENDS leads with Elite, the plan with no activation fee', () => {
+  // Apprentice shows 80% off at $37/mo but charges $99 once you pass: $136 to
+  // get funded. Elite shows 35% off at $96.85 and charges nothing after. The
+  // reference size stays the 50K, the plan is the one that costs less all in.
   const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'legends-trading' });
   assert.equal(deal.headline.size, 50000);
-  assert.equal(deal.headline.discountPct, 80);
+  assert.equal(deal.programLabel, 'Elite');
+  assert.equal(deal.headline.price, 96.85);
+  assert.equal(deal.rules.activationFee, null);
+  assert.equal(deal.priceType, 'one-time');
 });
 
 test('a monthly plan marks BOTH prices per month, never just the new one', () => {

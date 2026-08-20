@@ -118,11 +118,27 @@ function headlineOf(firm) {
     Math.abs(b - REFERENCE_SIZE) < Math.abs(a - REFERENCE_SIZE) ? b : a
   );
 
+  // Then the cheapest way to actually get funded, NOT the biggest percentage.
+  //
+  // A percentage hides the fee that comes after. LEGENDS Apprentice is 80% off
+  // at $37/mo and charges $99 once you pass, so $136 minimum, while Elite shows
+  // 35% off at $96.85 and charges nothing after: Elite is the cheaper path.
+  // Top One Elite Access is worse still, $39 with a $189 activation, so $228 to
+  // get funded against a $218 struck price it claims 82% off.
+  //
+  // Monthly plans count one month, the floor, and their card says they are
+  // billed monthly.
+  const costToFunded = (plan) => plan.price + (plan.activationFee ?? 0);
+
   let best = null;
   for (const { program, plan } of pairs.filter((p) => p.plan.size === targetSize)) {
     const pct = discountPct(plan.price, plan.originalPrice);
-    const cand = { program, plan, pct };
-    if (!best || cand.pct > best.pct || (cand.pct === best.pct && cand.plan.price < best.plan.price)) {
+    const cand = { program, plan, pct, cost: costToFunded(plan) };
+    if (
+      !best ||
+      cand.cost < best.cost ||
+      (cand.cost === best.cost && cand.pct > best.pct)
+    ) {
       best = cand;
     }
   }
