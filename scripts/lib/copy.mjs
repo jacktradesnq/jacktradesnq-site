@@ -132,7 +132,6 @@ export const REQUIRED_BLOCKS = [
   'discord',
   'tweet',
   'catch.monthly',
-  'catch.trailing',
   'catch.consistency',
   'catch.activation',
 ];
