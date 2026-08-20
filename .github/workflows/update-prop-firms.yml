@@ -30,10 +30,13 @@ jobs:
       - name: Scrape prop firms prices
         run: node scripts/scrape-prop-firms.mjs
 
+      - name: Build live promos feed
+        run: node scripts/build-live-promos.mjs
+
       - name: Check for data changes
         id: diff
         run: |
-          if [ -n "$(git status --porcelain public/data/prop-firms.json)" ]; then
+          if [ -n "$(git status --porcelain public/data/prop-firms.json public/data/live-promos.json)" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -44,7 +47,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/data/prop-firms.json
+          git add public/data/prop-firms.json public/data/live-promos.json
           git commit -m "chore(data): daily prop-firms price sync"
           git push origin HEAD:main
 
