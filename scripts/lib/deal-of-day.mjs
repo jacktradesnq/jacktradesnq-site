@@ -163,9 +163,11 @@ function caveatsOf(program, plan, messages) {
   if (program.priceType === 'monthly') {
     out.push({ text: say('catch.monthly'), source: 'program.priceType' });
   }
-  if (plan.ddType && plan.ddType !== 'EOD') {
-    out.push({ text: say('catch.trailing'), source: 'plan.ddType' });
-  }
+  // No caveat derived from ddType. FundedSeat's buy screen says "EOD Drawdown"
+  // and the word trailing appears nowhere on their site, while Blue Guardian's
+  // own tooltip says "EOD, static, no trailing": the label means different
+  // things firm by firm, the daily rule check cannot read it, so nothing here
+  // asserts a behaviour from it. The amount and the label are printed as is.
   if (plan.consistency && !/^(none|no|n\/a)$/i.test(String(plan.consistency).trim())) {
     out.push({ text: say('catch.consistency'), source: 'plan.consistency' });
   }

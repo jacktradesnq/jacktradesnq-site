@@ -90,9 +90,6 @@ Every size: {ladder}
 ## catch.monthly
 Billed every month, not once. It stops costing you the day you stop.
 
-## catch.trailing
-The drawdown follows your balance up, so it is tighter than the number above.
-
 ## catch.consistency
 Consistency rule: {consistency}.
 
