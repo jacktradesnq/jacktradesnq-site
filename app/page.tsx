@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import livePromos from '@/public/data/live-promos.json';
+
 const SITE = {
   brand: 'Jacktradesnq',
   socials: [
@@ -16,6 +18,7 @@ const SITE = {
   studies: { url: '/studies/', tagline: '10 years of 1-minute futures data, every setup backtested' },
   nefarious: { name: 'Nefarious', url: '/nefarious/', tagline: 'Official partner · free Discord community' },
   propFirms: { name: 'Prop firms', url: '/prop-firms/', tagline: 'Futures partners compared · code JTNQ' },
+  promos: { name: 'Promos', url: '/promos/' },
   legal: {
     copyright: '© 2026 JackTradesNQ. All rights reserved.',
     mentionsUrl: '/mentions-legales/',
@@ -45,6 +48,13 @@ export default function Home() {
   const headerRef = useRef<HTMLElement>(null);
   const socialsRef = useRef<HTMLDivElement>(null);
   const [socialsOpen, setSocialsOpen] = useState(false);
+
+  // Live count off public/data/live-promos.json, rebuilt every morning by the
+  // price sync. A card that says how many deals are running beats a card that
+  // says the word "promos", and it stays true on its own.
+  const promoCount = livePromos.promos.length;
+  const biggestOff = Math.max(...livePromos.promos.map((p) => p.discountPct));
+  const promoTagline = `${promoCount} running today \u00b7 up to ${biggestOff}% off`;
 
   useEffect(() => {
     if (!socialsOpen) return;
@@ -257,6 +267,7 @@ export default function Home() {
         </a>
         <nav className="nav" aria-label="Primary">
           <a href={SITE.nefarious.url}>Nefarious</a>
+          <a href={SITE.propFirms.url}>Prop firms</a>
           <div className={`nav-socials${socialsOpen ? ' is-open' : ''}`} ref={socialsRef}>
             <button
               type="button"
@@ -358,6 +369,19 @@ export default function Home() {
               </div>
               <p className="tagline">{SITE.propFirms.tagline}</p>
             </a>
+
+            <a className="hub-card" href={SITE.promos.url}>
+              <div className="row">
+                <h3 className="title">
+                  {SITE.promos.name}
+                  <span className="swash">.</span>
+                </h3>
+                <svg className="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 17L17 7M9 7h8v8" />
+                </svg>
+              </div>
+              <p className="tagline">{promoTagline}</p>
+            </a>
           </div>
         </section>
       </main>
@@ -451,6 +475,9 @@ const CSS = `
 .jtnq-home .nav a{
   font-size: 13px; color: var(--c-text-soft); padding: 8px 14px;
   border-radius: 999px; transition: color .18s ease;
+  /* "Prop firms" is the first two-word entry: without this it breaks onto two
+     lines at phone width and the whole bar looks squeezed. */
+  white-space: nowrap;
 }
 .jtnq-home .nav a:hover{ color: var(--c-text); }
 .jtnq-home .nav .nav-cta{

@@ -2,10 +2,14 @@
 /**
  * Daily price sync for public/data/prop-firms.json.
  *
- * Updates ONLY: plan price / originalPrice, program promoCode / promoLabel,
- * firm promo, firm lastChecked / stale, top-level generatedAt.
+ * Updates ONLY: plan price / originalPrice / activationFee, program promoCode /
+ * promoLabel, firm promo, firm lastChecked / stale, top-level generatedAt.
  * Risk rules (profit target, drawdown, daily loss, consistency, contracts)
  * are maintained manually and never touched here.
+ *
+ * activationFee is money the buyer pays, so it is scraped like a price, but
+ * only for the firms whose scraper reports it (Top One today). For the others
+ * the key is left exactly as it is.
  *
  * Per-firm guards: numeric price, 10 <= price <= 6000, price <= originalPrice,
  * scraped plan count must cover every plan already in the JSON for that firm.
@@ -143,8 +147,32 @@ const TOPONE_TABS = {
 };
 const TOPONE_SIZES = [25000, 50000, 100000, 150000];
 
+// The activation fee is money, not a risk rule: on Elite Access you pay $39 to
+// start and the activation fee once you pass, so leaving it hand-maintained
+// meant a public page quoting a figure nobody re-checked. One row per card:
+//   <div class="v3-table-row-info"><div>Activation Fee</div></div>
+//   <div class="v3-table-row-value"><div>$139</div></div>
+// "None!" (Elite Daily) means there is none. Fixtures for both shapes live in
+// scripts/__fixtures__/, see scripts/scrape-prop-firms.test.mjs.
+export function topOneActivationFees(pane) {
+  const rows = [
+    ...pane.matchAll(
+      /v3-table-row-info"><div>Activation Fee<\/div><\/div><div class="v3-table-row-value"><div>([^<]+)<\/div>/g,
+    ),
+  ];
+  return rows.map(([, raw]) => {
+    const value = raw.trim();
+    if (/^(none!?|no|n\/a|free)$/i.test(value)) return null;
+    const amount = num(value.replace(/[^\d.,]/g, ''));
+    if (!Number.isFinite(amount) || amount <= 0 || amount > 6000) {
+      throw new Error(`unreadable activation fee: "${value}"`);
+    }
+    return amount;
+  });
+}
+
 // Each pricing tab is one <div data-w-tab="X" class="acc__content__pane v3-pricing-swiper …">.
-function topOnePane(html, tab) {
+export function topOnePane(html, tab) {
   const panes = [...html.matchAll(/data-w-tab="([^"]+)" class="acc__content__pane v3-pricing-swiper[^"]*"/g)];
   const i = panes.findIndex((m) => m[1] === tab);
   if (i === -1) throw new Error(`pricing tab pane not found: ${tab}`);
@@ -192,11 +220,21 @@ async function scrapeTopOne() {
     if (olds.length !== cards.length)
       throw new Error(`${tab}: ${cards.length} cards but ${olds.length} struck-through prices`);
 
+    const activations = topOneActivationFees(pane);
+    if (activations.length !== cards.length)
+      throw new Error(`${tab}: ${cards.length} cards but ${activations.length} activation fee rows`);
+
     cards.forEach((m, i) => {
       const size = num(m[1]) * 1000;
       if (size !== TOPONE_SIZES[i])
         throw new Error(`${tab}: card ${i} is $${size / 1000}K, expected $${TOPONE_SIZES[i] / 1000}K`);
-      updates.push({ programName, size, price: num(m[2]), originalPrice: olds[i] });
+      updates.push({
+        programName,
+        size,
+        price: num(m[2]),
+        originalPrice: olds[i],
+        activationFee: activations[i],
+      });
     });
   }
 
@@ -381,48 +419,77 @@ async function scrapeFundedSeat() {
 /* LEGENDS Trading — static Webflow HTML on https://thelegendstrading.com/plans */
 /* ------------------------------------------------------------------ */
 
-const LEGENDS_PROGRAMS = ['Apprentice', 'Elite', 'Straight to Master'];
+// Their Webflow page serves a STALE price table to any HTTP client: verified
+// 2026-08-20 with this scraper's own user-agent and a cache-buster, the HTML
+// said Apprentice 50K was $185 -> $37/mo while the rendered page said
+// $59 -> $29.50. The string "29.50" appears nowhere in that HTML. The old
+// extractor happily "verified 12 plans, no changes" against numbers no visitor
+// ever sees.
+//
+// The rendered page gets its prices from their own public shop API, which is
+// plain HTTP and needs no browser. That is what we read now.
+//
+// Field trap: `price` is the STRUCK price and `strikeThroughPrice` is what the
+// buyer pays. Their names are inverted, confirmed against the rendered card
+// showing "$59 $29.50" for price 59 / strikeThroughPrice 29.5.
+const LEGENDS_API =
+  'https://api.thelegendstrading.com/shop/plans?purchasableOnly=true&broker=Tradovate';
+
+// "$50,000" and "$50,000 Elite" both mean the 50K account.
+function legendsSize(storeDisplayName) {
+  const m = /\$([\d,]+)/.exec(String(storeDisplayName ?? ''));
+  return m ? num(m[1]) : null;
+}
+
+// The description carries the rules and the fee, one per line:
+//   "$99 Activation Fee" (Apprentice) or "Activation Fee: None" (Elite)
+export function legendsActivationFee(description) {
+  const text = String(description ?? '');
+  if (/activation fee\s*:\s*none/i.test(text)) return null;
+  const m = /\$([\d,.]+)\s*activation fee/i.exec(text);
+  if (!m) return null;
+  const fee = num(m[1]);
+  if (!Number.isFinite(fee) || fee <= 0 || fee > 6000) {
+    throw new Error(`unreadable LEGENDS activation fee: "${m[0]}"`);
+  }
+  return fee;
+}
+
+export function legendsUpdatesFrom(payload) {
+  const plans = payload?.data;
+  if (!Array.isArray(plans) || plans.length === 0) throw new Error('LEGENDS API returned no plans');
+
+  const updates = [];
+  for (const plan of plans) {
+    if (plan.isPublic === false) continue;
+    const size = legendsSize(plan.storeDisplayName);
+    const paid = plan.strikeThroughPrice; // what the buyer pays, despite the name
+    const listed = plan.price; // the struck-through one
+    if (!size || !Number.isFinite(paid) || !Number.isFinite(listed)) {
+      throw new Error(`LEGENDS plan unreadable: ${JSON.stringify(plan.storeDisplayName)}`);
+    }
+    if (paid > listed) {
+      throw new Error(
+        `LEGENDS ${plan.productCategory} ${size}: paid ${paid} > listed ${listed}, the two fields may have been swapped back`,
+      );
+    }
+    updates.push({
+      programName: plan.productCategory,
+      size,
+      price: paid,
+      originalPrice: listed,
+      activationFee: legendsActivationFee(plan.description),
+    });
+  }
+  return updates;
+}
 
 async function scrapeLegends() {
-  const html = await fetchText('https://thelegendstrading.com/plans');
-  const text = html
-    .replace(/<script[\s\S]*?<\/script>/g, ' ')
-    .replace(/<style[\s\S]*?<\/style>/g, ' ')
-    .replace(/<[^>]+>/g, '\n');
-  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
-
-  const sizeRe = /^\$([\d,]+)$/;
-  const priceRe = /^\$([\d,.]+)$/;
-  const updates = [];
-  let programIdx = 0;
-  let cardsInProgram = 0;
-
-  for (let i = 0; i < lines.length; i++) {
-    const m = sizeRe.exec(lines[i]);
-    if (!m) continue;
-    // Card shape: size, "Max N contracts...", originalPrice, price, "/ per month|one time".
-    const maybeContracts = lines[i + 1] || '';
-    if (!/max/i.test(maybeContracts)) continue; // guard against unrelated "$X" (testimonials etc.)
-    const origM = priceRe.exec(lines[i + 2] || '');
-    const priceM = priceRe.exec(lines[i + 3] || '');
-    if (!origM || !priceM) continue;
-
-    if (cardsInProgram === 4) {
-      programIdx += 1;
-      cardsInProgram = 0;
-    }
-    if (programIdx >= LEGENDS_PROGRAMS.length) break; // page repeats the same 12 cards twice (mobile/desktop)
-
-    updates.push({
-      programName: LEGENDS_PROGRAMS[programIdx],
-      size: num(m[1]),
-      price: num(priceM[1]),
-      originalPrice: num(origM[1]),
-    });
-    cardsInProgram += 1;
-  }
-  if (updates.length === 0) throw new Error('no plan cards parsed from /plans page');
-  return { updates }; // promo stays manual — site banner overstates Elite's discount, see JSON
+  const res = await fetch(LEGENDS_API, {
+    headers: { 'user-agent': UA, accept: 'application/json' },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for the LEGENDS shop API`);
+  return { updates: legendsUpdatesFrom(await res.json()) }; // promo label stays manual
 }
 
 /* ------------------------------------------------------------------ */
@@ -531,6 +598,16 @@ function apply(firm, res, changes) {
     for (const plan of program.plans) {
       const u = res.updates.find((x) => x.programName === program.name && x.size === plan.size);
       const tag = `${firm.name} / ${program.name} $${plan.size / 1000}K`;
+      // Only firms whose scraper reports the field carry the key: for everyone
+      // else it stays hand-maintained, untouched.
+      if ('activationFee' in u) {
+        const before = plan.activationFee ?? null;
+        if (before !== u.activationFee) {
+          changes.push(`${tag}: activationFee ${before} -> ${u.activationFee}`);
+          if (u.activationFee == null) delete plan.activationFee;
+          else plan.activationFee = u.activationFee;
+        }
+      }
       if (plan.price !== u.price) {
         changes.push(`${tag}: price ${plan.price} -> ${u.price}`);
         plan.price = u.price;
@@ -669,4 +746,5 @@ async function main() {
   }
 }
 
-main();
+// Importable for tests without running the sync.
+if (process.argv[1] && process.argv[1].endsWith('scrape-prop-firms.mjs')) main();
