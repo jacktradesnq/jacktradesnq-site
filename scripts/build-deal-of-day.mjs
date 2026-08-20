@@ -22,6 +22,7 @@ import {
   renderDiscord,
   renderTweet,
   auditDiscountClaims,
+  auditCodeClaims,
 } from './lib/deal-of-day.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -58,16 +59,25 @@ function build(deal) {
   // Nothing leaves this script claiming a discount the data cannot back. Two
   // firms advertise "X% off + Y% with a code"; those never add up, and a
   // hand-typed percentage in the copy file is caught here too.
-  const problems = auditDiscountClaims(deal, {
+  const channels = {
     subject: built.email.subject,
-    email: built.email.text,
+    preheader: built.email.preheader,
+    'email html': built.email.html, // the body people actually read
+    'email text': built.email.text,
     discord: built.discord,
     tweet: built.tweet,
-  });
+  };
+  const problems = [...auditDiscountClaims(deal, channels), ...auditCodeClaims(deal, channels)];
   if (problems.length) {
-    console.error('refusing to emit, discount claim does not match the data:');
+    console.error('refusing to emit:');
     for (const p of problems) console.error(`  ${p}`);
     process.exit(1);
+  }
+  if (deal.codeUndeclared) {
+    console.warn(
+      `note: ${deal.firmId} is not in content/newsletter/codes.md, falling back to JTNQ. ` +
+        `Add a line there (a code, or "link" to print none).`
+    );
   }
   return built;
 }

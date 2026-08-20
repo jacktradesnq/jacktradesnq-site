@@ -6,11 +6,19 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import { parseCopy, fill, useCopy, resetCopy, loadCopy, assertComplete, parseLabels } from './lib/copy.mjs';
-import { pickDeal, renderTweet, renderDiscord, renderEmail, auditDiscountClaims } from './lib/deal-of-day.mjs';
+import {
+  pickDeal,
+  renderTweet,
+  renderDiscord,
+  renderEmail,
+  auditDiscountClaims,
+  auditCodeClaims,
+} from './lib/deal-of-day.mjs';
 
 const DATA = JSON.parse(readFileSync(new URL('../public/data/prop-firms.json', import.meta.url), 'utf8'));
 const SHIPPED = readFileSync(new URL('../content/newsletter/messages.md', import.meta.url), 'utf8');
 const TAKES = readFileSync(new URL('../content/newsletter/takes.md', import.meta.url), 'utf8');
+const CODES = readFileSync(new URL('../content/newsletter/codes.md', import.meta.url), 'utf8');
 
 afterEach(resetCopy);
 
@@ -161,7 +169,8 @@ test('a percentage typed by hand into the copy file is refused', () => {
     TAKES
   );
   const d = pickDeal(DATA, { today: '2026-08-20', history: [] });
-  const problems = auditDiscountClaims(d, { email: renderEmail(d, {}).text });
+  const email = renderEmail(d, {});
+  const problems = auditDiscountClaims(d, { email: email.text });
   assert.equal(problems.length, 1, `expected one problem, got ${problems.length}`);
   assert.match(problems[0], /claims "50% off"/);
   assert.match(problems[0], /only discount computed from the data is 45%/);
@@ -183,6 +192,78 @@ test('the shipped copy passes the audit on every firm', () => {
       `${firm.id} failed the audit`
     );
   }
+});
+
+// ── his code, not theirs ─────────────────────────────────────────────────────
+
+const PUBLIC_CODES = { 'blue-guardian': 'BG25', 'top-one-futures': 'BOGO', fundedseat: 'ULTRA50', 'legends-trading': 'LTG' };
+
+test('no message ever prints a firm public code', () => {
+  for (const [firmId, publicCode] of Object.entries(PUBLIC_CODES)) {
+    const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: firmId });
+    const rendered = [renderTweet(d), renderDiscord(d), renderEmail(d, {}).html, renderEmail(d, {}).text].join('\n');
+    assert.ok(
+      !new RegExp(`(^|[^A-Za-z0-9])${publicCode.replace('.', '\\.')}([^A-Za-z0-9]|$)`).test(rendered),
+      `${firmId}: printed the public code ${publicCode}`
+    );
+  }
+});
+
+test('every firm prints JTNQ today, the same as the comparison page', () => {
+  for (const firm of DATA.firms) {
+    const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: firm.id });
+    if (!d) continue;
+    // codes.md has traders-launch on "link": no code typed, the link does it.
+    if (firm.id === 'traders-launch') {
+      assert.equal(d.code, null);
+      assert.match(renderEmail(d, {}).html, /discount rides on the link/);
+      continue;
+    }
+    assert.equal(d.code, 'JTNQ', `${firm.id} prints ${d.code}`);
+    assert.match(renderTweet(d), /Code JTNQ:/);
+  }
+});
+
+test('a code declared in codes.md is the one that gets printed', () => {
+  useCopy(SHIPPED, TAKES, '## codes\nlegends-trading = LTG\n');
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'legends-trading' });
+  assert.equal(d.code, 'LTG');
+  assert.match(renderTweet(d), /Code LTG:/);
+  // Declared on purpose, so the audit must not fight it.
+  assert.deepEqual(auditCodeClaims(d, { tweet: renderTweet(d) }), []);
+});
+
+test('an undeclared firm falls back to JTNQ and says so', () => {
+  useCopy(SHIPPED, TAKES, '## codes\ntradeday = JTNQ\n');
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
+  assert.equal(d.code, 'JTNQ');
+  assert.equal(d.codeUndeclared, true);
+
+  const declared = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'tradeday' });
+  assert.equal(declared.codeUndeclared, false);
+});
+
+test('a public code typed by hand into the copy file is refused', () => {
+  useCopy(
+    SHIPPED.replace('## email.code\nCode at checkout: {code}', '## email.code\nCode at checkout: {code} or ULTRA50'),
+    TAKES,
+    '## codes\nfundedseat = JTNQ\n'
+  );
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
+  const email = renderEmail(d, {});
+  const problems = auditCodeClaims(d, { html: email.html });
+  assert.equal(problems.length, 1, `expected one problem, got ${problems.length}`);
+  assert.match(problems[0], /prints the public code "ULTRA50" instead of "JTNQ"/);
+});
+
+test('"link" prints no code at all', () => {
+  useCopy(SHIPPED, TAKES, '## codes\nfundedseat = link\n');
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
+  assert.equal(d.code, null);
+  const email = renderEmail(d, {});
+  assert.ok(!email.html.includes('Code at checkout'), 'a code line survived');
+  assert.match(email.html, /discount rides on the link/);
+  assert.match(renderTweet(d), /Discount is already on the link/);
 });
 
 test('the shipped file passes its own completeness check', () => {

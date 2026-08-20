@@ -58,6 +58,12 @@ Code at checkout: {code}
 ## email.code_in_link
 No code to type, the discount rides on the link.
 
+## code_line
+Code {code}
+
+## code_line_in_link
+Discount is already on the link
+
 ## email.catch_title
 The catch
 

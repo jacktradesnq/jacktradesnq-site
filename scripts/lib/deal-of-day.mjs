@@ -176,7 +176,28 @@ function caveatsOf(program, plan, messages) {
   return out.slice(0, 2);
 }
 
-function candidateFor(firm, { today, prevSnapshot, messages }) {
+// His code, never the firm's public one.
+//
+// A public code (BG25, ULTRA50, LTG, BOGO) gives the reader the same discount
+// while pushing him out of the transaction wherever a firm attributes by code,
+// and it wastes the point of the newsletter. So the only codes that can be
+// printed are the ones declared in content/newsletter/codes.md.
+//
+// `link` there means: print no code, the affiliate link carries both the
+// discount and the attribution. An undeclared firm falls back to JTNQ, the same
+// default as chipCode() in app/prop-firms/page.tsx, and is reported.
+const AFFILIATE_CODE = 'JTNQ';
+
+function codeFor(firm, codes) {
+  const declared = codes?.[firm.id];
+  if (!declared) return { code: AFFILIATE_CODE, undeclared: true, viaLink: false };
+  // "link" is a decision, not a guess about the URL shape: fundedseat.link/jtnq
+  // carries the affiliation in its path, with no query parameter to sniff.
+  if (declared.toLowerCase() === 'link') return { code: null, undeclared: false, viaLink: true };
+  return { code: declared, undeclared: false, viaLink: false };
+}
+
+function candidateFor(firm, { today, prevSnapshot, messages, codes }) {
   if (firm.stale) return null; // scrape failed, old numbers kept: never headline it
   const head = headlineOf(firm);
   if (!head) return null;
@@ -185,6 +206,7 @@ function candidateFor(firm, { today, prevSnapshot, messages }) {
   const promo = program.promoCode
     ? { label: program.promoLabel ?? null, code: program.promoCode, ends: undefined }
     : firm.promo ?? null;
+  const ourCode = codeFor(firm, codes);
 
   const endsAt = promo?.ends ?? null;
   const hoursLeft = endsAt ? Math.round((dayEnd(endsAt) - dayStart(today)) / 3.6e6) : null;
@@ -226,8 +248,10 @@ function candidateFor(firm, { today, prevSnapshot, messages }) {
     firmName: firm.name,
     logo: `${LOGO_BASE}/${firm.id}.png`,
     url: firm.url,
-    code: program.promoCode ?? firm.promo?.code ?? firm.code ?? null,
-    codeInLink: /(?:coupon|code|ref|afmc|a_aid)=/i.test(firm.url),
+    code: ourCode.code,
+    codeUndeclared: ourCode.undeclared,
+    codeViaLink: ourCode.viaLink,
+    publicCode: program.promoCode ?? firm.promo?.code ?? null, // never printed, kept for the audit
     split: firm.split,
     payout: firm.payout,
     lastChecked: firm.lastChecked,
@@ -264,10 +288,10 @@ function candidateFor(firm, { today, prevSnapshot, messages }) {
 }
 
 export function analyzeFirms(data, { today, prevSnapshot = null } = {}) {
-  const { messages } = loadCopy();
+  const { messages, codes } = loadCopy();
   assertComplete(messages);
   return data.firms
-    .map((f) => candidateFor(f, { today, prevSnapshot, messages }))
+    .map((f) => candidateFor(f, { today, prevSnapshot, messages, codes }))
     .filter(Boolean)
     .sort((a, b) => b.score - a.score || a.firmId.localeCompare(b.firmId));
 }
@@ -302,9 +326,11 @@ function endsClause(deal) {
   return ` Ends ${weekdayOf(deal.endsAt)}.`;
 }
 
-function codeLine(deal) {
-  if (deal.code) return `Code ${deal.code}`;
-  if (deal.codeInLink) return 'Discount is already on the link';
+// The short form used by the tweet and by Discord. Same ownership rule as the
+// rest: the words live in content/newsletter/messages.md.
+function codeLine(deal, messages, values) {
+  if (deal.code) return say(messages, 'code_line', values);
+  if (deal.codeViaLink) return say(messages, 'code_line_in_link', values);
   return '';
 }
 
@@ -349,7 +375,7 @@ function say(messages, block, values, options) {
 export function renderTweet(deal) {
   const { messages, takes } = loadCopy();
   const values = valuesFor(deal, { takes });
-  const code = codeLine(deal);
+  const code = codeLine(deal, messages, values);
   return [
     say(messages, 'tweet', values),
     code ? `${code}: ${deal.url}` : deal.url,
@@ -364,7 +390,7 @@ export function renderDiscord(deal) {
   if (deal.caveats.length) {
     lines.push('', `${say(messages, 'email.catch_title', values)}:`, ...deal.caveats.map((c) => `- ${c.text}`));
   }
-  const code = codeLine(deal);
+  const code = codeLine(deal, messages, values);
   lines.push('', code ? `${code} · <${deal.url}>` : `<${deal.url}>`);
   lines.push(say(messages, 'email.footer', values));
   return lines.join('\n');
@@ -394,6 +420,26 @@ export function auditDiscountClaims(deal, renderings) {
             `${computed ? `${computed}%` : 'none'} (${deal.firmName}, ${deal.programName})`
         );
       }
+    }
+  }
+  return problems;
+}
+
+// A firm's public code must never appear in a message: the reader would type it
+// instead of his, and wherever a firm attributes by code that is a commission
+// he does not get.
+export function auditCodeClaims(deal, renderings) {
+  const problems = [];
+  if (!deal.publicCode || deal.publicCode === deal.code) return problems;
+
+  const needle = deal.publicCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const boundary = new RegExp(`(^|[^A-Za-z0-9])${needle}([^A-Za-z0-9]|$)`);
+  for (const [channel, text] of Object.entries(renderings)) {
+    if (boundary.test(String(text ?? ''))) {
+      problems.push(
+        `${channel}: prints the public code "${deal.publicCode}" instead of ` +
+          `${deal.code ? `"${deal.code}"` : 'no code at all'} (${deal.firmName})`
+      );
     }
   }
   return problems;
@@ -530,7 +576,7 @@ export function renderEmail(deal, { generatedAt } = {}) {
 
   const code = deal.code
     ? `<p style="margin:16px 0 0;font:500 15px ${FONT};color:${C.muted};">${fill(esc(messages['email.code']), hv, { blockName: 'email.code', bold: inkBold }).replace(esc(deal.code), `<strong style="color:${C.gold};font:700 15px ${MONO};">${esc(deal.code)}</strong>`)}</p>`
-    : deal.codeInLink
+    : deal.codeViaLink
       ? `<p style="margin:16px 0 0;font:500 15px ${FONT};color:${C.muted};">${html_('email.code_in_link')}</p>`
       : '';
 
@@ -589,7 +635,7 @@ export function renderEmail(deal, { generatedAt } = {}) {
     '',
     ...(values.take ? [`${plain('email.take_title')}: ${values.take}`, ''] : []),
     ...(deal.caveats.length ? [`${plain('email.catch_title')}: ${deal.caveats.map((c) => c.text).join(' ')}`, ''] : []),
-    codeLine(deal) ? `${codeLine(deal)}` : '',
+    codeLine(deal, messages, values),
     deal.url,
     '',
     plain('email.footer'),
