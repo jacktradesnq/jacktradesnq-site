@@ -6,11 +6,33 @@ scrapés chaque matin par `scripts/scrape-prop-firms.mjs`).
 
 Rien n'est inventé : si la donnée n'existe pas, le texte n'en parle pas.
 
+## Le texte est à toi, le reste est à la machine
+
+Aucune phrase n'est dans le code. Tout ce qui se lit est dans deux fichiers :
+
+| Fichier | Ce que tu y écris |
+|---|---|
+| `content/newsletter/messages.md` | Les phrases des trois messages : objet, accroche, bouton, pied, le message Discord, le tweet, et les quatre "pièges" |
+| `content/newsletter/takes.md` | Ton avis, firme par firme. Une firme sans section sort sans avis, rien n'est inventé |
+
+Trois règles dans ces fichiers : `{trou}` que la machine remplit,
+`[entre crochets]` qui disparaît si l'info n'existe pas ce jour-là,
+`*entre étoiles*` pour le gras du mail. Si tu inventes un trou, la machine
+refuse et te dit lequel, elle n'envoie jamais un mail avec un blanc.
+
+Pour voir le résultat après une modif :
+
+```
+cd ~/jacktradesnq-site
+node scripts/build-deal-of-day.mjs --dry
+```
+
 ## Ce que ça fait
 
 | Fichier | Rôle |
 |---|---|
-| `scripts/lib/deal-of-day.mjs` | Choisit la firme du jour et écrit les 3 messages (email, Discord, tweet) |
+| `scripts/lib/copy.mjs` | Lit tes deux fichiers de texte, remplit les trous, refuse une variable inventée |
+| `scripts/lib/deal-of-day.mjs` | Choisit la firme du jour et passe les chiffres à tes phrases |
 | `scripts/build-deal-of-day.mjs` | CLI : rend les messages, tient l'état de rotation |
 | `functions/api/subscribe.js` | POST du formulaire, stocke en "pending", envoie le mail de confirmation |
 | `functions/api/newsletter/confirm.js` | Le clic qui met l'adresse sur la liste |
@@ -46,7 +68,7 @@ message Discord, tweet).
 Tests :
 
 ```
-node --test scripts/deal-of-day.test.mjs functions/_shared/subscribers.test.mjs functions/api/endpoints.test.mjs
+node --test scripts/deal-of-day.test.mjs scripts/copy.test.mjs functions/_shared/subscribers.test.mjs functions/api/endpoints.test.mjs
 ```
 
 ## Ce qu'il reste à brancher (côté comptes, pas côté code)
@@ -88,16 +110,30 @@ Dashboard Cloudflare → jacktradesnq → Settings → Environment variables :
 Repo → Settings → Secrets and variables → Actions → New secret :
 `NEWSLETTER_SEND_KEY`, la **même** valeur qu'à l'étape 3.
 
-### 5. Premier envoi
+### 5. Premier envoi, puis le quotidien
 
-Onglet Actions → "Newsletter — deal of the day" → Run workflow :
+Le workflow tourne **tous les jours à 6h40 UTC sur les serveurs GitHub**, juste
+après le sync des prix de 6h17. Ton Mac peut être fermé, éteint, en voyage :
+rien de la chaîne ne tourne chez toi.
 
-- `mode: dry-run` → il rend l'email et répond le nombre d'abonnés, sans envoyer.
-- `mode: send` → il envoie vraiment.
+Par défaut ce run quotidien est un **essai à blanc** : il compose le mail,
+compte les abonnés confirmés et n'envoie à personne.
 
-Le workflow n'a **aucun cron** : tant que personne ne clique, rien ne part. Le
-jour où le texte est réglé, ajouter un bloc `schedule:` (après le sync des prix
-de 6h17 UTC, donc vers 6h30).
+Pour l'armer, une seule variable à créer :
+repo → Settings → Secrets and variables → Actions → onglet **Variables** →
+`NEWSLETTER_ENABLED` = `true`. Pour le désarmer, la repasser à `false`.
+
+Même chose pour le post Discord automatique : `NEWSLETTER_DISCORD` = `true`.
+
+Un envoi à la main, quand tu veux : onglet Actions →
+"Newsletter — deal of the day" → Run workflow → `mode: send`.
+
+| Déclencheur | `NEWSLETTER_ENABLED` | Ce qui se passe |
+|---|---|---|
+| cron quotidien | absente ou `false` | essai à blanc, zéro mail |
+| cron quotidien | `true` | envoi aux abonnés confirmés |
+| bouton, `mode: dry-run` | peu importe | essai à blanc |
+| bouton, `mode: send` | peu importe | envoi |
 
 ## Garde-fous déjà en place
 

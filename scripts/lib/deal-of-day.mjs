@@ -4,8 +4,11 @@
 // scripts/scrape-prop-firms.mjs). Nothing here invents a price, a rule or a
 // discount: if the data does not carry it, the copy does not mention it.
 //
-// Pure functions only, no fs and no network, so the whole thing is testable:
-// see scripts/deal-of-day.test.mjs.
+// The wording is NOT here: every sentence comes from content/newsletter/,
+// which Angelo edits without touching code. This file decides which firm, and
+// hands the numbers to the templates. See scripts/lib/copy.mjs.
+
+import { loadCopy, fill, assertComplete, parseLabels } from './copy.mjs';
 
 const URGENCY_WINDOW_H = 96; // a promo ending inside 4 days is the day's headline
 const COOLDOWN_DAYS = 7; // never headline the same firm twice in a week
@@ -148,35 +151,32 @@ function headlineOf(firm) {
   return { program: best.program, plan: best.plan, pct: best.pct, pctSource: 'plan.originalPrice' };
 }
 
-function caveatsOf(program, plan) {
+// Which catches apply comes from the data; how they are worded comes from
+// content/newsletter/messages.md.
+function caveatsOf(program, plan, messages) {
+  const values = {
+    consistency: plan.consistency ?? '',
+    activation: plan.activationFee ? money(plan.activationFee) : '',
+  };
+  const say = (block) => fill(messages[block], values, { blockName: block });
+
   const out = [];
   if (program.priceType === 'monthly') {
-    out.push({
-      text: 'Billed every month, not once. It stops costing you the day you stop.',
-      source: 'program.priceType',
-    });
+    out.push({ text: say('catch.monthly'), source: 'program.priceType' });
   }
   if (plan.ddType && plan.ddType !== 'EOD') {
-    // The exact type is printed in the stats strip right above, so this sentence
-    // says what it means instead of repeating the label.
-    out.push({
-      text: 'The drawdown follows your balance up, so it is tighter than the number above.',
-      source: 'plan.ddType',
-    });
+    out.push({ text: say('catch.trailing'), source: 'plan.ddType' });
   }
   if (plan.consistency && !/^(none|no|n\/a)$/i.test(String(plan.consistency).trim())) {
-    out.push({ text: `Consistency rule: ${plan.consistency}.`, source: 'plan.consistency' });
+    out.push({ text: say('catch.consistency'), source: 'plan.consistency' });
   }
   if (plan.activationFee) {
-    out.push({
-      text: `${money(plan.activationFee)} activation fee once you get funded.`,
-      source: 'plan.activationFee',
-    });
+    out.push({ text: say('catch.activation'), source: 'plan.activationFee' });
   }
   return out.slice(0, 2);
 }
 
-function candidateFor(firm, { today, prevSnapshot }) {
+function candidateFor(firm, { today, prevSnapshot, messages }) {
   if (firm.stale) return null; // scrape failed, old numbers kept: never headline it
   const head = headlineOf(firm);
   if (!head) return null;
@@ -253,17 +253,21 @@ function candidateFor(firm, { today, prevSnapshot }) {
       dailyLoss: plan.dailyLoss,
       dailyLossSoft: plan.dailyLossSoft ?? false,
       contracts: plan.contracts,
+      consistency: plan.consistency ?? null,
+      activationFee: plan.activationFee ?? null,
     },
     ladder,
-    caveats: caveatsOf(program, plan),
+    caveats: caveatsOf(program, plan, messages),
     signals,
     score,
   };
 }
 
 export function analyzeFirms(data, { today, prevSnapshot = null } = {}) {
+  const { messages } = loadCopy();
+  assertComplete(messages);
   return data.firms
-    .map((f) => candidateFor(f, { today, prevSnapshot }))
+    .map((f) => candidateFor(f, { today, prevSnapshot, messages }))
     .filter(Boolean)
     .sort((a, b) => b.score - a.score || a.firmId.localeCompare(b.firmId));
 }
@@ -304,37 +308,65 @@ function codeLine(deal) {
   return '';
 }
 
-// Price first, then what it buys: the reader is scanning for a number.
-function offerLine(deal) {
+// Everything a template can reach. An empty string means "no such thing
+// today", which collapses any [group] that mentions it.
+function valuesFor(deal, { takes = {} } = {}) {
   const h = deal.headline;
-  const was = h.originalPrice ? `, instead of ${at(deal, h.originalPrice)}` : '';
-  return `${at(deal, h.price)} for a ${accountPhrase(deal)}${was}.`;
+  const r = deal.rules;
+  const values = {
+    firm: deal.firmName,
+    plan: deal.programLabel,
+    account: accountPhrase(deal),
+    size: sizeLabel(h.size),
+    price: at(deal, h.price),
+    was: h.originalPrice ? at(deal, h.originalPrice) : '',
+    discount: h.discountPct ? String(h.discountPct) : '',
+    split: deal.split,
+    payout: prose(deal.payout),
+    ddtype: r.ddType ?? '',
+    target: r.profitTarget ? `$${usd(r.profitTarget)}` : '',
+    maxdd: r.maxDrawdown ? `$${usd(r.maxDrawdown)}` : '',
+    dailyloss: r.dailyLoss ? `$${usd(r.dailyLoss)}` : '',
+    contracts: r.contracts ?? '',
+    consistency: r.consistency ?? '',
+    activation: r.activationFee ? money(r.activationFee) : '',
+    code: deal.code ?? '',
+    url: deal.url,
+    ends: deal.signals.includes('expiring') ? weekdayOf(deal.endsAt) : '',
+    checked: deal.lastChecked,
+    ladder: deal.ladder.map((p) => `${sizeLabel(p.size)} ${at(deal, p.price)}`).join(' · '),
+    take: '',
+  };
+  const take = takes[deal.firmId];
+  values.take = take ? fill(take, values, { blockName: `takes.md ${deal.firmId}` }) : '';
+  return values;
+}
+
+function say(messages, block, values, options) {
+  return fill(messages[block], values, { blockName: block, ...options });
 }
 
 export function renderTweet(deal) {
-  const l1 = `${offerLine(deal)} ${deal.firmName}, ${deal.programLabel} plan.${endsClause(deal)}`;
-  const l2 = `${deal.split} split, payout ${prose(deal.payout)}.`;
+  const { messages, takes } = loadCopy();
+  const values = valuesFor(deal, { takes });
   const code = codeLine(deal);
-  const l3 = code ? `${code}: ${deal.url}` : deal.url;
-  return [l1, l2, l3].join('\n');
+  return [
+    say(messages, 'tweet', values),
+    code ? `${code}: ${deal.url}` : deal.url,
+  ].join('\n');
 }
 
 export function renderDiscord(deal) {
-  const h = deal.headline;
-  const ladder = deal.ladder.map((p) => `${sizeLabel(p.size)} ${at(deal, p.price)}`).join(' · ');
-  const lines = [
-    `**${deal.firmName}, deal of the day**`,
-    `${offerLine(deal)}${h.discountPct ? ` ${h.discountPct}% off on the ${deal.programLabel} plan.` : ''}${endsClause(deal)}`,
-    '',
-    `Every size: ${ladder}`,
-    `${deal.split} split · payout ${deal.payout} · ${deal.rules.ddType} drawdown${deal.rules.contracts ? ` · ${deal.rules.contracts}` : ''}`,
-  ];
+  const { messages, takes } = loadCopy();
+  const values = valuesFor(deal, { takes });
+  const lines = [say(messages, 'discord', values)];
+  if (values.take) lines.push('', `${say(messages, 'email.take_title', values)}: ${values.take}`);
   if (deal.caveats.length) {
-    lines.push('', 'Watch out:', ...deal.caveats.map((c) => `- ${c.text}`));
+    lines.push('', `${say(messages, 'email.catch_title', values)}:`, ...deal.caveats.map((c) => `- ${c.text}`));
   }
   const code = codeLine(deal);
   lines.push('', code ? `${code} · <${deal.url}>` : `<${deal.url}>`);
-  lines.push(`Prices checked ${deal.lastChecked} on the firm's own site.`);
+  lines.push(say(messages, 'email.footer', values));
   return lines.join('\n');
 }
 
@@ -373,34 +405,46 @@ const esc = (s) =>
     .replace(/"/g, '&quot;')
     .replace(/[^\x00-\x7F]/g, (ch) => `&#${ch.codePointAt(0)};`);
 
-function subjectOf(deal) {
-  const h = deal.headline;
-  const ends = deal.signals.includes('expiring') ? `, ends ${weekdayOf(deal.endsAt)}` : '';
-  const full = `${deal.firmName} ${accountPhrase(deal)} at ${at(deal, h.price)}${
-    h.originalPrice ? ` instead of ${at(deal, h.originalPrice)}` : ''
-  }${ends}`;
+// Inbox lists cut a subject around 70 characters, so an over-long one is
+// re-rendered without the struck-through price rather than chopped mid-word.
+function subjectOf(messages, values) {
+  const full = say(messages, 'email.subject', values);
   if (full.length <= 70) return full;
-  const short = `${deal.firmName} ${accountPhrase(deal)} at ${at(deal, h.price)}${ends}`;
-  return short.slice(0, 70);
+  return say(messages, 'email.subject', { ...values, was: '' }).slice(0, 70);
 }
 
 // Target, drawdown and daily loss are what a trader actually decides on.
 // Third slot is a sub-label, so the drawdown type does not crowd the number.
-function statsOf(deal) {
+function statsOf(deal, labels) {
   const r = deal.rules;
   const out = [];
-  if (r.profitTarget) out.push(['Profit target', `$${usd(r.profitTarget)}`, '']);
-  if (r.maxDrawdown) out.push(['Max drawdown', `$${usd(r.maxDrawdown)}`, r.ddType]);
-  if (r.dailyLoss) out.push(['Daily loss', `$${usd(r.dailyLoss)}`, r.dailyLossSoft ? 'soft' : '']);
+  if (r.profitTarget) out.push([labels.target, `$${usd(r.profitTarget)}`, '']);
+  if (r.maxDrawdown) out.push([labels.maxdd, `$${usd(r.maxDrawdown)}`, r.ddType]);
+  if (r.dailyLoss) out.push([labels.dailyloss, `$${usd(r.dailyLoss)}`, r.dailyLossSoft ? 'soft' : '']);
   return out;
 }
 
 export function renderEmail(deal, { generatedAt } = {}) {
   const h = deal.headline;
-  const subject = subjectOf(deal);
-  const preheader = h.originalPrice
-    ? `${h.discountPct}% off, was ${money(h.originalPrice)}. ${deal.split} split, payout ${prose(deal.payout)}.`
-    : `${deal.split} split, payout ${prose(deal.payout)}. Prices checked ${deal.lastChecked}.`;
+  const { messages, takes } = loadCopy();
+  const values = valuesFor(deal, { takes });
+  const labels = parseLabels(messages['email.labels']);
+
+  // Values and template text both get escaped before they touch the markup, so
+  // an apostrophe or an accent in the copy file cannot break the email.
+  const hv = Object.fromEntries(Object.entries(values).map(([k, v]) => [k, esc(v)]));
+  const goldBold = (t) => `<strong style="color:${C.gold};">${t}</strong>`;
+  const inkBold = (t) => `<strong style="color:${C.ink};">${t}</strong>`;
+  const html_ = (block, bold = inkBold) => fill(esc(messages[block]), hv, { blockName: block, bold });
+
+  const subject = subjectOf(messages, values);
+  const preheader = say(messages, 'email.preheader', values);
+
+  // The old price gets struck through wherever the copy chose to put it.
+  const lead = html_('email.lead', goldBold);
+  const leadHtml = hv.was
+    ? lead.replace(hv.was, `<s style="color:${C.muted};">${hv.was}</s>`)
+    : lead;
 
   const ladderRows = deal.ladder
     .map((p) => {
@@ -414,7 +458,7 @@ export function renderEmail(deal, { generatedAt } = {}) {
     })
     .join('');
 
-  const stats = statsOf(deal);
+  const stats = statsOf(deal, labels);
   const statsBlock = stats.length
     ? `
       <tr><td style="padding:24px 32px 0;">
@@ -430,22 +474,35 @@ export function renderEmail(deal, { generatedAt } = {}) {
       </td></tr>`
     : '';
 
-  const caveats = deal.caveats.length
-    ? `
+  // A titled panel: used for the catch and, when Angelo wrote one, his take.
+  const panel = (title, body, background) => `
       <tr><td style="padding:0 32px 24px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.terraSoft};border-radius:12px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${background};border-radius:12px;">
           <tr><td style="padding:16px 20px;font:500 14px/1.55 ${FONT};color:${C.ink};">
-            <span style="font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.gold};">The catch</span><br>
-            ${deal.caveats.map((c) => esc(c.text)).join('<br>')}
+            <span style="font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.gold};">${title}</span><br>
+            ${body}
           </td></tr>
         </table>
-      </td></tr>`
+      </td></tr>`;
+
+  // values.take already has its placeholders resolved, so it only needs
+  // escaping and the *bold* pass.
+  const takeBlock = values.take
+    ? panel(
+        html_('email.take_title'),
+        esc(values.take).replace(/\*([^*]+)\*/g, (_, t) => inkBold(t)),
+        C.raised
+      )
+    : '';
+
+  const caveats = deal.caveats.length
+    ? panel(html_('email.catch_title'), deal.caveats.map((c) => esc(c.text)).join('<br>'), C.terraSoft)
     : '';
 
   const code = deal.code
-    ? `<p style="margin:16px 0 0;font:500 15px ${FONT};color:${C.muted};">Code at checkout: <strong style="color:${C.gold};font:700 15px ${MONO};">${esc(deal.code)}</strong></p>`
+    ? `<p style="margin:16px 0 0;font:500 15px ${FONT};color:${C.muted};">${fill(esc(messages['email.code']), hv, { blockName: 'email.code', bold: inkBold }).replace(esc(deal.code), `<strong style="color:${C.gold};font:700 15px ${MONO};">${esc(deal.code)}</strong>`)}</p>`
     : deal.codeInLink
-      ? `<p style="margin:16px 0 0;font:500 15px ${FONT};color:${C.muted};">No code to type, the discount rides on the link.</p>`
+      ? `<p style="margin:16px 0 0;font:500 15px ${FONT};color:${C.muted};">${html_('email.code_in_link')}</p>`
       : '';
 
   const html = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.surface};margin:0;padding:0;">
@@ -458,56 +515,60 @@ export function renderEmail(deal, { generatedAt } = {}) {
             <img src="${esc(deal.logo)}" width="48" height="48" alt="${esc(deal.firmName)}" style="display:block;width:48px;height:48px;border:0;">
           </td>
           <td style="vertical-align:top;">
-            <p style="margin:0;font:400 10px ${MONO};letter-spacing:.2em;text-transform:uppercase;color:${C.muted};">Deal of the day${deal.signals.includes('expiring') ? ` ${SEP} <span style="color:${C.gold};">ends ${weekdayOf(deal.endsAt)}</span>` : ''}</p>
+            <p style="margin:0;font:400 10px ${MONO};letter-spacing:.2em;text-transform:uppercase;color:${C.muted};">${html_('email.eyebrow')}${values.ends ? ` ${SEP} <span style="color:${C.gold};">${html_('email.ends')}</span>` : ''}</p>
             <h1 style="margin:8px 0 0;font:italic 400 32px/1.1 ${DISPLAY};color:${C.ink};">${esc(deal.firmName)}<span style="color:${C.gold};">.</span></h1>
           </td>
         </tr></table>
-        <p style="margin:16px 0 0;font:500 18px/1.5 ${FONT};color:${C.ink};"><strong style="color:${C.gold};">${at(deal, h.price)}</strong> for a ${accountPhrase(deal)}${h.originalPrice ? `, instead of <s style="color:${C.muted};">${at(deal, h.originalPrice)}</s>` : ''}.</p>
-        ${h.discountPct ? `<p style="margin:4px 0 0;font:500 15px/1.5 ${FONT};color:${C.muted};">${h.discountPct}% off on the ${esc(deal.programLabel)} plan.</p>` : ''}
+        <p style="margin:16px 0 0;font:500 18px/1.5 ${FONT};color:${C.ink};">${leadHtml}</p>
+        ${values.discount ? `<p style="margin:4px 0 0;font:500 15px/1.5 ${FONT};color:${C.muted};">${html_('email.sub')}</p>` : ''}
       </td></tr>
       ${statsBlock}
       <tr><td style="padding:24px 32px 0;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
           <tr>
-            <td style="font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.muted};padding-bottom:8px;">Account size</td>
-            <td style="font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.muted};padding-bottom:8px;text-align:right;">Now</td>
-            <td style="font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.muted};padding-bottom:8px;text-align:right;">Before</td>
+            <td style="font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.muted};padding-bottom:8px;">${esc(labels.size_col)}</td>
+            <td style="font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.muted};padding-bottom:8px;text-align:right;">${esc(labels.now_col)}</td>
+            <td style="font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.muted};padding-bottom:8px;text-align:right;">${esc(labels.before_col)}</td>
           </tr>${ladderRows}
         </table>
       </td></tr>
       <tr><td style="padding:24px 32px 0;font:500 15px/1.6 ${FONT};color:${C.muted};">
-        <strong style="color:${C.ink};">${esc(deal.split)}</strong> profit split ${SEP} payout <strong style="color:${C.ink};">${esc(deal.payout)}</strong>${deal.rules.contracts ? ` ${SEP} ${esc(deal.rules.contracts)}` : ''}
+        ${html_('email.specs')}
       </td></tr>
       <tr><td style="padding:24px 32px;">
-        <a href="${esc(deal.url)}" style="display:inline-block;background:${C.gold};color:${C.surface};font:700 16px ${FONT};text-decoration:none;padding:16px 32px;border-radius:999px;">Get the ${sizeLabel(h.size)} at ${at(deal, h.price)}</a>
+        <a href="${esc(deal.url)}" style="display:inline-block;background:${C.gold};color:${C.surface};font:700 16px ${FONT};text-decoration:none;padding:16px 32px;border-radius:999px;">${html_('email.cta')}</a>
         ${code}
       </td></tr>
+      ${takeBlock}
       ${caveats}
       <tr><td style="padding:24px 32px 32px;font:400 13px/1.6 ${FONT};color:${C.muted};border-top:1px solid ${C.borderSoft};">
-        Prices read off ${esc(deal.firmName)}'s own site, checked ${esc(deal.lastChecked)}${generatedAt ? ` (sync ${esc(generatedAt)})` : ''}. Affiliate links, your price does not change. You signed up for this on jacktradesnq.com. <a href="{{unsubscribe_url}}" style="color:${C.muted};text-decoration:underline;">Unsubscribe</a>.
+        ${html_('email.footer')}${generatedAt ? ` <span style="color:${C.borderSoft};">(sync ${esc(generatedAt)})</span>` : ''} <a href="{{unsubscribe_url}}" style="color:${C.muted};text-decoration:underline;">${html_('email.unsubscribe')}</a>.
       </td></tr>
     </table>
   </td></tr>
 </table>`;
 
+  const plain = (block) => say(messages, block, values);
   const text = [
-    `${deal.firmName}, deal of the day`,
+    `${deal.firmName}, ${plain('email.eyebrow').toLowerCase()}`,
     '',
-    `${offerLine(deal)}${h.discountPct ? ` ${h.discountPct}% off on the ${deal.programLabel} plan.` : ''}${endsClause(deal)}`,
-    `${deal.split} split, payout ${prose(deal.payout)}.`,
-    statsOf(deal).map(([label, value, sub]) => `${label}: ${value}${sub ? ` ${sub}` : ''}`).join(', '),
+    `${plain('email.lead')} ${plain('email.sub')}${values.ends ? ` (${plain('email.ends')})` : ''}`.trim(),
+    plain('email.specs'),
+    statsOf(deal, labels).map(([label, value, sub]) => `${label}: ${value}${sub ? ` ${sub}` : ''}`).join(', '),
     '',
     deal.ladder.map((p) => `${sizeLabel(p.size)}: ${at(deal, p.price)}${p.originalPrice ? ` (was ${at(deal, p.originalPrice)})` : ''}`).join('\n'),
     '',
-    ...(deal.caveats.length ? [`The catch: ${deal.caveats.map((c) => c.text).join(' ')}`, ''] : []),
+    ...(values.take ? [`${plain('email.take_title')}: ${values.take}`, ''] : []),
+    ...(deal.caveats.length ? [`${plain('email.catch_title')}: ${deal.caveats.map((c) => c.text).join(' ')}`, ''] : []),
     codeLine(deal) ? `${codeLine(deal)}` : '',
     deal.url,
     '',
-    `Prices checked ${deal.lastChecked} on the firm's own site. Affiliate links, your price does not change.`,
-    'Unsubscribe: {{unsubscribe_url}}',
+    plain('email.footer'),
+    `${plain('email.unsubscribe')}: {{unsubscribe_url}}`,
   ]
     .filter((l) => l !== '')
-    .join('\n');
+    .join('\n')
+    .replace(/\*/g, '');
 
   return { subject, preheader, html, text };
 }

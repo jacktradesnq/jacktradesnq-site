@@ -159,14 +159,17 @@ test('a monthly plan marks BOTH prices per month, never just the new one', () =>
   assert.match(mail.text, /\/mo.*was.*\/mo/s);
 });
 
-test('no interpunct inside a sentence, it reads like a spreadsheet', () => {
+test('a scraped value never drags an interpunct into a sentence', () => {
+  // "Daily · 5h guaranteed" is fine in a table and wrong mid-sentence. The
+  // separators the copy file itself uses are Angelo's call, not this test's.
   for (const firm of DATA.firms) {
     const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: firm.id });
     if (!deal) continue;
     const tweet = renderTweet(deal);
     assert.ok(!tweet.includes('·'), `${firm.id}: interpunct in tweet\n${tweet}`);
-    assert.ok(!renderEmail(deal, {}).text.includes('·'), `${firm.id}: interpunct in email text`);
   }
+  const fundedseat = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
+  assert.match(renderTweet(fundedseat), /payout Daily, 5h guaranteed/);
 });
 
 test('the program label never repeats the firm name', () => {
