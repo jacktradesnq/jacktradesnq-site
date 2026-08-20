@@ -76,8 +76,12 @@ test('a firm sent in the last 7 days is not picked again', () => {
     today: '2026-08-21',
     history: [{ firmId: 'fundedseat', date: '2026-08-20' }],
   });
+  // Which firm comes second is incidental, it follows the discounts of the day.
+  // What matters is that the one already sent is skipped, and that the runner-up
+  // is the best of the firms still eligible.
   assert.notEqual(deal.firmId, 'fundedseat');
-  assert.equal(deal.firmId, 'top-one-futures');
+  const eligible = analyzeFirms(DATA, { today: '2026-08-21' }).filter((c) => c.firmId !== 'fundedseat');
+  assert.equal(deal.firmId, eligible[0].firmId);
 });
 
 test('7 consecutive days rotate over 7 distinct firms', () => {

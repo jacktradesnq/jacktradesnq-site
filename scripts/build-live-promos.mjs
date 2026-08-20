@@ -65,6 +65,7 @@ const promos = live
     price: c.headline.price,
     originalPrice: c.headline.originalPrice,
     discountPct: c.headline.discountPct,
+    priceNote: c.priceNote,
     endsAt: c.endsAt,
     expiring: c.signals.includes('expiring'),
     split: c.split,

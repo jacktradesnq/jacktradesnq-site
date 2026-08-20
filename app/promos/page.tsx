@@ -26,6 +26,7 @@ type Promo = {
   price: number;
   originalPrice: number | null;
   discountPct: number;
+  priceNote: string | null;
   endsAt: string | null;
   expiring: boolean;
   split: string;
@@ -150,6 +151,7 @@ export default function PromosPage() {
                   )}
                   <span className="promo-off">{p.discountPct}% off</span>
                 </div>
+                {p.priceNote && <p className="promo-note">{p.priceNote}</p>}
 
                 <dl className="promo-specs">
                   <div>

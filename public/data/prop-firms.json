@@ -829,7 +829,7 @@
             },
             {
               "size": 50000,
-              "price": 98.15,
+              "price": 49,
               "originalPrice": 151,
               "profitTarget": 2700,
               "maxDrawdown": 2200,
@@ -837,7 +837,8 @@
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "40%",
-              "contracts": "4 minis / 40 micros"
+              "contracts": "4 minis / 40 micros",
+              "priceNote": "$49 first order, $98 after"
             },
             {
               "size": 100000,

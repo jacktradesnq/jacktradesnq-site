@@ -455,6 +455,30 @@ export function legendsActivationFee(description) {
   return fee;
 }
 
+// Their August promotion, from the asset LEGENDS sent Angelo with his own code
+// on it: the 50K Elite is $49 on a FIRST order and $98 after. Their shop API
+// only exposes the repeat price ($98.15), so the promo price is pinned here.
+//
+// `until` is what keeps this honest: past that date the override stops applying
+// and the API price comes back on its own, instead of a stale $49 living on the
+// page forever. The note next to it is set once in prop-firms.json.
+const LEGENDS_PROMO = {
+  programName: 'Elite',
+  size: 50000,
+  price: 49,
+  until: '2026-09-01',
+  source: 'August promotion asset, "$49 FIRST ORDER, $98 OTHER ORDERS", code JTNQ',
+};
+
+export function applyLegendsPromo(updates, today = TODAY) {
+  if (today >= LEGENDS_PROMO.until) return updates;
+  return updates.map((u) =>
+    u.programName === LEGENDS_PROMO.programName && u.size === LEGENDS_PROMO.size
+      ? { ...u, price: LEGENDS_PROMO.price }
+      : u,
+  );
+}
+
 export function legendsUpdatesFrom(payload) {
   const plans = payload?.data;
   if (!Array.isArray(plans) || plans.length === 0) throw new Error('LEGENDS API returned no plans');
@@ -489,7 +513,7 @@ async function scrapeLegends() {
     headers: { 'user-agent': UA, accept: 'application/json' },
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} for the LEGENDS shop API`);
-  return { updates: legendsUpdatesFrom(await res.json()) }; // promo label stays manual
+  return { updates: applyLegendsPromo(legendsUpdatesFrom(await res.json())) };
 }
 
 /* ------------------------------------------------------------------ */
