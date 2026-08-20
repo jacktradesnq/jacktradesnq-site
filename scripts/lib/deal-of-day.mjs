@@ -34,6 +34,15 @@ function programLabelOf(firmName, programName) {
 // The size traders actually compare against each other.
 const REFERENCE_SIZE = 50000;
 
+// Raster copies of the firm logos, for email: Gmail strips SVG.
+// Built by scripts/build-email-logos.sh into public/logos/email/.
+const LOGO_BASE = 'https://jacktradesnq.com/logos/email';
+
+// An evaluation is not a funded account. Saying "funded" about a challenge is
+// the one wording mistake that would cost credibility with traders.
+const accountPhrase = (deal) =>
+  `${sizeLabel(deal.headline.size)} ${deal.programType === 'instant' ? 'instant funded account' : 'challenge'}`;
+
 const dayStart = (iso) => Date.parse(`${iso}T00:00:00Z`);
 const dayEnd = (iso) => Date.parse(`${iso}T23:59:59Z`);
 
@@ -148,8 +157,10 @@ function caveatsOf(program, plan) {
     });
   }
   if (plan.ddType && plan.ddType !== 'EOD') {
+    // The exact type is printed in the stats strip right above, so this sentence
+    // says what it means instead of repeating the label.
     out.push({
-      text: `Drawdown trails your balance (${plan.ddType}), so it is tighter than the headline number.`,
+      text: 'The drawdown follows your balance up, so it is tighter than the number above.',
       source: 'plan.ddType',
     });
   }
@@ -213,6 +224,7 @@ function candidateFor(firm, { today, prevSnapshot }) {
   return {
     firmId: firm.id,
     firmName: firm.name,
+    logo: `${LOGO_BASE}/${firm.id}.png`,
     url: firm.url,
     code: program.promoCode ?? firm.promo?.code ?? firm.code ?? null,
     codeInLink: /(?:coupon|code|ref|afmc|a_aid)=/i.test(firm.url),
@@ -239,6 +251,7 @@ function candidateFor(firm, { today, prevSnapshot }) {
       maxDrawdown: plan.maxDrawdown,
       ddType: plan.ddType,
       dailyLoss: plan.dailyLoss,
+      dailyLossSoft: plan.dailyLossSoft ?? false,
       contracts: plan.contracts,
     },
     ladder,
@@ -291,9 +304,15 @@ function codeLine(deal) {
   return '';
 }
 
-export function renderTweet(deal) {
+// Price first, then what it buys: the reader is scanning for a number.
+function offerLine(deal) {
   const h = deal.headline;
-  const l1 = `${deal.firmName} ${deal.programLabel} ${sizeLabel(h.size)} is ${priceLine(deal)}.${endsClause(deal)}`;
+  const was = h.originalPrice ? `, instead of ${at(deal, h.originalPrice)}` : '';
+  return `${at(deal, h.price)} for a ${accountPhrase(deal)}${was}.`;
+}
+
+export function renderTweet(deal) {
+  const l1 = `${offerLine(deal)} ${deal.firmName}, ${deal.programLabel} plan.${endsClause(deal)}`;
   const l2 = `${deal.split} split, payout ${prose(deal.payout)}.`;
   const code = codeLine(deal);
   const l3 = code ? `${code}: ${deal.url}` : deal.url;
@@ -304,13 +323,15 @@ export function renderDiscord(deal) {
   const h = deal.headline;
   const ladder = deal.ladder.map((p) => `${sizeLabel(p.size)} ${at(deal, p.price)}`).join(' · ');
   const lines = [
-    `**Deal of the day: ${deal.firmName}**`,
-    `${deal.programLabel} ${sizeLabel(h.size)} at ${priceLine(deal)}${h.discountPct ? ` (${h.discountPct}% off)` : ''}.${endsClause(deal)}`,
+    `**${deal.firmName}, deal of the day**`,
+    `${offerLine(deal)}${h.discountPct ? ` ${h.discountPct}% off on the ${deal.programLabel} plan.` : ''}${endsClause(deal)}`,
     '',
-    `Whole ladder: ${ladder}`,
+    `Every size: ${ladder}`,
     `${deal.split} split · payout ${deal.payout} · ${deal.rules.ddType} drawdown${deal.rules.contracts ? ` · ${deal.rules.contracts}` : ''}`,
   ];
-  if (deal.caveats.length) lines.push(`Watch out: ${deal.caveats.map((c) => c.text).join(' ')}`);
+  if (deal.caveats.length) {
+    lines.push('', 'Watch out:', ...deal.caveats.map((c) => `- ${c.text}`));
+  }
   const code = codeLine(deal);
   lines.push('', code ? `${code} · <${deal.url}>` : `<${deal.url}>`);
   lines.push(`Prices checked ${deal.lastChecked} on the firm's own site.`);
@@ -354,19 +375,23 @@ const esc = (s) =>
 
 function subjectOf(deal) {
   const h = deal.headline;
-  let s = `${deal.firmName}: ${sizeLabel(h.size)} ${deal.programLabel} at ${at(deal, h.price)}`;
-  if (deal.signals.includes('expiring')) s += `, ends ${weekdayOf(deal.endsAt)}`;
-  if (s.length > 70) s = `${deal.firmName}: ${sizeLabel(h.size)} at ${at(deal, h.price)}`;
-  return s.slice(0, 70);
+  const ends = deal.signals.includes('expiring') ? `, ends ${weekdayOf(deal.endsAt)}` : '';
+  const full = `${deal.firmName} ${accountPhrase(deal)} at ${at(deal, h.price)}${
+    h.originalPrice ? ` instead of ${at(deal, h.originalPrice)}` : ''
+  }${ends}`;
+  if (full.length <= 70) return full;
+  const short = `${deal.firmName} ${accountPhrase(deal)} at ${at(deal, h.price)}${ends}`;
+  return short.slice(0, 70);
 }
 
 // Target, drawdown and daily loss are what a trader actually decides on.
+// Third slot is a sub-label, so the drawdown type does not crowd the number.
 function statsOf(deal) {
   const r = deal.rules;
   const out = [];
-  if (r.profitTarget) out.push(['Profit target', `$${usd(r.profitTarget)}`]);
-  if (r.maxDrawdown) out.push(['Max drawdown', `$${usd(r.maxDrawdown)} ${r.ddType}`]);
-  if (r.dailyLoss) out.push(['Daily loss', `$${usd(r.dailyLoss)}`]);
+  if (r.profitTarget) out.push(['Profit target', `$${usd(r.profitTarget)}`, '']);
+  if (r.maxDrawdown) out.push(['Max drawdown', `$${usd(r.maxDrawdown)}`, r.ddType]);
+  if (r.dailyLoss) out.push(['Daily loss', `$${usd(r.dailyLoss)}`, r.dailyLossSoft ? 'soft' : '']);
   return out;
 }
 
@@ -374,17 +399,17 @@ export function renderEmail(deal, { generatedAt } = {}) {
   const h = deal.headline;
   const subject = subjectOf(deal);
   const preheader = h.originalPrice
-    ? `${h.discountPct}% off, was ${money(h.originalPrice)}. ${deal.split} split, payout ${deal.payout}.`
-    : `${deal.split} split, payout ${deal.payout}. Prices checked ${deal.lastChecked}.`;
+    ? `${h.discountPct}% off, was ${money(h.originalPrice)}. ${deal.split} split, payout ${prose(deal.payout)}.`
+    : `${deal.split} split, payout ${prose(deal.payout)}. Prices checked ${deal.lastChecked}.`;
 
   const ladderRows = deal.ladder
     .map((p) => {
       const lead = p.size === h.size;
       return `
             <tr>
-              <td style="padding:9px 0;border-bottom:1px solid ${C.borderSoft};font:${lead ? '700' : '500'} 15px ${FONT};color:${lead ? C.gold : C.muted};">${sizeLabel(p.size)}</td>
-              <td style="padding:9px 0;border-bottom:1px solid ${C.borderSoft};font:700 15px ${FONT};color:${lead ? C.gold : C.ink};text-align:right;">${at(deal, p.price)}</td>
-              <td style="padding:9px 0 9px 12px;border-bottom:1px solid ${C.borderSoft};font:400 14px ${FONT};color:${C.muted};text-align:right;">${p.originalPrice ? `<s>${at(deal, p.originalPrice)}</s>` : ''}</td>
+              <td style="padding:8px 0;border-bottom:1px solid ${C.borderSoft};font:${lead ? '700' : '500'} 15px ${FONT};color:${lead ? C.gold : C.muted};">${sizeLabel(p.size)}</td>
+              <td style="padding:8px 0;border-bottom:1px solid ${C.borderSoft};font:700 15px ${FONT};color:${lead ? C.gold : C.ink};text-align:right;">${at(deal, p.price)}</td>
+              <td style="padding:8px 0 8px 12px;border-bottom:1px solid ${C.borderSoft};font:400 14px ${FONT};color:${C.muted};text-align:right;">${p.originalPrice ? `<s>${at(deal, p.originalPrice)}</s>` : ''}</td>
             </tr>`;
     })
     .join('');
@@ -392,12 +417,12 @@ export function renderEmail(deal, { generatedAt } = {}) {
   const stats = statsOf(deal);
   const statsBlock = stats.length
     ? `
-      <tr><td style="padding:20px 32px 0;">
+      <tr><td style="padding:24px 32px 0;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.raised};border:1px solid ${C.border};border-radius:12px;">
           <tr>${stats
             .map(
-              ([label, value]) => `
-            <td style="padding:14px 16px;font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.muted};">${esc(label)}<br><span style="font:700 15px ${FONT};letter-spacing:0;text-transform:none;color:${C.ink};">${esc(value)}</span></td>`
+              ([label, value, sub]) => `
+            <td style="padding:16px;font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.muted};">${esc(label)}<br><span style="font:700 17px ${FONT};letter-spacing:0;text-transform:none;color:${C.ink};">${esc(value)}</span>${sub ? `<br><span style="font:400 10px ${MONO};letter-spacing:.12em;color:${C.muted};">${esc(sub)}</span>` : ''}</td>`
             )
             .join('')}
           </tr>
@@ -418,52 +443,59 @@ export function renderEmail(deal, { generatedAt } = {}) {
     : '';
 
   const code = deal.code
-    ? `<p style="margin:18px 0 0;font:500 15px ${FONT};color:${C.muted};">Code at checkout: <strong style="color:${C.gold};font:700 15px ${MONO};">${esc(deal.code)}</strong></p>`
+    ? `<p style="margin:16px 0 0;font:500 15px ${FONT};color:${C.muted};">Code at checkout: <strong style="color:${C.gold};font:700 15px ${MONO};">${esc(deal.code)}</strong></p>`
     : deal.codeInLink
-      ? `<p style="margin:18px 0 0;font:500 15px ${FONT};color:${C.muted};">No code to type, the discount rides on the link.</p>`
+      ? `<p style="margin:16px 0 0;font:500 15px ${FONT};color:${C.muted};">No code to type, the discount rides on the link.</p>`
       : '';
 
   const html = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.surface};margin:0;padding:0;">
   <tr><td align="center" style="padding:24px 12px;">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${esc(preheader)}</div>
     <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:${C.card};border:1px solid ${C.border};border-radius:12px;">
-      <tr><td style="padding:28px 32px 0;">
-        <p style="margin:0;font:400 10px ${MONO};letter-spacing:.2em;text-transform:uppercase;color:${C.muted};">Deal of the day${deal.signals.includes('expiring') ? ` ${SEP} <span style="color:${C.gold};">ends ${weekdayOf(deal.endsAt)}</span>` : ''}</p>
-        <h1 style="margin:10px 0 0;font:italic 400 34px/1.1 ${DISPLAY};color:${C.ink};">${esc(deal.firmName)}<span style="color:${C.gold};">.</span></h1>
-        <p style="margin:12px 0 0;font:500 17px/1.5 ${FONT};color:${C.muted};">${esc(deal.programLabel)} ${sizeLabel(h.size)} is <strong style="color:${C.gold};">${at(deal, h.price)}</strong>${h.originalPrice ? ` instead of <s>${at(deal, h.originalPrice)}</s>, ${h.discountPct}% off` : ''}.</p>
+      <tr><td style="padding:32px 32px 0;">
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td width="48" style="padding-right:16px;vertical-align:top;">
+            <img src="${esc(deal.logo)}" width="48" height="48" alt="${esc(deal.firmName)}" style="display:block;width:48px;height:48px;border:0;">
+          </td>
+          <td style="vertical-align:top;">
+            <p style="margin:0;font:400 10px ${MONO};letter-spacing:.2em;text-transform:uppercase;color:${C.muted};">Deal of the day${deal.signals.includes('expiring') ? ` ${SEP} <span style="color:${C.gold};">ends ${weekdayOf(deal.endsAt)}</span>` : ''}</p>
+            <h1 style="margin:8px 0 0;font:italic 400 32px/1.1 ${DISPLAY};color:${C.ink};">${esc(deal.firmName)}<span style="color:${C.gold};">.</span></h1>
+          </td>
+        </tr></table>
+        <p style="margin:16px 0 0;font:500 18px/1.5 ${FONT};color:${C.ink};"><strong style="color:${C.gold};">${at(deal, h.price)}</strong> for a ${accountPhrase(deal)}${h.originalPrice ? `, instead of <s style="color:${C.muted};">${at(deal, h.originalPrice)}</s>` : ''}.</p>
+        ${h.discountPct ? `<p style="margin:4px 0 0;font:500 15px/1.5 ${FONT};color:${C.muted};">${h.discountPct}% off on the ${esc(deal.programLabel)} plan.</p>` : ''}
       </td></tr>
       ${statsBlock}
       <tr><td style="padding:24px 32px 0;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
           <tr>
-            <td style="font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.muted};padding-bottom:6px;">Account size</td>
-            <td style="font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.muted};padding-bottom:6px;text-align:right;">Now</td>
-            <td style="font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.muted};padding-bottom:6px;text-align:right;">Before</td>
+            <td style="font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.muted};padding-bottom:8px;">Account size</td>
+            <td style="font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.muted};padding-bottom:8px;text-align:right;">Now</td>
+            <td style="font:400 10px ${MONO};letter-spacing:.16em;text-transform:uppercase;color:${C.muted};padding-bottom:8px;text-align:right;">Before</td>
           </tr>${ladderRows}
         </table>
       </td></tr>
-      <tr><td style="padding:22px 32px 0;font:500 15px/1.6 ${FONT};color:${C.muted};">
-        <strong style="color:${C.ink};">${esc(deal.split)}</strong> profit split ${SEP} payout <strong style="color:${C.ink};">${esc(deal.payout)}</strong> ${SEP} ${esc(deal.rules.ddType)} drawdown${deal.rules.contracts ? ` ${SEP} ${esc(deal.rules.contracts)}` : ''}
+      <tr><td style="padding:24px 32px 0;font:500 15px/1.6 ${FONT};color:${C.muted};">
+        <strong style="color:${C.ink};">${esc(deal.split)}</strong> profit split ${SEP} payout <strong style="color:${C.ink};">${esc(deal.payout)}</strong>${deal.rules.contracts ? ` ${SEP} ${esc(deal.rules.contracts)}` : ''}
       </td></tr>
-      <tr><td style="padding:26px 32px;">
-        <a href="${esc(deal.url)}" style="display:inline-block;background:${C.gold};color:${C.surface};font:700 16px ${FONT};text-decoration:none;padding:14px 30px;border-radius:999px;">See the offer</a>
+      <tr><td style="padding:24px 32px;">
+        <a href="${esc(deal.url)}" style="display:inline-block;background:${C.gold};color:${C.surface};font:700 16px ${FONT};text-decoration:none;padding:16px 32px;border-radius:999px;">Get the ${sizeLabel(h.size)} at ${at(deal, h.price)}</a>
         ${code}
       </td></tr>
       ${caveats}
-      <tr><td style="padding:20px 32px 28px;font:400 13px/1.6 ${FONT};color:${C.muted};border-top:1px solid ${C.borderSoft};">
-        Every price above is read straight off ${esc(deal.firmName)}'s own site, last checked ${esc(deal.lastChecked)}${generatedAt ? ` (data synced ${esc(generatedAt)})` : ''}. Links are affiliate links: the price you pay does not change.<br><br>
-        You are getting this because you signed up for the daily prop firm deal on jacktradesnq.com. <a href="{{unsubscribe_url}}" style="color:${C.muted};text-decoration:underline;">Unsubscribe</a>.
+      <tr><td style="padding:24px 32px 32px;font:400 13px/1.6 ${FONT};color:${C.muted};border-top:1px solid ${C.borderSoft};">
+        Prices read off ${esc(deal.firmName)}'s own site, checked ${esc(deal.lastChecked)}${generatedAt ? ` (sync ${esc(generatedAt)})` : ''}. Affiliate links, your price does not change. You signed up for this on jacktradesnq.com. <a href="{{unsubscribe_url}}" style="color:${C.muted};text-decoration:underline;">Unsubscribe</a>.
       </td></tr>
     </table>
   </td></tr>
 </table>`;
 
   const text = [
-    `${deal.firmName} - deal of the day`,
+    `${deal.firmName}, deal of the day`,
     '',
-    `${deal.programLabel} ${sizeLabel(h.size)} is ${priceLine(deal)}${h.discountPct ? ` (${h.discountPct}% off)` : ''}.${endsClause(deal)}`,
-    `${deal.split} split, payout ${prose(deal.payout)}, ${deal.rules.ddType} drawdown.`,
-    statsOf(deal).map(([label, value]) => `${label}: ${value}`).join(', '),
+    `${offerLine(deal)}${h.discountPct ? ` ${h.discountPct}% off on the ${deal.programLabel} plan.` : ''}${endsClause(deal)}`,
+    `${deal.split} split, payout ${prose(deal.payout)}.`,
+    statsOf(deal).map(([label, value, sub]) => `${label}: ${value}${sub ? ` ${sub}` : ''}`).join(', '),
     '',
     deal.ladder.map((p) => `${sizeLabel(p.size)}: ${at(deal, p.price)}${p.originalPrice ? ` (was ${at(deal, p.originalPrice)})` : ''}`).join('\n'),
     '',

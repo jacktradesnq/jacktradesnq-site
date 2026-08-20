@@ -2,7 +2,7 @@
 // Run: node --test scripts/deal-of-day.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 
 import {
   analyzeFirms,
@@ -100,7 +100,7 @@ test('a firm priced by affiliate code shows the same price as the site', () => {
   assert.equal(deal.headline.price, 135.15);
   assert.equal(deal.headline.originalPrice, 159);
   assert.equal(deal.headline.discountPct, 15);
-  assert.match(renderTweet(deal), /\$135\.15 instead of \$159/);
+  assert.match(renderTweet(deal), /\$135\.15 for a 100K challenge, instead of \$159/);
 });
 
 // ── renderers ────────────────────────────────────────────────────────────────
@@ -179,6 +179,82 @@ test('the program label never repeats the firm name', () => {
       `${firm.id}: "${deal.firmName} ${deal.programLabel}" stutters`
     );
   }
+});
+
+// ── images ───────────────────────────────────────────────────────────────────
+
+test('every firm has an email-safe raster logo that exists on disk', () => {
+  for (const firm of DATA.firms) {
+    const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: firm.id });
+    if (!deal) continue;
+    assert.equal(
+      deal.logo,
+      `https://jacktradesnq.com/logos/email/${firm.id}.png`,
+      `${firm.id}: unexpected logo url`
+    );
+    // SVG is stripped by Gmail, so the email set has to be PNG and has to exist.
+    const onDisk = new URL(`../public/logos/email/${firm.id}.png`, import.meta.url);
+    assert.ok(existsSync(onDisk), `${firm.id}: public/logos/email/${firm.id}.png missing`);
+  }
+});
+
+test('the email shows the logo once, sized and described', () => {
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const { html } = renderEmail(deal, {});
+  const imgs = html.match(/<img[^>]*>/g) ?? [];
+  assert.equal(imgs.length, 1, `expected one image, got ${imgs.length}`);
+  const [img] = imgs;
+  assert.match(img, /src="https:\/\/jacktradesnq\.com\/logos\/email\/fundedseat\.png"/);
+  assert.match(img, /width="48"/);
+  assert.match(img, /height="48"/);
+  assert.match(img, /alt="FundedSeat"/);
+});
+
+// ── spacing ──────────────────────────────────────────────────────────────────
+
+test('every spacing value sits on the 4pt grid', () => {
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const { html } = renderEmail(deal, {});
+  const offenders = [];
+  for (const [, prop, value] of html.matchAll(/(padding|margin)(?:-[a-z]+)?:([^;"]+)/g)) {
+    for (const px of value.matchAll(/(\d+)px/g)) {
+      if (Number(px[1]) % 4 !== 0) offenders.push(`${prop}: ${px[1]}px`);
+    }
+  }
+  assert.deepEqual(offenders, [], `off-grid spacing: ${offenders.join(', ')}`);
+});
+
+// ── wording ──────────────────────────────────────────────────────────────────
+
+test('an evaluation is called a challenge, instant funding is called funded', () => {
+  const evalDeal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'tradeday' });
+  assert.equal(evalDeal.programType, 'eval');
+  assert.match(renderTweet(evalDeal), /50K challenge/);
+  assert.doesNotMatch(renderTweet(evalDeal), /funded account/);
+
+  // No firm currently headlines an instant program, so strip a firm down to one
+  // to prove the wording follows program.type and not the firm.
+  const data = structuredClone(DATA);
+  const bg = data.firms.find((f) => f.id === 'blue-guardian');
+  bg.programs = bg.programs.filter((p) => p.type === 'instant');
+  const instant = pickDeal(data, { today: '2026-08-20', history: [], forceFirmId: 'blue-guardian' });
+  assert.equal(instant.programType, 'instant');
+  assert.match(renderTweet(instant), /instant funded account/);
+  assert.doesNotMatch(renderTweet(instant), /challenge/);
+});
+
+test('the drawdown type is stated once, not twice', () => {
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const { html } = renderEmail(deal, {});
+  const hits = html.match(/EOD Trailing/g) ?? [];
+  assert.equal(hits.length, 1, `"EOD Trailing" appears ${hits.length} times`);
+});
+
+test('the button says what it costs', () => {
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const { html } = renderEmail(deal, {});
+  const cta = html.match(/<a href="[^"]*"[^>]*>([^<]+)<\/a>/)?.[1] ?? '';
+  assert.match(cta, /Get the 50K at \$104\.95/, `cta reads "${cta}"`);
 });
 
 test('email html is pure ASCII, a stray byte shows up as mojibake in clients', () => {
