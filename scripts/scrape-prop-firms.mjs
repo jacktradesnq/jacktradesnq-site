@@ -21,6 +21,8 @@
 
 import fs from 'node:fs';
 
+import { fundedseatPlansFrom, FUNDEDSEAT_API } from './lib/fundedseat-api.mjs';
+
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
 const DRY = process.argv.includes('--dry');
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -288,11 +290,18 @@ const FUNDEDSEAT_PROGRAMS = [
 const MONTHS = { JANUARY: 1, FEBRUARY: 2, MARCH: 3, APRIL: 4, MAY: 5, JUNE: 6, JULY: 7, AUGUST: 8, SEPTEMBER: 9, OCTOBER: 10, NOVEMBER: 11, DECEMBER: 12 };
 
 async function scrapeFundedSeat() {
+  // Their own backend answers for 11 of our 15 plans. It is the second witness:
+  // the cards are what a buyer is shown, the API is what their system charges,
+  // and a disagreement between the two is not ours to resolve silently.
+  const apiPlans = fundedseatPlansFrom(JSON.parse(await fetchText(FUNDEDSEAT_API)));
+
   let pw;
   try {
     pw = await import('playwright');
   } catch {
-    console.log('fundedseat: playwright not installed, skipped');
+    // Flex has no API counterpart, so 11/15 plans cannot satisfy the full-coverage
+    // guard: skip the firm exactly as before rather than write a partial update.
+    console.log(`fundedseat: ${apiPlans.length} plans read from their API, but Flex needs playwright — skipped`);
     return null;
   }
   const browser = await pw.chromium.launch({ headless: true });
@@ -383,6 +392,20 @@ async function scrapeFundedSeat() {
           originalPrice: num(priceM[1]),
         });
       }
+    }
+
+    // Cross-check every plan both sources describe. Tab clicking is the weak
+    // link here (their variant buttons swap the cards under us, which is why the
+    // "Bolt" guard above exists), so a card that disagrees with their backend is
+    // treated as a bad read and stops the firm instead of publishing a guess.
+    for (const api of apiPlans) {
+      const card = updates.find((u) => u.programName === api.programName && u.size === api.size);
+      if (!card) throw new Error(`${api.programName} $${api.size / 1000}K: in their API, missing from the cards`);
+      if (card.price !== api.price || card.originalPrice !== api.originalPrice)
+        throw new Error(
+          `${api.programName} $${api.size / 1000}K: card says $${card.price}/$${card.originalPrice}, ` +
+            `their API says $${api.price}/$${api.originalPrice}`,
+        );
     }
 
     // Top banner, e.g. "50% OFF YOUR NEXT 3 PURCHASES — USE CODE JULY50 — ENDS JULY 26"

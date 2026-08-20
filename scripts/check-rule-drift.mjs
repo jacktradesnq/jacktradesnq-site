@@ -28,12 +28,14 @@
 
 import fs from 'node:fs';
 
+import { fundedseatPlansFrom, FUNDEDSEAT_API, FUNDEDSEAT_API_UNCOVERED } from './lib/fundedseat-api.mjs';
+
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 
 const FIELDS = ['profitTarget', 'maxDrawdown', 'dailyLoss', 'consistency', 'contracts'];
-const BROKEN = Symbol('broken'); // rules[field] === BROKEN => anchor present-but-unreadable
+export const BROKEN = Symbol('broken'); // rules[field] === BROKEN => anchor present-but-unreadable
 
 /* ------------------------------------------------------------------ */
 /* Normalizers (task §4)                                               */
@@ -395,40 +397,50 @@ async function extractTradeDay() {
 }
 
 /* ---- Legends Trading — static cards, two formats ---- */
-const LEGENDS_PROGRAMS = ['Apprentice', 'Elite', 'Straight to Master'];
+/* Read from their own shop API, not from thelegendstrading.com/plans: that page
+ * serves a stale table to every HTTP client (proven 2026-08-20 — it advertises
+ * $185 for a plan the store sells at $59), and reading rules off it reported four
+ * drifts that do not exist. The API is what the store actually charges, and it
+ * spells every rule out in the plan description, in two wordings:
+ *   Apprentice: "$3,000 profit goal | $2,000 EOD trailing max loss |
+ *                No consistency required | $99 Activation Fee"
+ *   Elite:      "$2,700 Profit Target | $2,200 EOD Trailing Max Loss |
+ *                Daily Loss Limit: None | Consistency: 40% | ..." */
+const LEGENDS_RULES_API = 'https://api.thelegendstrading.com/shop/plans?purchasableOnly=true&broker=Tradovate';
 async function extractLegends() {
-  const lines = htmlToLines(await fetchText('https://thelegendstrading.com/plans'));
-  const starts = [];
-  for (let i = 0; i < lines.length; i++)
-    if (/^\$[\d,.]+$/.test(lines[i]) && /max/i.test(lines[i + 1] || '')) starts.push(i);
+  return legendsRulesFrom(JSON.parse(await fetchText(LEGENDS_RULES_API)));
+}
 
-  const out = [];
-  for (let c = 0; c < Math.min(starts.length, 12); c++) {
-    const programName = LEGENDS_PROGRAMS[Math.floor(c / 4)];
-    const i = starts[c];
-    const size = money(lines[i]);
-    const card = lines.slice(i, i + 18);
-    const find = (re) => {
-      const l = card.find((x) => re.test(x));
-      return l ? l.match(re) : null;
+export function legendsRulesFrom(payload) {
+  const plans = Array.isArray(payload) ? payload : (payload?.data ?? []);
+  if (plans.length === 0) throw new Error('shop API returned no plans');
+
+  return plans.map((p) => {
+    const text = String(p.description ?? '');
+    const short = String(p.shortDescription ?? '');
+    const find = (re, s = text) => {
+      const m = s.match(re);
+      return m ? m[1] : null;
     };
-    const pt = find(/\$?([\d.,]+)\s*(?:profit goal|profit target)/i);
-    const dd = find(/\$?([\d.,]+)[^\n]*trailing max loss/i);
-    const cons = find(/consistency:?\s*(\d+)\s*%/i);
-    const daily = find(/daily loss limit:?\s*(none|\$?[\d.,]+)/i);
-    out.push({
-      programName,
-      size,
-      rules: {
-        profitTarget: pt ? money(pt[1]) : BROKEN,
-        maxDrawdown: dd ? money(dd[1]) : BROKEN,
-        contracts: contracts(lines[i + 1]) ?? BROKEN, // header "Max N contracts / M micros"
-        consistency: cons ? `${cons[1]}%` : null,
-        dailyLoss: daily ? money(daily[1]) : null,
-      },
-    });
-  }
-  return out;
+    const pt = find(/\$([\d,.]+)\s*profit\s*(?:goal|target)/i);
+    const dd = find(/\$([\d,.]+)\s*EOD\s*trailing\s*max\s*loss/i);
+    const daily = find(/daily loss limit:?\s*(none|\$[\d,.]+)/i);
+    // Two ways to say it, and only these two: a percentage, or the sentence
+    // saying there is none. Anything else is unreadable, never assumed absent.
+    const consPct = find(/consistency:?\s*(\d+)\s*%/i);
+    const consNone = /no consistency required/i.test(text);
+    const ct = find(/max\s*(\d+\s*(?:contracts?|minis?)\s*\/\s*\d+\s*micros?)/i, short);
+    const rules = {
+      profitTarget: pt ? money(pt) : BROKEN,
+      maxDrawdown: dd ? money(dd) : BROKEN,
+      contracts: ct ? contracts(ct) : BROKEN,
+      consistency: consPct ? `${consPct}%` : consNone ? null : BROKEN,
+    };
+    // Elite spells out "Daily Loss Limit: None"; Apprentice descriptions carry no
+    // such line at all, so the field stays absent rather than claimed absent.
+    if (daily) rules.dailyLoss = money(daily);
+    return { programName: p.productCategory, size: money(String(p.storeDisplayName ?? '')), rules };
+  });
 }
 
 /* ---- FundedSeat — playwright (client-rendered) ---- */
@@ -439,7 +451,58 @@ const FUNDEDSEAT_PROGRAMS = [
   { programName: 'Sprint', sub: 'Sprint' },
   { programName: 'Instant Funding', sub: null },
 ];
+/**
+ * Two witnesses for this firm: their buy-screen cards (what a buyer is shown)
+ * and their own /api/pullchallenges (what their system charges). The API needs no
+ * browser and covers 11 of our 15 plans; Flex is not sold through it. Where both
+ * describe a field and disagree, neither wins — the field is reported for a human.
+ */
 async function extractFundedSeat() {
+  const api = fundedseatPlansFrom(JSON.parse(await fetchText(FUNDEDSEAT_API)));
+  for (const p of api) {
+    if (p.payoutConsistency)
+      console.log(
+        `  note: fundedseat ${p.programName} $${p.size / 1000}K — the card shows no consistency rule, ` +
+          `their API puts ${p.payoutConsistency} on the funded step`,
+      );
+  }
+
+  let cards;
+  try {
+    cards = await readFundedSeatCards();
+  } catch (e) {
+    console.log(
+      `  note: fundedseat cards unread (${e.message}) — API only, ` +
+        `${api.length} plans checked, ${FUNDEDSEAT_API_UNCOVERED.join('/')} left unverified`,
+    );
+    return api.map(({ programName, size, rules }) => ({ programName, size, rules }));
+  }
+
+  const out = cards.map((card) => {
+    const match = api.find((p) => p.programName === card.programName && p.size === card.size);
+    if (!match) return card; // Flex, and anything they stop selling through the API
+    const rules = { ...card.rules };
+    for (const [field, apiValue] of Object.entries(match.rules)) {
+      const cardValue = rules[field];
+      if (cardValue === undefined || cardValue === BROKEN) {
+        rules[field] = apiValue;
+      } else if (!fieldEqual(field, cardValue, apiValue)) {
+        rules[field] = {
+          broken: `their two sources disagree: card says ${show(field, cardValue)}, API says ${show(field, apiValue)}`,
+        };
+      }
+    }
+    return { ...card, rules };
+  });
+  // A plan their API sells but no card described is a bad card read, not news.
+  for (const p of api) {
+    if (!out.some((c) => c.programName === p.programName && c.size === p.size))
+      out.push({ programName: p.programName, size: p.size, rules: p.rules });
+  }
+  return out;
+}
+
+async function readFundedSeatCards() {
   let pw;
   try {
     pw = await import('playwright');
@@ -620,6 +683,8 @@ function skipReason(firmId, programName, field) {
   if (firmId === 'blue-guardian' && field === 'profitTarget') return 'instant: no profit-target rule';
   if (firmId === 'blue-guardian' && field === 'consistency') return 'instant: hand summary of per-payout rows';
   if (firmId === 'top-one-futures' && field === 'profitTarget') return 'instant: no profit-target row on the card';
+  if (firmId === 'fundedseat' && FUNDEDSEAT_API_UNCOVERED.includes(programName))
+    return 'not sold through their API; card read needs playwright';
   if (firmId === 'tradeday' && field === 'dailyLoss') return 'no daily-loss row on the cards (manual null)';
   if (firmId === 'tradeday' && field === 'contracts' && programName === 'Fast Pass')
     return 'card shows the eval limit; ours bundles eval + funded ("15 eval / 4 funded")';
@@ -655,7 +720,7 @@ async function runChecks(data, only) {
       for (const plan of program.plans) {
         const match = plans.find((p) => p.programName === program.name && p.size === plan.size);
         if (!match) {
-          broken.push({ firm: firm.name, program: program.name, size: plan.size, field: '(plan)', detail: 'plan not found on site' });
+          broken.push({ firm: firm.name, program: program.name, size: plan.size, field: '(plan)', detail: 'plan not returned by the extractor' });
           continue;
         }
         for (const field of FIELDS) {
@@ -664,8 +729,9 @@ async function runChecks(data, only) {
             skips.push({ firm: firm.name, program: program.name, size: plan.size, field, reason: skipReason(firm.id, program.name, field) });
             continue;
           }
-          if (rv === BROKEN) {
-            broken.push({ firm: firm.name, program: program.name, size: plan.size, field, detail: 'field present on site but unreadable' });
+          if (rv === BROKEN || (rv !== null && typeof rv === 'object' && typeof rv.broken === 'string')) {
+            const detail = rv === BROKEN ? 'field present on site but unreadable' : rv.broken;
+            broken.push({ firm: firm.name, program: program.name, size: plan.size, field, detail });
             continue;
           }
           if (!fieldEqual(field, plan[field], rv)) {
@@ -780,6 +846,9 @@ async function main() {
   if (result.drifts.length) await postAlert(report);
 }
 
-main().catch((e) => {
-  console.error(`[rule-drift] unexpected error (ignored, exit 0): ${e.stack || e.message}`);
-});
+// Importable for tests without running the live check.
+if (process.argv[1] && process.argv[1].endsWith('check-rule-drift.mjs')) {
+  main().catch((e) => {
+    console.error(`[rule-drift] unexpected error (ignored, exit 0): ${e.stack || e.message}`);
+  });
+}

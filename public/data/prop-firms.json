@@ -779,7 +779,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "30%",
+              "consistency": "None",
               "contracts": "2 minis / 20 micros",
               "activationFee": 99
             },
@@ -792,7 +792,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "30%",
+              "consistency": "None",
               "contracts": "4 minis / 40 micros",
               "activationFee": 129
             },
@@ -805,7 +805,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "30%",
+              "consistency": "None",
               "contracts": "6 minis / 60 micros",
               "activationFee": 149
             }
