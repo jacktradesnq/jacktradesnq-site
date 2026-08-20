@@ -1,0 +1,84 @@
+name: Newsletter — deal of the day
+
+# Manual only, on purpose. There is NO schedule here: merging this branch can
+# never silently email the list. Add a `schedule:` block the day the copy is
+# settled and a real send has been run by hand at least once.
+#
+# mode=dry-run (default) renders the email and asks the site how many confirmed
+# subscribers there are, without sending anything.
+# mode=send actually mails them.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'dry-run (render + count only) or send'
+        type: choice
+        options: [dry-run, send]
+        default: dry-run
+      discord:
+        description: 'also post the deal to Discord'
+        type: boolean
+        default: false
+      force_firm:
+        description: 'firm id to force (blank = the day rotation picks)'
+        type: string
+        default: ''
+
+jobs:
+  deal:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build the day's deal
+        id: build
+        run: |
+          ARGS=(--json)
+          if [ -n "${{ inputs.force_firm }}" ]; then ARGS+=(--force=${{ inputs.force_firm }}); fi
+          node scripts/build-deal-of-day.mjs "${ARGS[@]}" > deal.json
+          node -e "const d=require('./deal.json');console.log('firm:',d.firmName);console.log('subject:',d.subject)"
+
+      - name: Send to the list
+        run: |
+          MODE=$([ "${{ inputs.mode }}" = "send" ] && echo send || echo dry-run)
+          MODE="$MODE" node -e "
+            const {subject,html,text}=require('./deal.json');
+            process.stdout.write(JSON.stringify({subject,html,text,mode:process.env.MODE}));
+          " > payload.json
+          RESPONSE=$(curl -sS -X POST https://jacktradesnq.com/api/newsletter/send \
+            -H "Content-Type: application/json" \
+            -H "x-jtnq-key: ${{ secrets.NEWSLETTER_SEND_KEY }}" \
+            --data @payload.json)
+          echo "$RESPONSE"
+          echo "$RESPONSE" | node -e "
+            let s='';process.stdin.on('data',c=>s+=c).on('end',()=>{
+              const r=JSON.parse(s);
+              if(!r.ok) { console.error('send endpoint refused'); process.exit(1); }
+            })"
+
+      - name: Post the deal to Discord
+        if: inputs.discord
+        run: |
+          node -e "
+            const d=require('./deal.json');
+            process.stdout.write(JSON.stringify({content:d.discord}));
+          " > discord.json
+          curl -sS -X POST -H "Content-Type: application/json" --data @discord.json "${{ secrets.DISCORD_WEBHOOK }}" > /dev/null
+
+      - name: Commit the rotation state
+        run: |
+          if [ -n "$(git status --porcelain data/newsletter)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add data/newsletter
+            git commit -m "chore(newsletter): deal of the day rotation state"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
