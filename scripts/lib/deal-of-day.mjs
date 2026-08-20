@@ -297,6 +297,7 @@ function candidateFor(firm, { today, prevSnapshot, messages, codes }) {
       consistency: plan.consistency ?? null,
       activationFee: plan.activationFee ?? null,
     },
+    priceNote: plan.priceNote ?? null,
     ladder,
     caveats: caveatsOf(program, plan, messages),
     signals,
