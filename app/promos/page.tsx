@@ -200,11 +200,11 @@ export default function PromosPage() {
             Prices, promos and activation fees are scraped off each firm&#8217;s own site every
             morning. The risk rules are maintained by hand and checked against those same sites
             every day: anything that no longer matches is flagged and fixed, and the last check ran
-            on {humanDate(generatedAt)}. One exception, and it is the field that matters most: the
-            drawdown type is not published clearly enough on most buy screens to be checked
-            automatically, so treat it as my reading and not as their words. A firm can also move a
-            rule between two checks, so read the checkout page before paying. Affiliate links: your
-            price does not change, and I earn a commission on sign-ups.
+            on {humanDate(generatedAt)}. One field is outside that check: the drawdown type. Some
+            firms spell it out on the buy screen, others just write &#8220;EOD drawdown&#8221; and
+            leave the trailing part to you, so the label here is my reading of theirs. A firm can
+            also move a rule between two checks, so read the checkout page before paying. Affiliate
+            links: your price does not change, and I earn a commission on sign-ups.
           </p>
         </section>
       </main>
