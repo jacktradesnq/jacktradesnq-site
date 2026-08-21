@@ -285,6 +285,17 @@ test('the email shows the logo once, sized and described', () => {
   assert.match(img, /alt="FundedSeat"/);
 });
 
+test('the logo is served cross-origin, or it shows up broken in an inbox', () => {
+  // The site sends Cross-Origin-Resource-Policy: same-origin on /*, which is
+  // exactly what an email does: load the image from another origin. Measured
+  // in a browser: ERR_BLOCKED_BY_RESPONSE.NotSameOrigin. Gmail proxies the
+  // image server-side and never sees it, Outlook web does.
+  const headers = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
+  const rule = headers.split(/\n(?=\/)/).find((block) => block.startsWith('/logos/email/*'));
+  assert.ok(rule, 'no /logos/email/* block in public/_headers');
+  assert.match(rule, /Cross-Origin-Resource-Policy:\s*cross-origin/);
+});
+
 // ── spacing ──────────────────────────────────────────────────────────────────
 
 test('every spacing value sits on the 4pt grid', () => {
