@@ -290,8 +290,8 @@
         "code": "2.0"
       },
       "url": "https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures",
-      "lastChecked": "2026-08-20",
-      "stale": true,
+      "lastChecked": "2026-08-21",
+      "stale": false,
       "programs": [
         {
           "name": "Elite Daily",
@@ -366,7 +366,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "None",
+              "consistency": "40% (funded)",
               "contracts": "1 mini / 10 micros",
               "activationFee": 139
             },
@@ -379,7 +379,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "None",
+              "consistency": "40% (funded)",
               "contracts": "3 minis / 30 micros",
               "activationFee": 189
             },
@@ -392,7 +392,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "None",
+              "consistency": "40% (funded)",
               "contracts": "5 minis / 50 micros",
               "activationFee": 259
             },
@@ -405,7 +405,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "None",
+              "consistency": "40% (funded)",
               "contracts": "7 minis / 70 micros",
               "activationFee": 359
             }

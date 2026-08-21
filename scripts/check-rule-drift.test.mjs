@@ -5,7 +5,14 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { legendsRulesFrom, handCheck, BROKEN } from './check-rule-drift.mjs';
+import {
+  legendsRulesFrom,
+  handCheck,
+  mergeFundedSeatSources,
+  e8CardRules,
+  topOneCardRules,
+  BROKEN,
+} from './check-rule-drift.mjs';
 
 // Captured 2026-08-20 from api.thelegendstrading.com/shop/plans
 const LEGENDS = JSON.parse(readFileSync(new URL('./__fixtures__/legends-shop-plans.json', import.meta.url), 'utf8'));
@@ -73,6 +80,72 @@ test('wording they change is unreadable, never silently absent', () => {
 test('an empty answer is a failure, never a firm with no rules', () => {
   assert.throws(() => legendsRulesFrom({ data: [] }), /no plans/);
   assert.throws(() => legendsRulesFrom([]), /no plans/);
+});
+
+test('a card saying None on its eval face is no drift when their API charges at the payout', () => {
+  // FundedSeat Sprint: the card's "Evaluation Rules" face says Consistency
+  // None, and its "Funded Rules" face says 25% at the first payout. We publish
+  // the rule a trader actually hits, so reading the eval face alone reported
+  // four drifts every single day that were not drifts.
+  const cards = [{ programName: 'Sprint', size: 50000, rules: { consistency: null, maxDrawdown: 2000 } }];
+  const api = [{ programName: 'Sprint', size: 50000, payoutConsistency: '25%', rules: { maxDrawdown: 2000 } }];
+  const [merged] = mergeFundedSeatSources(cards, api);
+  assert.equal(merged.rules.consistency, '25%');
+});
+
+/* ------- Top One: every card has two faces, eval and funded ------- */
+
+const topOneCard = (file) => {
+  const pane = readFileSync(new URL(`./__fixtures__/${file}`, import.meta.url), 'utf8');
+  const at = [...pane.matchAll(/v3-pricing-title">\$(\d+)K/g)].map((m) => m.index);
+  return pane.slice(at[0], at[1]); // the $25K card
+};
+
+test('a consistency rule that only exists once funded is still published', () => {
+  // Elite Access: "Consistency on Eval None!" on the face you land on, and
+  // "Consistency 40%" on the funded face of the same card, all four sizes.
+  // Our page said None, which is the half that suits them.
+  const rules = topOneCardRules(topOneCard('top-one-elite-access.pane.html'));
+  assert.equal(rules.consistency, '40% (funded)');
+});
+
+test('the eval rule wins when the eval face states one', () => {
+  // Elite Daily is the mirror image: 40% during the challenge, none once
+  // funded. The rule a trader meets first is the one that gets printed.
+  const rules = topOneCardRules(topOneCard('top-one-elite-daily.pane.html'));
+  assert.equal(rules.consistency, '40%');
+  assert.equal(rules.dailyLoss, 500);
+});
+
+// Captured 2026-08-21 from the Configure Challenge widget on e8futures.com
+const E8_CARD = readFileSync(new URL('./__fixtures__/e8-signature-card.txt', import.meta.url), 'utf8');
+
+test('an E8 card that no longer lists contracts leaves the field unclaimed', () => {
+  // Their Signature cards dropped the contract row in August: the word
+  // "contract" appears zero times on that page now. Unclaimed sends it to the
+  // manual list; claiming it broken cried scraper failure four times a day.
+  const card = e8CardRules('E8 Signature Futures', E8_CARD);
+  assert.equal(card.size, 25000);
+  assert.equal(card.rules.profitTarget, 1500);
+  assert.equal(card.rules.maxDrawdown, 1000);
+  assert.equal('contracts' in card.rules, false);
+});
+
+test('the contract row coming back is read again, never left to the manual list', () => {
+  const back = E8_CARD.replace('Drawdown type', 'Max contracts\n5\nDrawdown type');
+  assert.deepEqual(e8CardRules('E8 Signature Futures', back).rules.contracts, { minis: 5, micros: null });
+});
+
+test('a contract row present but unreadable is a broken scraper, not an absent rule', () => {
+  const mangled = E8_CARD.replace('Drawdown type', 'Max contracts\nask support\nDrawdown type');
+  assert.equal(e8CardRules('E8 Signature Futures', mangled).rules.contracts, BROKEN);
+});
+
+test('a consistency they do publish on the eval is never replaced by the payout one', () => {
+  const cards = [{ programName: 'Daily', size: 50000, rules: { consistency: '40%' } }];
+  const api = [{ programName: 'Daily', size: 50000, payoutConsistency: '25%', rules: {} }];
+  const [merged] = mergeFundedSeatSources(cards, api);
+  assert.equal(merged.rules.consistency, '40%');
 });
 
 test('what their API says matches the published JSON, field by field', () => {

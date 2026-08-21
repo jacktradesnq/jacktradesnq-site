@@ -173,6 +173,28 @@ export function topOneActivationFees(pane) {
   });
 }
 
+// The two instant funding tabs carry no Activation Fee row at all: the price is
+// paid upfront and nothing is due on passing. Measured 2026-08-21, the words
+// "Activation Fee" appear zero times in those panes, while Elite prints "None!"
+// on every card and Elite Access prints a figure.
+const TOPONE_NO_ACTIVATION_TABS = new Set(['Instant Sim Funded', 'Ignite Instant Funding']);
+
+// One fee per card, or null where there is nothing to pay. A missing row is
+// only accepted on the tabs that never had one, and only while the words stay
+// absent: if they come back without a readable value, that is a markup change
+// and the firm goes stale rather than publishing "no fee" on a plan with one.
+export function topOneFees(tab, pane, cardCount) {
+  const fees = topOneActivationFees(pane);
+  if (fees.length === 0 && TOPONE_NO_ACTIVATION_TABS.has(tab)) {
+    if (/Activation Fee/i.test(pane))
+      throw new Error(`${tab}: an Activation Fee row is back and unreadable`);
+    return Array.from({ length: cardCount }, () => null);
+  }
+  if (fees.length !== cardCount)
+    throw new Error(`${tab}: ${cardCount} cards but ${fees.length} activation fee rows`);
+  return fees;
+}
+
 // Each pricing tab is one <div data-w-tab="X" class="acc__content__pane v3-pricing-swiper …">.
 export function topOnePane(html, tab) {
   const panes = [...html.matchAll(/data-w-tab="([^"]+)" class="acc__content__pane v3-pricing-swiper[^"]*"/g)];
@@ -222,9 +244,7 @@ async function scrapeTopOne() {
     if (olds.length !== cards.length)
       throw new Error(`${tab}: ${cards.length} cards but ${olds.length} struck-through prices`);
 
-    const activations = topOneActivationFees(pane);
-    if (activations.length !== cards.length)
-      throw new Error(`${tab}: ${cards.length} cards but ${activations.length} activation fee rows`);
+    const activations = topOneFees(tab, pane, cards.length);
 
     cards.forEach((m, i) => {
       const size = num(m[1]) * 1000;
