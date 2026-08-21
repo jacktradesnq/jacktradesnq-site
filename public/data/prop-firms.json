@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-20",
+  "generatedAt": "2026-08-21",
   "firms": [
     {
       "id": "blue-guardian",
@@ -11,7 +11,7 @@
         "code": "BG25"
       },
       "url": "https://blueguardian.com/?afmc=JTNQ",
-      "lastChecked": "2026-08-20",
+      "lastChecked": "2026-08-21",
       "stale": false,
       "programs": [
         {
@@ -231,7 +231,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-08-20",
+      "lastChecked": "2026-08-21",
       "stale": false,
       "programs": [
         {
@@ -291,7 +291,7 @@
       },
       "url": "https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures",
       "lastChecked": "2026-08-20",
-      "stale": false,
+      "stale": true,
       "programs": [
         {
           "name": "Elite Daily",
@@ -538,7 +538,7 @@
         "ends": "2026-08-23"
       },
       "url": "https://fundedseat.link/jtnq",
-      "lastChecked": "2026-08-20",
+      "lastChecked": "2026-08-21",
       "stale": false,
       "programs": [
         {
@@ -640,61 +640,6 @@
           ]
         },
         {
-          "name": "Flex",
-          "type": "eval",
-          "priceType": "one-time",
-          "plans": [
-            {
-              "size": 25000,
-              "price": 76.95,
-              "originalPrice": 140,
-              "profitTarget": 1500,
-              "maxDrawdown": 1000,
-              "ddType": "EOD Trailing",
-              "dailyLoss": null,
-              "dailyLossSoft": false,
-              "consistency": "35%",
-              "contracts": "2 minis / 20 micros"
-            },
-            {
-              "size": 50000,
-              "price": 104.95,
-              "originalPrice": 190,
-              "profitTarget": 3000,
-              "maxDrawdown": 2000,
-              "ddType": "EOD Trailing",
-              "dailyLoss": null,
-              "dailyLossSoft": false,
-              "consistency": "35%",
-              "contracts": "4 minis / 40 micros"
-            },
-            {
-              "size": 100000,
-              "price": 174.95,
-              "originalPrice": 320,
-              "profitTarget": 6000,
-              "maxDrawdown": 3000,
-              "ddType": "EOD Trailing",
-              "dailyLoss": null,
-              "dailyLossSoft": false,
-              "consistency": "35%",
-              "contracts": "8 minis / 80 micros"
-            },
-            {
-              "size": 150000,
-              "price": 244.95,
-              "originalPrice": 445,
-              "profitTarget": 9000,
-              "maxDrawdown": 4500,
-              "ddType": "EOD Trailing",
-              "dailyLoss": null,
-              "dailyLossSoft": false,
-              "consistency": "35%",
-              "contracts": "12 minis / 120 micros"
-            }
-          ]
-        },
-        {
           "name": "Sprint",
           "type": "eval",
           "priceType": "one-time",
@@ -708,7 +653,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "None",
+              "consistency": "25% (1st payout)",
               "contracts": "2 minis / 20 micros"
             },
             {
@@ -720,7 +665,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": 1200,
               "dailyLossSoft": true,
-              "consistency": "None",
+              "consistency": "25% (1st payout)",
               "contracts": "4 minis / 40 micros"
             },
             {
@@ -732,7 +677,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": 1800,
               "dailyLossSoft": true,
-              "consistency": "None",
+              "consistency": "25% (1st payout)",
               "contracts": "8 minis / 80 micros"
             },
             {
@@ -744,12 +689,13 @@
               "ddType": "EOD Trailing",
               "dailyLoss": 2700,
               "dailyLossSoft": true,
-              "consistency": "None",
+              "consistency": "25% (1st payout)",
               "contracts": "12 minis / 120 micros"
             }
           ]
         }
-      ]
+      ],
+      "rulesCheckedAt": "2026-08-21"
     },
     {
       "id": "legends-trading",
@@ -757,11 +703,12 @@
       "split": "90%",
       "payout": "Twice monthly",
       "promo": {
-        "label": "Apprentice 80% · Elite 35% off",
-        "code": "LTG"
+        "label": "50K Elite $49 - 35% off other Elites",
+        "code": "JTNQ",
+        "ends": "2026-08-21"
       },
       "url": "https://thelegendstrading.com/?ref=JTNQ",
-      "lastChecked": "2026-08-20",
+      "lastChecked": "2026-08-21",
       "stale": false,
       "programs": [
         {
@@ -778,7 +725,7 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "30%",
+              "consistency": "None",
               "contracts": "2 minis / 20 micros",
               "activationFee": 99
             },
@@ -791,20 +738,20 @@
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "30%",
+              "consistency": "None",
               "contracts": "4 minis / 40 micros",
               "activationFee": 129
             },
             {
               "size": 150000,
-              "price": 69.0,
+              "price": 69,
               "originalPrice": 138,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "30%",
+              "consistency": "None",
               "contracts": "6 minis / 60 micros",
               "activationFee": 149
             }
@@ -829,7 +776,7 @@
             },
             {
               "size": 50000,
-              "price": 98.15,
+              "price": 49,
               "originalPrice": 151,
               "profitTarget": 2700,
               "maxDrawdown": 2200,
@@ -837,7 +784,8 @@
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "40%",
-              "contracts": "4 minis / 40 micros"
+              "contracts": "4 minis / 40 micros",
+              "priceNote": "new and existing customers, extra Elite accounts 35% off"
             },
             {
               "size": 100000,
@@ -878,7 +826,7 @@
       },
       "code": "JTNQ",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-08-20",
+      "lastChecked": "2026-08-21",
       "stale": false,
       "programs": [
         {
@@ -1022,7 +970,8 @@
             }
           ]
         }
-      ]
+      ],
+      "rulesCheckedAt": "2026-08-21"
     },
     {
       "id": "tradeday",
@@ -1034,7 +983,7 @@
         "code": "JTNQ"
       },
       "url": "https://www.tradeday.com/?a_aid=JTNQ",
-      "lastChecked": "2026-08-20",
+      "lastChecked": "2026-08-21",
       "stale": false,
       "programs": [
         {

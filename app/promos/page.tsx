@@ -5,7 +5,6 @@
 
 import rawPromos from '@/public/data/live-promos.json';
 import { CSS, META, money, sizeLabel } from '../prop-firms/shared';
-import { DealSignup } from '../prop-firms/DealSignup';
 import { PROMOS_CSS } from './styles';
 
 // Every figure on this page comes from public/data/live-promos.json, built by
@@ -27,6 +26,7 @@ type Promo = {
   price: number;
   originalPrice: number | null;
   discountPct: number;
+  priceNote: string | null;
   endsAt: string | null;
   expiring: boolean;
   split: string;
@@ -53,14 +53,17 @@ const humanDate = (iso: string) =>
 
 const per = (p: Promo) => (p.priceType === 'monthly' ? '/mo' : '');
 
-// What the buyer still has to swallow. Only what the data actually carries.
-function catches(p: Promo): string[] {
+// No "catch" block on a promo page: Angelo's call, and it is his page. What
+// stays is only what changes the price you pay, stated flatly under it, because
+// showing "$37/mo" next to a hidden "$99 once funded" is the kind of half-truth
+// this whole page exists to avoid. Trading constraints such as the consistency
+// rule live on the full comparison table instead.
+function priceFacts(p: Promo): string[] {
   const out: string[] = [];
-  if (p.priceType === 'monthly') out.push('Billed monthly, not once');
+  if (p.priceNote) out.push(p.priceNote);
+  if (p.priceType === 'monthly') out.push('billed monthly');
   if (p.activationFee) out.push(`${money(p.activationFee)} activation once funded`);
-  if (p.ddType !== 'EOD') out.push('Drawdown follows your balance up');
-  if (p.consistency && !/^(none|no|n\/a)$/i.test(p.consistency)) out.push(`Consistency ${p.consistency}`);
-  return out.slice(0, 2);
+  return out;
 }
 
 export default function PromosPage() {
@@ -109,7 +112,11 @@ export default function PromosPage() {
 
           <div className="promo-grid">
             {promos.map((p) => (
-              <article key={p.firmId} className={`promo-card${p.expiring ? ' is-urgent' : ''}`}>
+              <article
+                key={p.firmId}
+                id={p.firmId}
+                className={`promo-card${p.expiring ? ' is-urgent' : ''}`}
+              >
                 <header className="promo-head">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img className="promo-logo" src={p.logo} alt="" width={40} height={40} />
@@ -140,6 +147,9 @@ export default function PromosPage() {
                   )}
                   <span className="promo-off">{p.discountPct}% off</span>
                 </div>
+                {priceFacts(p).length > 0 && (
+                  <p className="promo-note">{priceFacts(p).join(' \u00b7 ')}</p>
+                )}
 
                 <dl className="promo-specs">
                   <div>
@@ -162,14 +172,14 @@ export default function PromosPage() {
                       <dd>{money(p.profitTarget)}</dd>
                     </div>
                   )}
+                  {p.consistency && !/^(none|no|n\/a)$/i.test(p.consistency) && (
+                    <div>
+                      <dt>Consistency</dt>
+                      <dd>{p.consistency}</dd>
+                    </div>
+                  )}
                 </dl>
 
-                {catches(p).length > 0 && (
-                  <p className="promo-catch">
-                    <span className="promo-catch-label">The catch</span>
-                    {catches(p).join('. ')}.
-                  </p>
-                )}
 
                 <div className="promo-foot">
                   <a className="promo-cta" href={p.url} target="_blank" rel="noopener nofollow sponsored">
@@ -191,13 +201,16 @@ export default function PromosPage() {
           </div>
 
           <p className="note">
-            Affiliate links: your price does not change, and I earn a commission on sign-ups. Prices
-            and rules are read off each firm&#8217;s own site every morning, but a firm can move them
-            at any time. Check the checkout page before paying.
+            Prices, promos and activation fees are scraped off each firm&#8217;s own site every
+            morning. The risk rules are maintained by hand and checked against those same sites
+            every day: anything that no longer matches is flagged and fixed, and the last check ran
+            on {humanDate(generatedAt)}. One field is outside that check: the drawdown type. Some
+            firms spell it out on the buy screen, others just write &#8220;EOD drawdown&#8221; and
+            leave the trailing part to you, so the label here is my reading of theirs. A firm can
+            also move a rule between two checks, so read the checkout page before paying. Affiliate
+            links: your price does not change, and I earn a commission on sign-ups.
           </p>
         </section>
-
-        <DealSignup />
       </main>
 
       <footer className="site-footer">

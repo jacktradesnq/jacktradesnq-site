@@ -39,6 +39,14 @@ export const PROMOS_CSS = `
 /* The one expiring promo is the only thing on the page allowed to shout. */
 .jtnq-cmp .promo-card.is-urgent{ border-color: oklch(0.52 0.09 45); }
 
+/* One link per firm: /promos#legends-trading lands on their card and marks it,
+   so a post can point at one deal instead of the whole page. */
+.jtnq-cmp .promo-card{ scroll-margin-top: 24px; }
+.jtnq-cmp .promo-card:target{
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 1px var(--c-accent), 0 24px 48px oklch(0.13 0.028 165 / 0.6);
+}
+
 .jtnq-cmp .promo-head{ display: flex; align-items: flex-start; gap: 12px; }
 .jtnq-cmp .promo-logo{
   width: 40px; height: 40px; border-radius: 4px; flex: 0 0 auto; object-fit: contain;
@@ -74,6 +82,13 @@ export const PROMOS_CSS = `
   color: var(--c-bg); background: var(--c-accent); border-radius: 999px; padding: 4px 10px;
 }
 
+/* A precision under the price, not a catch: what changes what you pay, such as
+   monthly billing or an activation fee due on passing. Hiding those next to a
+   headline price would be lying by omission. */
+.jtnq-cmp .promo-note{
+  margin-top: -4px; font-size: 13px; line-height: 1.5; color: var(--c-text-mute);
+}
+
 .jtnq-cmp .promo-specs{
   display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px;
   padding-top: 20px; border-top: 1px solid var(--c-line-soft);
@@ -83,15 +98,6 @@ export const PROMOS_CSS = `
   color: var(--c-text-deep);
 }
 .jtnq-cmp .promo-specs dd{ margin-top: 4px; font-size: 14px; color: var(--c-text-soft); }
-
-.jtnq-cmp .promo-catch{
-  font-size: 13px; line-height: 1.6; color: var(--c-text-soft);
-  background: var(--c-bg-deep); border-radius: 12px; padding: 12px 16px;
-}
-.jtnq-cmp .promo-catch-label{
-  display: block; font-family: var(--f-mono); font-size: 10px; letter-spacing: .14em;
-  text-transform: uppercase; color: var(--c-accent); margin-bottom: 4px;
-}
 
 .jtnq-cmp .promo-foot{
   margin-top: auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;

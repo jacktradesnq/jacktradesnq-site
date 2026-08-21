@@ -21,6 +21,8 @@
 
 import fs from 'node:fs';
 
+import { fundedseatPlansFrom, FUNDEDSEAT_API } from './lib/fundedseat-api.mjs';
+
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
 const DRY = process.argv.includes('--dry');
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -281,18 +283,24 @@ async function scrapeTradersLaunch() {
 const FUNDEDSEAT_PRIMARY = '1 Step';
 const FUNDEDSEAT_PROGRAMS = [
   { programName: 'Daily', sub: 'Daily' },
-  { programName: 'Flex', sub: 'Flex' },
   { programName: 'Sprint', sub: 'Sprint' },
   { programName: 'Instant Funding', sub: null }, // top-level tab, no payout sub-variant
 ];
 const MONTHS = { JANUARY: 1, FEBRUARY: 2, MARCH: 3, APRIL: 4, MAY: 5, JUNE: 6, JULY: 7, AUGUST: 8, SEPTEMBER: 9, OCTOBER: 10, NOVEMBER: 11, DECEMBER: 12 };
 
 async function scrapeFundedSeat() {
+  // Their own catalogue answers for every plan we list. It is the second witness:
+  // the cards are what a buyer is shown, the API is what their system charges,
+  // and a disagreement between the two is not ours to resolve silently.
+  const apiPlans = fundedseatPlansFrom(JSON.parse(await fetchText(FUNDEDSEAT_API)));
+
   let pw;
   try {
     pw = await import('playwright');
   } catch {
-    console.log('fundedseat: playwright not installed, skipped');
+    // The cards still carry the promo banner and are the second opinion on every
+    // price, so without them the firm is skipped rather than written from one source.
+    console.log(`fundedseat: ${apiPlans.length} plans read from their API, but Flex needs playwright — skipped`);
     return null;
   }
   const browser = await pw.chromium.launch({ headless: true });
@@ -385,6 +393,20 @@ async function scrapeFundedSeat() {
       }
     }
 
+    // Cross-check every plan both sources describe. Tab clicking is the weak
+    // link here (their variant buttons swap the cards under us, which is why the
+    // "Bolt" guard above exists), so a card that disagrees with their backend is
+    // treated as a bad read and stops the firm instead of publishing a guess.
+    for (const api of apiPlans) {
+      const card = updates.find((u) => u.programName === api.programName && u.size === api.size);
+      if (!card) throw new Error(`${api.programName} $${api.size / 1000}K: in their API, missing from the cards`);
+      if (card.price !== api.price || card.originalPrice !== api.originalPrice)
+        throw new Error(
+          `${api.programName} $${api.size / 1000}K: card says $${card.price}/$${card.originalPrice}, ` +
+            `their API says $${api.price}/$${api.originalPrice}`,
+        );
+    }
+
     // Top banner, e.g. "50% OFF YOUR NEXT 3 PURCHASES — USE CODE JULY50 — ENDS JULY 26"
     let firmPromo;
     const bodyText = await page.evaluate(() => document.body.innerText);
@@ -455,6 +477,30 @@ export function legendsActivationFee(description) {
   return fee;
 }
 
+// Their August promotion, from the asset LEGENDS sent Angelo with his own code
+// on it: the 50K Elite is $49 on a FIRST order and $98 after. Their shop API
+// only exposes the repeat price ($98.15), so the promo price is pinned here.
+//
+// `until` is what keeps this honest: past that date the override stops applying
+// and the API price comes back on its own, instead of a stale $49 living on the
+// page forever. The note next to it is set once in prop-firms.json.
+const LEGENDS_PROMO = {
+  programName: 'Elite',
+  size: 50000,
+  price: 49,
+  until: '2026-08-22', // leur mail: promo jusqu'au vendredi 21 aout 23h59 ET
+  source: 'August promotion asset, "$49 FIRST ORDER, $98 OTHER ORDERS", code JTNQ',
+};
+
+export function applyLegendsPromo(updates, today = TODAY) {
+  if (today >= LEGENDS_PROMO.until) return updates;
+  return updates.map((u) =>
+    u.programName === LEGENDS_PROMO.programName && u.size === LEGENDS_PROMO.size
+      ? { ...u, price: LEGENDS_PROMO.price }
+      : u,
+  );
+}
+
 export function legendsUpdatesFrom(payload) {
   const plans = payload?.data;
   if (!Array.isArray(plans) || plans.length === 0) throw new Error('LEGENDS API returned no plans');
@@ -489,7 +535,7 @@ async function scrapeLegends() {
     headers: { 'user-agent': UA, accept: 'application/json' },
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} for the LEGENDS shop API`);
-  return { updates: legendsUpdatesFrom(await res.json()) }; // promo label stays manual
+  return { updates: applyLegendsPromo(legendsUpdatesFrom(await res.json())) };
 }
 
 /* ------------------------------------------------------------------ */

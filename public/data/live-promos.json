@@ -1,7 +1,35 @@
 {
-  "generatedAt": "2026-08-19",
-  "builtFor": "2026-08-20",
+  "generatedAt": "2026-08-21",
+  "builtFor": "2026-08-21",
   "promos": [
+    {
+      "firmId": "legends-trading",
+      "firmName": "LEGENDS Trading",
+      "logo": "/logos/email/legends-trading.png",
+      "url": "https://thelegendstrading.com/?ref=JTNQ",
+      "code": "JTNQ",
+      "codeViaLink": false,
+      "program": "Elite",
+      "programType": "eval",
+      "priceType": "one-time",
+      "size": 50000,
+      "price": 49,
+      "originalPrice": 151,
+      "discountPct": 68,
+      "priceNote": "new and existing customers, extra Elite accounts 35% off",
+      "endsAt": "2026-08-21",
+      "expiring": true,
+      "split": "90%",
+      "payout": "Twice monthly",
+      "ddType": "EOD Trailing",
+      "profitTarget": 2700,
+      "maxDrawdown": 2200,
+      "dailyLoss": null,
+      "consistency": "40%",
+      "activationFee": null,
+      "contracts": "4 minis / 40 micros",
+      "lastChecked": "2026-08-21"
+    },
     {
       "firmId": "fundedseat",
       "firmName": "FundedSeat",
@@ -16,6 +44,7 @@
       "price": 104.95,
       "originalPrice": 190,
       "discountPct": 45,
+      "priceNote": null,
       "endsAt": "2026-08-23",
       "expiring": true,
       "split": "90%",
@@ -27,61 +56,7 @@
       "consistency": "35%",
       "activationFee": null,
       "contracts": "4 minis / 40 micros",
-      "lastChecked": "2026-08-19"
-    },
-    {
-      "firmId": "top-one-futures",
-      "firmName": "Top One Futures",
-      "logo": "/logos/email/top-one-futures.png",
-      "url": "https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures",
-      "code": "JTNQ",
-      "codeViaLink": false,
-      "program": "Elite Access",
-      "programType": "eval",
-      "priceType": "one-time",
-      "size": 50000,
-      "price": 39,
-      "originalPrice": 218,
-      "discountPct": 82,
-      "endsAt": null,
-      "expiring": false,
-      "split": "90%",
-      "payout": "On-demand",
-      "ddType": "EOD Trailing",
-      "profitTarget": 3000,
-      "maxDrawdown": 2000,
-      "dailyLoss": null,
-      "consistency": "None",
-      "activationFee": 189,
-      "contracts": "3 minis / 30 micros",
-      "lastChecked": "2026-08-19"
-    },
-    {
-      "firmId": "legends-trading",
-      "firmName": "LEGENDS Trading",
-      "logo": "/logos/email/legends-trading.png",
-      "url": "https://thelegendstrading.com/?ref=JTNQ",
-      "code": "JTNQ",
-      "codeViaLink": false,
-      "program": "Apprentice",
-      "programType": "eval",
-      "priceType": "monthly",
-      "size": 50000,
-      "price": 37,
-      "originalPrice": 185,
-      "discountPct": 80,
-      "endsAt": null,
-      "expiring": false,
-      "split": "90%",
-      "payout": "Twice monthly",
-      "ddType": "EOD Trailing",
-      "profitTarget": 3000,
-      "maxDrawdown": 2000,
-      "dailyLoss": null,
-      "consistency": "30%",
-      "activationFee": 99,
-      "contracts": "10 minis / 50 micros",
-      "lastChecked": "2026-08-19"
+      "lastChecked": "2026-08-21"
     },
     {
       "firmId": "tradeday",
@@ -97,6 +72,7 @@
       "price": 59,
       "originalPrice": 131,
       "discountPct": 55,
+      "priceNote": null,
       "endsAt": null,
       "expiring": false,
       "split": "50→90%",
@@ -108,7 +84,7 @@
       "consistency": "30% (eval only)",
       "activationFee": null,
       "contracts": "5 contracts (50 micros)",
-      "lastChecked": "2026-08-19"
+      "lastChecked": "2026-08-21"
     },
     {
       "firmId": "e8-markets",
@@ -124,6 +100,7 @@
       "price": 116,
       "originalPrice": 178,
       "discountPct": 35,
+      "priceNote": null,
       "endsAt": null,
       "expiring": false,
       "split": "80%",
@@ -135,7 +112,7 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "4 minis / 40 micros",
-      "lastChecked": "2026-08-19"
+      "lastChecked": "2026-08-21"
     },
     {
       "firmId": "blue-guardian",
@@ -151,6 +128,7 @@
       "price": 116,
       "originalPrice": 154,
       "discountPct": 25,
+      "priceNote": null,
       "endsAt": null,
       "expiring": false,
       "split": "90%",
@@ -162,7 +140,7 @@
       "consistency": "50%",
       "activationFee": null,
       "contracts": "4 Mini | 40 Micro",
-      "lastChecked": "2026-08-19"
+      "lastChecked": "2026-08-21"
     },
     {
       "firmId": "traders-launch",
@@ -178,6 +156,7 @@
       "price": 135.15,
       "originalPrice": 159,
       "discountPct": 15,
+      "priceNote": null,
       "endsAt": null,
       "expiring": false,
       "split": "80%",
@@ -189,7 +168,7 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "2 minis / 20 micros",
-      "lastChecked": "2026-08-19"
+      "lastChecked": "2026-08-21"
     }
   ]
 }

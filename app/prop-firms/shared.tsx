@@ -370,8 +370,6 @@ export const CSS = `
   transition: transform .18s ease;
 }
 .jtnq-cmp .hero-promos svg{ width: 14px; height: 14px; }
-.jtnq-cmp .hero-promos:hover{ transform: translateY(-1px); }
-
 /* ── daily deal signup (DealSignup.tsx) ── */
 .jtnq-cmp .signup{ padding: 0 var(--pad-x) clamp(48px, 6vw, 80px); }
 .jtnq-cmp .signup-card{
@@ -421,9 +419,11 @@ export const CSS = `
   margin-top: 20px; font-size: 12px; line-height: 1.7; color: var(--c-text-deep);
 }
 
-@media (max-width: 720px){
   .jtnq-cmp .signup-btn{ width: 100%; }
 
+.jtnq-cmp .hero-promos:hover{ transform: translateY(-1px); }
+
+@media (max-width: 720px){
   .jtnq-cmp .hero{ padding: 72px var(--pad-x) 32px; }
   .jtnq-cmp .wordmark{ font-size: clamp(40px, 13vw, 60px); }
   .jtnq-cmp .phrase{ font-size: 14px; margin-top: 20px; }

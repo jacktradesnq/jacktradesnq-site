@@ -52,3 +52,5 @@ next-env.d.ts
 # Python
 __pycache__/
 *.pyc
+# local preview server log (scripts/../out served on :4321)
+/.local-preview.log

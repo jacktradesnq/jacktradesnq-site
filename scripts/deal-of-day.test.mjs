@@ -18,11 +18,16 @@ const DATA = JSON.parse(readFileSync(new URL('../public/data/prop-firms.json', i
 // ── selection ────────────────────────────────────────────────────────────────
 
 test('a firm whose promo expires within 96h wins over a bigger discount', () => {
-  // FundedSeat promo ends 2026-08-23; Top One has the biggest raw discount (89%).
+  // Which firm that is depends on the day: LEGENDS ends 21 August, FundedSeat
+  // ends the 23rd, and Top One has the fattest standing discount. So the
+  // assertion is the rule, and the winner must be the soonest to end.
   const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
-  assert.equal(deal.firmId, 'fundedseat');
-  assert.ok(deal.signals.includes('expiring'), `signals=${deal.signals}`);
+  assert.ok(deal.signals.includes('expiring'), `${deal.firmId} signals=${deal.signals}`);
   assert.ok(deal.hoursLeft > 0 && deal.hoursLeft <= 96, `hoursLeft=${deal.hoursLeft}`);
+
+  const expiring = analyzeFirms(DATA, { today: '2026-08-20' }).filter((c) => c.signals.includes('expiring'));
+  const soonest = expiring.reduce((a, b) => (b.hoursLeft < a.hoursLeft ? b : a));
+  assert.equal(deal.firmId, soonest.firmId);
 });
 
 test('an activation fee beats a headline percentage', () => {
@@ -30,7 +35,12 @@ test('an activation fee beats a headline percentage', () => {
   // funded, more than the $218 it strikes through while claiming 82% off.
   // Elite Daily is $98 all in. The cheaper path wins even though it shows a
   // smaller percentage.
-  const deal = pickDeal(DATA, { today: '2026-09-30', history: [], forceFirmId: 'top-one-futures' });
+  // Read off a copy where Top One is not stale: what is measured here is the
+  // arbitration between two of their plans, not whether this morning's scrape
+  // of their site worked.
+  const data = structuredClone(DATA);
+  for (const f of data.firms) if (f.id === 'top-one-futures') f.stale = false;
+  const deal = pickDeal(data, { today: '2026-09-30', history: [], forceFirmId: 'top-one-futures' });
   assert.equal(deal.programLabel, 'Elite Daily');
   assert.equal(deal.headline.size, 50000);
   assert.equal(deal.headline.price, 98);
@@ -76,21 +86,30 @@ test('a firm sent in the last 7 days is not picked again', () => {
     today: '2026-08-21',
     history: [{ firmId: 'fundedseat', date: '2026-08-20' }],
   });
+  // Which firm comes second is incidental, it follows the discounts of the day.
+  // What matters is that the one already sent is skipped, and that the runner-up
+  // is the best of the firms still eligible.
   assert.notEqual(deal.firmId, 'fundedseat');
-  assert.equal(deal.firmId, 'top-one-futures');
+  const eligible = analyzeFirms(DATA, { today: '2026-08-21' }).filter((c) => c.firmId !== 'fundedseat');
+  assert.equal(deal.firmId, eligible[0].firmId);
 });
 
-test('7 consecutive days rotate over 7 distinct firms', () => {
+test('a week of sends never sends the same firm twice', () => {
+  // How many firms a week can cover is the feed's call, not a number typed
+  // here: a firm whose scrape failed is held back, and the rotation shrinks
+  // with it. Asserting 7 was asserting yesterday's feed.
+  const eligible = analyzeFirms(DATA, { today: '2026-08-20' }).length;
+  assert.ok(eligible >= 5, `only ${eligible} firms eligible, the week would repeat`);
   const history = [];
   const picked = [];
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < eligible; i++) {
     const today = new Date(Date.UTC(2026, 7, 20 + i)).toISOString().slice(0, 10);
     const deal = pickDeal(DATA, { today, history });
     assert.ok(deal, `no deal on ${today}`);
     picked.push(deal.firmId);
     history.push({ firmId: deal.firmId, date: today });
   }
-  assert.equal(new Set(picked).size, 7, `picked=${picked.join(',')}`);
+  assert.equal(new Set(picked).size, eligible, `picked=${picked.join(',')}`);
 });
 
 test('a stale firm is never headlined (its promo may already be dead)', () => {
@@ -160,7 +179,7 @@ test('tweet stays under 280 chars for every firm, with code and link', () => {
 });
 
 test('discord message fits the 2000 char limit and carries the offer', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const msg = renderDiscord(deal);
   assert.ok(msg.length <= 2000, `${msg.length} chars`);
   assert.ok(msg.includes(deal.firmName));
@@ -169,7 +188,7 @@ test('discord message fits the 2000 char limit and carries the offer', () => {
 });
 
 test('email carries subject, real prices, the code, and an unsubscribe slot', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const mail = renderEmail(deal, { generatedAt: DATA.generatedAt });
   assert.ok(mail.subject.length > 0 && mail.subject.length <= 70, `subject: ${mail.subject}`);
   assert.ok(mail.preheader.length > 0);
@@ -255,7 +274,7 @@ test('every firm has an email-safe raster logo that exists on disk', () => {
 });
 
 test('the email shows the logo once, sized and described', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const { html } = renderEmail(deal, {});
   const imgs = html.match(/<img[^>]*>/g) ?? [];
   assert.equal(imgs.length, 1, `expected one image, got ${imgs.length}`);
@@ -269,7 +288,7 @@ test('the email shows the logo once, sized and described', () => {
 // ── spacing ──────────────────────────────────────────────────────────────────
 
 test('every spacing value sits on the 4pt grid', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const { html } = renderEmail(deal, {});
   const offenders = [];
   for (const [, prop, value] of html.matchAll(/(padding|margin)(?:-[a-z]+)?:([^;"]+)/g)) {
@@ -300,14 +319,14 @@ test('an evaluation is called a challenge, instant funding is called funded', ()
 });
 
 test('the drawdown type is stated once, not twice', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const { html } = renderEmail(deal, {});
   const hits = html.match(/EOD Trailing/g) ?? [];
   assert.equal(hits.length, 1, `"EOD Trailing" appears ${hits.length} times`);
 });
 
 test('the button says what it costs', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const { html } = renderEmail(deal, {});
   const cta = html.match(/<a href="[^"]*"[^>]*>([^<]+)<\/a>/)?.[1] ?? '';
   assert.match(cta, /Get the 50K at \$104\.95/, `cta reads "${cta}"`);
@@ -323,7 +342,7 @@ test('email html is pure ASCII, a stray byte shows up as mojibake in clients', (
 });
 
 test('the email uses the site palette, warm black and gold, not cream', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const { html } = renderEmail(deal, {});
   assert.ok(html.includes('#02130C'), 'warm black surface missing');
   assert.ok(html.includes('#E9B44B'), 'gold accent missing');
