@@ -284,6 +284,51 @@ function topOneRowValue(raw) {
     .replace(/\s+/g, ' ')
     .trim();
 }
+/**
+ * One pricing card into the rules it states. Every card holds two tables,
+ * "Evaluation rules" and "Funded rules"; the one flagged w--tab-active is what
+ * the page shows by default and the phase our JSON stores (Eval on the
+ * challenges, Funded on the instants, whose two tables are identical anyway).
+ *
+ * One exception, and it is what this whole file exists for: a consistency rule
+ * that lives only on the other face. Elite Access reads "Consistency on Eval:
+ * None!" and, one click away on the same card, "Consistency: 40%" once funded.
+ * Reading the active face alone published "None" on a plan that has one, the
+ * same omission FundedSeat Sprint had. Returns null when the card holds no
+ * rules table at all.
+ */
+export function topOneCardRules(card) {
+  const active = card.match(/data-w-tab="(Eval|Funded)" class="rules-tab-content w-tab-pane w--tab-active"/);
+  if (!active) return null;
+  let block = card.slice(active.index);
+  const sibling = block.indexOf('class="rules-tab-content w-tab-pane"');
+  if (sibling !== -1) block = block.slice(0, sibling);
+  const rules = topOneRulesFrom(block);
+
+  if (active[1] === 'Eval' && consistency(rules.consistency) == null) {
+    const other = card.match(/data-w-tab="Funded" class="rules-tab-content w-tab-pane"/);
+    const funded = other ? consistency(topOneRulesFrom(card.slice(other.index)).consistency) : null;
+    if (funded != null) rules.consistency = `${funded} (funded)`;
+  }
+  return rules;
+}
+
+function topOneRulesFrom(block) {
+  const rules = {};
+  const rows = block.matchAll(
+    /v3-table-row-info"><div>([^<]*)<\/div><\/div><div class="v3-table-row-value"><div>([\s\S]*?)<\/div><\/div>/g,
+  );
+  for (const [, label, raw] of rows) {
+    // "Daily Loss Limit" is typed with a non-breaking space on the instant
+    // tabs (…Loss Limit), hence the whitespace collapse before lookup.
+    const field = TOPONE_ROWS[label.replace(/\s+/g, ' ').trim().toLowerCase()];
+    if (!field || field in rules) continue; // first row wins
+    const value = topOneRowValue(raw);
+    rules[field] = value === '' ? BROKEN : TOPONE_NORMALIZE[field](value);
+  }
+  return rules;
+}
+
 async function extractTopOne() {
   const html = await fetchText('https://toponefutures.com');
   const panes = [...html.matchAll(/data-w-tab="([^"]+)" class="acc__content__pane v3-pricing-swiper[^"]*"/g)];
@@ -302,24 +347,8 @@ async function extractTopOne() {
       // one flagged w--tab-active is what the page shows by default and the
       // phase our JSON stores: Eval on the challenges, Funded on the instants
       // (which have no eval at all — their two tables are identical anyway).
-      const active = card.match(/data-w-tab="(?:Eval|Funded)" class="rules-tab-content w-tab-pane w--tab-active"/);
-      if (!active) continue; // no rules table => reported as "plan not found"
-      let block = card.slice(active.index);
-      const sibling = block.indexOf('class="rules-tab-content w-tab-pane"');
-      if (sibling !== -1) block = block.slice(0, sibling);
-
-      const rules = {};
-      const rows = block.matchAll(
-        /v3-table-row-info"><div>([^<]*)<\/div><\/div><div class="v3-table-row-value"><div>([\s\S]*?)<\/div><\/div>/g,
-      );
-      for (const [, label, raw] of rows) {
-        // "Daily Loss Limit" is typed with a non-breaking space on the instant
-        // tabs (…Loss Limit), hence the whitespace collapse before lookup.
-        const field = TOPONE_ROWS[label.replace(/\s+/g, ' ').trim().toLowerCase()];
-        if (!field || field in rules) continue; // first row wins
-        const value = topOneRowValue(raw);
-        rules[field] = value === '' ? BROKEN : TOPONE_NORMALIZE[field](value);
-      }
+      const rules = topOneCardRules(card);
+      if (!rules) continue; // no rules table => reported as "plan not found"
       // Instant tabs carry no Profit Target row => not emitted (JSON is null).
       out.push({ programName, size, rules });
     }
@@ -477,6 +506,15 @@ async function extractFundedSeat() {
     return api.map(({ programName, size, rules }) => ({ programName, size, rules }));
   }
 
+  return mergeFundedSeatSources(cards, api);
+}
+
+/**
+ * Their two witnesses into one reading. A field only one of them describes is
+ * taken from that one; a field they describe differently is reported for a
+ * human instead of picking a winner.
+ */
+export function mergeFundedSeatSources(cards, api) {
   const out = cards.map((card) => {
     const match = api.find((p) => p.programName === card.programName && p.size === card.size);
     if (!match) return card; // Flex, and anything they stop selling through the API
@@ -490,6 +528,13 @@ async function extractFundedSeat() {
           broken: `their two sources disagree: card says ${show(field, cardValue)}, API says ${show(field, apiValue)}`,
         };
       }
+    }
+    // The card has two faces: "Eval Rules" says Consistency None, and "Funded
+    // Rules" on the same card says 25% at the first payout. We publish the rule
+    // a trader actually hits, so the funded one is what this compares against.
+    // Reading the eval face alone reported four drifts a day that were not.
+    if (match.payoutConsistency && consistency(rules.consistency) == null) {
+      rules.consistency = match.payoutConsistency;
     }
     return { ...card, rules };
   });
@@ -588,7 +633,35 @@ const E8_TABS = {
   'E8 Zero MAX': 'E8 Zero MAX Futures',
   'E8 Zero Starter': 'E8 Zero Starter Futures',
 };
-const E8_ZERO = new Set(['E8 Zero MAX Futures', 'E8 Zero Starter Futures']);
+/**
+ * One "Configure Challenge" card, as innerText, into the rules it states.
+ * A row the card does not carry is left unemitted (manual), never guessed:
+ * their Signature cards stopped listing the contract limit in August 2026, and
+ * the word "contract" no longer appears anywhere on that page. Demanding it
+ * reported four broken fields a day on a firm whose card had simply changed.
+ * If the row comes back, it is read again — presence decides, not this comment.
+ */
+export function e8CardRules(programName, text) {
+  const sizeM = /\$(\d+)K/i.exec(text);
+  if (!sizeM) return null;
+  const after = (re) => {
+    const m = text.match(re);
+    return m ? m[1] : undefined;
+  };
+  const pt = after(/Profit Target\s*\n\s*\$([\d,]+)/i);
+  const dd = after(/Max drawdown\s*\n\s*\$([\d,]+)/i);
+  const cons = after(/Consistency rule\s*\n\s*(\d+%)/i);
+  const ct = after(/Max contracts\s*\n\s*(\d+)/i);
+  const rules = {
+    profitTarget: pt != null ? money(pt) : BROKEN,
+    maxDrawdown: dd != null ? money(dd) : BROKEN,
+    consistency: cons != null ? consistency(cons) : null, // Signature shows none => None
+    // dailyLoss never shown on E8 cards => not emitted (manual, JSON null).
+  };
+  if (/max contracts/i.test(text))
+    rules.contracts = ct != null ? { minis: parseInt(ct, 10), micros: null } : BROKEN;
+  return { programName, size: parseInt(sizeM[1], 10) * 1000, rules };
+}
 async function extractE8() {
   let pw;
   try {
@@ -636,25 +709,8 @@ async function extractE8() {
       await page.waitForTimeout(1500);
       const cards = await readCards();
       for (const text of cards) {
-        const sizeM = /\$(\d+)K/i.exec(text);
-        if (!sizeM) continue;
-        const after = (re) => {
-          const m = text.match(re);
-          return m ? m[1] : undefined;
-        };
-        const pt = after(/Profit Target\s*\n\s*\$([\d,]+)/i);
-        const dd = after(/Max drawdown\s*\n\s*\$([\d,]+)/i);
-        const cons = after(/Consistency rule\s*\n\s*(\d+%)/i);
-        const ct = after(/Max contracts\s*\n\s*(\d+)/i);
-        const rules = {
-          profitTarget: pt != null ? money(pt) : BROKEN,
-          maxDrawdown: dd != null ? money(dd) : BROKEN,
-          consistency: cons != null ? consistency(cons) : null, // Signature shows none => None
-          // dailyLoss never shown on E8 cards => not emitted (manual, JSON null).
-        };
-        // Zero cards omit the contract limit; only Signature carries it.
-        if (!E8_ZERO.has(programName)) rules.contracts = ct != null ? { minis: parseInt(ct, 10), micros: null } : BROKEN;
-        out.push({ programName, size: parseInt(sizeM[1], 10) * 1000, rules });
+        const card = e8CardRules(programName, text);
+        if (card) out.push(card);
       }
     }
     return out;
@@ -678,7 +734,8 @@ function skipReason(firmId, programName, field) {
   if (firmId === 'traders-launch' && field === 'consistency') return 'FAQ-only "40% rule" (not on card)';
   if (firmId === 'traders-launch' && field === 'dailyLoss') return 'not advertised (manual null)';
   if (firmId === 'e8-markets' && field === 'dailyLoss') return 'never shown on E8 cards (manual null)';
-  if (firmId === 'e8-markets' && field === 'contracts') return 'Zero cards omit contract limit (manual)';
+  if (firmId === 'e8-markets' && field === 'contracts')
+    return 'their cards stopped listing the contract limit (manual)';
   if (firmId === 'blue-guardian' && field === 'profitTarget') return 'instant: no profit-target rule';
   if (firmId === 'blue-guardian' && field === 'consistency') return 'instant: hand summary of per-payout rows';
   if (firmId === 'top-one-futures' && field === 'profitTarget') return 'instant: no profit-target row on the card';
