@@ -1,35 +1,7 @@
 {
-  "generatedAt": "2026-08-21",
-  "builtFor": "2026-08-21",
+  "generatedAt": "2026-08-22",
+  "builtFor": "2026-08-22",
   "promos": [
-    {
-      "firmId": "legends-trading",
-      "firmName": "LEGENDS Trading",
-      "logo": "/logos/email/legends-trading.png",
-      "url": "https://thelegendstrading.com/?ref=JTNQ",
-      "code": "JTNQ",
-      "codeViaLink": false,
-      "program": "Elite",
-      "programType": "eval",
-      "priceType": "one-time",
-      "size": 50000,
-      "price": 49,
-      "originalPrice": 151,
-      "discountPct": 68,
-      "priceNote": "new and existing customers, extra Elite accounts 35% off",
-      "endsAt": "2026-08-21",
-      "expiring": true,
-      "split": "90%",
-      "payout": "Twice monthly",
-      "ddType": "EOD Trailing",
-      "profitTarget": 2700,
-      "maxDrawdown": 2200,
-      "dailyLoss": null,
-      "consistency": "40%",
-      "activationFee": null,
-      "contracts": "4 minis / 40 micros",
-      "lastChecked": "2026-08-21"
-    },
     {
       "firmId": "fundedseat",
       "firmName": "FundedSeat",
@@ -56,7 +28,7 @@
       "consistency": "35%",
       "activationFee": null,
       "contracts": "4 minis / 40 micros",
-      "lastChecked": "2026-08-21"
+      "lastChecked": "2026-08-22"
     },
     {
       "firmId": "top-one-futures",
@@ -84,7 +56,7 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "3 minis / 30 micros",
-      "lastChecked": "2026-08-21"
+      "lastChecked": "2026-08-22"
     },
     {
       "firmId": "tradeday",
@@ -112,7 +84,7 @@
       "consistency": "30% (eval only)",
       "activationFee": null,
       "contracts": "5 contracts (50 micros)",
-      "lastChecked": "2026-08-21"
+      "lastChecked": "2026-08-22"
     },
     {
       "firmId": "e8-markets",
@@ -140,7 +112,35 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "4 minis / 40 micros",
-      "lastChecked": "2026-08-21"
+      "lastChecked": "2026-08-22"
+    },
+    {
+      "firmId": "legends-trading",
+      "firmName": "LEGENDS Trading",
+      "logo": "/logos/email/legends-trading.png",
+      "url": "https://thelegendstrading.com/?ref=JTNQ",
+      "code": "JTNQ",
+      "codeViaLink": false,
+      "program": "Elite",
+      "programType": "eval",
+      "priceType": "one-time",
+      "size": 50000,
+      "price": 98.15,
+      "originalPrice": 151,
+      "discountPct": 35,
+      "priceNote": "new and existing customers, extra Elite accounts 35% off",
+      "endsAt": "2026-08-21",
+      "expiring": false,
+      "split": "90%",
+      "payout": "Twice monthly",
+      "ddType": "EOD Trailing",
+      "profitTarget": 2700,
+      "maxDrawdown": 2200,
+      "dailyLoss": null,
+      "consistency": "40%",
+      "activationFee": null,
+      "contracts": "4 minis / 40 micros",
+      "lastChecked": "2026-08-22"
     },
     {
       "firmId": "blue-guardian",
@@ -168,7 +168,7 @@
       "consistency": "50%",
       "activationFee": null,
       "contracts": "4 Mini | 40 Micro",
-      "lastChecked": "2026-08-21"
+      "lastChecked": "2026-08-22"
     },
     {
       "firmId": "traders-launch",
@@ -196,7 +196,7 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "2 minis / 20 micros",
-      "lastChecked": "2026-08-21"
+      "lastChecked": "2026-08-22"
     }
   ]
 }
