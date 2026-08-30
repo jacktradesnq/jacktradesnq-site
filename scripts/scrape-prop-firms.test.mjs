@@ -5,7 +5,13 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { topOneActivationFees, topOneFees, legendsUpdatesFrom, legendsActivationFee } from './scrape-prop-firms.mjs';
+import {
+  topOneActivationFees,
+  topOneFees,
+  legendsUpdatesFrom,
+  legendsActivationFee,
+  reconcileFundedSeatCards,
+} from './scrape-prop-firms.mjs';
 import { fundedseatPlansFrom, FUNDEDSEAT_API_UNCOVERED } from './lib/fundedseat-api.mjs';
 
 const fixture = (name) =>
@@ -270,4 +276,47 @@ test('what the API says matches the published JSON, field by field', () => {
     }
   }
   assert.equal(checked, 11);
+});
+
+
+// ── FundedSeat: the card, their API, and the banner between the two ──────────
+// Real numbers, read 2026-08-30: banner "50% OFF THE DAILY ULTRA & SPRINT —
+// USE CODE ULTRA50 | SPRINT50", Sprint 25K card $67.50 off $135, their API
+// still answering $74.95 off $135.
+const API_SPRINT = [{ programName: 'Sprint', size: 25000, price: 74.95, originalPrice: 135 }];
+const CARD_AT_CODE_PRICE = [{ programName: 'Sprint', size: 25000, price: 67.5, originalPrice: 135 }];
+const BANNER = { code: 'SPRINT50', pct: 50 };
+
+test('a card at the banner code price is the price the buyer pays, not a bad read', () => {
+  assert.doesNotThrow(() => reconcileFundedSeatCards(API_SPRINT, CARD_AT_CODE_PRICE, BANNER));
+});
+
+test('the same cheaper card with no banner is still a bad read', () => {
+  assert.throws(
+    () => reconcileFundedSeatCards(API_SPRINT, CARD_AT_CODE_PRICE, { code: null, pct: null }),
+    /card says \$67\.5\/\$135, their API says \$74\.95\/\$135/,
+  );
+});
+
+test('a discount the banner never announced is refused', () => {
+  const card = [{ programName: 'Sprint', size: 25000, price: 40, originalPrice: 135 }]; // 70% off
+  assert.throws(() => reconcileFundedSeatCards(API_SPRINT, card, BANNER), /card says \$40/);
+});
+
+test('a card DEARER than their API is refused, banner or not', () => {
+  const card = [{ programName: 'Sprint', size: 25000, price: 89, originalPrice: 135 }];
+  assert.throws(() => reconcileFundedSeatCards(API_SPRINT, card, BANNER), /card says \$89/);
+});
+
+test('a list price that disagrees is refused even under a banner', () => {
+  const card = [{ programName: 'Sprint', size: 25000, price: 67.5, originalPrice: 150 }];
+  assert.throws(() => reconcileFundedSeatCards(API_SPRINT, card, BANNER), /\$67\.5\/\$150/);
+});
+
+test('two sources that already agree pass without needing a banner', () => {
+  assert.doesNotThrow(() => reconcileFundedSeatCards(API_SPRINT, API_SPRINT.map((p) => ({ ...p })), {}));
+});
+
+test('a plan their API sells but no card shows still stops the firm', () => {
+  assert.throws(() => reconcileFundedSeatCards(API_SPRINT, [], BANNER), /missing from the cards/);
 });

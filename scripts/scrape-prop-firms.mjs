@@ -308,6 +308,45 @@ const FUNDEDSEAT_PROGRAMS = [
 ];
 const MONTHS = { JANUARY: 1, FEBRUARY: 2, MARCH: 3, APRIL: 4, MAY: 5, JUNE: 6, JULY: 7, AUGUST: 8, SEPTEMBER: 9, OCTOBER: 10, NOVEMBER: 11, DECEMBER: 12 };
 
+// Cross-check every plan both sources describe. Tab clicking is the weak link
+// here (their variant buttons swap the cards under us, which is why the "Bolt"
+// guard exists), so a card that disagrees with their backend is normally a bad
+// read and stops the firm instead of publishing a guess.
+//
+// One disagreement is real, not a bad read: a code promo. On 2026-08-30 their
+// banner read "50% OFF THE DAILY ULTRA & SPRINT — USE CODE ULTRA50 | SPRINT50"
+// and the Sprint 25K card said $67.50 while their API still said $74.95 — the
+// API returns the list price, the card the price the code charges. The old
+// guard called that a bad read and marked the whole firm stale for six days,
+// which froze EVERY firm's prices behind a red workflow. So: a card CHEAPER
+// than the API is accepted only when the banner announces exactly that
+// discount, off the same list price. Anything else still throws — a dearer
+// card, a different list price, a discount the banner never announced.
+export function reconcileFundedSeatCards(apiPlans, cards, banner = {}) {
+  for (const api of apiPlans) {
+    const card = cards.find((u) => u.programName === api.programName && u.size === api.size);
+    const where = `${api.programName} $${api.size / 1000}K`;
+    if (!card) throw new Error(`${where}: in their API, missing from the cards`);
+    if (card.price === api.price && card.originalPrice === api.originalPrice) continue;
+    const announced =
+      banner.code != null &&
+      banner.pct != null &&
+      card.originalPrice === api.originalPrice &&
+      card.price < api.price &&
+      pctOff(card.price, card.originalPrice) === banner.pct;
+    if (!announced)
+      throw new Error(
+        `${where}: card says $${card.price}/$${card.originalPrice}, ` +
+          `their API says $${api.price}/$${api.originalPrice}`,
+      );
+    console.log(
+      `  fundedseat: ${where} $${card.price} is their banner's ${banner.pct}% OFF ` +
+        `with code ${banner.code} — API list price $${api.price} kept out`,
+    );
+  }
+  return cards;
+}
+
 async function scrapeFundedSeat() {
   // Their own catalogue answers for every plan we list. It is the second witness:
   // the cards are what a buyer is shown, the API is what their system charges,
@@ -413,26 +452,19 @@ async function scrapeFundedSeat() {
       }
     }
 
-    // Cross-check every plan both sources describe. Tab clicking is the weak
-    // link here (their variant buttons swap the cards under us, which is why the
-    // "Bolt" guard above exists), so a card that disagrees with their backend is
-    // treated as a bad read and stops the firm instead of publishing a guess.
-    for (const api of apiPlans) {
-      const card = updates.find((u) => u.programName === api.programName && u.size === api.size);
-      if (!card) throw new Error(`${api.programName} $${api.size / 1000}K: in their API, missing from the cards`);
-      if (card.price !== api.price || card.originalPrice !== api.originalPrice)
-        throw new Error(
-          `${api.programName} $${api.size / 1000}K: card says $${card.price}/$${card.originalPrice}, ` +
-            `their API says $${api.price}/$${api.originalPrice}`,
-        );
-    }
-
-    // Top banner, e.g. "50% OFF YOUR NEXT 3 PURCHASES — USE CODE JULY50 — ENDS JULY 26"
+    // Top banner, e.g. "50% OFF YOUR NEXT 3 PURCHASES — USE CODE JULY50 — ENDS JULY 26".
+    // Read BEFORE the cross-check: when they run a code promo their backend does
+    // not know about, the banner is what tells a cheaper card from a bad read.
     let firmPromo;
     const bodyText = await page.evaluate(() => document.body.innerText);
     const codeM = bodyText.match(/USE CODE\s+([A-Z0-9]+)/i);
+    const bannerPctM = bodyText.match(/(\d+)%\s*OFF/i);
+    reconcileFundedSeatCards(apiPlans, updates, {
+      code: codeM ? codeM[1].toUpperCase() : null,
+      pct: bannerPctM ? Number(bannerPctM[1]) : null,
+    });
+
     if (codeM) {
-      const bannerPctM = bodyText.match(/(\d+)%\s*OFF/i);
       const endsM = bodyText.match(/ENDS\s+([A-Z]+)\s+(\d{1,2})/i);
       const withOriginal = updates.filter((u) => u.originalPrice != null);
       const sitePct =
