@@ -13,7 +13,12 @@ import {
   renderTweet,
 } from './lib/deal-of-day.mjs';
 
-const DATA = JSON.parse(readFileSync(new URL('../public/data/prop-firms.json', import.meta.url), 'utf8'));
+// Frozen data on purpose. These tests are about how a deal RENDERS, and the
+// published file is rewritten every morning by the price sync: the day it
+// marked FundedSeat stale, seventeen of these went red on main without a line
+// of code changing. Freshness of the live file is checked in
+// scrape-prop-firms.test.mjs and check-rule-drift.test.mjs, where it belongs.
+const DATA = JSON.parse(readFileSync(new URL('./fixtures/prop-firms.fixture.json', import.meta.url), 'utf8'));
 
 // ── selection ────────────────────────────────────────────────────────────────
 
