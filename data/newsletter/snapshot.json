@@ -1,0 +1,120 @@
+{
+  "generatedAt": "2026-08-19",
+  "firms": {
+    "blue-guardian": {
+      "promoKey": "25% OFF|BG25|",
+      "prices": {
+        "Direct|25000": 230,
+        "Direct|50000": 371,
+        "Direct|100000": 494,
+        "Direct|150000": 618,
+        "Express|50000": 134,
+        "Express|100000": 212,
+        "Express|150000": 290,
+        "Reserve|25000": 83,
+        "Reserve|50000": 116,
+        "Reserve|100000": 186,
+        "Reserve|150000": 297,
+        "Standard|25000": 116,
+        "Standard|50000": 157,
+        "Standard|100000": 248,
+        "Standard|150000": 318
+      }
+    },
+    "traders-launch": {
+      "promoKey": null,
+      "prices": {
+        "1-Step|100000": 159,
+        "1-Step|200000": 299,
+        "1-Step|300000": 599
+      }
+    },
+    "top-one-futures": {
+      "promoKey": "55% OFF|2.0|",
+      "prices": {
+        "Elite Daily|25000": 80,
+        "Elite Daily|50000": 98,
+        "Elite Daily|100000": 179,
+        "Elite Daily|150000": 247,
+        "Elite Access|25000": 39,
+        "Elite Access|50000": 39,
+        "Elite Access|100000": 39,
+        "Elite Access|150000": 39,
+        "Instant Sim Funded|25000": 189,
+        "Instant Sim Funded|50000": 306,
+        "Instant Sim Funded|100000": 369,
+        "Instant Sim Funded|150000": 423,
+        "Ignite|25000": 98,
+        "Ignite|50000": 179,
+        "Ignite|100000": 253,
+        "Ignite|150000": 360
+      }
+    },
+    "fundedseat": {
+      "promoKey": "45% OFF + 50% w/ code|ULTRA50|2026-08-23",
+      "prices": {
+        "Daily|25000": 76.95,
+        "Daily|50000": 104.95,
+        "Daily|100000": 174.95,
+        "Daily|150000": 244.95,
+        "Instant Funding|25000": 219.95,
+        "Instant Funding|50000": 329.95,
+        "Instant Funding|100000": 494.95,
+        "Flex|25000": 76.95,
+        "Flex|50000": 104.95,
+        "Flex|100000": 174.95,
+        "Flex|150000": 244.95,
+        "Sprint|25000": 74.95,
+        "Sprint|50000": 109.95,
+        "Sprint|100000": 164.95,
+        "Sprint|150000": 259.95
+      }
+    },
+    "legends-trading": {
+      "promoKey": "Apprentice 80% · Elite 35% off|LTG|",
+      "prices": {
+        "Apprentice|25000": 33,
+        "Apprentice|50000": 37,
+        "Apprentice|100000": 45,
+        "Apprentice|150000": 64,
+        "Elite|25000": 64.35,
+        "Elite|50000": 96.85,
+        "Elite|100000": 117,
+        "Elite|150000": 149.5,
+        "Straight to Master|25000": 239.4,
+        "Straight to Master|50000": 299.4,
+        "Straight to Master|100000": 359.4,
+        "Straight to Master|150000": 419.4
+      }
+    },
+    "e8-markets": {
+      "promoKey": "Up to 40% off|JTNQ|",
+      "prices": {
+        "E8 Signature Futures|25000": 99,
+        "E8 Signature Futures|50000": 135,
+        "E8 Signature Futures|100000": 234,
+        "E8 Signature Futures|150000": 351,
+        "E8 Zero MAX Futures|50000": 214,
+        "E8 Zero MAX Futures|100000": 383,
+        "E8 Zero MAX Futures|200000": 708,
+        "E8 Zero Starter Futures|50000": 116,
+        "E8 Zero Starter Futures|100000": 181,
+        "E8 Zero Starter Futures|200000": 363
+      }
+    },
+    "tradeday": {
+      "promoKey": "Public 55% off already applied|JTNQ|",
+      "prices": {
+        "Quick Pay Intraday|150000": 162,
+        "Quick Pay Intraday|100000": 108,
+        "Quick Pay Intraday|50000": 59,
+        "Quick Pay EOD|150000": 180,
+        "Quick Pay EOD|100000": 129,
+        "Quick Pay EOD|50000": 79,
+        "Fast Pass|150000": 225,
+        "Fast Pass|100000": 149,
+        "Fast Pass|50000": 85
+      }
+    }
+  }
+}

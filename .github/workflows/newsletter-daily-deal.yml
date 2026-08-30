@@ -1,0 +1,96 @@
+name: Newsletter — deal of the day
+
+# Runs on GitHub's servers, so it does not care whether the Mac is open, asleep
+# or shut. 06:40 UTC, right after the 06:17 price sync.
+#
+# The daily run is a DRY RUN until the repository variable NEWSLETTER_ENABLED is
+# set to "true" (Settings > Secrets and variables > Actions > Variables). Until
+# then it renders the email, counts the confirmed subscribers and mails nobody,
+# so merging this can never start emailing people on its own.
+#
+# A manual run can always force mode=send regardless of that variable.
+on:
+  schedule:
+    - cron: '40 6 * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'dry-run (render + count only) or send'
+        type: choice
+        options: [dry-run, send]
+        default: dry-run
+      discord:
+        description: 'also post the deal to Discord'
+        type: boolean
+        default: false
+      force_firm:
+        description: 'firm id to force (blank = the day rotation picks)'
+        type: string
+        default: ''
+
+jobs:
+  deal:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build the day's deal
+        id: build
+        run: |
+          ARGS=(--json)
+          if [ -n "${{ inputs.force_firm }}" ]; then ARGS+=(--force=${{ inputs.force_firm }}); fi
+          node scripts/build-deal-of-day.mjs "${ARGS[@]}" > deal.json
+          node -e "const d=require('./deal.json');console.log('firm:',d.firmName);console.log('subject:',d.subject)"
+
+      - name: Send to the list
+        run: |
+          # A scheduled run only sends once NEWSLETTER_ENABLED is "true".
+          # A manual run sends when its mode input says so.
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            MODE=$([ "${{ vars.NEWSLETTER_ENABLED }}" = "true" ] && echo send || echo dry-run)
+          else
+            MODE=$([ "${{ inputs.mode }}" = "send" ] && echo send || echo dry-run)
+          fi
+          echo "mode: $MODE"
+          MODE="$MODE" node -e "
+            const {subject,html,text}=require('./deal.json');
+            process.stdout.write(JSON.stringify({subject,html,text,mode:process.env.MODE}));
+          " > payload.json
+          RESPONSE=$(curl -sS -X POST https://jacktradesnq.com/api/newsletter/send \
+            -H "Content-Type: application/json" \
+            -H "x-jtnq-key: ${{ secrets.NEWSLETTER_SEND_KEY }}" \
+            --data @payload.json)
+          echo "$RESPONSE"
+          echo "$RESPONSE" | node -e "
+            let s='';process.stdin.on('data',c=>s+=c).on('end',()=>{
+              const r=JSON.parse(s);
+              if(!r.ok) { console.error('send endpoint refused'); process.exit(1); }
+            })"
+
+      - name: Post the deal to Discord
+        # Manual: the checkbox. Scheduled: the NEWSLETTER_DISCORD variable.
+        if: inputs.discord || (github.event_name == 'schedule' && vars.NEWSLETTER_DISCORD == 'true')
+        run: |
+          node -e "
+            const d=require('./deal.json');
+            process.stdout.write(JSON.stringify({content:d.discord}));
+          " > discord.json
+          curl -sS -X POST -H "Content-Type: application/json" --data @discord.json "${{ secrets.DISCORD_WEBHOOK }}" > /dev/null
+
+      - name: Commit the rotation state
+        run: |
+          if [ -n "$(git status --porcelain data/newsletter)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add data/newsletter
+            git commit -m "chore(newsletter): deal of the day rotation state"
+            git push origin HEAD:${{ github.ref_name }}
+          fi

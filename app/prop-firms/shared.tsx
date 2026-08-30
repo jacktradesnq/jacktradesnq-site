@@ -370,6 +370,57 @@ export const CSS = `
   transition: transform .18s ease;
 }
 .jtnq-cmp .hero-promos svg{ width: 14px; height: 14px; }
+/* ── daily deal signup (DealSignup.tsx) ── */
+.jtnq-cmp .signup{ padding: 0 var(--pad-x) clamp(48px, 6vw, 80px); }
+.jtnq-cmp .signup-card{
+  max-width: var(--maxw); margin: 0 auto; padding: clamp(28px, 4vw, 44px);
+  background: var(--c-bg-raise); border: 1px solid var(--c-line); border-radius: 12px;
+}
+.jtnq-cmp .signup-eyebrow{
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--c-text-mute);
+}
+.jtnq-cmp .signup-title{
+  margin-top: 12px; font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1; letter-spacing: -0.01em;
+}
+.jtnq-cmp .signup-title .dot{ color: var(--c-accent); }
+.jtnq-cmp .signup-copy{
+  margin-top: 16px; max-width: 60ch; font-size: 15px; line-height: 1.7;
+  color: var(--c-text-soft); text-wrap: pretty;
+}
+.jtnq-cmp .signup-form{ margin-top: 24px; }
+.jtnq-cmp .signup-label{
+  display: block; margin-bottom: 8px;
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--c-text-mute);
+}
+.jtnq-cmp .signup-row{ display: flex; flex-wrap: wrap; gap: 12px; }
+.jtnq-cmp .signup-input{
+  flex: 1 1 260px; min-width: 0; padding: 14px 16px;
+  font-family: var(--f-sans); font-size: 15px; color: var(--c-text);
+  background: var(--c-bg-deep); border: 1px solid var(--c-line); border-radius: 4px;
+  transition: border-color .2s ease;
+}
+.jtnq-cmp .signup-input::placeholder{ color: var(--c-text-deep); }
+.jtnq-cmp .signup-input:focus{ outline: none; border-color: var(--c-accent); }
+.jtnq-cmp .signup-btn{
+  padding: 14px 28px; font-family: var(--f-sans); font-size: 15px; font-weight: 700;
+  color: var(--c-bg); background: var(--c-accent); border: none; border-radius: 999px;
+  cursor: pointer; transition: transform .18s ease, opacity .18s ease;
+}
+.jtnq-cmp .signup-btn:hover{ transform: translateY(-1px); }
+.jtnq-cmp .signup-btn:disabled{ opacity: .6; cursor: default; transform: none; }
+/* Off-screen rather than display:none, so bots that read the DOM still fill it. */
+.jtnq-cmp .signup-trap{ position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.jtnq-cmp .signup-done{ margin-top: 24px; font-size: 15px; color: var(--c-accent); }
+.jtnq-cmp .signup-error{ margin-top: 12px; font-size: 14px; color: oklch(0.66 0.11 40); }
+.jtnq-cmp .signup-fine{
+  margin-top: 20px; font-size: 12px; line-height: 1.7; color: var(--c-text-deep);
+}
+
+  .jtnq-cmp .signup-btn{ width: 100%; }
+
 .jtnq-cmp .hero-promos:hover{ transform: translateY(-1px); }
 
 @media (max-width: 720px){

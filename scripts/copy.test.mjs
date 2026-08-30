@@ -155,12 +155,16 @@ test('a firm advertising two discounts never gets them added up', () => {
 test("the firm's own promo text never reaches a message", () => {
   // It is free marketing prose ("45% OFF + 50% w/ code ULTRA50") and it moves
   // without warning, so it is deliberately not a placeholder.
+  let checked = 0;
   for (const firm of DATA.firms) {
     if (!firm.promo?.label) continue;
     const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: firm.id });
+    if (!d) continue; // held back today (a failed scrape): nothing is rendered for it
+    checked++;
     const rendered = [renderTweet(d), renderDiscord(d), renderEmail(d, {}).html].join('\n');
     assert.ok(!rendered.includes(firm.promo.label), `${firm.id}: the promo label leaked into a message`);
   }
+  assert.ok(checked >= 2, `only ${checked} firms rendered: this test would pass on nothing`);
 });
 
 test('a percentage typed by hand into the copy file is refused', () => {
@@ -202,14 +206,18 @@ test('the shipped copy passes the audit on every firm', () => {
 const PUBLIC_CODES = { 'blue-guardian': 'BG25', 'top-one-futures': 'BOGO', fundedseat: 'ULTRA50', 'legends-trading': 'LTG' };
 
 test('no message ever prints a firm public code', () => {
+  let checked = 0;
   for (const [firmId, publicCode] of Object.entries(PUBLIC_CODES)) {
     const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: firmId });
+    if (!d) continue; // held back today (a failed scrape): nothing is rendered for it
+    checked++;
     const rendered = [renderTweet(d), renderDiscord(d), renderEmail(d, {}).html, renderEmail(d, {}).text].join('\n');
     assert.ok(
       !new RegExp(`(^|[^A-Za-z0-9])${publicCode.replace('.', '\\.')}([^A-Za-z0-9]|$)`).test(rendered),
       `${firmId}: printed the public code ${publicCode}`
     );
   }
+  assert.ok(checked >= 2, `only ${checked} firms rendered: this test would pass on nothing`);
 });
 
 test('every firm prints JTNQ today, the same as the comparison page', () => {

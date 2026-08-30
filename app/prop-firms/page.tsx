@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import rawData from '@/public/data/prop-firms.json';
 import { AssetNav, CSS, META, money, sizeLabel } from './shared';
+import { DealSignup } from './DealSignup';
 
 // Affiliate code applied on every firm link below.
 const CODE = 'JTNQ';
@@ -287,6 +288,8 @@ export default function PropFirms() {
           </div>
           <p className="note">{NOTE}</p>
         </section>
+
+        <DealSignup />
       </main>
 
       <footer className="site-footer">

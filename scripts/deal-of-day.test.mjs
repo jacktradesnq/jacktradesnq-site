@@ -35,7 +35,12 @@ test('an activation fee beats a headline percentage', () => {
   // funded, more than the $218 it strikes through while claiming 82% off.
   // Elite Daily is $98 all in. The cheaper path wins even though it shows a
   // smaller percentage.
-  const deal = pickDeal(DATA, { today: '2026-09-30', history: [], forceFirmId: 'top-one-futures' });
+  // Read off a copy where Top One is not stale: what is measured here is the
+  // arbitration between two of their plans, not whether this morning's scrape
+  // of their site worked.
+  const data = structuredClone(DATA);
+  for (const f of data.firms) if (f.id === 'top-one-futures') f.stale = false;
+  const deal = pickDeal(data, { today: '2026-09-30', history: [], forceFirmId: 'top-one-futures' });
   assert.equal(deal.programLabel, 'Elite Daily');
   assert.equal(deal.headline.size, 50000);
   assert.equal(deal.headline.price, 98);
@@ -89,17 +94,22 @@ test('a firm sent in the last 7 days is not picked again', () => {
   assert.equal(deal.firmId, eligible[0].firmId);
 });
 
-test('7 consecutive days rotate over 7 distinct firms', () => {
+test('a week of sends never sends the same firm twice', () => {
+  // How many firms a week can cover is the feed's call, not a number typed
+  // here: a firm whose scrape failed is held back, and the rotation shrinks
+  // with it. Asserting 7 was asserting yesterday's feed.
+  const eligible = analyzeFirms(DATA, { today: '2026-08-20' }).length;
+  assert.ok(eligible >= 5, `only ${eligible} firms eligible, the week would repeat`);
   const history = [];
   const picked = [];
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < eligible; i++) {
     const today = new Date(Date.UTC(2026, 7, 20 + i)).toISOString().slice(0, 10);
     const deal = pickDeal(DATA, { today, history });
     assert.ok(deal, `no deal on ${today}`);
     picked.push(deal.firmId);
     history.push({ firmId: deal.firmId, date: today });
   }
-  assert.equal(new Set(picked).size, 7, `picked=${picked.join(',')}`);
+  assert.equal(new Set(picked).size, eligible, `picked=${picked.join(',')}`);
 });
 
 test('a stale firm is never headlined (its promo may already be dead)', () => {
@@ -273,6 +283,17 @@ test('the email shows the logo once, sized and described', () => {
   assert.match(img, /width="48"/);
   assert.match(img, /height="48"/);
   assert.match(img, /alt="FundedSeat"/);
+});
+
+test('the logo is served cross-origin, or it shows up broken in an inbox', () => {
+  // The site sends Cross-Origin-Resource-Policy: same-origin on /*, which is
+  // exactly what an email does: load the image from another origin. Measured
+  // in a browser: ERR_BLOCKED_BY_RESPONSE.NotSameOrigin. Gmail proxies the
+  // image server-side and never sees it, Outlook web does.
+  const headers = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
+  const rule = headers.split(/\n(?=\/)/).find((block) => block.startsWith('/logos/email/*'));
+  assert.ok(rule, 'no /logos/email/* block in public/_headers');
+  assert.match(rule, /Cross-Origin-Resource-Policy:\s*cross-origin/);
 });
 
 // ── spacing ──────────────────────────────────────────────────────────────────
