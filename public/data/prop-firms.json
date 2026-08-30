@@ -535,11 +535,11 @@
       "promo": {
         "label": "45% OFF + 50% w/ code",
         "code": "ULTRA50",
-        "ends": "2026-08-23"
+        "ends": "2026-08-30"
       },
       "url": "https://fundedseat.link/jtnq",
-      "lastChecked": "2026-08-24",
-      "stale": true,
+      "lastChecked": "2026-08-30",
+      "stale": false,
       "programs": [
         {
           "name": "Daily",
@@ -646,7 +646,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 74.95,
+              "price": 67.5,
               "originalPrice": 135,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
@@ -658,7 +658,7 @@
             },
             {
               "size": 50000,
-              "price": 109.95,
+              "price": 100,
               "originalPrice": 200,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -670,7 +670,7 @@
             },
             {
               "size": 100000,
-              "price": 164.95,
+              "price": 150,
               "originalPrice": 300,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
@@ -682,7 +682,7 @@
             },
             {
               "size": 150000,
-              "price": 259.95,
+              "price": 237.5,
               "originalPrice": 475,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
