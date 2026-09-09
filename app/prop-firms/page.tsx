@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import rawData from '@/public/data/prop-firms.json';
 import { AssetNav, CSS, META, money, sizeLabel } from './shared';
 import { DealSignup } from './DealSignup';
+import { goHref } from '@/lib/go-links';
 
 // Affiliate code applied on every firm link below.
 const CODE = 'JTNQ';
@@ -407,7 +408,7 @@ function FirmRow({
         <td className="num cell-daily" data-label="Daily loss">{dailyLossValue(winner.plan)}</td>
 
         <td className="col-cta">
-          <a className="row-cta" href={firm.url} target="_blank" rel="noopener nofollow sponsored">
+          <a className="row-cta" href={goHref('prop-firms', firm.id)} target="_blank" rel="noopener nofollow sponsored">
             Get funded
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M7 17L17 7M9 7h8v8" />

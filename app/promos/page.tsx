@@ -6,6 +6,7 @@
 import rawPromos from '@/public/data/live-promos.json';
 import { CSS, META, money, sizeLabel } from '../prop-firms/shared';
 import { PROMOS_CSS } from './styles';
+import { goHref } from '@/lib/go-links';
 
 // Every figure on this page comes from public/data/live-promos.json, built by
 // scripts/build-live-promos.mjs from the same engine as the newsletter, so the
@@ -182,7 +183,7 @@ export default function PromosPage() {
 
 
                 <div className="promo-foot">
-                  <a className="promo-cta" href={p.url} target="_blank" rel="noopener nofollow sponsored">
+                  <a className="promo-cta" href={goHref('promos', p.firmId)} target="_blank" rel="noopener nofollow sponsored">
                     Get the {sizeLabel(p.size)}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M7 17L17 7M9 7h8v8" />

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import rawCfdData from '@/public/data/cfd-firms.json';
 import { AssetNav, CSS, META, money, sizeLabel } from './shared';
+import { goHref } from '@/lib/go-links';
 
 // CFD and crypto programs live in their own file and their own pages: they are
 // sized in percentages (target, daily loss, drawdown) with leverage instead of
@@ -170,7 +171,7 @@ export default function MarketComparator({ market }: { market: CfdMarket }) {
                       {program.dailyLoss ?? <span className="none">n/c</span>}
                     </td>
                     <td className="col-cta">
-                      <a className="row-cta" href={firm.url} target="_blank" rel="noopener nofollow sponsored">
+                      <a className="row-cta" href={goHref('prop-firms', firm.id)} target="_blank" rel="noopener nofollow sponsored">
                         Get funded
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M7 17L17 7M9 7h8v8" />
