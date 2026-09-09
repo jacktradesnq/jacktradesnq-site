@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-30",
+  "generatedAt": "2026-09-09",
   "firms": [
     {
       "id": "blue-guardian",
@@ -11,7 +11,7 @@
         "code": "BG25"
       },
       "url": "https://blueguardian.com/?afmc=JTNQ",
-      "lastChecked": "2026-08-30",
+      "lastChecked": "2026-09-09",
       "stale": false,
       "programs": [
         {
@@ -76,8 +76,8 @@
           "plans": [
             {
               "size": 50000,
-              "price": 134,
-              "originalPrice": 178,
+              "price": 103,
+              "originalPrice": 137,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -88,8 +88,8 @@
             },
             {
               "size": 100000,
-              "price": 212,
-              "originalPrice": 282,
+              "price": 172,
+              "originalPrice": 229,
               "profitTarget": 6000,
               "maxDrawdown": 3500,
               "ddType": "EOD Trailing",
@@ -100,8 +100,8 @@
             },
             {
               "size": 150000,
-              "price": 290,
-              "originalPrice": 386,
+              "price": 259,
+              "originalPrice": 345,
               "profitTarget": 9000,
               "maxDrawdown": 5000,
               "ddType": "EOD Trailing",
@@ -131,8 +131,8 @@
             },
             {
               "size": 50000,
-              "price": 116,
-              "originalPrice": 154,
+              "price": 123,
+              "originalPrice": 164,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -231,7 +231,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-08-30",
+      "lastChecked": "2026-09-09",
       "stale": false,
       "programs": [
         {
@@ -291,7 +291,7 @@
       },
       "url": "https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures",
       "lastChecked": "2026-08-30",
-      "stale": false,
+      "stale": true,
       "programs": [
         {
           "name": "Elite Daily",
@@ -533,12 +533,12 @@
       "split": "90%",
       "payout": "Daily · 5h guaranteed",
       "promo": {
-        "label": "45% OFF + 50% w/ code",
-        "code": "ULTRA50",
-        "ends": "2026-08-30"
+        "label": "50% OFF + 50% w/ code",
+        "code": "SEP50",
+        "ends": "2026-09-21"
       },
       "url": "https://fundedseat.link/jtnq",
-      "lastChecked": "2026-08-30",
+      "lastChecked": "2026-09-09",
       "stale": false,
       "programs": [
         {
@@ -548,7 +548,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 76.95,
+              "price": 70,
               "originalPrice": 140,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
@@ -560,7 +560,7 @@
             },
             {
               "size": 50000,
-              "price": 104.95,
+              "price": 95,
               "originalPrice": 190,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -572,7 +572,7 @@
             },
             {
               "size": 100000,
-              "price": 174.95,
+              "price": 160,
               "originalPrice": 320,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
@@ -584,7 +584,7 @@
             },
             {
               "size": 150000,
-              "price": 244.95,
+              "price": 222.5,
               "originalPrice": 445,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
@@ -603,7 +603,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 219.95,
+              "price": 200,
               "originalPrice": 400,
               "profitTarget": null,
               "maxDrawdown": 1000,
@@ -615,7 +615,7 @@
             },
             {
               "size": 50000,
-              "price": 329.95,
+              "price": 300,
               "originalPrice": 600,
               "profitTarget": null,
               "maxDrawdown": 2000,
@@ -627,7 +627,7 @@
             },
             {
               "size": 100000,
-              "price": 494.95,
+              "price": 450,
               "originalPrice": 900,
               "profitTarget": null,
               "maxDrawdown": 3000,
@@ -708,7 +708,7 @@
         "ends": "2026-08-21"
       },
       "url": "https://thelegendstrading.com/?ref=JTNQ",
-      "lastChecked": "2026-08-30",
+      "lastChecked": "2026-09-09",
       "stale": false,
       "programs": [
         {
@@ -718,7 +718,7 @@
           "plans": [
             {
               "size": 50000,
-              "price": 29.5,
+              "price": 35.4,
               "originalPrice": 59,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -727,11 +727,11 @@
               "dailyLossSoft": false,
               "consistency": "None",
               "contracts": "2 minis / 20 micros",
-              "activationFee": 99
+              "activationFee": 59
             },
             {
               "size": 100000,
-              "price": 53.5,
+              "price": 64.2,
               "originalPrice": 107,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
@@ -740,11 +740,11 @@
               "dailyLossSoft": false,
               "consistency": "None",
               "contracts": "4 minis / 40 micros",
-              "activationFee": 129
+              "activationFee": 79
             },
             {
               "size": 150000,
-              "price": 69,
+              "price": 82.8,
               "originalPrice": 138,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
@@ -753,7 +753,7 @@
               "dailyLossSoft": false,
               "consistency": "None",
               "contracts": "6 minis / 60 micros",
-              "activationFee": 149
+              "activationFee": 89
             }
           ]
         },
@@ -764,7 +764,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 77.35,
+              "price": 83.3,
               "originalPrice": 119,
               "profitTarget": 1500,
               "maxDrawdown": 1250,
@@ -776,7 +776,7 @@
             },
             {
               "size": 50000,
-              "price": 98.15,
+              "price": 105.7,
               "originalPrice": 151,
               "profitTarget": 2700,
               "maxDrawdown": 2200,
@@ -789,7 +789,7 @@
             },
             {
               "size": 100000,
-              "price": 147.55,
+              "price": 158.9,
               "originalPrice": 227,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
@@ -801,7 +801,7 @@
             },
             {
               "size": 150000,
-              "price": 225.55,
+              "price": 242.9,
               "originalPrice": 347,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
@@ -826,7 +826,7 @@
       },
       "code": "JTNQ",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-08-30",
+      "lastChecked": "2026-09-09",
       "stale": false,
       "programs": [
         {
@@ -836,7 +836,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 88,
+              "price": 83,
               "originalPrice": 110,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
@@ -848,7 +848,7 @@
             },
             {
               "size": 50000,
-              "price": 120,
+              "price": 113,
               "originalPrice": 150,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -860,7 +860,7 @@
             },
             {
               "size": 100000,
-              "price": 208,
+              "price": 195,
               "originalPrice": 260,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
@@ -872,7 +872,7 @@
             },
             {
               "size": 150000,
-              "price": 312,
+              "price": 293,
               "originalPrice": 390,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
@@ -983,7 +983,7 @@
         "code": "JTNQ"
       },
       "url": "https://www.tradeday.com/?a_aid=JTNQ",
-      "lastChecked": "2026-08-30",
+      "lastChecked": "2026-09-09",
       "stale": false,
       "programs": [
         {
