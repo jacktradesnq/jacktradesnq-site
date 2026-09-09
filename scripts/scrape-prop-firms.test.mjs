@@ -261,7 +261,15 @@ test('what the API says matches the published JSON, field by field', () => {
       const api = fsPlan(plans, program.name, plan.size);
       if (!api) continue; // Flex: not sold through this endpoint
       const tag = `${program.name} ${plan.size}`;
-      assert.equal(plan.price, api.price, `${tag} price`);
+      // Their API answers the list price; a code promo makes the card cheaper.
+      // Read 2026-08-30: Sprint 25K card $67.50 off $135, their API $74.95 off
+      // $135, banner "50% OFF ... USE CODE SPRINT50". reconcileFundedSeatCards()
+      // is what rules on that discount, so here the published price only has to
+      // be no dearer than the API's — the list price below stays strict.
+      assert.ok(
+        plan.price <= api.price,
+        `${tag} price: published $${plan.price} is dearer than the API's $${api.price}`,
+      );
       assert.equal(plan.originalPrice, api.originalPrice, `${tag} originalPrice`);
       for (const [field, v] of Object.entries(api.rules)) {
         if (field === 'contracts') {
