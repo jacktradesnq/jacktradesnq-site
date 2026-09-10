@@ -54,3 +54,9 @@ __pycache__/
 *.pyc
 # local preview server log (scripts/../out served on :4321)
 /.local-preview.log
+
+# Explorations de direction artistique (session 2026-09-10) : maquettes locales,
+# captures de ses posts IG et frames de ses lives OBS. Les frames montrent son
+# numero de compte Tradovate et son equity — rien de tout ca ne doit partir sur
+# un depot public.
+.mockups/
