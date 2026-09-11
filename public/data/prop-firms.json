@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-10",
+  "generatedAt": "2026-09-11",
   "firms": [
     {
       "id": "blue-guardian",
@@ -11,7 +11,7 @@
         "code": "BG25"
       },
       "url": "https://blueguardian.com/?afmc=JTNQ",
-      "lastChecked": "2026-09-10",
+      "lastChecked": "2026-09-11",
       "stale": false,
       "programs": [
         {
@@ -231,7 +231,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-09-10",
+      "lastChecked": "2026-09-11",
       "stale": false,
       "programs": [
         {
@@ -538,7 +538,7 @@
         "ends": "2026-09-21"
       },
       "url": "https://fundedseat.link/jtnq",
-      "lastChecked": "2026-09-10",
+      "lastChecked": "2026-09-11",
       "stale": false,
       "programs": [
         {
@@ -708,7 +708,7 @@
         "ends": "2026-08-21"
       },
       "url": "https://thelegendstrading.com/?ref=JTNQ",
-      "lastChecked": "2026-09-10",
+      "lastChecked": "2026-09-11",
       "stale": false,
       "programs": [
         {
@@ -826,7 +826,7 @@
       },
       "code": "JTNQ",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-09-10",
+      "lastChecked": "2026-09-11",
       "stale": false,
       "programs": [
         {
@@ -836,8 +836,8 @@
           "plans": [
             {
               "size": 25000,
-              "price": 83,
-              "originalPrice": 110,
+              "price": 90,
+              "originalPrice": 120,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
@@ -848,8 +848,8 @@
             },
             {
               "size": 50000,
-              "price": 113,
-              "originalPrice": 150,
+              "price": 120,
+              "originalPrice": 160,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -860,8 +860,8 @@
             },
             {
               "size": 100000,
-              "price": 195,
-              "originalPrice": 260,
+              "price": 210,
+              "originalPrice": 280,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
@@ -872,8 +872,8 @@
             },
             {
               "size": 150000,
-              "price": 293,
-              "originalPrice": 390,
+              "price": 338,
+              "originalPrice": 450,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
               "ddType": "EOD Trailing",
@@ -983,7 +983,7 @@
         "code": "JTNQ"
       },
       "url": "https://www.tradeday.com/?a_aid=JTNQ",
-      "lastChecked": "2026-09-10",
+      "lastChecked": "2026-09-11",
       "stale": false,
       "programs": [
         {
