@@ -21,9 +21,16 @@ type Plan = {
   ddType: DdType;
   dailyLoss: number | null;
   dailyLossSoft: boolean;
-  consistency: string;
+  // Une regle qu'aucune source ne publie n'a pas de cle : les cartes « Legacy
+  // NYC » de Traders Launch ne disent rien de leur consistency, et inventer une
+  // valeur serait pire que de dire qu'on ne l'a pas.
+  consistency?: string;
   contracts: string;
-  activationFee?: number;
+  activationFee?: number | null;
+  // Chez FundedSeat un meme produit est actif a plusieurs prix en meme temps
+  // (« Daily Ultra (35%) - 100K » a $264.50, $297.50 et $451.50 le 2026-09-13).
+  // On publie le moins cher, et on le dit.
+  priceAmbiguous?: boolean;
 };
 type Program = {
   name: string;
@@ -430,6 +437,7 @@ function FirmRow({
                         {program.name} · {program.type}
                       </span>
                       <span className="sub-price">
+                        {plan.priceAmbiguous && <span className="price-from">from </span>}
                         {money(effectivePrice(firm, plan).now)}
                         {program.priceType === 'monthly' && <span className="per">/mo</span>}
                         {effectivePrice(firm, plan).was != null && (
@@ -448,7 +456,13 @@ function FirmRow({
                         {money(plan.maxDrawdown)} {ddTag(plan)}
                       </span>
                       <span className="sub-daily">{dailyLossValue(plan)}</span>
-                      <span className="sub-consistency">{plan.consistency} consistency</span>
+                      <span className="sub-consistency">
+                        {plan.consistency ? (
+                          `${plan.consistency} consistency`
+                        ) : (
+                          <span className="none">consistency not published</span>
+                        )}
+                      </span>
                       <span className="sub-contracts">{plan.contracts}</span>
                       {plan.activationFee != null && (
                         <span className="sub-activation">+ {money(plan.activationFee)} activation</span>
