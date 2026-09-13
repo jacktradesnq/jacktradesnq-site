@@ -1469,6 +1469,108 @@
           ]
         }
       ]
+    },
+    {
+      "id": "iqcapital",
+      "name": "IQ Capital",
+      "split": "90% (Instant)",
+      "payout": "Every 10 days (Instant)",
+      "promo": {
+        "label": "Summer Sale 80% off",
+        "code": "JTNQ"
+      },
+      "code": "JTNQ",
+      "url": "https://checkout.iqcapital.io/products?aff=jtnq",
+      "lastChecked": "2026-09-13",
+      "stale": false,
+      "programs": [
+        {
+          "name": "Core",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 50000,
+              "price": 49,
+              "originalPrice": 245,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1000,
+              "dailyLossSoft": false,
+              "consistency": "None"
+            },
+            {
+              "size": 100000,
+              "price": 95,
+              "originalPrice": 475,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1500,
+              "dailyLossSoft": false,
+              "consistency": "None"
+            }
+          ]
+        },
+        {
+          "name": "Rapid",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 50000,
+              "price": 135,
+              "originalPrice": 675,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "consistency": "40%"
+            },
+            {
+              "size": 100000,
+              "price": 225,
+              "originalPrice": 1125,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "consistency": "40%"
+            }
+          ]
+        },
+        {
+          "name": "Instant",
+          "type": "instant",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 50000,
+              "price": 349,
+              "originalPrice": 1745,
+              "profitTarget": null,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1000,
+              "dailyLossSoft": false,
+              "consistency": "30%",
+              "note": "90/10 profit split, reset $299, payouts every 10 days."
+            },
+            {
+              "size": 100000,
+              "price": 699,
+              "originalPrice": 3495,
+              "profitTarget": null,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1500,
+              "dailyLossSoft": false,
+              "consistency": "30%",
+              "note": "90/10 profit split, reset $599, payouts every 10 days."
+            }
+          ]
+        }
+      ],
+      "_source": "iqcapital.io/futures lu en navigateur headless le 2026-09-13 (pas d'API publique, pas encore de scraper : prix a la main)"
     }
   ]
 }
