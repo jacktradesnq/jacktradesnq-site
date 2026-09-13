@@ -47,15 +47,17 @@ test('parseFamily : Ultra n est jamais confondu avec Daily', () => {
   );
 });
 
-test('programsFrom : les 7 familles vendues, dans l ordre', () => {
-  assert.deepEqual(programs.map((p) => p.name), FAMILY_ORDER);
-  assert.equal(programs.length, 7, 'le dataset du site n en connait que 3');
+test('programsFrom : les 8 familles vendues, dans l ordre', () => {
+  const attendu = [...FAMILY_ORDER];
+  attendu.splice(attendu.indexOf('Daily Ultra (35%)') + 1, 0, 'Daily Ultra (35%) (with daily loss limit)');
+  assert.deepEqual(programs.map((p) => p.name), attendu);
+  assert.equal(programs.length, 8, 'le dataset du site n en connaissait que 3');
 });
 
 test('programsFrom : les deux Ultra sont la, chacune avec ses prix', () => {
   assert.ok(famille('Daily Ultra (35%)'), 'Ultra (35%) manquait dans la tournee');
   assert.ok(famille('Daily Ultra (25%)'));
-  assert.equal(plan('Daily Ultra (35%)', 50000).price, 197.5);
+  assert.equal(plan('Daily Ultra (35%)', 50000).price, 307.5);
   assert.equal(plan('Daily Ultra (25%)', 50000).price, 252.5);
 });
 
@@ -77,13 +79,18 @@ test('programsFrom : la daily loss lue est celle du CHALLENGE, pas du compte fin
   assert.equal(plan('Sprint', 50000).dailyLoss, 1200);
 });
 
-test('programsFrom : un nom actif a 3 prix garde ses 3 variantes et affiche la moins chere', () => {
+test('programsFrom : un nom actif a 2 prix sans daily loss garde ses 2 variantes et affiche la moins chere', () => {
   const p = plan('Daily Ultra (35%)', 100000);
   assert.equal(p.priceAmbiguous, true);
-  assert.equal(p.variants.length, 3);
-  assert.deepEqual(p.variants.map((v) => v.price), [264.5, 297.5, 451.5]);
-  assert.equal(p.price, Math.min(...p.variants.map((v) => v.price)));
+  assert.equal(p.variants.length, 2);
+  assert.deepEqual(p.variants.map((v) => v.price), [264.5, 451.5]);
   assert.equal(p.price, 264.5);
+  assert.ok(!('dailyLoss' in p));
+  // La variante avec daily loss est un produit a part, sans ambiguite.
+  const avec = plan('Daily Ultra (35%) (with daily loss limit)', 100000);
+  assert.equal(avec.price, 297.5);
+  assert.equal(avec.dailyLoss, 1800);
+  assert.ok(!('priceAmbiguous' in avec));
 });
 
 test('programsFrom : un nom actif une seule fois ne porte aucun avertissement', () => {
@@ -147,7 +154,7 @@ test('programsFrom : une famille inconnue de l ordre passe a la fin, jamais a la
   const nouveau = [...payload, { ...payload[0], id: 9998, name: '1 Step Turbo - 25K' }];
   const noms = programsFrom(nouveau).map((p) => p.name);
   assert.equal(noms.at(-1), 'Turbo');
-  assert.equal(noms.length, 8);
+  assert.equal(noms.length, 9);
 });
 
 test('programsFrom : un nom qui contredit account_size arrete tout', () => {
@@ -168,7 +175,7 @@ test('fetchFundedSeatPrograms : lit l API et rend les programmes', async () => {
   };
   const progs = await fetchFundedSeatPrograms({ fetchImpl });
   assert.equal(vu, FUNDEDSEAT_API);
-  assert.equal(progs.length, 7);
+  assert.equal(progs.length, 8);
 });
 
 test('fetchFundedSeatPrograms : une panne se dit clairement, elle ne se devine pas', async () => {

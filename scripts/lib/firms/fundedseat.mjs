@@ -191,9 +191,31 @@ export function programsFrom(payload) {
     groups.set(key, group);
   }
 
-  const familles = [...new Set([...groups.values()].map((g) => g.family))].sort((a, b) => {
-    const ia = FAMILY_ORDER.indexOf(a);
-    const ib = FAMILY_ORDER.indexOf(b);
+  // Un meme nom vendu deux fois : « 1 Step Daily Ultra (35%) - 50K » existe AVEC
+  // un daily loss de 1 200 $ (197,50 $) et SANS (307,50 $, ce que la page Ultra
+  // vend : « Daily Loss Limit: None »). Ce sont deux produits, pas un prix
+  // ambigu : on les separe, la variante avec daily loss prend un suffixe.
+  const WITH_DLL = ' (with daily loss limit)';
+  for (const [key, group] of [...groups.entries()]) {
+    if (group.rows.length < 2) continue;
+    const dll = (r) => num(((r.steps ?? []).find((s) => s.order === 1) ?? {}).dailyloss) != null;
+    const avec = group.rows.filter(dll);
+    const sans = group.rows.filter((r) => !dll(r));
+    if (!avec.length || !sans.length) continue;
+    groups.set(key, { ...group, rows: sans });
+    const family = group.family + WITH_DLL;
+    groups.set(`${family}|${group.size}`, { ...group, family, rows: avec });
+  }
+
+  const rank = (f) => {
+    const base = f.endsWith(WITH_DLL) ? f.slice(0, -WITH_DLL.length) : f;
+    const i = FAMILY_ORDER.indexOf(base);
+    return (i < 0 ? FAMILY_ORDER.length : i) + (f.endsWith(WITH_DLL) ? 0.5 : 0);
+  };
+  const familles = [...new Set([...groups.values()].map((g) => g.family))].sort((a, b) => rank(a) - rank(b));
+  familles.sort((a, b) => {
+    const ia = rank(a);
+    const ib = rank(b);
     return (ia < 0 ? FAMILY_ORDER.length : ia) - (ib < 0 ? FAMILY_ORDER.length : ib);
   });
 

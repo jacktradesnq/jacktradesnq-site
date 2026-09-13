@@ -724,8 +724,8 @@
           "plans": [
             {
               "size": 25000,
-              "price": 104.5,
-              "originalPrice": 190,
+              "price": 154.5,
+              "originalPrice": 280,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
@@ -734,25 +734,12 @@
               "contracts": "2 minis",
               "maxPayout": null,
               "minPayout": 250,
-              "resetFee": 90,
-              "priceAmbiguous": true,
-              "variants": [
-                {
-                  "price": 104.5,
-                  "originalPrice": 190,
-                  "id": 1093
-                },
-                {
-                  "price": 154.5,
-                  "originalPrice": 280,
-                  "id": 1080
-                }
-              ]
+              "resetFee": 135
             },
             {
               "size": 50000,
-              "price": 197.5,
-              "originalPrice": 360,
+              "price": 307.5,
+              "originalPrice": 560,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -761,20 +748,7 @@
               "contracts": "4 minis",
               "maxPayout": null,
               "minPayout": 250,
-              "resetFee": 170,
-              "priceAmbiguous": true,
-              "variants": [
-                {
-                  "price": 197.5,
-                  "originalPrice": 360,
-                  "id": 1094
-                },
-                {
-                  "price": 307.5,
-                  "originalPrice": 560,
-                  "id": 1081
-                }
-              ]
+              "resetFee": 275
             },
             {
               "size": 100000,
@@ -796,16 +770,60 @@
                   "id": 1090
                 },
                 {
-                  "price": 297.5,
-                  "originalPrice": 540,
-                  "id": 1092
-                },
-                {
                   "price": 451.5,
                   "originalPrice": 820,
                   "id": 1091
                 }
               ]
+            }
+          ]
+        },
+        {
+          "name": "Daily Ultra (35%) (with daily loss limit)",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 104.5,
+              "originalPrice": 190,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 600,
+              "consistency": "35%",
+              "contracts": "2 minis",
+              "maxPayout": null,
+              "minPayout": 250,
+              "resetFee": 90
+            },
+            {
+              "size": 50000,
+              "price": 197.5,
+              "originalPrice": 360,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1200,
+              "consistency": "35%",
+              "contracts": "4 minis",
+              "maxPayout": null,
+              "minPayout": 250,
+              "resetFee": 170
+            },
+            {
+              "size": 100000,
+              "price": 297.5,
+              "originalPrice": 540,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1800,
+              "consistency": "35%",
+              "contracts": "6 minis",
+              "maxPayout": null,
+              "minPayout": 250,
+              "resetFee": 260
             }
           ]
         },
@@ -1010,6 +1028,52 @@
               "contracts": "8 minis",
               "maxPayout": 2000,
               "minPayout": 2000
+            }
+          ]
+        },
+        {
+          "name": "Blitz Daily",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 94.95,
+              "originalPrice": 175,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 500,
+              "contracts": "2 minis",
+              "maxPayout": 500,
+              "minPayout": 250,
+              "resetFee": 90
+            },
+            {
+              "size": 50000,
+              "price": 189.95,
+              "originalPrice": 345,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1000,
+              "contracts": "4 minis",
+              "maxPayout": 1000,
+              "minPayout": 500,
+              "resetFee": 180
+            },
+            {
+              "size": 100000,
+              "price": 279.95,
+              "originalPrice": 510,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1500,
+              "contracts": "6 minis",
+              "maxPayout": 1500,
+              "minPayout": 1000,
+              "resetFee": 270
             }
           ]
         }
