@@ -477,7 +477,7 @@ const FUNDEDSEAT_PRIMARY = '1 Step';
 const FUNDEDSEAT_PROGRAMS = [
   { programName: 'Daily', sub: 'Daily' },
   { programName: 'Sprint', sub: 'Sprint' },
-  { programName: 'Instant Funding', sub: null },
+  { programName: 'Instant Funding Direct', sub: null }, // leur onglet dit "Instant Funding", leur catalogue "Direct"
 ];
 /**
  * Two witnesses for this firm: their buy-screen cards (what a buyer is shown)

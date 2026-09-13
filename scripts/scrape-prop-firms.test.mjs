@@ -5,13 +5,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import {
-  topOneActivationFees,
-  topOneFees,
-  legendsUpdatesFrom,
-  legendsActivationFee,
-  reconcileFundedSeatCards,
-} from './scrape-prop-firms.mjs';
+import { topOneActivationFees, topOneFees } from './scrape-prop-firms.mjs';
 import { fundedseatPlansFrom, FUNDEDSEAT_API_UNCOVERED } from './lib/fundedseat-api.mjs';
 
 const fixture = (name) =>
@@ -100,55 +94,13 @@ test('what the parser reads matches what the published JSON says', () => {
   assert.deepEqual(published, topOneActivationFees(ELITE_ACCESS));
 });
 
-// ── LEGENDS Trading, read from their own shop API ───────────────────────────
-// Captured 2026-08-20 from
-// api.thelegendstrading.com/shop/plans?purchasableOnly=true&broker=Tradovate
-
-const LEGENDS = JSON.parse(fixture('legends-shop-plans.json'));
-
-test('their API field names are inverted, and we read the price the buyer pays', () => {
-  // The card renders "$59 $29.50": price is the struck one, strikeThroughPrice
-  // is what you pay. Getting this backwards would advertise double.
-  const apprentice50 = legendsUpdatesFrom(LEGENDS).find(
-    (u) => u.programName === 'Apprentice' && u.size === 50000
-  );
-  assert.equal(apprentice50.price, 29.5);
-  assert.equal(apprentice50.originalPrice, 59);
-  assert.equal(apprentice50.activationFee, 99);
-});
-
-test('only what they actually sell comes back, seven plans over two programs', () => {
-  const updates = legendsUpdatesFrom(LEGENDS);
-  assert.equal(updates.length, 7);
-  assert.deepEqual([...new Set(updates.map((u) => u.programName))].sort(), ['Apprentice', 'Elite']);
-  // Elite pays nothing on activation, which is why it beats Apprentice on the
-  // cost to get funded even at a smaller headline percentage.
-  for (const u of updates.filter((x) => x.programName === 'Elite')) {
-    assert.equal(u.activationFee, null, `Elite ${u.size} should have no activation fee`);
-  }
-});
-
-test('a swap of those two fields is caught, not published', () => {
-  const broken = structuredClone(LEGENDS);
-  const plan = broken.data.find((p) => p.productCategory === 'Apprentice');
-  [plan.price, plan.strikeThroughPrice] = [plan.strikeThroughPrice, plan.price];
-  assert.throws(() => legendsUpdatesFrom(broken), /may have been swapped back/);
-});
-
-test('the activation fee is read from their wording, both shapes', () => {
-  assert.equal(legendsActivationFee('Code: LTG\n$99 Activation Fee'), 99);
-  assert.equal(legendsActivationFee('Activation Fee: None'), null);
-  assert.equal(legendsActivationFee(''), null);
-  assert.throws(() => legendsActivationFee('$99999 Activation Fee'), /unreadable/);
-});
-
-test('an empty API answer is a failure, never an empty price list', () => {
-  assert.throws(() => legendsUpdatesFrom({ data: [] }), /returned no plans/);
-  assert.throws(() => legendsUpdatesFrom({}), /returned no plans/);
-});
 
 /* ---------------- FundedSeat: their own /api/pullchallenges ---------------- */
 
+// scripts/lib/fundedseat-api.mjs ne fait plus la tournee de prix (c'est
+// scripts/lib/firms/fundedseat.mjs, teste dans scripts/firms-fundedseat.test.mjs)
+// mais scripts/check-rule-drift.mjs le lit toujours : son mapping par nom exact
+// reste teste ici.
 // Captured 2026-08-20 from https://fundedseat.com/api/pullchallenges (24 rows).
 const FS_API = JSON.parse(fixture('fundedseat-pullchallenges.json'));
 const fsPlan = (plans, programName, size) => plans.find((p) => p.programName === programName && p.size === size);
@@ -249,82 +201,4 @@ test('a deactivated product is not sold, so it is not read', () => {
 test('an empty API answer is a failure, never zero plans', () => {
   assert.throws(() => fundedseatPlansFrom([]), /non-empty array/);
   assert.throws(() => fundedseatPlansFrom(null), /non-empty array/);
-});
-
-test('what the API says matches the published JSON, field by field', () => {
-  const firm = JSON.parse(readFileSync(new URL('../public/data/prop-firms.json', import.meta.url), 'utf8'))
-    .firms.find((f) => f.id === 'fundedseat');
-  const plans = fundedseatPlansFrom(FS_API);
-  let checked = 0;
-  for (const program of firm.programs) {
-    for (const plan of program.plans) {
-      const api = fsPlan(plans, program.name, plan.size);
-      if (!api) continue; // Flex: not sold through this endpoint
-      const tag = `${program.name} ${plan.size}`;
-      // Their API answers the list price; a code promo makes the card cheaper.
-      // Read 2026-08-30: Sprint 25K card $67.50 off $135, their API $74.95 off
-      // $135, banner "50% OFF ... USE CODE SPRINT50". reconcileFundedSeatCards()
-      // is what rules on that discount, so here the published price only has to
-      // be no dearer than the API's — the list price below stays strict.
-      assert.ok(
-        plan.price <= api.price,
-        `${tag} price: published $${plan.price} is dearer than the API's $${api.price}`,
-      );
-      assert.equal(plan.originalPrice, api.originalPrice, `${tag} originalPrice`);
-      for (const [field, v] of Object.entries(api.rules)) {
-        if (field === 'contracts') {
-          assert.equal(plan.contracts.startsWith(`${v.minis} mini`), true, `${tag} contracts`);
-        } else if (field === 'dailyLoss' || field === 'consistency') {
-          assert.equal(String(plan[field]), String(v), `${tag} ${field}`);
-        } else {
-          assert.equal(plan[field], v, `${tag} ${field}`);
-        }
-      }
-      checked++;
-    }
-  }
-  assert.equal(checked, 11);
-});
-
-
-// ── FundedSeat: the card, their API, and the banner between the two ──────────
-// Real numbers, read 2026-08-30: banner "50% OFF THE DAILY ULTRA & SPRINT —
-// USE CODE ULTRA50 | SPRINT50", Sprint 25K card $67.50 off $135, their API
-// still answering $74.95 off $135.
-const API_SPRINT = [{ programName: 'Sprint', size: 25000, price: 74.95, originalPrice: 135 }];
-const CARD_AT_CODE_PRICE = [{ programName: 'Sprint', size: 25000, price: 67.5, originalPrice: 135 }];
-const BANNER = { code: 'SPRINT50', pct: 50 };
-
-test('a card at the banner code price is the price the buyer pays, not a bad read', () => {
-  assert.doesNotThrow(() => reconcileFundedSeatCards(API_SPRINT, CARD_AT_CODE_PRICE, BANNER));
-});
-
-test('the same cheaper card with no banner is still a bad read', () => {
-  assert.throws(
-    () => reconcileFundedSeatCards(API_SPRINT, CARD_AT_CODE_PRICE, { code: null, pct: null }),
-    /card says \$67\.5\/\$135, their API says \$74\.95\/\$135/,
-  );
-});
-
-test('a discount the banner never announced is refused', () => {
-  const card = [{ programName: 'Sprint', size: 25000, price: 40, originalPrice: 135 }]; // 70% off
-  assert.throws(() => reconcileFundedSeatCards(API_SPRINT, card, BANNER), /card says \$40/);
-});
-
-test('a card DEARER than their API is refused, banner or not', () => {
-  const card = [{ programName: 'Sprint', size: 25000, price: 89, originalPrice: 135 }];
-  assert.throws(() => reconcileFundedSeatCards(API_SPRINT, card, BANNER), /card says \$89/);
-});
-
-test('a list price that disagrees is refused even under a banner', () => {
-  const card = [{ programName: 'Sprint', size: 25000, price: 67.5, originalPrice: 150 }];
-  assert.throws(() => reconcileFundedSeatCards(API_SPRINT, card, BANNER), /\$67\.5\/\$150/);
-});
-
-test('two sources that already agree pass without needing a banner', () => {
-  assert.doesNotThrow(() => reconcileFundedSeatCards(API_SPRINT, API_SPRINT.map((p) => ({ ...p })), {}));
-});
-
-test('a plan their API sells but no card shows still stops the firm', () => {
-  assert.throws(() => reconcileFundedSeatCards(API_SPRINT, [], BANNER), /missing from the cards/);
 });

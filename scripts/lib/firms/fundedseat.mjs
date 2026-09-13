@@ -128,7 +128,11 @@ function planFrom(rows) {
     'consistency',
     num(challenge.consistency_percentage) == null ? null : `${challenge.consistency_percentage}%`,
   );
-  claim('contracts', num(ref.contracts) == null ? null : `${ref.contracts} minis`);
+  // « 1 minis » se lit sur une page publique : le pluriel suit le nombre.
+  claim(
+    'contracts',
+    num(ref.contracts) == null ? null : `${ref.contracts} mini${ref.contracts > 1 ? 's' : ''}`,
+  );
 
   // La seule exception a la regle « pas de null » : sur les Ultra, `maxpayout`
   // est null la ou Daily et Daily Max annoncent 1000 / 2500. Face a des voisins

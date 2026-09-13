@@ -122,6 +122,8 @@ test('programsFrom : la forme du dataset, pour que rien en aval ne change', () =
   assert.equal(p.originalPrice, 290);
   assert.equal(p.consistency, '35%');
   assert.equal(p.contracts, '4 minis');
+  // Le pluriel suit le nombre : « 1 minis » se lirait sur une page publique.
+  assert.equal(plan('Instant Funding Direct', 25000).contracts, '1 mini');
   assert.equal(p.minPayout, 2000);
   assert.equal(p.resetFee, 150);
   // Un Instant n a pas d objectif : la cle n existe pas, elle ne vaut pas null.

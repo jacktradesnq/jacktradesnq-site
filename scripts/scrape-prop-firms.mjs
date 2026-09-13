@@ -1,27 +1,36 @@
 #!/usr/bin/env node
 /**
- * Daily price sync for public/data/prop-firms.json.
+ * Daily sync for public/data/prop-firms.json.
  *
- * Updates ONLY: plan price / originalPrice / activationFee, program promoCode /
- * promoLabel, firm promo, firm lastChecked / stale, top-level generatedAt.
- * Risk rules (profit target, drawdown, daily loss, consistency, contracts)
- * are maintained manually and never touched here.
+ * Deux chemins, selon ce que rend le scraper d'une firme :
  *
- * activationFee is money the buyer pays, so it is scraped like a price, but
- * only for the firms whose scraper reports it (Top One today). For the others
- * the key is left exactly as it is.
+ *  - `{ programs }` — un LECTEUR de catalogue (scripts/lib/firms/*.mjs) a lu
+ *    tout ce que la firme vend. guardCatalog() + syncCatalog() creent les
+ *    programmes et les tailles nouveaux, retirent ce qui n'est plus vendu, et
+ *    gardent les regles curatees a la main que le lecteur n'encode pas.
+ *    FundedSeat, Traders Launch, Blue Guardian, TradeDay, LEGENDS.
  *
- * Per-firm guards: numeric price, 10 <= price <= 6000, price <= originalPrice,
- * scraped plan count must cover every plan already in the JSON for that firm.
- * Any guard failure => keep the firm's existing data, mark stale: true, log,
- * continue with the other firms. Exit code is 0 unless the JSON write fails.
+ *  - `{ updates }` — le chemin historique, un metteur a jour de PRIX sur des
+ *    programmes figes a la main : guard() + apply() ne touchent que price /
+ *    originalPrice / activationFee. Top One et E8 restent dessus, faute de
+ *    lecteur.
+ *
+ * Dans les deux cas les promos (promo firme, promoCode / promoLabel par
+ * programme) passent par applyPromos(), et une firme dont le scraper echoue
+ * garde ses donnees avec stale: true — les autres firmes continuent.
+ * Exit code is 0 unless the JSON write fails.
  *
  * Usage: node scripts/scrape-prop-firms.mjs [--dry]
  */
 
 import fs from 'node:fs';
 
-import { fundedseatPlansFrom, FUNDEDSEAT_API } from './lib/fundedseat-api.mjs';
+import { guardCatalog, syncCatalog } from './lib/catalog-sync.mjs';
+import { BLUE_GUARDIAN_URL, programsFromHtml as blueGuardianPrograms } from './lib/firms/blueguardian.mjs';
+import { fetchFundedSeatPrograms } from './lib/firms/fundedseat.mjs';
+import { fetchLegendsPrograms } from './lib/firms/legends.mjs';
+import { fetchTradeDayPrograms } from './lib/firms/tradeday.mjs';
+import { fetchTradersLaunchPrograms } from './lib/firms/traderslaunch.mjs';
 
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
 const DRY = process.argv.includes('--dry');
@@ -92,41 +101,47 @@ function extractBalancedArray(s, start) {
   return null;
 }
 
-const BG_PROGRAMS = { direct: 'Direct', express: 'Express', reserve: 'Reserve', standard: 'Standard' };
-
-async function scrapeBlueGuardian() {
-  const html = await fetchText('https://www.blueguardian.com/futures');
+// Le CATALOGUE de Blue Guardian vient de scripts/lib/firms/blueguardian.mjs,
+// qui lit le meme payload RSC : produits, tailles, regles. Ce qui reste ici est
+// ce que le lecteur ne dit pas, parce que ce n'est pas du catalogue — le code
+// coupon porte par chaque taille, et le pourcentage qu'il retire.
+function blueGuardianPromo(html) {
   const s = decodePayloadHtml(html);
   const idx = s.indexOf('"plans":[');
   if (idx === -1) throw new Error('"plans":[ payload not found');
   const arrText = extractBalancedArray(s, s.indexOf('[', idx));
   if (!arrText) throw new Error('unbalanced plans array');
-  const payload = JSON.parse(arrText);
-  const futures = payload.filter((p) => p && p.market === 'futures');
-  if (futures.length === 0) throw new Error('no futures entries in payload');
 
-  const updates = [];
   const couponCodes = [];
   const pcts = [];
-  for (const entry of futures) {
-    const programName = BG_PROGRAMS[entry.key];
-    if (!programName) continue;
+  for (const entry of JSON.parse(arrText)) {
+    if (!entry || entry.market !== 'futures') continue;
     for (const size of entry.sizes ?? []) {
-      const price = size.currentPrice ?? size.originalPrice;
-      const originalPrice = size.currentPrice != null ? (size.originalPrice ?? null) : null;
-      updates.push({ programName, size: size.amount, price, originalPrice });
       if (size.coupon?.code) couponCodes.push(size.coupon.code);
-      if (originalPrice != null) pcts.push(pctOff(price, originalPrice));
+      if (size.currentPrice != null && size.originalPrice != null)
+        pcts.push(pctOff(size.currentPrice, size.originalPrice));
     }
   }
 
-  let firmPromo = null; // no coupon anywhere => promo really is off
-  if (couponCodes.length > 0) {
-    const code = mode(couponCodes).value;
-    const pct = pcts.length > 0 ? mode(pcts).value : null;
-    firmPromo = pct != null ? { label: `${pct}% OFF`, code } : undefined; // undefined => keep existing label/promo
+  if (couponCodes.length === 0) return null; // no coupon anywhere => promo really is off
+  const code = mode(couponCodes).value;
+  const pct = pcts.length > 0 ? mode(pcts).value : null;
+  return pct != null ? { label: `${pct}% OFF`, code } : undefined; // undefined => keep existing label
+}
+
+async function scrapeBlueGuardian() {
+  const html = await fetchText(BLUE_GUARDIAN_URL);
+  const programs = blueGuardianPrograms(html);
+
+  // Le catalogue vaut plus que la banniere : un coupon devenu illisible garde
+  // la promo deja publiee au lieu de faire perdre la firme entiere.
+  let firmPromo;
+  try {
+    firmPromo = blueGuardianPromo(html);
+  } catch (e) {
+    console.log(`  blue-guardian: coupons illisibles (${e.message}) — promo existante gardee`);
   }
-  return { updates, firmPromo };
+  return { programs, firmPromo };
 }
 
 /* ------------------------------------------------------------------ */
@@ -273,321 +288,118 @@ async function scrapeTopOne() {
 /* Traders Launch — server-rendered cards on https://traderslaunch.com  */
 /* ------------------------------------------------------------------ */
 
+// Le comparateur n'etiquette que trois drawdowns ("No trail", "EOD Trail",
+// "Intraday Trail"). Leurs cartes ecrivent "EOD - Locks at Starting Balance" :
+// un drawdown de fin de journee qui suit les plus hauts jusqu'a revenir au
+// solde de depart, ou il se fige — "EOD Trailing" dans notre vocabulaire. La
+// phrase exacte de la carte part dans `note`, pour que la traduction ne perde
+// aucun mot de la source. Une formulation inconnue arrete la firme plutot que
+// de publier un drawdown que la page ne sait pas nommer.
+const TRADERSLAUNCH_DD = {
+  'EOD - Locks at Starting Balance': 'EOD Trailing',
+  'EOD': 'EOD',
+  'EOD Trailing': 'EOD Trailing',
+  'Intraday': 'Intraday',
+};
+
 async function scrapeTradersLaunch() {
-  const html = await fetchText('https://traderslaunch.com');
-  const updates = [];
-  for (const size of [100000, 200000, 300000]) {
-    const label = `>$${size.toLocaleString('en-US')}<`;
-    const fees = new Set();
-    let idx = -1;
-    while ((idx = html.indexOf(label, idx + 1)) !== -1) {
-      const feeM = html.slice(idx, idx + 600).match(/\$([\d,.]+)<\/p><p[^>]*>One-time fee/);
-      if (feeM) fees.add(num(feeM[1]));
+  const programs = await fetchTradersLaunchPrograms();
+  for (const program of programs) {
+    for (const plan of program.plans) {
+      if (plan.ddType == null) continue;
+      const vocab = TRADERSLAUNCH_DD[plan.ddType];
+      if (!vocab) throw new Error(`drawdown « ${plan.ddType} » hors du vocabulaire du comparateur`);
+      if (vocab !== plan.ddType) {
+        plan.note = [plan.note, `Max Drawdown affiche : « ${plan.ddType} ».`].filter(Boolean).join(' ');
+        plan.ddType = vocab;
+      }
     }
-    if (fees.size !== 1) throw new Error(`$${size / 1000}K card: expected 1 one-time fee, got ${fees.size}`);
-    updates.push({ programName: '1-Step', size, price: [...fees][0], originalPrice: null });
   }
-  return { updates }; // no promo recipe for this firm — promo stays manual
+  return { programs }; // no promo recipe for this firm — promo stays manual
 }
 
 /* ------------------------------------------------------------------ */
-/* FundedSeat — client-rendered pricing, needs playwright (optional)   */
+/* FundedSeat — leur catalogue par API, leur banniere par navigateur          */
 /* ------------------------------------------------------------------ */
 
-// FundedSeat's pricing tab row has two INDEPENDENT axes:
-//   primary  = { "1 Step", "Instant Funding" }  (challenge type)
-//   variants = { "Daily", "Flex", "Sprint" }     (payout variant, only shown under "1 Step")
-// The variant buttons are removed from the DOM whenever "Instant Funding" is active, so the
-// primary "1 Step" tab must be re-clicked to restore them before selecting Daily/Flex/Sprint.
-// programName here must match the JSON program names exactly ("1 Step" default = the Daily variant).
-const FUNDEDSEAT_PRIMARY = '1 Step';
-const FUNDEDSEAT_PROGRAMS = [
-  { programName: 'Daily', sub: 'Daily' },
-  { programName: 'Sprint', sub: 'Sprint' },
-  { programName: 'Instant Funding', sub: null }, // top-level tab, no payout sub-variant
-];
+// Le catalogue vient de scripts/lib/firms/fundedseat.mjs, qui lit leur propre
+// /api/pullchallenges : sept familles, la ou les onglets de leur page n'en
+// montraient que trois a un scraper.
+//
+// La banniere de promo, elle, n'existe que dans la page RENDUE : le HTML servi
+// n'en contient qu'un gabarit invisible ("70% OFF ALL ACCOUNTS",
+// visibility:hidden, mesure du 2026-09-13). C'est la seule raison qui reste
+// d'ouvrir un navigateur ici — plus aucune carte n'est lue.
 const MONTHS = { JANUARY: 1, FEBRUARY: 2, MARCH: 3, APRIL: 4, MAY: 5, JUNE: 6, JULY: 7, AUGUST: 8, SEPTEMBER: 9, OCTOBER: 10, NOVEMBER: 11, DECEMBER: 12 };
 
-// Cross-check every plan both sources describe. Tab clicking is the weak link
-// here (their variant buttons swap the cards under us, which is why the "Bolt"
-// guard exists), so a card that disagrees with their backend is normally a bad
-// read and stops the firm instead of publishing a guess.
-//
-// One disagreement is real, not a bad read: a code promo. On 2026-08-30 their
-// banner read "50% OFF THE DAILY ULTRA & SPRINT — USE CODE ULTRA50 | SPRINT50"
-// and the Sprint 25K card said $67.50 while their API still said $74.95 — the
-// API returns the list price, the card the price the code charges. The old
-// guard called that a bad read and marked the whole firm stale for six days,
-// which froze EVERY firm's prices behind a red workflow. So: a card CHEAPER
-// than the API is accepted only when the banner announces exactly that
-// discount, off the same list price. Anything else still throws — a dearer
-// card, a different list price, a discount the banner never announced.
-export function reconcileFundedSeatCards(apiPlans, cards, banner = {}) {
-  for (const api of apiPlans) {
-    const card = cards.find((u) => u.programName === api.programName && u.size === api.size);
-    const where = `${api.programName} $${api.size / 1000}K`;
-    if (!card) throw new Error(`${where}: in their API, missing from the cards`);
-    if (card.price === api.price && card.originalPrice === api.originalPrice) continue;
-    const announced =
-      banner.code != null &&
-      banner.pct != null &&
-      card.originalPrice === api.originalPrice &&
-      card.price < api.price &&
-      pctOff(card.price, card.originalPrice) === banner.pct;
-    if (!announced)
-      throw new Error(
-        `${where}: card says $${card.price}/$${card.originalPrice}, ` +
-          `their API says $${api.price}/$${api.originalPrice}`,
-      );
-    console.log(
-      `  fundedseat: ${where} $${card.price} is their banner's ${banner.pct}% OFF ` +
-        `with code ${banner.code} — API list price $${api.price} kept out`,
-    );
-  }
-  return cards;
+// "50% OFF YOUR NEXT 3 PURCHASES — USE CODE SEP50 — ENDS SEPTEMBER 21" ->
+// { label, code, ends }. `sitePct` est la remise deja dans les prix du
+// catalogue, le pourcentage de la banniere celle que le code ajoute.
+function fundedSeatPromo(bodyText, programs) {
+  const codeM = bodyText.match(/USE CODE\s+([A-Z0-9]+)/i);
+  if (!codeM) return undefined; // banniere absente ou illisible : on garde la promo publiee
+
+  const bannerPctM = bodyText.match(/(\d+)%\s*OFF/i);
+  const withOriginal = programs.flatMap((p) => p.plans).filter((pl) => pl.originalPrice != null);
+  const sitePct =
+    withOriginal.length > 0
+      ? mode(withOriginal.map((pl) => pctOff(pl.price, pl.originalPrice))).value
+      : null;
+  const label =
+    sitePct != null && bannerPctM
+      ? `${sitePct}% OFF + ${bannerPctM[1]}% w/ code`
+      : bannerPctM
+        ? `${bannerPctM[1]}% OFF w/ code`
+        : `code ${codeM[1].toUpperCase()}`;
+
+  const endsM = bodyText.match(/ENDS\s+([A-Z]+)\s+(\d{1,2})/i);
+  const month = endsM ? MONTHS[endsM[1].toUpperCase()] : null;
+  const ends = month
+    ? `${TODAY.slice(0, 4)}-${String(month).padStart(2, '0')}-${endsM[2].padStart(2, '0')}`
+    : undefined;
+  return { label, code: codeM[1].toUpperCase(), ...(ends ? { ends } : {}) };
 }
 
 async function scrapeFundedSeat() {
-  // Their own catalogue answers for every plan we list. It is the second witness:
-  // the cards are what a buyer is shown, the API is what their system charges,
-  // and a disagreement between the two is not ours to resolve silently.
-  const apiPlans = fundedseatPlansFrom(JSON.parse(await fetchText(FUNDEDSEAT_API)));
+  const programs = await fetchFundedSeatPrograms();
 
   let pw;
   try {
     pw = await import('playwright');
   } catch {
-    // The cards still carry the promo banner and are the second opinion on every
-    // price, so without them the firm is skipped rather than written from one source.
-    console.log(`fundedseat: ${apiPlans.length} plans read from their API, but Flex needs playwright — skipped`);
-    return null;
+    console.log('  fundedseat: playwright absent — catalogue lu, promo existante gardee');
+    return { programs };
   }
-  const browser = await pw.chromium.launch({ headless: true });
-  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  // Helpers ported from the verified reference scraper — all scoped to #pricing-section.
-  const readCards = (page) =>
-    page.evaluate(() => {
-      const sec = document.querySelector('#pricing-section');
-      const out = [];
-      for (const h3 of sec.querySelectorAll('h3')) {
-        if (!/\$[\d,]+ Account/i.test(h3.innerText || '')) continue;
-        let el = h3.parentElement;
-        while (el && !/Add to Cart/i.test(el.innerText || '')) el = el.parentElement;
-        if (el) out.push(el.innerText);
-      }
-      return out;
-    });
-  const sizeButtonCount = (page) =>
-    page.evaluate(() => {
-      const sec = document.querySelector('#pricing-section');
-      return [...sec.querySelectorAll('button')].filter((b) => /^\$[\d,]+$/.test((b.innerText || '').trim())).length;
-    });
-  const isActive = (page, label) =>
-    page.evaluate((lbl) => {
-      const sec = document.querySelector('#pricing-section');
-      const t = [...sec.querySelectorAll('button')].find((b) => (b.innerText || '').trim() === lbl);
-      return t ? /active/i.test(t.className) : null; // null => button not present
-    }, label);
-  const buttonPresent = (page, label) =>
-    page.evaluate((lbl) => {
-      const sec = document.querySelector('#pricing-section');
-      return [...sec.querySelectorAll('button')].some((b) => (b.innerText || '').trim() === lbl);
-    }, label);
-  const clickTab = (page, label) => {
-    const rx = new RegExp('^' + label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$');
-    return page.locator('#pricing-section button', { hasText: rx }).first().click({ timeout: 8000 });
-  };
-  // Anti-"Bolt" guard: after clicking a tab, wait until cards truly reflect it and are stable.
-  const waitStableCards = async (page, targetLabel) => {
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      const activeOk = (await isActive(page, targetLabel)) === true;
-      const read1 = await readCards(page);
-      await sleep(450);
-      const read2 = await readCards(page);
-      const stable = read1.length > 0 && read1.join('|||') === read2.join('|||');
-      const sizes = read2.map((c) => (c.match(/\$([\d,]+)\s*Account/i) || [])[1]);
-      const dup = sizes.length !== new Set(sizes).size;
-      const bolt = read2.some((c) => /bolt/i.test(c));
-      const allCart = read2.every((c) => /Add to Cart/i.test(c));
-      const expected = await sizeButtonCount(page);
-      const countOk = expected === 0 ? read2.length > 0 : read2.length === expected;
-      if (activeOk && stable && !dup && !bolt && allCart && read2.length > 0 && countOk) return read2;
-      console.log(`  fundedseat: "${targetLabel}" unstable attempt ${attempt} (active=${activeOk} stable=${stable} dup=${dup} count=${read2.length}/${expected}) — retrying`);
-      await clickTab(page, targetLabel).catch(() => {});
-      await sleep(900 + attempt * 400);
-    }
-    return await readCards(page); // best-effort read after exhausting retries
-  };
-
+  // Le navigateur est lance DANS le try : une banniere qu'on ne sait pas lire,
+  // ou un chromium absent, ne doit pas coûter le catalogue lu juste au-dessus.
+  let browser;
   try {
+    browser = await pw.chromium.launch({ headless: true });
     const page = await browser.newPage({ userAgent: UA, viewport: { width: 1440, height: 900 } });
     await page.goto('https://fundedseat.com', { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForSelector('#pricing-section', { timeout: 30000 });
-    await page.evaluate(() => document.querySelector('#pricing-section')?.scrollIntoView({ block: 'center' }));
-    await sleep(2500); // let styled-components / lazy render settle
-
-    const updates = [];
-    for (const { programName, sub } of FUNDEDSEAT_PROGRAMS) {
-      const target = sub ?? programName; // Instant Funding is a primary tab, no sub-variant
-      // Restore the Daily/Flex/Sprint variant row if a prior "Instant Funding" click removed it.
-      if (sub && !(await buttonPresent(page, sub))) {
-        await clickTab(page, FUNDEDSEAT_PRIMARY).catch(() => {});
-        await sleep(700);
-      }
-      await clickTab(page, target).catch((e) => console.log(`  fundedseat: click "${target}" failed: ${e.message.split('\n')[0]}`));
-      await sleep(600);
-
-      const cardTexts = await waitStableCards(page, target);
-      for (const text of cardTexts) {
-        const sizeM = text.match(/\$([\d\s,]+)\s*Account/);
-        const priceM = text.match(/Add to Cart\s*\$([\d.,]+)\s*\$([\d.,]+)/); // (original, promo)
-        if (!sizeM || !priceM) continue;
-        updates.push({
-          programName,
-          size: num(sizeM[1]),
-          price: num(priceM[2]),
-          originalPrice: num(priceM[1]),
-        });
-      }
-    }
-
-    // Top banner, e.g. "50% OFF YOUR NEXT 3 PURCHASES — USE CODE JULY50 — ENDS JULY 26".
-    // Read BEFORE the cross-check: when they run a code promo their backend does
-    // not know about, the banner is what tells a cheaper card from a bad read.
-    let firmPromo;
+    await page.waitForTimeout(2500); // laisser la banniere se rendre
     const bodyText = await page.evaluate(() => document.body.innerText);
-    const codeM = bodyText.match(/USE CODE\s+([A-Z0-9]+)/i);
-    const bannerPctM = bodyText.match(/(\d+)%\s*OFF/i);
-    reconcileFundedSeatCards(apiPlans, updates, {
-      code: codeM ? codeM[1].toUpperCase() : null,
-      pct: bannerPctM ? Number(bannerPctM[1]) : null,
-    });
-
-    if (codeM) {
-      const endsM = bodyText.match(/ENDS\s+([A-Z]+)\s+(\d{1,2})/i);
-      const withOriginal = updates.filter((u) => u.originalPrice != null);
-      const sitePct =
-        withOriginal.length > 0
-          ? mode(withOriginal.map((u) => pctOff(u.price, u.originalPrice))).value
-          : null;
-      const label =
-        sitePct != null && bannerPctM
-          ? `${sitePct}% OFF + ${bannerPctM[1]}% w/ code`
-          : bannerPctM
-            ? `${bannerPctM[1]}% OFF w/ code`
-            : `code ${codeM[1].toUpperCase()}`;
-      const month = endsM ? MONTHS[endsM[1].toUpperCase()] : null;
-      const ends = month
-        ? `${TODAY.slice(0, 4)}-${String(month).padStart(2, '0')}-${endsM[2].padStart(2, '0')}`
-        : undefined;
-      firmPromo = { label, code: codeM[1].toUpperCase(), ...(ends ? { ends } : {}) };
-    }
-    return { updates, firmPromo };
+    return { programs, firmPromo: fundedSeatPromo(bodyText, programs) };
+  } catch (e) {
+    console.log(`  fundedseat: banniere illisible (${e.message.split('\n')[0]}) — promo existante gardee`);
+    return { programs };
   } finally {
-    await browser.close();
+    await browser?.close();
   }
 }
 
 /* ------------------------------------------------------------------ */
-/* LEGENDS Trading — static Webflow HTML on https://thelegendstrading.com/plans */
+/* LEGENDS Trading — leur API boutique publique                        */
 /* ------------------------------------------------------------------ */
 
-// Their Webflow page serves a STALE price table to any HTTP client: verified
-// 2026-08-20 with this scraper's own user-agent and a cache-buster, the HTML
-// said Apprentice 50K was $185 -> $37/mo while the rendered page said
-// $59 -> $29.50. The string "29.50" appears nowhere in that HTML. The old
-// extractor happily "verified 12 plans, no changes" against numbers no visitor
-// ever sees.
-//
-// The rendered page gets its prices from their own public shop API, which is
-// plain HTTP and needs no browser. That is what we read now.
-//
-// Field trap: `price` is the STRUCK price and `strikeThroughPrice` is what the
-// buyer pays. Their names are inverted, confirmed against the rendered card
-// showing "$59 $29.50" for price 59 / strikeThroughPrice 29.5.
-const LEGENDS_API =
-  'https://api.thelegendstrading.com/shop/plans?purchasableOnly=true&broker=Tradovate';
-
-// "$50,000" and "$50,000 Elite" both mean the 50K account.
-function legendsSize(storeDisplayName) {
-  const m = /\$([\d,]+)/.exec(String(storeDisplayName ?? ''));
-  return m ? num(m[1]) : null;
-}
-
-// The description carries the rules and the fee, one per line:
-//   "$99 Activation Fee" (Apprentice) or "Activation Fee: None" (Elite)
-export function legendsActivationFee(description) {
-  const text = String(description ?? '');
-  if (/activation fee\s*:\s*none/i.test(text)) return null;
-  const m = /\$([\d,.]+)\s*activation fee/i.exec(text);
-  if (!m) return null;
-  const fee = num(m[1]);
-  if (!Number.isFinite(fee) || fee <= 0 || fee > 6000) {
-    throw new Error(`unreadable LEGENDS activation fee: "${m[0]}"`);
-  }
-  return fee;
-}
-
-// Their August promotion, from the asset LEGENDS sent Angelo with his own code
-// on it: the 50K Elite is $49 on a FIRST order and $98 after. Their shop API
-// only exposes the repeat price ($98.15), so the promo price is pinned here.
-//
-// `until` is what keeps this honest: past that date the override stops applying
-// and the API price comes back on its own, instead of a stale $49 living on the
-// page forever. The note next to it is set once in prop-firms.json.
-const LEGENDS_PROMO = {
-  programName: 'Elite',
-  size: 50000,
-  price: 49,
-  until: '2026-08-22', // leur mail: promo jusqu'au vendredi 21 aout 23h59 ET
-  source: 'August promotion asset, "$49 FIRST ORDER, $98 OTHER ORDERS", code JTNQ',
-};
-
-export function applyLegendsPromo(updates, today = TODAY) {
-  if (today >= LEGENDS_PROMO.until) return updates;
-  return updates.map((u) =>
-    u.programName === LEGENDS_PROMO.programName && u.size === LEGENDS_PROMO.size
-      ? { ...u, price: LEGENDS_PROMO.price }
-      : u,
-  );
-}
-
-export function legendsUpdatesFrom(payload) {
-  const plans = payload?.data;
-  if (!Array.isArray(plans) || plans.length === 0) throw new Error('LEGENDS API returned no plans');
-
-  const updates = [];
-  for (const plan of plans) {
-    if (plan.isPublic === false) continue;
-    const size = legendsSize(plan.storeDisplayName);
-    const paid = plan.strikeThroughPrice; // what the buyer pays, despite the name
-    const listed = plan.price; // the struck-through one
-    if (!size || !Number.isFinite(paid) || !Number.isFinite(listed)) {
-      throw new Error(`LEGENDS plan unreadable: ${JSON.stringify(plan.storeDisplayName)}`);
-    }
-    if (paid > listed) {
-      throw new Error(
-        `LEGENDS ${plan.productCategory} ${size}: paid ${paid} > listed ${listed}, the two fields may have been swapped back`,
-      );
-    }
-    updates.push({
-      programName: plan.productCategory,
-      size,
-      price: paid,
-      originalPrice: listed,
-      activationFee: legendsActivationFee(plan.description),
-    });
-  }
-  return updates;
-}
-
+// Leur page Webflow sert une table de prix PERIMEE a tout client HTTP (verifie
+// le 2026-08-20 : le HTML disait Apprentice 50K $185 -> $37/mo quand la page
+// rendue affichait $59 -> $29.50). scripts/lib/firms/legends.mjs lit leur shop
+// API a la place, ou `price` est le prix plein et `strikeThroughPrice` le prix
+// remise — leurs noms sont inverses.
 async function scrapeLegends() {
-  const res = await fetch(LEGENDS_API, {
-    headers: { 'user-agent': UA, accept: 'application/json' },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status} for the LEGENDS shop API`);
-  return { updates: applyLegendsPromo(legendsUpdatesFrom(await res.json())) };
+  return { programs: await fetchLegendsPrograms() };
 }
 
 /* ------------------------------------------------------------------ */
@@ -715,16 +527,23 @@ function apply(firm, res, changes) {
         plan.originalPrice = u.originalPrice;
       }
     }
+  }
+  applyPromos(firm, res, changes);
+}
+
+// Les promos, communes aux deux chemins : un `firmPromo` absent (undefined)
+// garde celle qui est publiee, un `null` explicite dit que la promo est finie.
+function applyPromos(firm, res, changes) {
+  for (const program of firm.programs) {
     const promo = res.programPromos?.[program.name];
-    if (promo) {
-      if (program.promoCode !== promo.code) {
-        changes.push(`${firm.name} / ${program.name}: promoCode ${program.promoCode} -> ${promo.code}`);
-        program.promoCode = promo.code;
-      }
-      if (promo.label != null && program.promoLabel !== promo.label) {
-        changes.push(`${firm.name} / ${program.name}: promoLabel ${program.promoLabel} -> ${promo.label}`);
-        program.promoLabel = promo.label;
-      }
+    if (!promo) continue;
+    if (program.promoCode !== promo.code) {
+      changes.push(`${firm.name} / ${program.name}: promoCode ${program.promoCode} -> ${promo.code}`);
+      program.promoCode = promo.code;
+    }
+    if (promo.label != null && program.promoLabel !== promo.label) {
+      changes.push(`${firm.name} / ${program.name}: promoLabel ${program.promoLabel} -> ${promo.label}`);
+      program.promoLabel = promo.label;
     }
   }
   if (res.firmPromo !== undefined) {
@@ -746,46 +565,12 @@ function apply(firm, res, changes) {
 /* client-side by fs-list-field attributes (drawdown / platform / account) */
 /* ------------------------------------------------------------------ */
 
-// account + drawdown -> our program name. Every card is duplicated per trading
-// platform, so the same (program, size) shows up more than once; the prices
-// must agree or we refuse the update.
-const TRADEDAY_PROGRAMS = {
-  'Quick Pay|Intraday': 'Quick Pay Intraday',
-  'Quick Pay|End of Day': 'Quick Pay EOD',
-  'Fast Pass|End of Day': 'Fast Pass',
-};
-
+// Le catalogue vient de scripts/lib/firms/tradeday.mjs, qui lit les memes
+// cartes Webflow (face avant = regles d'evaluation, dos = regles du compte
+// finance) et rend les quatre tailles, 25K comprise : elle manquait partout
+// dans le dataset jusqu'au 2026-09-13.
 async function scrapeTradeDay() {
-  const html = await fetchText('https://www.tradeday.com');
-  const starts = [...html.matchAll(/class="pricing_dyn w-dyn-item"/g)].map((m) => m.index);
-  if (starts.length === 0) throw new Error('no pricing cards found');
-
-  const seen = new Map(); // "program|size" -> { price, originalPrice }
-  for (let i = 0; i < starts.length; i++) {
-    const card = html.slice(starts[i], i + 1 < starts.length ? starts[i + 1] : undefined);
-    const drawdown = card.match(/fs-list-field="drawdown"[^>]*>([^<]+)</)?.[1].trim();
-    const account = card.match(/fs-list-field="account"[^>]*>([^<]+)</)?.[1].trim();
-    const programName = TRADEDAY_PROGRAMS[`${account}|${drawdown}`];
-    if (!programName) continue; // a product we do not list
-
-    const sizeM = card.match(/text-color-primary">(\d+)k</i);
-    const prices = [...card.matchAll(/display-inline">\$<\/div><div class="display-inline">([\d,]+)</g)].map((m) => num(m[1]));
-    if (!sizeM || prices.length !== 2)
-      throw new Error(`${programName}: card ${i} has no size or ${prices.length} prices (expected 2)`);
-
-    const key = `${programName}|${num(sizeM[1]) * 1000}`;
-    const found = { originalPrice: prices[0], price: prices[1] };
-    const prev = seen.get(key);
-    if (prev && (prev.price !== found.price || prev.originalPrice !== found.originalPrice))
-      throw new Error(`${key}: two cards disagree ($${prev.price}/$${prev.originalPrice} vs $${found.price}/$${found.originalPrice})`);
-    seen.set(key, found);
-  }
-
-  const updates = [...seen.entries()].map(([key, v]) => {
-    const [programName, size] = key.split('|');
-    return { programName, size: Number(size), ...v };
-  });
-  return { updates };
+  return { programs: await fetchTradeDayPrograms() };
 }
 
 /* ------------------------------------------------------------------ */
@@ -813,9 +598,17 @@ async function main() {
     try {
       const res = await scraper();
       if (res === null) continue; // skipped (playwright missing)
-      guard(firm, res);
       const changes = [];
-      apply(firm, res, changes);
+      if (res.programs) {
+        // Un lecteur a rendu tout ce que la firme vend : le catalogue suit.
+        guardCatalog(firm, res.programs);
+        syncCatalog(firm, res.programs, changes);
+        applyPromos(firm, res, changes);
+      } else {
+        // Chemin historique : des prix sur des programmes figes a la main.
+        guard(firm, res);
+        apply(firm, res, changes);
+      }
       totalChanges += changes.length;
       const plansTotal = firm.programs.reduce((n, p) => n + p.plans.length, 0);
       if (changes.length === 0) {
