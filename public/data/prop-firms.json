@@ -261,7 +261,7 @@
               "dailyLossSoft": false,
               "consistency": "40%",
               "contracts": "2 Mini or 20 Micros",
-              "note": "Prix du split 80 %. Max Drawdown affiche : « EOD - Locks at Starting Balance »."
+              "note": "Price shown for the 80% split."
             },
             {
               "size": 200000,
@@ -273,7 +273,7 @@
               "dailyLossSoft": false,
               "consistency": "40%",
               "contracts": "4 Mini or 40 Micros",
-              "note": "Prix du split 80 %. Max Drawdown affiche : « EOD - Locks at Starting Balance »."
+              "note": "Price shown for the 80% split."
             },
             {
               "size": 300000,
@@ -285,7 +285,7 @@
               "dailyLossSoft": false,
               "consistency": "40%",
               "contracts": "6 Mini or 60 Micros",
-              "note": "Prix du split 80 %. Max Drawdown affiche : « EOD - Locks at Starting Balance »."
+              "note": "Price shown for the 80% split."
             }
           ]
         },
@@ -301,7 +301,7 @@
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
               "contracts": "5 Micros",
-              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Prix du split 80 %. Max Drawdown affiche : « EOD - Locks at Starting Balance »."
+              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Price shown for the 80% split."
             },
             {
               "size": 200000,
@@ -310,7 +310,7 @@
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
               "contracts": "1 Mini or 10 Micros",
-              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Prix du split 80 %. Max Drawdown affiche : « EOD - Locks at Starting Balance »."
+              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Price shown for the 80% split."
             },
             {
               "size": 300000,
@@ -319,7 +319,7 @@
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
               "contracts": "2 Mini or 20 Micros",
-              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Prix du split 80 %. Max Drawdown affiche : « EOD - Locks at Starting Balance »."
+              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Price shown for the 80% split."
             }
           ]
         }

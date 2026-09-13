@@ -291,10 +291,10 @@ async function scrapeTopOne() {
 // Le comparateur n'etiquette que trois drawdowns ("No trail", "EOD Trail",
 // "Intraday Trail"). Leurs cartes ecrivent "EOD - Locks at Starting Balance" :
 // un drawdown de fin de journee qui suit les plus hauts jusqu'a revenir au
-// solde de depart, ou il se fige — "EOD Trailing" dans notre vocabulaire. La
-// phrase exacte de la carte part dans `note`, pour que la traduction ne perde
-// aucun mot de la source. Une formulation inconnue arrete la firme plutot que
-// de publier un drawdown que la page ne sait pas nommer.
+// solde de depart, ou il se fige — "EOD Trailing" dans notre vocabulaire, et
+// la legende du tableau dit ce que l'etiquette veut dire. Une formulation
+// inconnue arrete la firme plutot que de publier un drawdown que la page ne
+// sait pas nommer.
 const TRADERSLAUNCH_DD = {
   'EOD - Locks at Starting Balance': 'EOD Trailing',
   'EOD': 'EOD',
@@ -309,10 +309,7 @@ async function scrapeTradersLaunch() {
       if (plan.ddType == null) continue;
       const vocab = TRADERSLAUNCH_DD[plan.ddType];
       if (!vocab) throw new Error(`drawdown « ${plan.ddType} » hors du vocabulaire du comparateur`);
-      if (vocab !== plan.ddType) {
-        plan.note = [plan.note, `Max Drawdown affiche : « ${plan.ddType} ».`].filter(Boolean).join(' ');
-        plan.ddType = vocab;
-      }
+      plan.ddType = vocab;
     }
   }
   return { programs }; // no promo recipe for this firm — promo stays manual

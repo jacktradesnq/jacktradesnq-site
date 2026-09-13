@@ -254,7 +254,7 @@ export function programsFromHtml(html) {
 
     const note = [];
     if (carte.legacy && horaires) note.push(horaires);
-    if (carte.split != null) note.push(`Prix du split ${carte.split} %.`);
+    if (carte.split != null) note.push(`Price shown for the ${carte.split}% split.`);
     if (note.length) plan.note = note.join(' ');
 
     p.plans.push(plan);

@@ -28,6 +28,9 @@ type Promo = {
   originalPrice: number | null;
   discountPct: number;
   priceNote: string | null;
+  // Ce que la firme affiche et qui qualifie ce prix : les horaires 9:30-16:00 ET
+  // d'un compte « Legacy NYC », le split auquel le prix correspond.
+  note: string | null;
   endsAt: string | null;
   expiring: boolean;
   split: string;
@@ -62,6 +65,7 @@ const per = (p: Promo) => (p.priceType === 'monthly' ? '/mo' : '');
 function priceFacts(p: Promo): string[] {
   const out: string[] = [];
   if (p.priceNote) out.push(p.priceNote);
+  if (p.note) out.push(p.note);
   if (p.priceType === 'monthly') out.push('billed monthly');
   if (p.activationFee) out.push(`${money(p.activationFee)} activation once funded`);
   return out;

@@ -31,6 +31,11 @@ type Plan = {
   // (« Daily Ultra (35%) - 100K » a $264.50, $297.50 et $451.50 le 2026-09-13).
   // On publie le moins cher, et on le dit.
   priceAmbiguous?: boolean;
+  // Ce qui qualifie le prix et que la source ecrit noir sur blanc : les
+  // horaires 9:30-16:00 ET des comptes « Legacy NYC » de Traders Launch, le
+  // split auquel le prix correspond. Un plan deux fois moins cher pour une
+  // raison affichee doit porter cette raison partout ou son prix apparait.
+  note?: string;
 };
 type Program = {
   name: string;
@@ -405,6 +410,7 @@ function FirmRow({
               {winner.plan.activationFee != null && (
                 <span className="activation-note">+ {money(winner.plan.activationFee)} activation</span>
               )}
+              {winner.plan.note && <span className="plan-note">{winner.plan.note}</span>}
             </td>
         <td className="num cell-target" data-label="Max profit">
           {winner.plan.profitTarget != null ? money(winner.plan.profitTarget) : <span className="none">None</span>}
@@ -467,6 +473,7 @@ function FirmRow({
                       {plan.activationFee != null && (
                         <span className="sub-activation">+ {money(plan.activationFee)} activation</span>
                       )}
+                      {plan.note && <span className="sub-note">{plan.note}</span>}
                     </div>
                   );
                 })}

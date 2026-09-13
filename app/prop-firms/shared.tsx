@@ -232,6 +232,13 @@ export const CSS = `
   display: block; margin-top: 4px; font-family: var(--f-sans); font-size: 11px; font-style: italic;
   font-weight: 400; color: var(--c-text-mute); white-space: nowrap;
 }
+/* Ce qui qualifie le prix (horaires restreints, split) sous le prix vedette.
+   Borne en largeur : la colonne prix ne doit pas s'elargir pour une phrase. */
+.jtnq-cmp .plan-note{
+  display: block; max-width: 150px; margin-top: 4px;
+  font-family: var(--f-sans); font-size: 11px; font-style: italic; font-weight: 400;
+  line-height: 1.35; color: var(--c-text-mute); white-space: normal; overflow-wrap: anywhere;
+}
 .jtnq-cmp .cell-loss .tag{ margin-left: 4px; }
 
 .jtnq-cmp .promo-chip{
@@ -327,6 +334,12 @@ export const CSS = `
 .jtnq-cmp .sub-row > *:not(:first-child)::before{ content: '· '; color: var(--c-text-deep); }
 .jtnq-cmp .sub-name{ color: var(--c-text); font-weight: 500; }
 .jtnq-cmp .sub-activation{ color: var(--c-text-mute); font-style: italic; }
+/* La note prend sa propre ligne : c'est une phrase, pas un champ de plus. */
+.jtnq-cmp .sub-note{
+  flex: 1 0 100%; margin: 4px 0 0; font-family: var(--f-sans); font-size: 11px;
+  font-style: italic; color: var(--c-text-mute); line-height: 1.4;
+}
+.jtnq-cmp .sub-row > .sub-note::before{ content: none; }
 
 .jtnq-cmp .legend{
   display: flex; flex-direction: column; gap: 6px; margin: 16px 0 0;
@@ -450,6 +463,7 @@ export const CSS = `
   .jtnq-cmp td.col-cta{ grid-area: cta; text-align: center; }
 
   .jtnq-cmp tr.firm-row td.num{ white-space: normal; }
+  .jtnq-cmp .plan-note{ max-width: none; }
   .jtnq-cmp td.cell-target, .jtnq-cmp td.cell-loss{ font-size: 20px; }
   .jtnq-cmp td.cell-price, .jtnq-cmp td.cell-daily{ font-size: 15px; }
 

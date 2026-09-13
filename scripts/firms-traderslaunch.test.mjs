@@ -77,8 +77,14 @@ test('programsFromHtml : les regles lues sur les cartes', () => {
 
 test('programsFromHtml : Legacy NYC porte les horaires NYC dans sa note', () => {
   for (const p of programme('Legacy NYC').plans) {
-    assert.match(p.note, /NYC trading hours: 9:30am–4:00pm ET/, JSON.stringify(p));
-    assert.match(p.note, /Legacy pricing and rules apply/);
+    // Cette note s'affiche telle quelle sur le site, donc en anglais, et en
+    // entier : c'est elle qui dit pourquoi ce compte est deux fois moins cher.
+    assert.equal(
+      p.note,
+      'NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. ' +
+        'Price shown for the 80% split.',
+      JSON.stringify(p),
+    );
   }
   // Le 1-Step n'a pas d'horaire restreint : on ne lui en colle pas un.
   for (const p of programme('1-Step').plans) {
@@ -90,7 +96,7 @@ test('programsFromHtml : le split qui qualifie le prix est dit, pas devine', () 
   // Les deux sections ont un selecteur 55 % / 80 %. Les six liens portent
   // split=80 : un prix publie sans son split serait a moitie vrai.
   for (const p of programs) {
-    for (const x of p.plans) assert.match(x.note, /Prix du split 80 %\./, `${p.name} ${x.size}`);
+    for (const x of p.plans) assert.match(x.note, /Price shown for the 80% split\./, `${p.name} ${x.size}`);
   }
 });
 

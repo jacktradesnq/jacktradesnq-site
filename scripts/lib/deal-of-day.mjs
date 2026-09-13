@@ -298,6 +298,8 @@ function candidateFor(firm, { today, prevSnapshot, messages, codes }) {
       activationFee: plan.activationFee ?? null,
     },
     priceNote: plan.priceNote ?? null,
+    note: plan.note ?? null, // ce que la firme affiche et qui qualifie ce prix
+
     ladder,
     caveats: caveatsOf(program, plan, messages),
     signals,
