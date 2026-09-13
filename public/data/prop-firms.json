@@ -1571,6 +1571,39 @@
         }
       ],
       "_source": "iqcapital.io/futures lu en navigateur headless le 2026-09-13 (pas d'API publique, pas encore de scraper : prix a la main)"
+    },
+    {
+      "id": "atlasfunded",
+      "name": "Atlas Funded",
+      "split": "80%",
+      "payout": "Bi-weekly",
+      "promo": {
+        "label": "35% off",
+        "code": "SEPT"
+      },
+      "url": "https://affiliates.atlasfunded.com/Tracking/click/?affid=12255&campaign=11300&product_id=1&t_type=Register&t_lang=EN",
+      "lastChecked": "2026-09-13",
+      "stale": false,
+      "programs": [
+        {
+          "name": "Futures",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 85,
+              "originalPrice": 132,
+              "profitTarget": 1500,
+              "maxDrawdown": 1750,
+              "dailyLoss": 1000,
+              "dailyLossSoft": false,
+              "note": "Volumetrica. Larger sizes exist on atlasfunded.com/futures but their rules could not be read yet."
+            }
+          ]
+        }
+      ],
+      "_source": "atlasfunded.com/futures lu en navigateur headless le 2026-09-13 : seul le 25K etait lisible ; prix des autres tailles dans l'API WooCommerce checkout.atlasfunded.com/wp-json/wc/store/v1/products, regles seulement en JS ; pas de scraper encore"
     }
   ]
 }
