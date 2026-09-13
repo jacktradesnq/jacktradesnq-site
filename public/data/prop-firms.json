@@ -15,99 +15,56 @@
       "stale": false,
       "programs": [
         {
-          "name": "Direct",
-          "type": "instant",
-          "priceType": "one-time",
-          "plans": [
-            {
-              "size": 25000,
-              "price": 230,
-              "originalPrice": 307,
-              "profitTarget": null,
-              "maxDrawdown": 1500,
-              "ddType": "EOD",
-              "dailyLoss": 1000,
-              "dailyLossSoft": false,
-              "consistency": "20→30% payouts",
-              "contracts": "1 Mini | 10 Micro"
-            },
-            {
-              "size": 50000,
-              "price": 371,
-              "originalPrice": 494,
-              "profitTarget": null,
-              "maxDrawdown": 2000,
-              "ddType": "EOD",
-              "dailyLoss": 1250,
-              "dailyLossSoft": false,
-              "consistency": "20→30% payouts",
-              "contracts": "4 Mini | 40 Micro"
-            },
-            {
-              "size": 100000,
-              "price": 494,
-              "originalPrice": 659,
-              "profitTarget": null,
-              "maxDrawdown": 3500,
-              "ddType": "EOD",
-              "dailyLoss": 2500,
-              "dailyLossSoft": false,
-              "consistency": "20→30% payouts",
-              "contracts": "8 Mini | 80 Micro"
-            },
-            {
-              "size": 150000,
-              "price": 618,
-              "originalPrice": 824,
-              "profitTarget": null,
-              "maxDrawdown": 4500,
-              "ddType": "EOD",
-              "dailyLoss": 3000,
-              "dailyLossSoft": false,
-              "consistency": "20→30% payouts",
-              "contracts": "12 Mini | 120 Micro"
-            }
-          ]
-        },
-        {
-          "name": "Express",
+          "name": "Standard",
           "type": "eval",
           "priceType": "one-time",
           "plans": [
             {
+              "size": 25000,
+              "price": 116,
+              "originalPrice": 154,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "None",
+              "contracts": "1 Mini | 10 Micro"
+            },
+            {
               "size": 50000,
-              "price": 103,
-              "originalPrice": 137,
+              "price": 157,
+              "originalPrice": 209,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
               "dailyLoss": 1000,
               "dailyLossSoft": true,
-              "consistency": "40%",
+              "consistency": "None",
               "contracts": "4 Mini | 40 Micro"
             },
             {
               "size": 100000,
-              "price": 172,
-              "originalPrice": 229,
+              "price": 248,
+              "originalPrice": 330,
               "profitTarget": 6000,
               "maxDrawdown": 3500,
               "ddType": "EOD Trailing",
               "dailyLoss": 2000,
               "dailyLossSoft": true,
-              "consistency": "40%",
+              "consistency": "None",
               "contracts": "8 Mini | 80 Micro"
             },
             {
               "size": 150000,
-              "price": 259,
-              "originalPrice": 345,
+              "price": 318,
+              "originalPrice": 424,
               "profitTarget": 9000,
               "maxDrawdown": 5000,
               "ddType": "EOD Trailing",
               "dailyLoss": 3000,
               "dailyLossSoft": true,
-              "consistency": "40%",
+              "consistency": "None",
               "contracts": "12 Mini | 120 Micro"
             }
           ]
@@ -168,56 +125,111 @@
           ]
         },
         {
-          "name": "Standard",
+          "name": "Express",
           "type": "eval",
           "priceType": "one-time",
           "plans": [
             {
               "size": 25000,
-              "price": 116,
-              "originalPrice": 154,
+              "price": 80,
+              "originalPrice": 106,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "None",
+              "consistency": "40%",
               "contracts": "1 Mini | 10 Micro"
             },
             {
               "size": 50000,
-              "price": 157,
-              "originalPrice": 209,
+              "price": 103,
+              "originalPrice": 137,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
               "dailyLoss": 1000,
-              "dailyLossSoft": true,
-              "consistency": "None",
+              "dailyLossSoft": false,
+              "consistency": "40%",
               "contracts": "4 Mini | 40 Micro"
             },
             {
               "size": 100000,
-              "price": 248,
-              "originalPrice": 330,
+              "price": 172,
+              "originalPrice": 229,
               "profitTarget": 6000,
-              "maxDrawdown": 3500,
+              "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
-              "dailyLoss": 2000,
-              "dailyLossSoft": true,
-              "consistency": "None",
+              "dailyLoss": 1500,
+              "dailyLossSoft": false,
+              "consistency": "40%",
               "contracts": "8 Mini | 80 Micro"
             },
             {
               "size": 150000,
-              "price": 318,
-              "originalPrice": 424,
+              "price": 259,
+              "originalPrice": 345,
               "profitTarget": 9000,
-              "maxDrawdown": 5000,
+              "maxDrawdown": 4500,
               "ddType": "EOD Trailing",
+              "dailyLoss": 2250,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "12 Mini | 120 Micro"
+            }
+          ]
+        },
+        {
+          "name": "Direct",
+          "type": "instant",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 230,
+              "originalPrice": 307,
+              "profitTarget": null,
+              "maxDrawdown": 1500,
+              "ddType": "EOD",
+              "dailyLoss": 1000,
+              "dailyLossSoft": false,
+              "consistency": "20→30% payouts",
+              "contracts": "1 Mini | 10 Micro"
+            },
+            {
+              "size": 50000,
+              "price": 371,
+              "originalPrice": 494,
+              "profitTarget": null,
+              "maxDrawdown": 2000,
+              "ddType": "EOD",
+              "dailyLoss": 1250,
+              "dailyLossSoft": false,
+              "consistency": "20→30% payouts",
+              "contracts": "4 Mini | 40 Micro"
+            },
+            {
+              "size": 100000,
+              "price": 494,
+              "originalPrice": 659,
+              "profitTarget": null,
+              "maxDrawdown": 3500,
+              "ddType": "EOD",
+              "dailyLoss": 2500,
+              "dailyLossSoft": false,
+              "consistency": "20→30% payouts",
+              "contracts": "8 Mini | 80 Micro"
+            },
+            {
+              "size": 150000,
+              "price": 618,
+              "originalPrice": 824,
+              "profitTarget": null,
+              "maxDrawdown": 4500,
+              "ddType": "EOD",
               "dailyLoss": 3000,
-              "dailyLossSoft": true,
-              "consistency": "None",
+              "dailyLossSoft": false,
+              "consistency": "20→30% payouts",
               "contracts": "12 Mini | 120 Micro"
             }
           ]
@@ -231,8 +243,8 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-09-11",
-      "stale": true,
+      "lastChecked": "2026-09-13",
+      "stale": false,
       "programs": [
         {
           "name": "1-Step",
@@ -242,38 +254,72 @@
             {
               "size": 100000,
               "price": 159,
-              "originalPrice": null,
               "profitTarget": 2000,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "40%",
-              "contracts": "2 minis / 20 micros"
+              "contracts": "2 Mini or 20 Micros",
+              "note": "Prix du split 80 %. Max Drawdown affiche : « EOD - Locks at Starting Balance »."
             },
             {
               "size": 200000,
               "price": 299,
-              "originalPrice": null,
               "profitTarget": 4000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "40%",
-              "contracts": "4 minis / 40 micros"
+              "contracts": "4 Mini or 40 Micros",
+              "note": "Prix du split 80 %. Max Drawdown affiche : « EOD - Locks at Starting Balance »."
             },
             {
               "size": 300000,
               "price": 599,
-              "originalPrice": null,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "40%",
-              "contracts": "6 minis / 60 micros"
+              "contracts": "6 Mini or 60 Micros",
+              "note": "Prix du split 80 %. Max Drawdown affiche : « EOD - Locks at Starting Balance »."
+            }
+          ]
+        },
+        {
+          "name": "Legacy NYC",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 100000,
+              "price": 99,
+              "profitTarget": 2000,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "contracts": "5 Micros",
+              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Prix du split 80 %. Max Drawdown affiche : « EOD - Locks at Starting Balance »."
+            },
+            {
+              "size": 200000,
+              "price": 149,
+              "profitTarget": 3000,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "contracts": "1 Mini or 10 Micros",
+              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Prix du split 80 %. Max Drawdown affiche : « EOD - Locks at Starting Balance »."
+            },
+            {
+              "size": 300000,
+              "price": 279,
+              "profitTarget": 5000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "contracts": "2 Mini or 20 Micros",
+              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Prix du split 80 %. Max Drawdown affiche : « EOD - Locks at Starting Balance »."
             }
           ]
         }
@@ -533,7 +579,7 @@
       "split": "90%",
       "payout": "Daily · 5h guaranteed",
       "promo": {
-        "label": "50% OFF + 50% w/ code",
+        "label": "45% OFF + 50% w/ code",
         "code": "SEP50",
         "ends": "2026-09-21"
       },
@@ -548,7 +594,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 70,
+              "price": 76.95,
               "originalPrice": 140,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
@@ -556,11 +602,14 @@
               "dailyLoss": null,
               "dailyLossSoft": true,
               "consistency": "35%",
-              "contracts": "2 minis / 20 micros"
+              "contracts": "2 minis",
+              "maxPayout": 500,
+              "minPayout": 250,
+              "resetFee": 67
             },
             {
               "size": 50000,
-              "price": 95,
+              "price": 104.95,
               "originalPrice": 190,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -568,11 +617,14 @@
               "dailyLoss": null,
               "dailyLossSoft": true,
               "consistency": "35%",
-              "contracts": "4 minis / 40 micros"
+              "contracts": "4 minis",
+              "maxPayout": 1000,
+              "minPayout": 500,
+              "resetFee": 95
             },
             {
               "size": 100000,
-              "price": 160,
+              "price": 174.95,
               "originalPrice": 320,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
@@ -580,11 +632,14 @@
               "dailyLoss": null,
               "dailyLossSoft": true,
               "consistency": "35%",
-              "contracts": "8 minis / 80 micros"
+              "contracts": "8 minis",
+              "maxPayout": 1500,
+              "minPayout": 1000,
+              "resetFee": 160
             },
             {
               "size": 150000,
-              "price": 222.5,
+              "price": 244.95,
               "originalPrice": 445,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
@@ -592,50 +647,211 @@
               "dailyLoss": null,
               "dailyLossSoft": true,
               "consistency": "35%",
-              "contracts": "12 minis / 120 micros"
+              "contracts": "12 minis",
+              "maxPayout": 2500,
+              "minPayout": 1500,
+              "resetFee": 215
             }
           ]
         },
         {
-          "name": "Instant Funding",
-          "type": "instant",
+          "name": "Daily Max",
+          "type": "eval",
           "priceType": "one-time",
           "plans": [
             {
               "size": 25000,
-              "price": 200,
-              "originalPrice": 400,
-              "profitTarget": null,
+              "price": 94.95,
+              "originalPrice": 175,
+              "profitTarget": 1500,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
-              "dailyLoss": null,
-              "dailyLossSoft": true,
-              "consistency": "15% biggest trade",
-              "contracts": "1 mini / 10 micros"
+              "dailyLoss": 500,
+              "consistency": "35%",
+              "contracts": "2 minis",
+              "maxPayout": 1250,
+              "minPayout": 1000,
+              "resetFee": 90
             },
             {
               "size": 50000,
-              "price": 300,
-              "originalPrice": 600,
-              "profitTarget": null,
+              "price": 159.95,
+              "originalPrice": 290,
+              "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
-              "dailyLoss": 1500,
-              "dailyLossSoft": true,
-              "consistency": "15% biggest trade",
-              "contracts": "4 minis / 40 micros"
+              "dailyLoss": 1000,
+              "consistency": "35%",
+              "contracts": "4 minis",
+              "maxPayout": 2500,
+              "minPayout": 2000,
+              "resetFee": 150
             },
             {
               "size": 100000,
-              "price": 450,
-              "originalPrice": 900,
-              "profitTarget": null,
+              "price": 279.95,
+              "originalPrice": 510,
+              "profitTarget": 6000,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
-              "dailyLoss": 2500,
-              "dailyLossSoft": true,
-              "consistency": "15% biggest trade",
-              "contracts": "8 minis / 80 micros"
+              "dailyLoss": 1500,
+              "consistency": "35%",
+              "contracts": "6 minis",
+              "maxPayout": 3750,
+              "minPayout": 3000,
+              "resetFee": 270
+            },
+            {
+              "size": 150000,
+              "price": 359.95,
+              "originalPrice": 655,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 2000,
+              "consistency": "35%",
+              "contracts": "10 minis",
+              "maxPayout": 5000,
+              "minPayout": 4000,
+              "resetFee": 345
+            }
+          ]
+        },
+        {
+          "name": "Daily Ultra (35%)",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 104.5,
+              "originalPrice": 190,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 600,
+              "consistency": "35%",
+              "contracts": "2 minis",
+              "maxPayout": null,
+              "minPayout": 250,
+              "resetFee": 90,
+              "priceAmbiguous": true,
+              "variants": [
+                {
+                  "price": 104.5,
+                  "originalPrice": 190,
+                  "id": 1093
+                },
+                {
+                  "price": 154.5,
+                  "originalPrice": 280,
+                  "id": 1080
+                }
+              ]
+            },
+            {
+              "size": 50000,
+              "price": 197.5,
+              "originalPrice": 360,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1200,
+              "consistency": "35%",
+              "contracts": "4 minis",
+              "maxPayout": null,
+              "minPayout": 250,
+              "resetFee": 170,
+              "priceAmbiguous": true,
+              "variants": [
+                {
+                  "price": 197.5,
+                  "originalPrice": 360,
+                  "id": 1094
+                },
+                {
+                  "price": 307.5,
+                  "originalPrice": 560,
+                  "id": 1081
+                }
+              ]
+            },
+            {
+              "size": 100000,
+              "price": 264.5,
+              "originalPrice": 480,
+              "profitTarget": 6000,
+              "maxDrawdown": 2250,
+              "ddType": "EOD Trailing",
+              "consistency": "35%",
+              "contracts": "6 minis",
+              "maxPayout": null,
+              "minPayout": 250,
+              "resetFee": 235,
+              "priceAmbiguous": true,
+              "variants": [
+                {
+                  "price": 264.5,
+                  "originalPrice": 480,
+                  "id": 1090
+                },
+                {
+                  "price": 297.5,
+                  "originalPrice": 540,
+                  "id": 1092
+                },
+                {
+                  "price": 451.5,
+                  "originalPrice": 820,
+                  "id": 1091
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Daily Ultra (25%)",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 126.5,
+              "originalPrice": 230,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "consistency": "26%",
+              "contracts": "2 minis",
+              "maxPayout": null,
+              "minPayout": 250,
+              "resetFee": 110
+            },
+            {
+              "size": 50000,
+              "price": 252.5,
+              "originalPrice": 460,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "consistency": "26%",
+              "contracts": "4 minis",
+              "maxPayout": null,
+              "minPayout": 250,
+              "resetFee": 225
+            },
+            {
+              "size": 100000,
+              "price": 379.5,
+              "originalPrice": 690,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "consistency": "26%",
+              "contracts": "6 minis",
+              "maxPayout": null,
+              "minPayout": 250,
+              "resetFee": 340
             }
           ]
         },
@@ -646,7 +862,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 67.5,
+              "price": 74.95,
               "originalPrice": 135,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
@@ -654,11 +870,14 @@
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "25% (1st payout)",
-              "contracts": "2 minis / 20 micros"
+              "contracts": "2 minis",
+              "maxPayout": 500,
+              "minPayout": 500,
+              "resetFee": 65
             },
             {
               "size": 50000,
-              "price": 100,
+              "price": 109.95,
               "originalPrice": 200,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -666,11 +885,14 @@
               "dailyLoss": 1200,
               "dailyLossSoft": true,
               "consistency": "25% (1st payout)",
-              "contracts": "4 minis / 40 micros"
+              "contracts": "4 minis",
+              "maxPayout": 1000,
+              "minPayout": 1000,
+              "resetFee": 100
             },
             {
               "size": 100000,
-              "price": 150,
+              "price": 164.95,
               "originalPrice": 300,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
@@ -678,11 +900,14 @@
               "dailyLoss": 1800,
               "dailyLossSoft": true,
               "consistency": "25% (1st payout)",
-              "contracts": "8 minis / 80 micros"
+              "contracts": "8 minis",
+              "maxPayout": 1500,
+              "minPayout": 1500,
+              "resetFee": 150
             },
             {
               "size": 150000,
-              "price": 237.5,
+              "price": 259.95,
               "originalPrice": 475,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
@@ -690,7 +915,101 @@
               "dailyLoss": 2700,
               "dailyLossSoft": true,
               "consistency": "25% (1st payout)",
-              "contracts": "12 minis / 120 micros"
+              "contracts": "12 minis",
+              "maxPayout": 2500,
+              "minPayout": 2500,
+              "resetFee": 235
+            }
+          ]
+        },
+        {
+          "name": "Instant Funding Direct",
+          "type": "instant",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 219.95,
+              "originalPrice": 400,
+              "profitTarget": null,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": true,
+              "consistency": "15% biggest trade",
+              "contracts": "1 mini",
+              "maxPayout": 500,
+              "minPayout": 500
+            },
+            {
+              "size": 50000,
+              "price": 329.95,
+              "originalPrice": 600,
+              "profitTarget": null,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1500,
+              "dailyLossSoft": true,
+              "consistency": "15% biggest trade",
+              "contracts": "4 minis",
+              "maxPayout": 1000,
+              "minPayout": 1000
+            },
+            {
+              "size": 100000,
+              "price": 494.95,
+              "originalPrice": 900,
+              "profitTarget": null,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 2500,
+              "dailyLossSoft": true,
+              "consistency": "15% biggest trade",
+              "contracts": "8 minis",
+              "maxPayout": 2000,
+              "minPayout": 2000
+            }
+          ]
+        },
+        {
+          "name": "Instant Funding Bolt",
+          "type": "instant",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 219.95,
+              "originalPrice": 400,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "consistency": "20%",
+              "contracts": "1 mini",
+              "maxPayout": 500,
+              "minPayout": 500
+            },
+            {
+              "size": 50000,
+              "price": 329.95,
+              "originalPrice": 600,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 1500,
+              "consistency": "20%",
+              "contracts": "4 minis",
+              "maxPayout": 1000,
+              "minPayout": 1000
+            },
+            {
+              "size": 100000,
+              "price": 439.95,
+              "originalPrice": 800,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 2500,
+              "consistency": "20%",
+              "contracts": "8 minis",
+              "maxPayout": 2000,
+              "minPayout": 2000
             }
           ]
         }
@@ -772,7 +1091,8 @@
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "40%",
-              "contracts": "2 minis / 20 micros"
+              "contracts": "2 minis / 20 micros",
+              "activationFee": null
             },
             {
               "size": 50000,
@@ -785,7 +1105,8 @@
               "dailyLossSoft": false,
               "consistency": "40%",
               "contracts": "4 minis / 40 micros",
-              "priceNote": "new and existing customers, extra Elite accounts 35% off"
+              "priceNote": "new and existing customers, extra Elite accounts 35% off",
+              "activationFee": null
             },
             {
               "size": 100000,
@@ -797,7 +1118,8 @@
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "40%",
-              "contracts": "8 minis / 80 micros"
+              "contracts": "8 minis / 80 micros",
+              "activationFee": null
             },
             {
               "size": 150000,
@@ -809,7 +1131,8 @@
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "40%",
-              "contracts": "12 minis / 120 micros"
+              "contracts": "12 minis / 120 micros",
+              "activationFee": null
             }
           ]
         }
@@ -992,16 +1315,26 @@
           "priceType": "monthly",
           "plans": [
             {
-              "size": 150000,
-              "price": 162,
-              "originalPrice": 360,
-              "profitTarget": 9000,
-              "maxDrawdown": 4500,
+              "size": 25000,
+              "price": 45,
+              "originalPrice": 100,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "Intraday",
+              "consistency": "30% (eval only)",
+              "contracts": "2 contracts (20 micros)"
+            },
+            {
+              "size": 50000,
+              "price": 59,
+              "originalPrice": 131,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
               "ddType": "Intraday",
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "30% (eval only)",
-              "contracts": "15 contracts (50 micros)"
+              "contracts": "5 contracts (50 micros)"
             },
             {
               "size": 100000,
@@ -1016,16 +1349,16 @@
               "contracts": "10 contracts (50 micros)"
             },
             {
-              "size": 50000,
-              "price": 59,
-              "originalPrice": 131,
-              "profitTarget": 3000,
-              "maxDrawdown": 2000,
+              "size": 150000,
+              "price": 162,
+              "originalPrice": 360,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
               "ddType": "Intraday",
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "30% (eval only)",
-              "contracts": "5 contracts (50 micros)"
+              "contracts": "15 contracts (50 micros)"
             }
           ]
         },
@@ -1035,16 +1368,26 @@
           "priceType": "monthly",
           "plans": [
             {
-              "size": 150000,
-              "price": 180,
-              "originalPrice": 400,
-              "profitTarget": 9000,
-              "maxDrawdown": 4500,
+              "size": 25000,
+              "price": 54,
+              "originalPrice": 120,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "consistency": "30% (eval only)",
+              "contracts": "2 contracts (20 micros)"
+            },
+            {
+              "size": 50000,
+              "price": 79,
+              "originalPrice": 175,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "30% (eval only)",
-              "contracts": "15 contracts (50 micros)"
+              "contracts": "5 contracts (50 micros)"
             },
             {
               "size": 100000,
@@ -1059,16 +1402,16 @@
               "contracts": "10 contracts (50 micros)"
             },
             {
-              "size": 50000,
-              "price": 79,
-              "originalPrice": 175,
-              "profitTarget": 3000,
-              "maxDrawdown": 2000,
+              "size": 150000,
+              "price": 180,
+              "originalPrice": 400,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "30% (eval only)",
-              "contracts": "5 contracts (50 micros)"
+              "contracts": "15 contracts (50 micros)"
             }
           ]
         },
@@ -1078,16 +1421,26 @@
           "priceType": "monthly",
           "plans": [
             {
-              "size": 150000,
-              "price": 225,
-              "originalPrice": 500,
-              "profitTarget": 9000,
-              "maxDrawdown": 4500,
+              "size": 25000,
+              "price": 59,
+              "originalPrice": 130,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "consistency": "45%",
+              "contracts": "2 contracts eval / 1 funded, +1 per $2k"
+            },
+            {
+              "size": 50000,
+              "price": 85,
+              "originalPrice": 189,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "45%",
-              "contracts": "15 contracts eval / 4 funded, +1 per $2k"
+              "contracts": "5 contracts eval / 2 funded, +1 per $2k"
             },
             {
               "size": 100000,
@@ -1102,16 +1455,16 @@
               "contracts": "10 contracts eval / 3 funded, +1 per $2k"
             },
             {
-              "size": 50000,
-              "price": 85,
-              "originalPrice": 189,
-              "profitTarget": 3000,
-              "maxDrawdown": 2000,
+              "size": 150000,
+              "price": 225,
+              "originalPrice": 500,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "45%",
-              "contracts": "5 contracts eval / 2 funded, +1 per $2k"
+              "contracts": "15 contracts eval / 4 funded, +1 per $2k"
             }
           ]
         }
