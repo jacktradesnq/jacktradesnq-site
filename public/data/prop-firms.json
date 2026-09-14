@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-13",
+  "generatedAt": "2026-09-14",
   "firms": [
     {
       "id": "blue-guardian",
@@ -11,7 +11,7 @@
         "code": "BG25"
       },
       "url": "https://blueguardian.com/?afmc=JTNQ",
-      "lastChecked": "2026-09-13",
+      "lastChecked": "2026-09-14",
       "stale": false,
       "programs": [
         {
@@ -76,50 +76,50 @@
           "plans": [
             {
               "size": 25000,
-              "price": 83,
-              "originalPrice": 110,
+              "price": 48,
+              "originalPrice": 64,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "50%",
+              "consistency": "40%",
               "contracts": "2 Mini | 20 Micro"
             },
             {
               "size": 50000,
-              "price": 123,
-              "originalPrice": 164,
+              "price": 75,
+              "originalPrice": 100,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "50%",
+              "consistency": "40%",
               "contracts": "4 Mini | 40 Micro"
             },
             {
               "size": 100000,
-              "price": 186,
-              "originalPrice": 248,
+              "price": 111,
+              "originalPrice": 148,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "50%",
+              "consistency": "40%",
               "contracts": "8 Mini | 80 Micro"
             },
             {
               "size": 150000,
-              "price": 297,
-              "originalPrice": 398,
+              "price": 222,
+              "originalPrice": 296,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
-              "consistency": "50%",
+              "consistency": "40%",
               "contracts": "12 Mini | 120 Micro"
             }
           ]
@@ -131,20 +131,20 @@
           "plans": [
             {
               "size": 25000,
-              "price": 80,
-              "originalPrice": 106,
+              "price": 59.5,
+              "originalPrice": 119,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
               "consistency": "40%",
-              "contracts": "1 Mini | 10 Micro"
+              "contracts": "1 Mini | 10 Micros"
             },
             {
               "size": 50000,
-              "price": 103,
-              "originalPrice": 137,
+              "price": 89.5,
+              "originalPrice": 179,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -155,8 +155,8 @@
             },
             {
               "size": 100000,
-              "price": 172,
-              "originalPrice": 229,
+              "price": 141.5,
+              "originalPrice": 283,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
@@ -167,8 +167,8 @@
             },
             {
               "size": 150000,
-              "price": 259,
-              "originalPrice": 345,
+              "price": 220,
+              "originalPrice": 440,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
               "ddType": "EOD Trailing",
@@ -243,7 +243,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-09-13",
+      "lastChecked": "2026-09-14",
       "stale": false,
       "programs": [
         {
@@ -584,7 +584,7 @@
         "ends": "2026-09-21"
       },
       "url": "https://fundedseat.link/jtnq",
-      "lastChecked": "2026-09-13",
+      "lastChecked": "2026-09-14",
       "stale": false,
       "programs": [
         {
@@ -785,8 +785,8 @@
           "plans": [
             {
               "size": 25000,
-              "price": 104.5,
-              "originalPrice": 190,
+              "price": 114.95,
+              "originalPrice": 210,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
@@ -799,8 +799,8 @@
             },
             {
               "size": 50000,
-              "price": 197.5,
-              "originalPrice": 360,
+              "price": 217.95,
+              "originalPrice": 395,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -813,8 +813,8 @@
             },
             {
               "size": 100000,
-              "price": 297.5,
-              "originalPrice": 540,
+              "price": 326.95,
+              "originalPrice": 595,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
@@ -1007,8 +1007,8 @@
             },
             {
               "size": 50000,
-              "price": 329.95,
-              "originalPrice": 600,
+              "price": 364.95,
+              "originalPrice": 660,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
               "dailyLoss": 1500,
@@ -1030,52 +1030,6 @@
               "minPayout": 2000
             }
           ]
-        },
-        {
-          "name": "Blitz Daily",
-          "type": "eval",
-          "priceType": "one-time",
-          "plans": [
-            {
-              "size": 25000,
-              "price": 94.95,
-              "originalPrice": 175,
-              "profitTarget": 1500,
-              "maxDrawdown": 1000,
-              "ddType": "EOD Trailing",
-              "dailyLoss": 500,
-              "contracts": "2 minis",
-              "maxPayout": 500,
-              "minPayout": 250,
-              "resetFee": 90
-            },
-            {
-              "size": 50000,
-              "price": 189.95,
-              "originalPrice": 345,
-              "profitTarget": 3000,
-              "maxDrawdown": 2000,
-              "ddType": "EOD Trailing",
-              "dailyLoss": 1000,
-              "contracts": "4 minis",
-              "maxPayout": 1000,
-              "minPayout": 500,
-              "resetFee": 180
-            },
-            {
-              "size": 100000,
-              "price": 279.95,
-              "originalPrice": 510,
-              "profitTarget": 6000,
-              "maxDrawdown": 3000,
-              "ddType": "EOD Trailing",
-              "dailyLoss": 1500,
-              "contracts": "6 minis",
-              "maxPayout": 1500,
-              "minPayout": 1000,
-              "resetFee": 270
-            }
-          ]
         }
       ],
       "rulesCheckedAt": "2026-08-21"
@@ -1091,7 +1045,7 @@
         "ends": "2026-08-21"
       },
       "url": "https://thelegendstrading.com/?ref=JTNQ",
-      "lastChecked": "2026-09-13",
+      "lastChecked": "2026-09-14",
       "stale": false,
       "programs": [
         {
@@ -1213,7 +1167,7 @@
       },
       "code": "JTNQ",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-09-13",
+      "lastChecked": "2026-09-14",
       "stale": false,
       "programs": [
         {
@@ -1370,7 +1324,7 @@
         "code": "JTNQ"
       },
       "url": "https://www.tradeday.com/?a_aid=JTNQ",
-      "lastChecked": "2026-09-13",
+      "lastChecked": "2026-09-14",
       "stale": false,
       "programs": [
         {

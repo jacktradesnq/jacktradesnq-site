@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-13",
-  "builtFor": "2026-09-13",
+  "generatedAt": "2026-09-14",
+  "builtFor": "2026-09-14",
   "promos": [
     {
       "firmId": "iqcapital",
@@ -57,7 +57,7 @@
       "consistency": "30% (eval only)",
       "activationFee": null,
       "contracts": "5 contracts (50 micros)",
-      "lastChecked": "2026-09-13"
+      "lastChecked": "2026-09-14"
     },
     {
       "firmId": "fundedseat",
@@ -86,7 +86,7 @@
       "consistency": "35%",
       "activationFee": null,
       "contracts": "4 minis",
-      "lastChecked": "2026-09-13"
+      "lastChecked": "2026-09-14"
     },
     {
       "firmId": "legends-trading",
@@ -115,7 +115,7 @@
       "consistency": "None",
       "activationFee": 59,
       "contracts": "2 minis / 20 micros",
-      "lastChecked": "2026-09-13"
+      "lastChecked": "2026-09-14"
     },
     {
       "firmId": "atlasfunded",
@@ -171,7 +171,7 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "4 minis / 40 micros",
-      "lastChecked": "2026-09-13"
+      "lastChecked": "2026-09-14"
     },
     {
       "firmId": "blue-guardian",
@@ -180,12 +180,12 @@
       "url": "https://blueguardian.com/?afmc=JTNQ",
       "code": "JTNQ",
       "codeViaLink": false,
-      "program": "Express",
+      "program": "Reserve",
       "programType": "eval",
       "priceType": "one-time",
       "size": 50000,
-      "price": 103,
-      "originalPrice": 137,
+      "price": 75,
+      "originalPrice": 100,
       "discountPct": 25,
       "priceNote": null,
       "note": null,
@@ -196,11 +196,11 @@
       "ddType": "EOD Trailing",
       "profitTarget": 3000,
       "maxDrawdown": 2000,
-      "dailyLoss": 1000,
+      "dailyLoss": null,
       "consistency": "40%",
       "activationFee": null,
       "contracts": "4 Mini | 40 Micro",
-      "lastChecked": "2026-09-13"
+      "lastChecked": "2026-09-14"
     },
     {
       "firmId": "traders-launch",
@@ -228,7 +228,7 @@
       "consistency": null,
       "activationFee": null,
       "contracts": "5 Micros",
-      "lastChecked": "2026-09-13"
+      "lastChecked": "2026-09-14"
     }
   ]
 }
