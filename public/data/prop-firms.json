@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-15",
+  "generatedAt": "2026-09-16",
   "firms": [
     {
       "id": "blue-guardian",
@@ -11,7 +11,7 @@
         "code": "BG25"
       },
       "url": "https://blueguardian.com/?afmc=JTNQ",
-      "lastChecked": "2026-09-15",
+      "lastChecked": "2026-09-16",
       "stale": false,
       "programs": [
         {
@@ -243,7 +243,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-09-15",
+      "lastChecked": "2026-09-16",
       "stale": false,
       "programs": [
         {
@@ -336,19 +336,19 @@
         "code": "2.0"
       },
       "url": "https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures",
-      "lastChecked": "2026-08-30",
-      "stale": true,
+      "lastChecked": "2026-09-16",
+      "stale": false,
       "programs": [
         {
           "name": "Elite Daily",
           "type": "eval",
           "priceType": "monthly",
-          "promoCode": "2.0",
-          "promoLabel": "55% OFF",
+          "promoCode": "SEPT",
+          "promoLabel": "45% OFF",
           "plans": [
             {
               "size": 25000,
-              "price": 80,
+              "price": 98,
               "originalPrice": 178,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
@@ -360,7 +360,7 @@
             },
             {
               "size": 50000,
-              "price": 98,
+              "price": 120,
               "originalPrice": 218,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -372,7 +372,7 @@
             },
             {
               "size": 100000,
-              "price": 179,
+              "price": 219,
               "originalPrice": 398,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
@@ -384,7 +384,7 @@
             },
             {
               "size": 150000,
-              "price": 247,
+              "price": 302,
               "originalPrice": 549,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
@@ -461,12 +461,12 @@
           "name": "Instant Sim Funded",
           "type": "instant",
           "priceType": "one-time",
-          "promoCode": "2.0",
-          "promoLabel": "55% OFF",
+          "promoCode": "SEPT",
+          "promoLabel": "45% OFF",
           "plans": [
             {
               "size": 25000,
-              "price": 189,
+              "price": 230,
               "originalPrice": 419,
               "profitTarget": null,
               "maxDrawdown": 1000,
@@ -478,7 +478,7 @@
             },
             {
               "size": 50000,
-              "price": 306,
+              "price": 373,
               "originalPrice": 679,
               "profitTarget": null,
               "maxDrawdown": 2000,
@@ -490,7 +490,7 @@
             },
             {
               "size": 100000,
-              "price": 369,
+              "price": 452,
               "originalPrice": 821,
               "profitTarget": null,
               "maxDrawdown": 4000,
@@ -502,7 +502,7 @@
             },
             {
               "size": 150000,
-              "price": 423,
+              "price": 517,
               "originalPrice": 939,
               "profitTarget": null,
               "maxDrawdown": 5250,
@@ -518,12 +518,12 @@
           "name": "Ignite",
           "type": "instant",
           "priceType": "one-time",
-          "promoCode": "2.0",
-          "promoLabel": "55% OFF",
+          "promoCode": "SEPT",
+          "promoLabel": "50% OFF",
           "plans": [
             {
               "size": 25000,
-              "price": 98,
+              "price": 109,
               "originalPrice": 218,
               "profitTarget": null,
               "maxDrawdown": 1000,
@@ -535,7 +535,7 @@
             },
             {
               "size": 50000,
-              "price": 179,
+              "price": 199,
               "originalPrice": 398,
               "profitTarget": null,
               "maxDrawdown": 2000,
@@ -547,7 +547,7 @@
             },
             {
               "size": 100000,
-              "price": 253,
+              "price": 282,
               "originalPrice": 563,
               "profitTarget": null,
               "maxDrawdown": 4000,
@@ -559,7 +559,7 @@
             },
             {
               "size": 150000,
-              "price": 360,
+              "price": 399,
               "originalPrice": 799,
               "profitTarget": null,
               "maxDrawdown": 6000,
@@ -584,7 +584,7 @@
         "ends": "2026-09-21"
       },
       "url": "https://fundedseat.link/jtnq",
-      "lastChecked": "2026-09-15",
+      "lastChecked": "2026-09-16",
       "stale": false,
       "programs": [
         {
@@ -1045,7 +1045,7 @@
         "ends": "2026-08-21"
       },
       "url": "https://thelegendstrading.com/?ref=JTNQ",
-      "lastChecked": "2026-09-15",
+      "lastChecked": "2026-09-16",
       "stale": false,
       "programs": [
         {
@@ -1167,7 +1167,7 @@
       },
       "code": "JTNQ",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-09-15",
+      "lastChecked": "2026-09-16",
       "stale": false,
       "programs": [
         {
@@ -1324,7 +1324,7 @@
         "code": "JTNQ"
       },
       "url": "https://www.tradeday.com/?a_aid=JTNQ",
-      "lastChecked": "2026-09-15",
+      "lastChecked": "2026-09-16",
       "stale": false,
       "programs": [
         {

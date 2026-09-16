@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-15",
-  "builtFor": "2026-09-15",
+  "generatedAt": "2026-09-16",
+  "builtFor": "2026-09-16",
   "promos": [
     {
       "firmId": "iqcapital",
@@ -57,7 +57,7 @@
       "consistency": "30% (eval only)",
       "activationFee": null,
       "contracts": "5 contracts (50 micros)",
-      "lastChecked": "2026-09-15"
+      "lastChecked": "2026-09-16"
     },
     {
       "firmId": "fundedseat",
@@ -86,7 +86,36 @@
       "consistency": "35%",
       "activationFee": null,
       "contracts": "4 minis",
-      "lastChecked": "2026-09-15"
+      "lastChecked": "2026-09-16"
+    },
+    {
+      "firmId": "top-one-futures",
+      "firmName": "Top One Futures",
+      "logo": "/logos/email/top-one-futures.png",
+      "url": "https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures",
+      "code": "JTNQ",
+      "codeViaLink": false,
+      "program": "Elite Daily",
+      "programType": "eval",
+      "priceType": "monthly",
+      "size": 50000,
+      "price": 120,
+      "originalPrice": 218,
+      "discountPct": 45,
+      "priceNote": null,
+      "note": null,
+      "endsAt": null,
+      "expiring": false,
+      "split": "90%",
+      "payout": "On-demand",
+      "ddType": "EOD Trailing",
+      "profitTarget": 3000,
+      "maxDrawdown": 2000,
+      "dailyLoss": 1000,
+      "consistency": "40%",
+      "activationFee": null,
+      "contracts": "3 minis / 30 micros",
+      "lastChecked": "2026-09-16"
     },
     {
       "firmId": "legends-trading",
@@ -115,7 +144,7 @@
       "consistency": "None",
       "activationFee": 59,
       "contracts": "2 minis / 20 micros",
-      "lastChecked": "2026-09-15"
+      "lastChecked": "2026-09-16"
     },
     {
       "firmId": "atlasfunded",
@@ -171,7 +200,7 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "4 minis / 40 micros",
-      "lastChecked": "2026-09-15"
+      "lastChecked": "2026-09-16"
     },
     {
       "firmId": "blue-guardian",
@@ -200,7 +229,7 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "4 Mini | 40 Micro",
-      "lastChecked": "2026-09-15"
+      "lastChecked": "2026-09-16"
     },
     {
       "firmId": "traders-launch",
@@ -228,7 +257,7 @@
       "consistency": null,
       "activationFee": null,
       "contracts": "5 Micros",
-      "lastChecked": "2026-09-15"
+      "lastChecked": "2026-09-16"
     }
   ]
 }
