@@ -1,7 +1,36 @@
 {
-  "generatedAt": "2026-09-17",
-  "builtFor": "2026-09-17",
+  "generatedAt": "2026-09-18",
+  "builtFor": "2026-09-18",
   "promos": [
+    {
+      "firmId": "fundedseat",
+      "firmName": "FundedSeat",
+      "logo": "/logos/email/fundedseat.png",
+      "url": "https://fundedseat.link/jtnq",
+      "code": "JTNQ",
+      "codeViaLink": false,
+      "program": "Daily",
+      "programType": "eval",
+      "priceType": "one-time",
+      "size": 50000,
+      "price": 104.95,
+      "originalPrice": 190,
+      "discountPct": 45,
+      "priceNote": null,
+      "note": null,
+      "endsAt": "2026-09-21",
+      "expiring": true,
+      "split": "90%",
+      "payout": "Daily · 5h guaranteed",
+      "ddType": "EOD Trailing",
+      "profitTarget": 3000,
+      "maxDrawdown": 2000,
+      "dailyLoss": null,
+      "consistency": "35%",
+      "activationFee": null,
+      "contracts": "4 minis",
+      "lastChecked": "2026-09-18"
+    },
     {
       "firmId": "iqcapital",
       "firmName": "IQ Capital",
@@ -57,36 +86,7 @@
       "consistency": "30% (eval only)",
       "activationFee": null,
       "contracts": "5 contracts (50 micros)",
-      "lastChecked": "2026-09-17"
-    },
-    {
-      "firmId": "fundedseat",
-      "firmName": "FundedSeat",
-      "logo": "/logos/email/fundedseat.png",
-      "url": "https://fundedseat.link/jtnq",
-      "code": "JTNQ",
-      "codeViaLink": false,
-      "program": "Daily",
-      "programType": "eval",
-      "priceType": "one-time",
-      "size": 50000,
-      "price": 104.95,
-      "originalPrice": 190,
-      "discountPct": 45,
-      "priceNote": null,
-      "note": null,
-      "endsAt": "2026-09-21",
-      "expiring": false,
-      "split": "90%",
-      "payout": "Daily · 5h guaranteed",
-      "ddType": "EOD Trailing",
-      "profitTarget": 3000,
-      "maxDrawdown": 2000,
-      "dailyLoss": null,
-      "consistency": "35%",
-      "activationFee": null,
-      "contracts": "4 minis",
-      "lastChecked": "2026-09-17"
+      "lastChecked": "2026-09-18"
     },
     {
       "firmId": "top-one-futures",
@@ -115,7 +115,7 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "3 minis / 30 micros",
-      "lastChecked": "2026-09-17"
+      "lastChecked": "2026-09-18"
     },
     {
       "firmId": "legends-trading",
@@ -144,7 +144,7 @@
       "consistency": "None",
       "activationFee": 59,
       "contracts": "2 minis / 20 micros",
-      "lastChecked": "2026-09-17"
+      "lastChecked": "2026-09-18"
     },
     {
       "firmId": "atlasfunded",
@@ -200,7 +200,7 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "4 minis / 40 micros",
-      "lastChecked": "2026-09-17"
+      "lastChecked": "2026-09-18"
     },
     {
       "firmId": "blue-guardian",
@@ -229,7 +229,7 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "4 Mini | 40 Micro",
-      "lastChecked": "2026-09-17"
+      "lastChecked": "2026-09-18"
     },
     {
       "firmId": "traders-launch",
@@ -257,7 +257,7 @@
       "consistency": null,
       "activationFee": null,
       "contracts": "5 Micros",
-      "lastChecked": "2026-09-17"
+      "lastChecked": "2026-09-18"
     }
   ]
 }
