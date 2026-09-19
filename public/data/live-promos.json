@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-18",
-  "builtFor": "2026-09-18",
+  "generatedAt": "2026-09-19",
+  "builtFor": "2026-09-19",
   "promos": [
     {
       "firmId": "fundedseat",
@@ -29,7 +29,7 @@
       "consistency": "35%",
       "activationFee": null,
       "contracts": "4 minis",
-      "lastChecked": "2026-09-18"
+      "lastChecked": "2026-09-19"
     },
     {
       "firmId": "iqcapital",
@@ -86,7 +86,7 @@
       "consistency": "30% (eval only)",
       "activationFee": null,
       "contracts": "5 contracts (50 micros)",
-      "lastChecked": "2026-09-18"
+      "lastChecked": "2026-09-19"
     },
     {
       "firmId": "top-one-futures",
@@ -115,7 +115,7 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "3 minis / 30 micros",
-      "lastChecked": "2026-09-18"
+      "lastChecked": "2026-09-19"
     },
     {
       "firmId": "legends-trading",
@@ -144,7 +144,7 @@
       "consistency": "None",
       "activationFee": 59,
       "contracts": "2 minis / 20 micros",
-      "lastChecked": "2026-09-18"
+      "lastChecked": "2026-09-19"
     },
     {
       "firmId": "atlasfunded",
@@ -174,35 +174,6 @@
       "lastChecked": "2026-09-13"
     },
     {
-      "firmId": "e8-markets",
-      "firmName": "E8 Markets",
-      "logo": "/logos/email/e8-markets.png",
-      "url": "https://e8markets.com/d/B1770991",
-      "code": "JTNQ",
-      "codeViaLink": false,
-      "program": "Zero Starter Futures",
-      "programType": "eval",
-      "priceType": "one-time",
-      "size": 50000,
-      "price": 116,
-      "originalPrice": 178,
-      "discountPct": 35,
-      "priceNote": null,
-      "note": null,
-      "endsAt": null,
-      "expiring": false,
-      "split": "80%",
-      "payout": "On-demand",
-      "ddType": "EOD Trailing",
-      "profitTarget": 3000,
-      "maxDrawdown": 1500,
-      "dailyLoss": null,
-      "consistency": "40%",
-      "activationFee": null,
-      "contracts": "4 minis / 40 micros",
-      "lastChecked": "2026-09-18"
-    },
-    {
       "firmId": "blue-guardian",
       "firmName": "Blue Guardian",
       "logo": "/logos/email/blue-guardian.png",
@@ -229,7 +200,7 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "4 Mini | 40 Micro",
-      "lastChecked": "2026-09-18"
+      "lastChecked": "2026-09-19"
     },
     {
       "firmId": "traders-launch",
@@ -257,7 +228,7 @@
       "consistency": null,
       "activationFee": null,
       "contracts": "5 Micros",
-      "lastChecked": "2026-09-18"
+      "lastChecked": "2026-09-19"
     }
   ]
 }
