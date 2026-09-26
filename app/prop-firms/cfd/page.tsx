@@ -1,7 +1,6 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import MarketComparator from '../market-comparator';
-
+// Plus aucun partenaire CFD/crypto depuis le 27/09 : la page renvoie au comparateur futures.
 export default function PropFirmsCfd() {
-  return <MarketComparator market="cfd" />;
+  redirect('/prop-firms/');
 }
