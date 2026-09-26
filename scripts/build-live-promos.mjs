@@ -26,10 +26,6 @@ const candidates = analyzeFirms(data, { today });
 // Firms whose live prices are NOT in the HTML we scrape would go here: our
 // figures would be known wrong, and publishing a stale price on a promo page is
 // worse than publishing nothing.
-//
-// legends-trading was held back on 2026-08-20 for exactly that reason, and is
-// back: scrapeLegends now reads their own public shop API instead of a Webflow
-// page that served a stale table to every HTTP client.
 const NEEDS_RENDERED_SCRAPE = new Set();
 
 // A promo is worth a card when there is something to show: a real discount, or

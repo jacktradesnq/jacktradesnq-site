@@ -44,11 +44,10 @@ export type AssetClass = 'futures' | 'cfd' | 'crypto';
 
 const ASSET_TABS: { id: AssetClass; label: string; href: string }[] = [
   { id: 'futures', label: 'Futures', href: '/prop-firms/' },
-  { id: 'cfd', label: 'CFD', href: '/prop-firms/cfd/' },
-  { id: 'crypto', label: 'Crypto', href: '/prop-firms/crypto/' },
 ];
 
 export function AssetNav({ current }: { current: AssetClass }) {
+  if (ASSET_TABS.length < 2) return null;
   return (
     <div className="class-toggle" role="group" aria-label="Asset class">
       {ASSET_TABS.map((tab) => (

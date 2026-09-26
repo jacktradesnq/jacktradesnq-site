@@ -7,7 +7,7 @@
  * liste pas n'existe pas sur le site. C'est comme ca que FundedSeat a vendu
  * sept familles pendant que le comparateur en montrait trois, que les comptes
  * « Legacy NYC » de Traders Launch n'ont jamais ete publies, et que les 25K de
- * TradeDay et de Blue Guardian Express manquaient.
+ * Blue Guardian Express manquaient.
  *
  * Ici, ce que rend le LECTEUR de la firme est le catalogue : un programme ou
  * une taille qu'il rend et que le JSON ignore est CREE, un programme ou une

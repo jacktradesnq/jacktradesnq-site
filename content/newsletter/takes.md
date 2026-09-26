@@ -17,13 +17,7 @@ Une phrase ou deux suffit. Vide = rien ne sort.
 
 ## fundedseat
 
-## top-one-futures
-
-## legends-trading
-
 ## e8-markets
-
-## tradeday
 
 ## blue-guardian
 

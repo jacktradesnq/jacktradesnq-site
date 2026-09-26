@@ -63,11 +63,8 @@ type PropData = { generatedAt: string; firms: Firm[] };
 const FIRM_LOGOS: Record<string, string> = {
   'blue-guardian': '/logos/blue-guardian.svg',
   'traders-launch': '/logos/traders-launch.png',
-  'top-one-futures': '/logos/top-one-futures.png',
   'fundedseat': '/logos/fundedseat.png',
-  'legends-trading': '/logos/legends-trading.png',
   'e8-markets': '/logos/e8-markets.svg',
-  'tradeday': '/logos/tradeday.png',
 };
 
 const DATA = rawData as unknown as PropData;
@@ -147,7 +144,7 @@ function dailyLossValue(plan: Plan) {
 
 // A firm whose scraper failed (or that has none) keeps its old prices while the
 // file's generatedAt still says today — the page used to advertise that date for
-// everyone, so Top One served 3-week-old prices under a "synced today" line.
+// everyone, so a stale firm served 3-week-old prices under a "synced today" line.
 // Say the truth instead: name the firms that are behind, and mark their rows.
 // "2026-08-01" -> "1 Aug 2026", the same way the manual date below is written.
 const humanDate = (iso: string) =>

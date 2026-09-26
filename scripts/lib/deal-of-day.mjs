@@ -102,10 +102,10 @@ function diffAgainst(prevSnapshot, firm) {
 
 // The size comes first, the discount second.
 //
-// Top One prices every Elite Access size at $39, so the percentage off is just
-// an artefact of the list price and "biggest % off" pointed at the 150K, the
-// size nobody quotes. So: pick the reference size the firm actually sells
-// (50K, or the closest it has), then the best deal within that size.
+// A firm that prices every size at the same dollar amount makes "biggest % off"
+// point at the largest account, the size nobody quotes. So: pick the reference
+// size the firm actually sells (50K, or the closest it has), then the best deal
+// within that size.
 function headlineOf(firm) {
   const pairs = [];
   for (const program of firm.programs ?? []) {
@@ -120,11 +120,9 @@ function headlineOf(firm) {
 
   // Then the cheapest way to actually get funded, NOT the biggest percentage.
   //
-  // A percentage hides the fee that comes after. LEGENDS Apprentice is 80% off
-  // at $37/mo and charges $99 once you pass, so $136 minimum, while Elite shows
-  // 35% off at $96.85 and charges nothing after: Elite is the cheaper path.
-  // Top One Elite Access is worse still, $39 with a $189 activation, so $228 to
-  // get funded against a $218 struck price it claims 82% off.
+  // A percentage hides the fee that comes after. A plan 80% off at $37/mo that
+  // charges $99 once you pass costs $136 minimum, while a 35% off plan at $96.85
+  // with nothing after is the cheaper path.
   //
   // Monthly plans count one month, the floor, and their card says they are
   // billed monthly.
@@ -195,7 +193,7 @@ function caveatsOf(program, plan, messages) {
 
 // His code, never the firm's public one.
 //
-// A public code (BG25, ULTRA50, LTG, BOGO) gives the reader the same discount
+// A public code (BG25, ULTRA50) gives the reader the same discount
 // while pushing him out of the transaction wherever a firm attributes by code,
 // and it wastes the point of the newsletter. So the only codes that can be
 // printed are the ones declared in content/newsletter/codes.md.
@@ -451,9 +449,9 @@ export function auditDiscountClaims(deal, renderings) {
 export function auditCodeClaims(deal, renderings) {
   const problems = [];
   if (!deal.publicCode || deal.publicCode === deal.code) return problems;
-  // Some firms publish HIS code as their site-wide promo (E8, TradeDay, and
-  // LEGENDS since their August asset). That is not a firm-specific code being
-  // printed instead of his, it IS his, so there is nothing to flag.
+  // Some firms publish HIS code as their site-wide promo (E8 does). That is not
+  // a firm-specific code being printed instead of his, it IS his, so there is
+  // nothing to flag.
   if (deal.publicCode === AFFILIATE_CODE) return problems;
 
   const needle = deal.publicCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

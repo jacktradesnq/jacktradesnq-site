@@ -23,9 +23,9 @@ const DATA = JSON.parse(readFileSync(new URL('./fixtures/prop-firms.fixture.json
 // ── selection ────────────────────────────────────────────────────────────────
 
 test('a firm whose promo expires within 96h wins over a bigger discount', () => {
-  // Which firm that is depends on the day: LEGENDS ends 21 August, FundedSeat
-  // ends the 23rd, and Top One has the fattest standing discount. So the
-  // assertion is the rule, and the winner must be the soonest to end.
+  // Which firm that is depends on the day: FundedSeat ends the 23rd, and the
+  // others have standing discounts. So the assertion is the rule, and the
+  // winner must be the soonest to end.
   const deal = pickDeal(DATA, { today: '2026-08-20', history: [] });
   assert.ok(deal.signals.includes('expiring'), `${deal.firmId} signals=${deal.signals}`);
   assert.ok(deal.hoursLeft > 0 && deal.hoursLeft <= 96, `hoursLeft=${deal.hoursLeft}`);
@@ -36,20 +36,32 @@ test('a firm whose promo expires within 96h wins over a bigger discount', () => 
 });
 
 test('an activation fee beats a headline percentage', () => {
-  // Top One Elite Access 50K is $39 with a $189 activation fee: $228 to get
-  // funded, more than the $218 it strikes through while claiming 82% off.
-  // Elite Daily is $98 all in. The cheaper path wins even though it shows a
-  // smaller percentage.
-  // Read off a copy where Top One is not stale: what is measured here is the
-  // arbitration between two of their plans, not whether this morning's scrape
-  // of their site worked.
+  // A $39 headline plus a $189 activation is $228 to get funded, more than a
+  // $98 plan with nothing after. The cheaper path wins even though it shows a
+  // smaller percentage. Injected on a kept firm so the test pins the engine,
+  // not a partnership that no longer exists.
   const data = structuredClone(DATA);
-  for (const f of data.firms) if (f.id === 'top-one-futures') f.stale = false;
-  const deal = pickDeal(data, { today: '2026-09-30', history: [], forceFirmId: 'top-one-futures' });
-  assert.equal(deal.programLabel, 'Elite Daily');
+  const firm = data.firms.find((f) => f.id === 'e8-markets');
+  firm.stale = false;
+  const base = firm.programs[0].plans.find((pl) => pl.size === 50000);
+  firm.programs = [
+    {
+      name: 'Headline Cheap',
+      type: 'eval',
+      priceType: 'one-time',
+      plans: [{ ...base, price: 39, originalPrice: 218, activationFee: 189 }],
+    },
+    {
+      name: 'All In',
+      type: 'eval',
+      priceType: 'one-time',
+      plans: [{ ...base, price: 98, originalPrice: 218, activationFee: null }],
+    },
+  ];
+  const deal = pickDeal(data, { today: '2026-09-30', history: [], forceFirmId: 'e8-markets' });
+  assert.equal(deal.programLabel, 'All In');
   assert.equal(deal.headline.size, 50000);
   assert.equal(deal.headline.price, 98);
-  assert.equal(deal.headline.discountPct, 55);
   assert.equal(deal.rules.activationFee, null);
 });
 
@@ -104,7 +116,7 @@ test('a week of sends never sends the same firm twice', () => {
   // here: a firm whose scrape failed is held back, and the rotation shrinks
   // with it. Asserting 7 was asserting yesterday's feed.
   const eligible = analyzeFirms(DATA, { today: '2026-08-20' }).length;
-  assert.ok(eligible >= 5, `only ${eligible} firms eligible, the week would repeat`);
+  assert.ok(eligible >= 4, `only ${eligible} firms eligible, the week would repeat`);
   const history = [];
   const picked = [];
   for (let i = 0; i < eligible; i++) {
@@ -119,9 +131,9 @@ test('a week of sends never sends the same firm twice', () => {
 
 test('a stale firm is never headlined (its promo may already be dead)', () => {
   const data = structuredClone(DATA);
-  for (const f of data.firms) f.stale = f.id === 'top-one-futures';
+  for (const f of data.firms) f.stale = f.id === 'e8-markets';
   const deal = pickDeal(data, { today: '2026-09-30', history: [] });
-  assert.notEqual(deal.firmId, 'top-one-futures');
+  assert.notEqual(deal.firmId, 'e8-markets');
 });
 
 test('a new promo since yesterday outranks a bigger standing discount', () => {
@@ -205,29 +217,40 @@ test('email carries subject, real prices, the code, and an unsubscribe slot', ()
   assert.ok(mail.text.includes(deal.url), 'plain-text part must carry the link');
 });
 
-test('LEGENDS leads with Elite, the plan with no activation fee', () => {
-  // Apprentice shows 80% off at $37/mo but charges $99 once you pass: $136 to
-  // get funded. Elite shows 35% off at $96.85 and charges nothing after. The
-  // reference size stays the 50K, the plan is the one that costs less all in.
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'legends-trading' });
+test('the plan with no activation fee wins when it is cheaper all in', () => {
+  // A monthly 80% off at $37 plus a $99 fee is $136 to get funded. A one-time
+  // 35% off at $96.85 with nothing after is the cheaper path. Same arbitration
+  // as the headline-percentage test, on a kept firm.
+  const data = structuredClone(DATA);
+  const firm = data.firms.find((f) => f.id === 'fundedseat');
+  const base = firm.programs[0].plans.find((pl) => pl.size === 50000);
+  firm.programs = [
+    {
+      name: 'Apprentice Path',
+      type: 'eval',
+      priceType: 'monthly',
+      plans: [{ ...base, price: 37, originalPrice: 185, activationFee: 99 }],
+    },
+    {
+      name: 'Elite Path',
+      type: 'eval',
+      priceType: 'one-time',
+      plans: [{ ...base, price: 96.85, originalPrice: 149, activationFee: null }],
+    },
+  ];
+  const deal = pickDeal(data, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   assert.equal(deal.headline.size, 50000);
-  assert.equal(deal.programLabel, 'Elite');
+  assert.equal(deal.programLabel, 'Elite Path');
   assert.equal(deal.rules.activationFee, null);
   assert.equal(deal.priceType, 'one-time');
-
-  // The prices move every few weeks, so the assertion is the rule and not a
-  // number: Elite all in must stay under Apprentice all in at that size.
-  const firm = DATA.firms.find((f) => f.id === 'legends-trading');
-  const allIn = (name) => {
-    const plan = firm.programs.find((p) => p.name === name).plans.find((pl) => pl.size === 50000);
-    return plan.price + (plan.activationFee ?? 0);
-  };
-  assert.ok(allIn('Elite') < allIn('Apprentice'), `Elite ${allIn('Elite')} vs Apprentice ${allIn('Apprentice')}`);
-  assert.equal(deal.headline.price, allIn('Elite'));
+  assert.equal(deal.headline.price, 96.85);
 });
 
 test('a monthly plan marks BOTH prices per month, never just the new one', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'tradeday' });
+  const data = structuredClone(DATA);
+  const firm = data.firms.find((f) => f.id === 'e8-markets');
+  for (const p of firm.programs) p.priceType = 'monthly';
+  const deal = pickDeal(data, { today: '2026-08-20', history: [], forceFirmId: 'e8-markets' });
   assert.equal(deal.priceType, 'monthly');
   const tweet = renderTweet(deal);
   const mail = renderEmail(deal, {});
@@ -318,7 +341,7 @@ test('every spacing value sits on the 4pt grid', () => {
 // ── wording ──────────────────────────────────────────────────────────────────
 
 test('an evaluation is called a challenge, instant funding is called funded', () => {
-  const evalDeal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'tradeday' });
+  const evalDeal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   assert.equal(evalDeal.programType, 'eval');
   assert.match(renderTweet(evalDeal), /50K challenge/);
   assert.doesNotMatch(renderTweet(evalDeal), /funded account/);
@@ -366,7 +389,7 @@ test('the email uses the site palette, warm black and gold, not cream', () => {
 });
 
 test('the email carries the numbers a trader decides on', () => {
-  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'legends-trading' });
+  const deal = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   const mail = renderEmail(deal, {});
   assert.ok(
     mail.html.includes(deal.rules.maxDrawdown.toLocaleString('en-US')),
@@ -381,8 +404,10 @@ test('the email carries the numbers a trader decides on', () => {
 });
 
 test('the email states the catch when the data shows one, and invents none', () => {
-  // TradeDay is billed monthly -> the catch must say so.
-  const monthly = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'tradeday' });
+  const data = structuredClone(DATA);
+  const firm = data.firms.find((f) => f.id === 'e8-markets');
+  for (const p of firm.programs) p.priceType = 'monthly';
+  const monthly = pickDeal(data, { today: '2026-08-20', history: [], forceFirmId: 'e8-markets' });
   const mail = renderEmail(monthly, { generatedAt: DATA.generatedAt });
   assert.match(mail.html, /month/i);
   // Every caveat sentence must be traceable to a data field.

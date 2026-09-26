@@ -5,95 +5,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { topOneActivationFees, topOneFees } from './scrape-prop-firms.mjs';
 import { fundedseatPlansFrom, FUNDEDSEAT_API_UNCOVERED } from './lib/fundedseat-api.mjs';
 
 const fixture = (name) =>
   readFileSync(new URL(`./__fixtures__/${name}`, import.meta.url), 'utf8');
-
-// Captured 2026-08-20 from https://toponefutures.com
-const ELITE_ACCESS = fixture('top-one-elite-access.pane.html');
-const ELITE_DAILY = fixture('top-one-elite-daily.pane.html');
-// Captured 2026-08-21, the tab that was marking the whole firm stale
-const INSTANT = fixture('top-one-instant-sim-funded.pane.html');
-
-test('an instant funding tab has no Activation Fee row, and that is not a failure', () => {
-  // Measured on their page: the words "Activation Fee" appear zero times in
-  // the Instant Sim Funded pane. You pay the price upfront ($189 to $423),
-  // nothing is due on passing. Demanding one row per card marked Top One stale
-  // every morning, which took it out of the comparison and the newsletter.
-  assert.equal(INSTANT.includes('Activation Fee'), false);
-  assert.deepEqual(topOneFees('Instant Sim Funded', INSTANT, 4), [null, null, null, null]);
-});
-
-test('an evaluation tab with no Activation Fee row still fails', () => {
-  // Elite Daily prints "None!" on every card. If those rows disappear, their
-  // markup moved and the firm goes stale rather than publishing a guess.
-  assert.throws(() => topOneFees('Elite', '<div>no table here</div>', 4), /activation fee rows/);
-});
-
-test('a fee row reappearing on an instant tab is read, never ignored', () => {
-  // The danger of accepting zero rows: if they start charging one and we keep
-  // reading nothing, the site would print "no activation fee" on a plan that
-  // has one. So the words showing up without a readable value is a failure.
-  const withRow = INSTANT.replace(
-    'v3-pricing-title">$25K',
-    'v3-table-row-info"><div>Activation Fee</div></div>v3-pricing-title">$25K'
-  );
-  assert.throws(() => topOneFees('Instant Sim Funded', withRow, 4), /Activation Fee/);
-});
-
-test('Elite Access activation fees come off the page, one per size', () => {
-  // The card reads "$139 $39 SAVE NOW ... Activation Fee $139": you pay $39 to
-  // start and the activation fee once you pass.
-  assert.deepEqual(topOneActivationFees(ELITE_ACCESS), [139, 189, 259, 359]);
-});
-
-test('Elite Daily says "None!", which means no fee, not an unknown one', () => {
-  assert.deepEqual(topOneActivationFees(ELITE_DAILY), [null, null, null, null]);
-});
-
-test('the fee is read from the Activation Fee row, not from any nearby price', () => {
-  // The 50K card is the proof: its struck price is $218 and its activation fee
-  // is $189. A parser grabbing the wrong number would return 218 here.
-  assert.equal(topOneActivationFees(ELITE_ACCESS)[1], 189);
-  assert.ok(ELITE_ACCESS.includes('v3-price-old">$218'), 'fixture no longer has the $218 card');
-});
-
-test('a fee that is not a number is a failure, not a silent zero', () => {
-  const broken = ELITE_ACCESS.replace(
-    'v3-table-row-value"><div>$139</div>',
-    'v3-table-row-value"><div>ask support</div>'
-  );
-  assert.throws(() => topOneActivationFees(broken), /unreadable activation fee: "ask support"/);
-});
-
-test('an absurd fee is refused, so a markup change cannot publish nonsense', () => {
-  const broken = ELITE_ACCESS.replace(
-    'v3-table-row-value"><div>$139</div>',
-    'v3-table-row-value"><div>$99999</div>'
-  );
-  assert.throws(() => topOneActivationFees(broken), /unreadable activation fee/);
-});
-
-test('no Activation Fee row at all returns nothing, which the caller rejects', () => {
-  // topOneFees decides what to do with it: nothing on an evaluation tab is a
-  // failure that marks the firm stale, nothing on an instant tab is the truth.
-  assert.deepEqual(topOneActivationFees('<div>no table here</div>'), []);
-});
-
-test('what the parser reads matches what the published JSON says', () => {
-  const data = JSON.parse(readFileSync(new URL('../public/data/prop-firms.json', import.meta.url), 'utf8'));
-  const access = data.firms
-    .find((f) => f.id === 'top-one-futures')
-    .programs.find((p) => p.name === 'Elite Access');
-  const published = access.plans
-    .slice()
-    .sort((a, b) => a.size - b.size)
-    .map((p) => p.activationFee ?? null);
-  assert.deepEqual(published, topOneActivationFees(ELITE_ACCESS));
-});
-
 
 /* ---------------- FundedSeat: their own /api/pullchallenges ---------------- */
 

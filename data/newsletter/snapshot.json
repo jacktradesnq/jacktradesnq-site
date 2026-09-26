@@ -29,27 +29,6 @@
         "1-Step|300000": 599
       }
     },
-    "top-one-futures": {
-      "promoKey": "55% OFF|2.0|",
-      "prices": {
-        "Elite Daily|25000": 80,
-        "Elite Daily|50000": 98,
-        "Elite Daily|100000": 179,
-        "Elite Daily|150000": 247,
-        "Elite Access|25000": 39,
-        "Elite Access|50000": 39,
-        "Elite Access|100000": 39,
-        "Elite Access|150000": 39,
-        "Instant Sim Funded|25000": 189,
-        "Instant Sim Funded|50000": 306,
-        "Instant Sim Funded|100000": 369,
-        "Instant Sim Funded|150000": 423,
-        "Ignite|25000": 98,
-        "Ignite|50000": 179,
-        "Ignite|100000": 253,
-        "Ignite|150000": 360
-      }
-    },
     "fundedseat": {
       "promoKey": "45% OFF + 50% w/ code|ULTRA50|2026-08-23",
       "prices": {
@@ -70,23 +49,6 @@
         "Sprint|150000": 259.95
       }
     },
-    "legends-trading": {
-      "promoKey": "Apprentice 80% · Elite 35% off|LTG|",
-      "prices": {
-        "Apprentice|25000": 33,
-        "Apprentice|50000": 37,
-        "Apprentice|100000": 45,
-        "Apprentice|150000": 64,
-        "Elite|25000": 64.35,
-        "Elite|50000": 96.85,
-        "Elite|100000": 117,
-        "Elite|150000": 149.5,
-        "Straight to Master|25000": 239.4,
-        "Straight to Master|50000": 299.4,
-        "Straight to Master|100000": 359.4,
-        "Straight to Master|150000": 419.4
-      }
-    },
     "e8-markets": {
       "promoKey": "Up to 40% off|JTNQ|",
       "prices": {
@@ -100,20 +62,6 @@
         "E8 Zero Starter Futures|50000": 116,
         "E8 Zero Starter Futures|100000": 181,
         "E8 Zero Starter Futures|200000": 363
-      }
-    },
-    "tradeday": {
-      "promoKey": "Public 55% off already applied|JTNQ|",
-      "prices": {
-        "Quick Pay Intraday|150000": 162,
-        "Quick Pay Intraday|100000": 108,
-        "Quick Pay Intraday|50000": 59,
-        "Quick Pay EOD|150000": 180,
-        "Quick Pay EOD|100000": 129,
-        "Quick Pay EOD|50000": 79,
-        "Fast Pass|150000": 225,
-        "Fast Pass|100000": 149,
-        "Fast Pass|50000": 85
       }
     }
   }

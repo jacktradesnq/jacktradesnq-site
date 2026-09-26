@@ -23,7 +23,7 @@ export function parseCopy(text) {
     if (name) blocks[name] = lines.join('\n').replace(/^\n+|\n+$/g, '');
   };
   for (const line of text.split('\n')) {
-    // Firm ids carry hyphens (top-one-futures), so the name charset needs one.
+    // Firm ids carry hyphens (e8-markets), so the name charset needs one.
     const heading = /^##\s+([a-z0-9_.-]+)\s*$/.exec(line);
     if (heading) {
       flush();

@@ -28,8 +28,8 @@ const CODES = readFileSync(new URL('../content/newsletter/codes.md', import.meta
 afterEach(resetCopy);
 
 // Named on purpose: these tests are about how FundedSeat renders, not about
-// which firm happens to win the day. LEGENDS' promo ending sooner used to
-// silently take that slot and break eight of them.
+// which firm happens to win the day. A promo ending sooner used to silently
+// take that slot and break eight of them.
 const deal = () => pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
 
 // ── the parser ───────────────────────────────────────────────────────────────
@@ -43,7 +43,7 @@ test('the notes and the placeholder table never leak into the copy', () => {
 
 test('a hyphenated firm id is a heading, not text', () => {
   const blocks = parseCopy(TAKES);
-  for (const id of ['top-one-futures', 'e8-markets', 'blue-guardian', 'traders-launch']) {
+  for (const id of ['e8-markets', 'blue-guardian', 'traders-launch']) {
     assert.ok(id in blocks, `${id} was not read as a section`);
     assert.equal(blocks[id], '', `${id} should be empty until Angelo writes it`);
   }
@@ -117,10 +117,10 @@ test('a take written in takes.md shows up, an empty one shows nothing', () => {
 });
 
 test('a take on another firm stays on that firm', () => {
-  useCopy(SHIPPED, TAKES.replace('## tradeday', '## tradeday\nTradeDay only pays fast if you pass.'));
+  useCopy(SHIPPED, TAKES.replace('## e8-markets', '## e8-markets\nE8 only pays fast if you pass.'));
   assert.ok(!renderEmail(deal(), {}).html.includes('pays fast'), 'a take leaked across firms');
   assert.match(
-    renderEmail(pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'tradeday' }), {}).html,
+    renderEmail(pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'e8-markets' }), {}).html,
     /pays fast if you pass/
   );
 });
@@ -208,7 +208,7 @@ test('the shipped copy passes the audit on every firm', () => {
 
 // ── his code, not theirs ─────────────────────────────────────────────────────
 
-const PUBLIC_CODES = { 'blue-guardian': 'BG25', 'top-one-futures': 'BOGO', fundedseat: 'ULTRA50', 'legends-trading': 'LTG' };
+const PUBLIC_CODES = { 'blue-guardian': 'BG25', fundedseat: 'ULTRA50' };
 
 test('no message ever prints a firm public code', () => {
   let checked = 0;
@@ -241,21 +241,21 @@ test('every firm prints JTNQ today, the same as the comparison page', () => {
 });
 
 test('a code declared in codes.md is the one that gets printed', () => {
-  useCopy(SHIPPED, TAKES, '## codes\nlegends-trading = LTG\n');
-  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'legends-trading' });
-  assert.equal(d.code, 'LTG');
-  assert.match(renderTweet(d), /Code LTG:/);
+  useCopy(SHIPPED, TAKES, '## codes\ne8-markets = E8X\n');
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'e8-markets' });
+  assert.equal(d.code, 'E8X');
+  assert.match(renderTweet(d), /Code E8X:/);
   // Declared on purpose, so the audit must not fight it.
   assert.deepEqual(auditCodeClaims(d, { tweet: renderTweet(d) }), []);
 });
 
 test('an undeclared firm falls back to JTNQ and says so', () => {
-  useCopy(SHIPPED, TAKES, '## codes\ntradeday = JTNQ\n');
+  useCopy(SHIPPED, TAKES, '## codes\ne8-markets = JTNQ\n');
   const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
   assert.equal(d.code, 'JTNQ');
   assert.equal(d.codeUndeclared, true);
 
-  const declared = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'tradeday' });
+  const declared = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'e8-markets' });
   assert.equal(declared.codeUndeclared, false);
 });
 

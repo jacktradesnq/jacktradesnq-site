@@ -8,12 +8,11 @@
  *    tout ce que la firme vend. guardCatalog() + syncCatalog() creent les
  *    programmes et les tailles nouveaux, retirent ce qui n'est plus vendu, et
  *    gardent les regles curatees a la main que le lecteur n'encode pas.
- *    FundedSeat, Traders Launch, Blue Guardian, TradeDay, LEGENDS.
+ *    FundedSeat, Traders Launch, Blue Guardian.
  *
  *  - `{ updates }` — le chemin historique, un metteur a jour de PRIX sur des
  *    programmes figes a la main : guard() + apply() ne touchent que price /
- *    originalPrice / activationFee. Top One et E8 restent dessus, faute de
- *    lecteur.
+ *    originalPrice / activationFee. E8 reste dessus, faute de lecteur.
  *
  * Dans les deux cas les promos (promo firme, promoCode / promoLabel par
  * programme) passent par applyPromos(), et une firme dont le scraper echoue
@@ -28,8 +27,6 @@ import fs from 'node:fs';
 import { guardCatalog, syncCatalog } from './lib/catalog-sync.mjs';
 import { BLUE_GUARDIAN_URL, programsFromHtml as blueGuardianPrograms } from './lib/firms/blueguardian.mjs';
 import { fetchFundedSeatPrograms } from './lib/firms/fundedseat.mjs';
-import { fetchLegendsPrograms } from './lib/firms/legends.mjs';
-import { fetchTradeDayPrograms } from './lib/firms/tradeday.mjs';
 import { fetchTradersLaunchPrograms } from './lib/firms/traderslaunch.mjs';
 
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
@@ -145,146 +142,6 @@ async function scrapeBlueGuardian() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Top One Futures — Webflow server-rendered tabs on https://toponefutures.com */
-/* ------------------------------------------------------------------ */
-
-/* Their pricing markup was rebuilt in Aug 2026 (v3-pricing-*). The old
- * `price__text` / `price__prev` pairs are gone, the tab keys changed, and two
- * programs disappeared from the site altogether (1-Step Elite Challenge and
- * S2F Sim Funded) — which is why the scraper had been failing, and the page
- * quietly serving July prices, since 2026-07-27.
- *
- * Key = the `data-w-tab` attribute; the visible label can differ (the "Elite"
- * tab is labelled "Elite Daily" on screen). Value = our program name. */
-const TOPONE_TABS = {
-  Elite: 'Elite Daily',
-  'Elite Access': 'Elite Access',
-  'Instant Sim Funded': 'Instant Sim Funded',
-  'Ignite Instant Funding': 'Ignite',
-};
-const TOPONE_SIZES = [25000, 50000, 100000, 150000];
-
-// The activation fee is money, not a risk rule: on Elite Access you pay $39 to
-// start and the activation fee once you pass, so leaving it hand-maintained
-// meant a public page quoting a figure nobody re-checked. One row per card:
-//   <div class="v3-table-row-info"><div>Activation Fee</div></div>
-//   <div class="v3-table-row-value"><div>$139</div></div>
-// "None!" (Elite Daily) means there is none. Fixtures for both shapes live in
-// scripts/__fixtures__/, see scripts/scrape-prop-firms.test.mjs.
-export function topOneActivationFees(pane) {
-  const rows = [
-    ...pane.matchAll(
-      /v3-table-row-info"><div>Activation Fee<\/div><\/div><div class="v3-table-row-value"><div>([^<]+)<\/div>/g,
-    ),
-  ];
-  return rows.map(([, raw]) => {
-    const value = raw.trim();
-    if (/^(none!?|no|n\/a|free)$/i.test(value)) return null;
-    const amount = num(value.replace(/[^\d.,]/g, ''));
-    if (!Number.isFinite(amount) || amount <= 0 || amount > 6000) {
-      throw new Error(`unreadable activation fee: "${value}"`);
-    }
-    return amount;
-  });
-}
-
-// The two instant funding tabs carry no Activation Fee row at all: the price is
-// paid upfront and nothing is due on passing. Measured 2026-08-21, the words
-// "Activation Fee" appear zero times in those panes, while Elite prints "None!"
-// on every card and Elite Access prints a figure.
-const TOPONE_NO_ACTIVATION_TABS = new Set(['Instant Sim Funded', 'Ignite Instant Funding']);
-
-// One fee per card, or null where there is nothing to pay. A missing row is
-// only accepted on the tabs that never had one, and only while the words stay
-// absent: if they come back without a readable value, that is a markup change
-// and the firm goes stale rather than publishing "no fee" on a plan with one.
-export function topOneFees(tab, pane, cardCount) {
-  const fees = topOneActivationFees(pane);
-  if (fees.length === 0 && TOPONE_NO_ACTIVATION_TABS.has(tab)) {
-    if (/Activation Fee/i.test(pane))
-      throw new Error(`${tab}: an Activation Fee row is back and unreadable`);
-    return Array.from({ length: cardCount }, () => null);
-  }
-  if (fees.length !== cardCount)
-    throw new Error(`${tab}: ${cardCount} cards but ${fees.length} activation fee rows`);
-  return fees;
-}
-
-// Each pricing tab is one <div data-w-tab="X" class="acc__content__pane v3-pricing-swiper …">.
-export function topOnePane(html, tab) {
-  const panes = [...html.matchAll(/data-w-tab="([^"]+)" class="acc__content__pane v3-pricing-swiper[^"]*"/g)];
-  const i = panes.findIndex((m) => m[1] === tab);
-  if (i === -1) throw new Error(`pricing tab pane not found: ${tab}`);
-  const from = panes[i].index;
-  const to = i + 1 < panes.length ? panes[i + 1].index : html.length;
-  return html.slice(from, to);
-}
-
-// What a given pricing tab actually offers: the code shown inside the tab, and
-// a label. The card badge is the label when it is a percentage ("55% OFF");
-// Elite Access shows "SAVE NOW" instead, so fall back to the sentence the page
-// attaches to that same code ("Buy 1, Get 1 FREE with Code: BOGO").
-function topOneOffer(html, pane) {
-  const codeM = pane.match(/v2-copy-text">([A-Z0-9.]{2,15})</);
-  if (!codeM) return null;
-  const code = codeM[1];
-  const badge = pane.match(/v3-pricing-discount[^>]*><div>([^<]+)</);
-  const badgeTxt = badge ? badge[1].trim() : '';
-  if (/^\d+% off$/i.test(badgeTxt)) return { code, label: badgeTxt.toUpperCase() };
-  const escaped = code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const phrase = html.match(
-    new RegExp(`>([^<]{5,40}) w(?:ith|\\.) Code:</div>[\\s\\S]{0,400}?v2-copy-text">${escaped}<`, 'i'),
-  );
-  return phrase ? { code, label: phrase[1].trim().toUpperCase() } : { code, label: null };
-}
-
-async function scrapeTopOne() {
-  const html = await fetchText('https://toponefutures.com');
-  const updates = [];
-  const programPromos = {};
-
-  for (const [tab, programName] of Object.entries(TOPONE_TABS)) {
-    const pane = topOnePane(html, tab);
-    const offer = topOneOffer(html, pane);
-    if (offer && offer.label) programPromos[programName] = offer;
-    // One card per size: title carries the size ("$25K Evaluation" / "$25K Account"),
-    // then the struck-through list price and the price you pay today.
-    const cards = [...pane.matchAll(
-      /v3-pricing-title">\$(\d+)K[^<]*<\/div>[\s\S]{0,3000}?<div class="v3-price-current">\$([\d,]+)/g,
-    )];
-    if (cards.length !== TOPONE_SIZES.length)
-      throw new Error(`${tab}: expected ${TOPONE_SIZES.length} pricing cards, got ${cards.length}`);
-
-    const olds = [...pane.matchAll(/v3-price-old">\$([\d,]+)/g)].map((m) => num(m[1]));
-    if (olds.length !== cards.length)
-      throw new Error(`${tab}: ${cards.length} cards but ${olds.length} struck-through prices`);
-
-    const activations = topOneFees(tab, pane, cards.length);
-
-    cards.forEach((m, i) => {
-      const size = num(m[1]) * 1000;
-      if (size !== TOPONE_SIZES[i])
-        throw new Error(`${tab}: card ${i} is $${size / 1000}K, expected $${TOPONE_SIZES[i] / 1000}K`);
-      updates.push({
-        programName,
-        size,
-        price: num(m[2]),
-        originalPrice: olds[i],
-        activationFee: activations[i],
-      });
-    });
-  }
-
-  // Site-wide banner: "55% off EVERYTHING w. code: 2.0". It is the code that
-  // produces the prices above — the per-card badges only repeat the percentage.
-  let firmPromo;
-  const banner = html.match(/<strong>(\d+)% off[^<]*w\. code:<\/strong><\/div>[\s\S]{0,400}?v2-copy-text">([A-Z0-9.]{2,15})</i);
-  if (banner) firmPromo = { label: `${banner[1]}% OFF`, code: banner[2] };
-
-  return { updates, programPromos, firmPromo };
-}
-
-/* ------------------------------------------------------------------ */
 /* Traders Launch — server-rendered cards on https://traderslaunch.com  */
 /* ------------------------------------------------------------------ */
 
@@ -384,19 +241,6 @@ async function scrapeFundedSeat() {
   } finally {
     await browser?.close();
   }
-}
-
-/* ------------------------------------------------------------------ */
-/* LEGENDS Trading — leur API boutique publique                        */
-/* ------------------------------------------------------------------ */
-
-// Leur page Webflow sert une table de prix PERIMEE a tout client HTTP (verifie
-// le 2026-08-20 : le HTML disait Apprentice 50K $185 -> $37/mo quand la page
-// rendue affichait $59 -> $29.50). scripts/lib/firms/legends.mjs lit leur shop
-// API a la place, ou `price` est le prix plein et `strikeThroughPrice` le prix
-// remise — leurs noms sont inverses.
-async function scrapeLegends() {
-  return { programs: await fetchLegendsPrograms() };
 }
 
 /* ------------------------------------------------------------------ */
@@ -555,30 +399,10 @@ function applyPromos(firm, res, changes) {
   firm.stale = false;
 }
 
-/* ------------------------------------------------------------------ */
-
-/* ------------------------------------------------------------------ */
-/* TradeDay — Webflow CMS cards on https://www.tradeday.com, filtered      */
-/* client-side by fs-list-field attributes (drawdown / platform / account) */
-/* ------------------------------------------------------------------ */
-
-// Le catalogue vient de scripts/lib/firms/tradeday.mjs, qui lit les memes
-// cartes Webflow (face avant = regles d'evaluation, dos = regles du compte
-// finance) et rend les quatre tailles, 25K comprise : elle manquait partout
-// dans le dataset jusqu'au 2026-09-13.
-async function scrapeTradeDay() {
-  return { programs: await fetchTradeDayPrograms() };
-}
-
-/* ------------------------------------------------------------------ */
-
 const SCRAPERS = {
   'blue-guardian': scrapeBlueGuardian,
-  'top-one-futures': scrapeTopOne,
   'traders-launch': scrapeTradersLaunch,
   fundedseat: scrapeFundedSeat,
-  tradeday: scrapeTradeDay,
-  'legends-trading': scrapeLegends,
   'e8-markets': scrapeE8Markets,
 };
 
