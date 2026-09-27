@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-26",
-  "builtFor": "2026-09-26",
+  "generatedAt": "2026-09-27",
+  "builtFor": "2026-09-27",
   "promos": [
     {
       "firmId": "fundedseat",
@@ -29,7 +29,7 @@
       "consistency": "35%",
       "activationFee": null,
       "contracts": "4 minis",
-      "lastChecked": "2026-09-26"
+      "lastChecked": "2026-09-27"
     },
     {
       "firmId": "blue-guardian",
@@ -58,7 +58,7 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "4 Mini | 40 Micro",
-      "lastChecked": "2026-09-26"
+      "lastChecked": "2026-09-27"
     },
     {
       "firmId": "traders-launch",
@@ -86,7 +86,7 @@
       "consistency": null,
       "activationFee": null,
       "contracts": "5 Micros",
-      "lastChecked": "2026-09-26"
+      "lastChecked": "2026-09-27"
     }
   ]
 }
