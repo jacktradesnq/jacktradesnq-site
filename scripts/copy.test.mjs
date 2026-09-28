@@ -16,10 +16,10 @@ import {
 } from './lib/deal-of-day.mjs';
 
 // Frozen data on purpose. These tests are about how a deal RENDERS, and the
-// published file is rewritten every morning by the price sync: the day it
-// marked FundedSeat stale, seventeen of these went red on main without a line
-// of code changing. Freshness of the live file is checked in
-// scrape-prop-firms.test.mjs and check-rule-drift.test.mjs, where it belongs.
+// published file is rewritten every morning by the price sync: the day a
+// scrape marked a firm stale, seventeen of these went red on main without a
+// line of code changing. Freshness of the live file is checked beside the
+// scrapers, where it belongs.
 const DATA = JSON.parse(readFileSync(new URL('./fixtures/prop-firms.fixture.json', import.meta.url), 'utf8'));
 const SHIPPED = readFileSync(new URL('../content/newsletter/messages.md', import.meta.url), 'utf8');
 const TAKES = readFileSync(new URL('../content/newsletter/takes.md', import.meta.url), 'utf8');
@@ -27,10 +27,10 @@ const CODES = readFileSync(new URL('../content/newsletter/codes.md', import.meta
 
 afterEach(resetCopy);
 
-// Named on purpose: these tests are about how FundedSeat renders, not about
-// which firm happens to win the day. A promo ending sooner used to silently
-// take that slot and break eight of them.
-const deal = () => pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
+// Named on purpose: these tests render one kept firm, not whichever firm
+// happens to win the day. A promo ending sooner used to silently take that
+// slot and break eight of them.
+const deal = () => pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'blue-guardian' });
 
 // ── the parser ───────────────────────────────────────────────────────────────
 
@@ -97,7 +97,7 @@ test('rewriting one line in the file rewrites all three messages', () => {
   );
 
   const after = { tweet: renderTweet(deal()), email: renderEmail(deal(), {}) };
-  assert.match(after.tweet, /^Grab the 50K for \$104\.95 today/);
+  assert.match(after.tweet, /^Grab the 50K for \$116 today/);
   assert.ok(!after.tweet.includes('for a 50K challenge'), 'the old wording survived');
   assert.match(after.email.html, />Take the 50K</);
   assert.ok(!after.email.html.includes('Get the 50K at'), 'the old button survived');
@@ -108,7 +108,7 @@ test('a take written in takes.md shows up, an empty one shows nothing', () => {
   assert.ok(!plain.html.includes('What I watch'), 'an empty take should print nothing');
 
   resetCopy();
-  useCopy(SHIPPED, TAKES.replace('## fundedseat', '## fundedseat\nI size down after a green day here, the {maxdd} trails.'));
+  useCopy(SHIPPED, TAKES.replace('## blue-guardian', '## blue-guardian\nI size down after a green day here, the {maxdd} trails.'));
   const withTake = renderEmail(deal(), {});
   assert.match(withTake.html, /What I watch/);
   assert.match(withTake.html, /size down after a green day here, the \$2,000 trails\./);
@@ -129,23 +129,28 @@ test('a take on another firm stays on that firm', () => {
 
 test('stars become bold in the email and are left alone for Discord', () => {
   const email = renderEmail(deal(), {});
-  assert.match(email.html, /<strong style="color:#E9B44B;">\$104\.95<\/strong>/);
+  assert.match(email.html, /<strong style="color:#E9B44B;">\$116<\/strong>/);
   assert.ok(!email.html.includes('*'), 'a raw star reached the email');
   assert.ok(!email.text.includes('*'), 'a raw star reached the plain text');
 
   // Discord's own bold is **, which must survive untouched.
-  assert.match(renderDiscord(deal()), /^\*\*FundedSeat, deal of the day\*\*/);
+  assert.match(renderDiscord(deal()), /^\*\*Blue Guardian, deal of the day\*\*/);
 });
 
 // ── discounts never stack ────────────────────────────────────────────────────
 
 test('a firm advertising two discounts never gets them added up', () => {
-  // FundedSeat's real label. 45 and 50 are alternatives: the public price, or
-  // the coupon. 95% off does not exist anywhere on earth.
-  const fs = DATA.firms.find((f) => f.id === 'fundedseat');
-  assert.match(fs.promo.label, /45% OFF \+ 50% w\/ code/, 'the label under test changed');
+  // 45 and 50 are alternatives: the public price, or the coupon. 95% off does
+  // not exist. Injected on a kept firm so the test pins the engine, not a
+  // partnership that no longer exists.
+  const data = structuredClone(DATA);
+  const firm = data.firms.find((f) => f.id === 'blue-guardian');
+  firm.promo = { label: '45% OFF + 50% w/ code', code: 'BG25' };
+  const plan = firm.programs.find((p) => p.name === 'Reserve').plans.find((pl) => pl.size === 50000);
+  plan.price = 104.95;
+  plan.originalPrice = 190;
 
-  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
+  const d = pickDeal(data, { today: '2026-08-20', history: [], forceFirmId: 'blue-guardian' });
   const rendered = [renderTweet(d), renderDiscord(d), renderEmail(d, {}).text, renderEmail(d, {}).html].join('\n');
 
   for (const forbidden of ['95%', '95 %']) {
@@ -158,8 +163,8 @@ test('a firm advertising two discounts never gets them added up', () => {
 });
 
 test("the firm's own promo text never reaches a message", () => {
-  // It is free marketing prose ("45% OFF + 50% w/ code ULTRA50") and it moves
-  // without warning, so it is deliberately not a placeholder.
+  // It is free marketing prose ("25% OFF") and it moves without warning, so
+  // it is deliberately not a placeholder.
   let checked = 0;
   for (const firm of DATA.firms) {
     if (!firm.promo?.label) continue;
@@ -180,12 +185,12 @@ test('a percentage typed by hand into the copy file is refused', () => {
     ),
     TAKES
   );
-  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'blue-guardian' });
   const email = renderEmail(d, {});
   const problems = auditDiscountClaims(d, { email: email.text });
   assert.equal(problems.length, 1, `expected one problem, got ${problems.length}`);
   assert.match(problems[0], /claims "50% off"/);
-  assert.match(problems[0], /only discount computed from the data is 45%/);
+  assert.match(problems[0], /only discount computed from the data is 25%/);
 });
 
 test('the shipped copy passes the audit on every firm', () => {
@@ -208,7 +213,7 @@ test('the shipped copy passes the audit on every firm', () => {
 
 // ── his code, not theirs ─────────────────────────────────────────────────────
 
-const PUBLIC_CODES = { 'blue-guardian': 'BG25', fundedseat: 'ULTRA50' };
+const PUBLIC_CODES = { 'blue-guardian': 'BG25' };
 
 test('no message ever prints a firm public code', () => {
   let checked = 0;
@@ -222,7 +227,7 @@ test('no message ever prints a firm public code', () => {
       `${firmId}: printed the public code ${publicCode}`
     );
   }
-  assert.ok(checked >= 2, `only ${checked} firms rendered: this test would pass on nothing`);
+  assert.ok(checked >= 1, `only ${checked} firms rendered: this test would pass on nothing`);
 });
 
 test('every firm prints JTNQ today, the same as the comparison page', () => {
@@ -251,7 +256,7 @@ test('a code declared in codes.md is the one that gets printed', () => {
 
 test('an undeclared firm falls back to JTNQ and says so', () => {
   useCopy(SHIPPED, TAKES, '## codes\ne8-markets = JTNQ\n');
-  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'blue-guardian' });
   assert.equal(d.code, 'JTNQ');
   assert.equal(d.codeUndeclared, true);
 
@@ -261,20 +266,20 @@ test('an undeclared firm falls back to JTNQ and says so', () => {
 
 test('a public code typed by hand into the copy file is refused', () => {
   useCopy(
-    SHIPPED.replace('## email.code\nCode at checkout: {code}', '## email.code\nCode at checkout: {code} or ULTRA50'),
+    SHIPPED.replace('## email.code\nCode at checkout: {code}', '## email.code\nCode at checkout: {code} or BG25'),
     TAKES,
-    '## codes\nfundedseat = JTNQ\n'
+    '## codes\nblue-guardian = JTNQ\n'
   );
-  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'blue-guardian' });
   const email = renderEmail(d, {});
   const problems = auditCodeClaims(d, { html: email.html });
   assert.equal(problems.length, 1, `expected one problem, got ${problems.length}`);
-  assert.match(problems[0], /prints the public code "ULTRA50" instead of "JTNQ"/);
+  assert.match(problems[0], /prints the public code "BG25" instead of "JTNQ"/);
 });
 
 test('"link" prints no code at all', () => {
-  useCopy(SHIPPED, TAKES, '## codes\nfundedseat = link\n');
-  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'fundedseat' });
+  useCopy(SHIPPED, TAKES, '## codes\nblue-guardian = link\n');
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'blue-guardian' });
   assert.equal(d.code, null);
   const email = renderEmail(d, {});
   assert.ok(!email.html.includes('Code at checkout'), 'a code line survived');

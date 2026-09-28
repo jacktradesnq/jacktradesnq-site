@@ -8,7 +8,7 @@
  *    tout ce que la firme vend. guardCatalog() + syncCatalog() creent les
  *    programmes et les tailles nouveaux, retirent ce qui n'est plus vendu, et
  *    gardent les regles curatees a la main que le lecteur n'encode pas.
- *    FundedSeat, Traders Launch, Blue Guardian.
+ *    Traders Launch, Blue Guardian.
  *
  *  - `{ updates }` — le chemin historique, un metteur a jour de PRIX sur des
  *    programmes figes a la main : guard() + apply() ne touchent que price /
@@ -26,7 +26,6 @@ import fs from 'node:fs';
 
 import { guardCatalog, syncCatalog } from './lib/catalog-sync.mjs';
 import { BLUE_GUARDIAN_URL, programsFromHtml as blueGuardianPrograms } from './lib/firms/blueguardian.mjs';
-import { fetchFundedSeatPrograms } from './lib/firms/fundedseat.mjs';
 import { fetchTradersLaunchPrograms } from './lib/firms/traderslaunch.mjs';
 
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
@@ -170,77 +169,6 @@ async function scrapeTradersLaunch() {
     }
   }
   return { programs }; // no promo recipe for this firm — promo stays manual
-}
-
-/* ------------------------------------------------------------------ */
-/* FundedSeat — leur catalogue par API, leur banniere par navigateur          */
-/* ------------------------------------------------------------------ */
-
-// Le catalogue vient de scripts/lib/firms/fundedseat.mjs, qui lit leur propre
-// /api/pullchallenges : sept familles, la ou les onglets de leur page n'en
-// montraient que trois a un scraper.
-//
-// La banniere de promo, elle, n'existe que dans la page RENDUE : le HTML servi
-// n'en contient qu'un gabarit invisible ("70% OFF ALL ACCOUNTS",
-// visibility:hidden, mesure du 2026-09-13). C'est la seule raison qui reste
-// d'ouvrir un navigateur ici — plus aucune carte n'est lue.
-const MONTHS = { JANUARY: 1, FEBRUARY: 2, MARCH: 3, APRIL: 4, MAY: 5, JUNE: 6, JULY: 7, AUGUST: 8, SEPTEMBER: 9, OCTOBER: 10, NOVEMBER: 11, DECEMBER: 12 };
-
-// "50% OFF YOUR NEXT 3 PURCHASES — USE CODE SEP50 — ENDS SEPTEMBER 21" ->
-// { label, code, ends }. `sitePct` est la remise deja dans les prix du
-// catalogue, le pourcentage de la banniere celle que le code ajoute.
-function fundedSeatPromo(bodyText, programs) {
-  const codeM = bodyText.match(/USE CODE\s+([A-Z0-9]+)/i);
-  if (!codeM) return undefined; // banniere absente ou illisible : on garde la promo publiee
-
-  const bannerPctM = bodyText.match(/(\d+)%\s*OFF/i);
-  const withOriginal = programs.flatMap((p) => p.plans).filter((pl) => pl.originalPrice != null);
-  const sitePct =
-    withOriginal.length > 0
-      ? mode(withOriginal.map((pl) => pctOff(pl.price, pl.originalPrice))).value
-      : null;
-  const label =
-    sitePct != null && bannerPctM
-      ? `${sitePct}% OFF + ${bannerPctM[1]}% w/ code`
-      : bannerPctM
-        ? `${bannerPctM[1]}% OFF w/ code`
-        : `code ${codeM[1].toUpperCase()}`;
-
-  const endsM = bodyText.match(/ENDS\s+([A-Z]+)\s+(\d{1,2})/i);
-  const month = endsM ? MONTHS[endsM[1].toUpperCase()] : null;
-  const ends = month
-    ? `${TODAY.slice(0, 4)}-${String(month).padStart(2, '0')}-${endsM[2].padStart(2, '0')}`
-    : undefined;
-  return { label, code: codeM[1].toUpperCase(), ...(ends ? { ends } : {}) };
-}
-
-async function scrapeFundedSeat() {
-  const programs = await fetchFundedSeatPrograms();
-
-  let pw;
-  try {
-    pw = await import('playwright');
-  } catch {
-    console.log('  fundedseat: playwright absent — catalogue lu, promo existante gardee');
-    return { programs };
-  }
-
-  // Le navigateur est lance DANS le try : une banniere qu'on ne sait pas lire,
-  // ou un chromium absent, ne doit pas coûter le catalogue lu juste au-dessus.
-  let browser;
-  try {
-    browser = await pw.chromium.launch({ headless: true });
-    const page = await browser.newPage({ userAgent: UA, viewport: { width: 1440, height: 900 } });
-    await page.goto('https://fundedseat.com', { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(2500); // laisser la banniere se rendre
-    const bodyText = await page.evaluate(() => document.body.innerText);
-    return { programs, firmPromo: fundedSeatPromo(bodyText, programs) };
-  } catch (e) {
-    console.log(`  fundedseat: banniere illisible (${e.message.split('\n')[0]}) — promo existante gardee`);
-    return { programs };
-  } finally {
-    await browser?.close();
-  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -402,7 +330,6 @@ function applyPromos(firm, res, changes) {
 const SCRAPERS = {
   'blue-guardian': scrapeBlueGuardian,
   'traders-launch': scrapeTradersLaunch,
-  fundedseat: scrapeFundedSeat,
   'e8-markets': scrapeE8Markets,
 };
 

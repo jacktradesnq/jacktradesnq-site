@@ -152,7 +152,7 @@ const sendReq = (body, key) =>
   });
 
 const CONTENT = {
-  subject: 'FundedSeat: 50K Daily at $104.95',
+  subject: 'Blue Guardian: 50K Reserve at $75',
   html: '<p>deal</p><a href="{{unsubscribe_url}}">out</a>',
   text: 'deal\nUnsubscribe: {{unsubscribe_url}}',
 };

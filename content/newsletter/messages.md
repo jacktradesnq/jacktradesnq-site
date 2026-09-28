@@ -102,41 +102,40 @@ Consistency rule: {consistency}.
 
 | trou | exemple aujourd'hui |
 |---|---|
-| `{firm}` | FundedSeat |
-| `{plan}` | Daily |
+| `{firm}` | Blue Guardian |
+| `{plan}` | Reserve |
 | `{account}` | 50K challenge (ou 50K instant funded account) |
 | `{size}` | 50K |
-| `{price}` | $104.95 (avec /mo si c'est un abonnement) |
-| `{was}` | $190 (vide si la firme n'a pas de prix barre) |
-| `{discount}` | 45 (vide s'il n'y a aucune remise) |
+| `{price}` | $75 (avec /mo si c'est un abonnement) |
+| `{was}` | $100 (vide si la firme n'a pas de prix barre) |
+| `{discount}` | 25 (vide s'il n'y a aucune remise) |
 | `{split}` | 90% |
-| `{payout}` | Daily, 5h guaranteed |
+| `{payout}` | On-demand |
 | `{ddtype}` | EOD Trailing |
 | `{target}` | $3,000 (vide sur un compte instant) |
 | `{maxdd}` | $2,000 |
-| `{dailyloss}` | $1,500 (vide si la firme n'en a pas) |
-| `{contracts}` | 4 minis / 40 micros |
-| `{consistency}` | 35% |
+| `{dailyloss}` | $1,000 (vide si la firme n'en a pas) |
+| `{contracts}` | 4 Mini / 40 Micro |
+| `{consistency}` | 40% |
 | `{activation}` | $150 (vide s'il n'y en a pas) |
-| `{code}` | ULTRA50 (vide si le code est deja dans le lien) |
+| `{code}` | JTNQ (vide si le code est deja dans le lien) |
 | `{url}` | ton lien d'affiliation |
 | `{ends}` | Sunday (vide si la promo n'a pas de date de fin) |
-| `{checked}` | 2026-08-19 |
-| `{ladder}` | 25K $76.95 - 50K $104.95 - 100K $174.95 |
+| `{checked}` | 2026-09-26 |
+| `{ladder}` | 25K $48 - 50K $75 - 100K $111 - 150K $222 |
 | `{take}` | ta phrase a toi, ecrite dans takes.md |
 
 Ton avis par firme se met dans `takes.md`, pas ici.
 
 ## Ce qui n'existe volontairement PAS
 
-**Le texte promo de la firme** (genre « 45% OFF + 50% w/ code ULTRA50 ») n'est
+**Le texte promo de la firme** (genre « 45% OFF + 50% w/ code ») n'est
 pas un trou disponible. Deux raisons :
 
 1. Ces deux pourcentages sont des alternatives, pas une addition. Aucune firme
    ne laisse cumuler deux remises. L'imprimer a cote de notre chiffre calcule
    ferait croire a un cumul qui n'existe pas.
-2. C'est de la prose marketing qui bouge sans prevenir (leur page annoncait
-   70% le 20/08 alors que notre donnee disait 45%). Les deux seuls chiffres
+2. C'est de la prose marketing qui bouge sans prevenir. Les deux seuls chiffres
    fiables sont le prix et le prix barre du plan.
 
 `{discount}` est donc TOUJOURS calcule sur ces deux prix, sur un seul plan. Si

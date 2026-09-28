@@ -177,11 +177,11 @@ function caveatsOf(program, plan, messages) {
   if (program.priceType === 'monthly') {
     out.push({ text: say('catch.monthly'), source: 'program.priceType' });
   }
-  // No caveat derived from ddType. FundedSeat's buy screen says "EOD Drawdown"
-  // and the word trailing appears nowhere on their site, while Blue Guardian's
-  // own tooltip says "EOD, static, no trailing": the label means different
-  // things firm by firm, the daily rule check cannot read it, so nothing here
-  // asserts a behaviour from it. The amount and the label are printed as is.
+  // No caveat derived from ddType. One buy screen says "EOD Drawdown" and
+  // never the word trailing, while Blue Guardian's own tooltip says "EOD,
+  // static, no trailing": the label means different things firm by firm, the
+  // daily rule check cannot read it, so nothing here asserts a behaviour from
+  // it. The amount and the label are printed as is.
   if (plan.consistency && !/^(none|no|n\/a)$/i.test(String(plan.consistency).trim())) {
     out.push({ text: say('catch.consistency'), source: 'plan.consistency' });
   }
@@ -193,7 +193,7 @@ function caveatsOf(program, plan, messages) {
 
 // His code, never the firm's public one.
 //
-// A public code (BG25, ULTRA50) gives the reader the same discount
+// A public code (BG25) gives the reader the same discount
 // while pushing him out of the transaction wherever a firm attributes by code,
 // and it wastes the point of the newsletter. So the only codes that can be
 // printed are the ones declared in content/newsletter/codes.md.
@@ -206,8 +206,8 @@ const AFFILIATE_CODE = 'JTNQ';
 function codeFor(firm, codes) {
   const declared = codes?.[firm.id];
   if (!declared) return { code: AFFILIATE_CODE, undeclared: true, viaLink: false };
-  // "link" is a decision, not a guess about the URL shape: fundedseat.link/jtnq
-  // carries the affiliation in its path, with no query parameter to sniff.
+  // "link" is a decision, not a guess about the URL shape: an affiliate URL
+  // can carry the attribution in its path, with no query parameter to sniff.
   if (declared.toLowerCase() === 'link') return { code: null, undeclared: false, viaLink: true };
   return { code: declared, undeclared: false, viaLink: false };
 }
@@ -416,7 +416,7 @@ export function renderDiscord(deal) {
 
 // ── the no-stacking audit ────────────────────────────────────────────────────
 
-// A firm's own promo text brags things like "45% OFF + 50% w/ code ULTRA50".
+// A firm's own promo text brags things like "45% OFF + 50% w/ code".
 // Those two numbers are alternatives, not a sum: no prop firm stacks discounts.
 // So the only discount this engine will ever state is the one it can do the
 // arithmetic for, on a single plan's own two prices. This walks the finished

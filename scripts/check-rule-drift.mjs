@@ -28,8 +28,6 @@
 
 import fs from 'node:fs';
 
-import { fundedseatPlansFrom, FUNDEDSEAT_API, FUNDEDSEAT_API_UNCOVERED } from './lib/fundedseat-api.mjs';
-
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
@@ -237,161 +235,6 @@ async function extractTradersLaunch() {
   return out;
 }
 
-/* ---- FundedSeat — playwright (client-rendered) ---- */
-const FUNDEDSEAT_PRIMARY = '1 Step';
-const FUNDEDSEAT_PROGRAMS = [
-  { programName: 'Daily', sub: 'Daily' },
-  { programName: 'Sprint', sub: 'Sprint' },
-  { programName: 'Instant Funding Direct', sub: null }, // leur onglet dit "Instant Funding", leur catalogue "Direct"
-];
-/**
- * Two witnesses for this firm: their buy-screen cards (what a buyer is shown)
- * and their own /api/pullchallenges (what their system charges). The API needs no
- * browser and covers 11 of our 15 plans; Flex is not sold through it. Where both
- * describe a field and disagree, neither wins — the field is reported for a human.
- */
-async function extractFundedSeat() {
-  const api = fundedseatPlansFrom(JSON.parse(await fetchText(FUNDEDSEAT_API)));
-  for (const p of api) {
-    if (p.payoutConsistency)
-      console.log(
-        `  note: fundedseat ${p.programName} $${p.size / 1000}K — ${p.payoutConsistency} consistency once funded ` +
-          `(their card only shows it behind its "Funded Rules" toggle)`,
-      );
-  }
-
-  let cards;
-  try {
-    cards = await readFundedSeatCards();
-  } catch (e) {
-    console.log(
-      `  note: fundedseat cards unread (${e.message}) — API only, ${api.length} plans checked` +
-        (FUNDEDSEAT_API_UNCOVERED.length ? `, ${FUNDEDSEAT_API_UNCOVERED.join('/')} left unverified` : ''),
-    );
-    return api.map(({ programName, size, rules }) => ({ programName, size, rules }));
-  }
-
-  return mergeFundedSeatSources(cards, api);
-}
-
-/**
- * Their two witnesses into one reading. A field only one of them describes is
- * taken from that one; a field they describe differently is reported for a
- * human instead of picking a winner.
- */
-export function mergeFundedSeatSources(cards, api) {
-  const out = cards.map((card) => {
-    const match = api.find((p) => p.programName === card.programName && p.size === card.size);
-    if (!match) return card; // Flex, and anything they stop selling through the API
-    const rules = { ...card.rules };
-    for (const [field, apiValue] of Object.entries(match.rules)) {
-      const cardValue = rules[field];
-      if (cardValue === undefined || cardValue === BROKEN) {
-        rules[field] = apiValue;
-      } else if (!fieldEqual(field, cardValue, apiValue)) {
-        rules[field] = {
-          broken: `their two sources disagree: card says ${show(field, cardValue)}, API says ${show(field, apiValue)}`,
-        };
-      }
-    }
-    // The card has two faces: "Eval Rules" says Consistency None, and "Funded
-    // Rules" on the same card says 25% at the first payout. We publish the rule
-    // a trader actually hits, so the funded one is what this compares against.
-    // Reading the eval face alone reported four drifts a day that were not.
-    if (match.payoutConsistency && consistency(rules.consistency) == null) {
-      rules.consistency = match.payoutConsistency;
-    }
-    return { ...card, rules };
-  });
-  // A plan their API sells but no card described is a bad card read, not news.
-  for (const p of api) {
-    if (!out.some((c) => c.programName === p.programName && c.size === p.size))
-      out.push({ programName: p.programName, size: p.size, rules: p.rules });
-  }
-  return out;
-}
-
-async function readFundedSeatCards() {
-  let pw;
-  try {
-    pw = await import('playwright');
-  } catch {
-    throw new Error('playwright not installed');
-  }
-  const browser = await pw.chromium.launch({ headless: true });
-  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-  try {
-    const page = await browser.newPage({ userAgent: UA, viewport: { width: 1440, height: 900 } });
-    await page.goto('https://fundedseat.com', { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForSelector('#pricing-section', { timeout: 30000 });
-    await page.evaluate(() => document.querySelector('#pricing-section')?.scrollIntoView({ block: 'center' }));
-    await sleep(5000);
-
-    const readCards = () =>
-      page.evaluate(() => {
-        const sec = document.querySelector('#pricing-section');
-        const out = [];
-        for (const h3 of sec.querySelectorAll('h3')) {
-          if (!/\$[\d,]+\s*Account/i.test(h3.innerText || '')) continue;
-          let el = h3.parentElement;
-          while (el && !/Add to Cart/i.test(el.innerText || '')) el = el.parentElement;
-          if (el) out.push(el.innerText);
-        }
-        return out;
-      });
-    const buttonPresent = (label) =>
-      page.evaluate((lbl) => {
-        const sec = document.querySelector('#pricing-section');
-        return [...sec.querySelectorAll('button')].some((b) => (b.innerText || '').trim() === lbl);
-      }, label);
-    const clickTab = (label) => {
-      const rx = new RegExp('^' + label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$');
-      return page.locator('#pricing-section button', { hasText: rx }).first().click({ timeout: 8000 });
-    };
-
-    const out = [];
-    for (const { programName, sub } of FUNDEDSEAT_PROGRAMS) {
-      const target = sub ?? programName;
-      if (sub && !(await buttonPresent(sub))) {
-        await clickTab(FUNDEDSEAT_PRIMARY).catch(() => {});
-        await sleep(700);
-      }
-      await clickTab(target).catch(() => {});
-      await sleep(1400);
-      const cards = await readCards();
-      for (const text of cards) {
-        const sizeM = text.match(/\$([\d,]+)\s*Account/i);
-        if (!sizeM) continue;
-        const after = (re) => {
-          const m = text.match(re);
-          return m ? m[1] : undefined;
-        };
-        const pt = after(/Profit Target\s*\n\s*\$([\d,]+)/i);
-        const dd = after(/EOD Drawdown\s*\n\s*\$([\d,]+)/i);
-        const daily = after(/Daily Loss Limit[^\n]*\n\s*(None|\$[\d,]+)/i);
-        // Daily/Flex/Sprint label it "Consistency"; Instant Funding labels the
-        // same rule "Biggest trade rule" (JSON stores it as "15% biggest trade").
-        const cons = after(/(?:Consistency|Biggest trade rule)\s*\n\s*(\d+%|None)/i);
-        const ct = after(/Max Contracts\s*\n\s*([\d]+\s*minis?\s*\/\s*[\d]+\s*micros?)/i);
-        out.push({
-          programName,
-          size: money(sizeM[1]),
-          rules: {
-            profitTarget: pt != null ? money(pt) : null, // Instant Funding has no PT line
-            maxDrawdown: dd != null ? money(dd) : BROKEN,
-            dailyLoss: daily != null ? money(daily) : null,
-            consistency: cons != null ? consistency(cons) : null,
-            contracts: ct != null ? contracts(ct) : BROKEN,
-          },
-        });
-      }
-    }
-    return out;
-  } finally {
-    await browser.close();
-  }
-}
-
 /* ---- E8 Markets — playwright (Configure Challenge widget) ---- */
 const E8_TABS = {
   'E8 Signature': 'E8 Signature Futures',
@@ -487,7 +330,6 @@ async function extractE8() {
 const EXTRACTORS = {
   'blue-guardian': extractBlueGuardian,
   'traders-launch': extractTradersLaunch,
-  fundedseat: extractFundedSeat,
   'e8-markets': extractE8,
 };
 

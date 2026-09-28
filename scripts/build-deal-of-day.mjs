@@ -4,7 +4,7 @@
 //   node scripts/build-deal-of-day.mjs                  # today, writes state
 //   node scripts/build-deal-of-day.mjs --dry            # nothing written
 //   node scripts/build-deal-of-day.mjs --today=2026-08-23
-//   node scripts/build-deal-of-day.mjs --force=fundedseat
+//   node scripts/build-deal-of-day.mjs --force=traders-launch
 //   node scripts/build-deal-of-day.mjs --all            # one preview per firm
 //
 // State lives in data/newsletter/: history.json (7-day cooldown) and

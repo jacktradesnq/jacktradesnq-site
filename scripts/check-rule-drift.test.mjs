@@ -1,5 +1,5 @@
-// Parsing tests for the rule-drift check, run against a real payload saved from
-// the firm's own store API. No network, no browser.
+// Parsing tests for the rule-drift check, run against a saved card. No network,
+// no browser.
 // Run: node --test scripts/check-rule-drift.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -7,21 +7,9 @@ import { readFileSync } from 'node:fs';
 
 import {
   handCheck,
-  mergeFundedSeatSources,
   e8CardRules,
   BROKEN,
 } from './check-rule-drift.mjs';
-
-test('a card saying None on its eval face is no drift when their API charges at the payout', () => {
-  // FundedSeat Sprint: the card's "Evaluation Rules" face says Consistency
-  // None, and its "Funded Rules" face says 25% at the first payout. We publish
-  // the rule a trader actually hits, so reading the eval face alone reported
-  // four drifts every single day that were not drifts.
-  const cards = [{ programName: 'Sprint', size: 50000, rules: { consistency: null, maxDrawdown: 2000 } }];
-  const api = [{ programName: 'Sprint', size: 50000, payoutConsistency: '25%', rules: { maxDrawdown: 2000 } }];
-  const [merged] = mergeFundedSeatSources(cards, api);
-  assert.equal(merged.rules.consistency, '25%');
-});
 
 // Captured 2026-08-21 from the Configure Challenge widget on e8futures.com
 const E8_CARD = readFileSync(new URL('./__fixtures__/e8-signature-card.txt', import.meta.url), 'utf8');
@@ -45,13 +33,6 @@ test('the contract row coming back is read again, never left to the manual list'
 test('a contract row present but unreadable is a broken scraper, not an absent rule', () => {
   const mangled = E8_CARD.replace('Drawdown type', 'Max contracts\nask support\nDrawdown type');
   assert.equal(e8CardRules('E8 Signature Futures', mangled).rules.contracts, BROKEN);
-});
-
-test('a consistency they do publish on the eval is never replaced by the payout one', () => {
-  const cards = [{ programName: 'Daily', size: 50000, rules: { consistency: '40%' } }];
-  const api = [{ programName: 'Daily', size: 50000, payoutConsistency: '25%', rules: {} }];
-  const [merged] = mergeFundedSeatSources(cards, api);
-  assert.equal(merged.rules.consistency, '40%');
 });
 
 /* ------- rules read by hand: how long that reading is worth trusting ------- */

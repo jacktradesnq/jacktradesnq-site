@@ -4,23 +4,22 @@
  * Le chemin historique de scripts/scrape-prop-firms.mjs (`guard()` + `apply()`)
  * est un metteur a jour de prix : les programmes et les tailles sont figes a la
  * main dans public/data/prop-firms.json, et tout produit que ce fichier ne
- * liste pas n'existe pas sur le site. C'est comme ca que FundedSeat a vendu
- * sept familles pendant que le comparateur en montrait trois, que les comptes
+ * liste pas n'existe pas sur le site. C'est comme ca que les comptes
  * « Legacy NYC » de Traders Launch n'ont jamais ete publies, et que les 25K de
  * Blue Guardian Express manquaient.
  *
  * Ici, ce que rend le LECTEUR de la firme est le catalogue : un programme ou
  * une taille qu'il rend et que le JSON ignore est CREE, un programme ou une
- * taille que le JSON garde et que le lecteur ne vend plus est SUPPRIME (la
- * « Flex » de FundedSeat, retiree en aout, a mis des semaines a disparaitre).
+ * taille que le JSON garde et que le lecteur ne vend plus est SUPPRIME (un
+ * programme que la firme ne vend plus a deja mis des semaines a disparaitre).
  *
  * La ou ce module refuse de trancher : les regles de risque curatees a la main
  * depuis les help centers. Le lecteur gagne quand il PORTE la cle — y compris
  * quand sa valeur est `null`, qui veut dire « la source dit qu'il n'y a pas de
  * regle ». Quand il OMET la cle, il ne sait pas, et la valeur du JSON reste :
- * c'est ce qui garde `consistency: "15% biggest trade"` sur l'Instant Funding
- * de FundedSeat, une regle que leur API n'encode nulle part. Jamais de `null`
- * a la place d'une valeur que le lecteur ne connait pas.
+ * c'est ce qui garde une regle curatee a la main quand le lecteur ne porte
+ * pas la cle. Jamais de `null` a la place d'une valeur que le lecteur ne
+ * connait pas.
  */
 
 /**
@@ -47,10 +46,9 @@ const RULE_FIELDS = [
  * rend, et leur absence est une information (plus de prix barre, plus
  * d'ambiguite de prix), donc la cle disparait du JSON.
  *
- * `priceAmbiguous` / `variants` : chez FundedSeat un meme nom est actif a
- * plusieurs prix en meme temps (« Daily Ultra (35%) - 100K » a $264.50, $297.50
- * et $451.50). Le lecteur publie le moins cher et dit que ce n'est pas le seul ;
- * ce fait se garde tel quel plutot que de se taire.
+ * `priceAmbiguous` / `variants` : un meme nom peut etre actif a plusieurs
+ * prix en meme temps. Le lecteur publie le moins cher et dit que ce n'est pas
+ * le seul ; ce fait se garde tel quel plutot que de se taire.
  */
 const READER_OWNED = ['originalPrice', 'priceAmbiguous', 'variants'];
 

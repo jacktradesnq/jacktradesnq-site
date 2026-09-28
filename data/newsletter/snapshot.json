@@ -29,26 +29,6 @@
         "1-Step|300000": 599
       }
     },
-    "fundedseat": {
-      "promoKey": "45% OFF + 50% w/ code|ULTRA50|2026-08-23",
-      "prices": {
-        "Daily|25000": 76.95,
-        "Daily|50000": 104.95,
-        "Daily|100000": 174.95,
-        "Daily|150000": 244.95,
-        "Instant Funding|25000": 219.95,
-        "Instant Funding|50000": 329.95,
-        "Instant Funding|100000": 494.95,
-        "Flex|25000": 76.95,
-        "Flex|50000": 104.95,
-        "Flex|100000": 174.95,
-        "Flex|150000": 244.95,
-        "Sprint|25000": 74.95,
-        "Sprint|50000": 109.95,
-        "Sprint|100000": 164.95,
-        "Sprint|150000": 259.95
-      }
-    },
     "e8-markets": {
       "promoKey": "Up to 40% off|JTNQ|",
       "prices": {

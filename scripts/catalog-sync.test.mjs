@@ -8,7 +8,7 @@ import { guardCatalog, syncCatalog } from './lib/catalog-sync.mjs';
 
 /** Une firme publiee minimale : un programme, une taille, des regles curatees. */
 const firmeJSON = () => ({
-  name: 'FundedSeat',
+  name: 'Blue Guardian',
   programs: [
     {
       name: 'Instant Funding',
@@ -61,7 +61,7 @@ test('un programme que la firme vend et que le JSON ignore est cree', () => {
   assert.equal(cree.type, 'eval');
   assert.equal(cree.priceType, 'one-time');
   assert.deepEqual(cree.plans.map((p) => p.size), [25000, 50000]);
-  assert.equal(changes.some((c) => c === 'FundedSeat: programme « Daily Ultra (35%) » ajoute (2 tailles)'), true);
+  assert.equal(changes.some((c) => c === 'Blue Guardian: programme « Daily Ultra (35%) » ajoute (2 tailles)'), true);
 });
 
 test('une taille nouvelle dans un programme deja publie est creee, et dite', () => {
@@ -84,7 +84,7 @@ test('une taille nouvelle dans un programme deja publie est creee, et dite', () 
   );
 
   assert.equal(plan(firm, 'Instant Funding', 25000).price, 219.95);
-  assert.equal(changes.includes('FundedSeat / Instant Funding $25K: plan ajoute'), true);
+  assert.equal(changes.includes('Blue Guardian / Instant Funding $25K: plan ajoute'), true);
 });
 
 test('un plan cree ne porte que ce que le lecteur a dit, dans l ordre du dataset', () => {
@@ -160,8 +160,8 @@ test('le lecteur qui PORTE la cle gagne, meme pour dire null', () => {
   const p = plan(firm, 'Instant Funding', 50000);
   assert.equal(p.consistency, '20%');
   assert.equal(p.dailyLoss, null);
-  assert.equal(changes.includes('FundedSeat / Instant Funding $50K: consistency "15% biggest trade" -> "20%"'), true);
-  assert.equal(changes.includes('FundedSeat / Instant Funding $50K: dailyLoss 1500 -> null'), true);
+  assert.equal(changes.includes('Blue Guardian / Instant Funding $50K: consistency "15% biggest trade" -> "20%"'), true);
+  assert.equal(changes.includes('Blue Guardian / Instant Funding $50K: dailyLoss 1500 -> null'), true);
 });
 
 test('prix et prix barre viennent toujours du lecteur, un barre disparu efface la cle', () => {
@@ -183,8 +183,8 @@ test('prix et prix barre viennent toujours du lecteur, un barre disparu efface l
   const p = plan(firm, 'Instant Funding', 50000);
   assert.equal(p.price, 329.95);
   assert.equal('originalPrice' in p, false);
-  assert.equal(changes.includes('FundedSeat / Instant Funding $50K: price 300 -> 329.95'), true);
-  assert.equal(changes.includes('FundedSeat / Instant Funding $50K: originalPrice 600 -> aucun'), true);
+  assert.equal(changes.includes('Blue Guardian / Instant Funding $50K: price 300 -> 329.95'), true);
+  assert.equal(changes.includes('Blue Guardian / Instant Funding $50K: originalPrice 600 -> aucun'), true);
 });
 
 test('un meme nom actif a plusieurs prix garde ses variantes dans le JSON', () => {
@@ -240,7 +240,7 @@ test('un programme que la firme ne vend plus est retire, et dit', () => {
   );
 
   assert.deepEqual(firm.programs.map((p) => p.name), ['Instant Funding']);
-  assert.equal(changes.includes('FundedSeat / Flex: programme retire'), true);
+  assert.equal(changes.includes('Blue Guardian / Flex: programme retire'), true);
 });
 
 test('une taille que la firme ne vend plus est retiree, et dite', () => {
@@ -261,12 +261,12 @@ test('une taille que la firme ne vend plus est retiree, et dite', () => {
   );
 
   assert.deepEqual(firm.programs[0].plans.map((p) => p.size), [50000]);
-  assert.equal(changes.includes('FundedSeat / Instant Funding $150K: plan retire'), true);
+  assert.equal(changes.includes('Blue Guardian / Instant Funding $150K: plan retire'), true);
 });
 
 test('les champs de programme que le lecteur ne touche pas survivent', () => {
   const firm = firmeJSON();
-  firm.programs[0].promoCode = 'SEP50';
+  firm.programs[0].promoCode = 'BG25';
   firm.programs[0].promoLabel = '50% OFF';
   syncCatalog(
     firm,
@@ -281,7 +281,7 @@ test('les champs de programme que le lecteur ne touche pas survivent', () => {
     [],
   );
 
-  assert.equal(firm.programs[0].promoCode, 'SEP50');
+  assert.equal(firm.programs[0].promoCode, 'BG25');
   assert.equal(firm.programs[0].promoLabel, '50% OFF');
 });
 

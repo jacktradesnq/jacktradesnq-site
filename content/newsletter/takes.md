@@ -15,8 +15,6 @@ Une phrase ou deux suffit. Vide = rien ne sort.
 
 ---
 
-## fundedseat
-
 ## e8-markets
 
 ## blue-guardian

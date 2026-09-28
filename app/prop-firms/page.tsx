@@ -27,8 +27,7 @@ type Plan = {
   consistency?: string;
   contracts: string;
   activationFee?: number | null;
-  // Chez FundedSeat un meme produit est actif a plusieurs prix en meme temps
-  // (« Daily Ultra (35%) - 100K » a $264.50, $297.50 et $451.50 le 2026-09-13).
+  // Un meme produit peut etre actif a plusieurs prix en meme temps.
   // On publie le moins cher, et on le dit.
   priceAmbiguous?: boolean;
   // Ce qui qualifie le prix et que la source ecrit noir sur blanc : les
@@ -63,7 +62,6 @@ type PropData = { generatedAt: string; firms: Firm[] };
 const FIRM_LOGOS: Record<string, string> = {
   'blue-guardian': '/logos/blue-guardian.svg',
   'traders-launch': '/logos/traders-launch.png',
-  'fundedseat': '/logos/fundedseat.png',
   'e8-markets': '/logos/e8-markets.svg',
 };
 

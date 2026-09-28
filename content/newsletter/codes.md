@@ -2,7 +2,7 @@
 
 Une ligne par firme. Deux valeurs possibles :
 
-    fundedseat = JTNQ      -> la page dit "code JTNQ"
+    e8-markets = JTNQ      -> la page dit "code JTNQ"
     traders-launch = link  -> aucun code a taper, le lien porte la remise
 
 ## Pourquoi c'est JTNQ partout
@@ -14,7 +14,7 @@ vente. L'affiliation ne tiendrait pas debout.
 
 La donnee le montre directement : chez **E8 Markets**, le
 code public scrape sur leur propre site EST `JTNQ`. Ils publient ton code comme
-promo generale. Chez les autres, le code public (BG25, ULTRA50) et le
+promo generale. Chez les autres, le code public (BG25) et le
 tien ouvrent la meme remise, celle qui est deja dans le prix affiche.
 
 Donc le prix de la page est le prix qu'on paie avec ton code, et c'est ton code
@@ -32,7 +32,6 @@ Eux n'ont pas de code public du tout. Leur remise de 15% arrive par le lien
 ## codes
 blue-guardian = JTNQ
 traders-launch = link
-fundedseat = JTNQ
 e8-markets = JTNQ
 
 ---
@@ -46,4 +45,4 @@ fait jamais perdre une commission, il te fait juste perdre l'occasion de
 faire taper ton nom.
 
 La machine n'imprimera jamais un code public a la place du tien : si un code
-comme BG25 ou ULTRA50 apparait dans un message, le build refuse d'emettre.
+comme BG25 apparait dans un message, le build refuse d'emettre.
