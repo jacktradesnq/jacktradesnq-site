@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-01",
+  "generatedAt": "2026-10-02",
   "firms": [
     {
       "id": "blue-guardian",
@@ -11,7 +11,7 @@
         "code": "BG25"
       },
       "url": "https://blueguardian.com/?afmc=JTNQ",
-      "lastChecked": "2026-10-01",
+      "lastChecked": "2026-10-02",
       "stale": false,
       "programs": [
         {
@@ -131,8 +131,8 @@
           "plans": [
             {
               "size": 25000,
-              "price": 59.5,
-              "originalPrice": 119,
+              "price": 65,
+              "originalPrice": 86,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
@@ -143,8 +143,8 @@
             },
             {
               "size": 50000,
-              "price": 89.5,
-              "originalPrice": 179,
+              "price": 98,
+              "originalPrice": 130,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -155,8 +155,8 @@
             },
             {
               "size": 100000,
-              "price": 141.5,
-              "originalPrice": 283,
+              "price": 154,
+              "originalPrice": 205,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
@@ -167,8 +167,8 @@
             },
             {
               "size": 150000,
-              "price": 220,
-              "originalPrice": 440,
+              "price": 240,
+              "originalPrice": 320,
               "profitTarget": 9000,
               "maxDrawdown": 4500,
               "ddType": "EOD Trailing",
@@ -243,7 +243,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-10-01",
+      "lastChecked": "2026-10-02",
       "stale": false,
       "programs": [
         {
