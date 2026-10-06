@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-05",
+  "generatedAt": "2026-10-06",
   "firms": [
     {
       "id": "blue-guardian",
@@ -11,7 +11,7 @@
         "code": "BG25"
       },
       "url": "https://blueguardian.com/?afmc=JTNQ",
-      "lastChecked": "2026-10-05",
+      "lastChecked": "2026-10-06",
       "stale": false,
       "programs": [
         {
@@ -243,7 +243,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-10-05",
+      "lastChecked": "2026-10-06",
       "stale": false,
       "programs": [
         {
