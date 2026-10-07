@@ -10,7 +10,6 @@ import { AssetProvider, type AssetKey } from '../_components/AssetContext';
 import AssetPills from '../_components/AssetPills';
 import KillzoneSwitcher from '../_components/KillzoneSwitcher';
 import NwogSwitcher from '../_components/NwogSwitcher';
-import News830Explorer from '../_components/News830Explorer';
 import EquityCurveWidget from '../_components/EquityCurveWidget';
 import MobileTabs, { type MobileTab } from '../_components/MobileTabs';
 import BilingualProse from '../_components/BilingualProse';
@@ -104,18 +103,6 @@ const EQUITY_DATA: Record<string, string> = {
 };
 
 const catLabel = (c: string) => (c === 'tradingview' ? 'TRADINGVIEW' : 'DATA');
-
-const NEWS830_CONFIGS: Record<string, { dataUrl: string; pdfTitle: string; dataUrlGc?: string; pdfTitleGc?: string }> = {
-  'nfp-ifvg-smt':                 { dataUrl: '/data/nfp-ifvg-smt.json',               pdfTitle: 'NFP IFVG + ES SMT',            dataUrlGc: '/data/nfp-ifvg-smt_gc.json',               pdfTitleGc: 'NFP IFVG + SI SMT' },
-  'cpi-ifvg-smt':                 { dataUrl: '/data/cpi-ifvg-smt.json',               pdfTitle: 'CPI IFVG + ES SMT',            dataUrlGc: '/data/cpi-ifvg-smt_gc.json',               pdfTitleGc: 'CPI IFVG + SI SMT' },
-  'ppi-ifvg-smt':                 { dataUrl: '/data/ppi-ifvg-smt.json',               pdfTitle: 'PPI IFVG + ES SMT',            dataUrlGc: '/data/ppi-ifvg-smt_gc.json',               pdfTitleGc: 'PPI IFVG + SI SMT' },
-  'retailsales-ifvg-smt':         { dataUrl: '/data/retailsales-ifvg-smt.json',       pdfTitle: 'Retail Sales IFVG + ES SMT',   dataUrlGc: '/data/retailsales-ifvg-smt_gc.json',       pdfTitleGc: 'Retail Sales IFVG + SI SMT' },
-  'pce-ifvg-smt':                 { dataUrl: '/data/pce-ifvg-smt.json',               pdfTitle: 'PCE IFVG + ES SMT',            dataUrlGc: '/data/pce-ifvg-smt_gc.json',               pdfTitleGc: 'PCE IFVG + SI SMT' },
-  'gdp-ifvg-smt':                 { dataUrl: '/data/gdp-ifvg-smt.json',               pdfTitle: 'GDP IFVG + ES SMT',            dataUrlGc: '/data/gdp-ifvg-smt_gc.json',               pdfTitleGc: 'GDP IFVG + SI SMT' },
-  'joblessclaims-ifvg-smt':       { dataUrl: '/data/joblessclaims-ifvg-smt.json',     pdfTitle: 'Jobless Claims IFVG + ES SMT', dataUrlGc: '/data/joblessclaims-ifvg-smt_gc.json',     pdfTitleGc: 'Jobless Claims IFVG + SI SMT' },
-  'empirestate-ifvg-smt':         { dataUrl: '/data/empirestate-ifvg-smt.json',       pdfTitle: 'Empire State IFVG + ES SMT',   dataUrlGc: '/data/empirestate-ifvg-smt_gc.json',       pdfTitleGc: 'Empire State IFVG + SI SMT' },
-  'employmentcostindex-ifvg-smt': { dataUrl: '/data/employmentcostindex-ifvg-smt.json', pdfTitle: 'ECI IFVG + ES SMT',          dataUrlGc: '/data/employmentcostindex-ifvg-smt_gc.json', pdfTitleGc: 'ECI IFVG + SI SMT' },
-};
 
 const FULLPORT_PDFS: Record<string, { nq: string; gc: string; label: string }> = {
   nfp: { nq: '/downloads/studies/nfp-fullport.pdf', gc: '/downloads/studies/nfp-fullport.pdf', label: 'Download — NFP Fullport PDF' },
@@ -244,20 +231,6 @@ export default async function BacktestedDetail({ params }: PageProps) {
     );
   }
 
-  const match = entry.explanationHtmlNq.match(EXPLORER_RE);
-  const explorerKey = match ? match[1].toLowerCase() : null;
-  const news830Config = explorerKey && NEWS830_CONFIGS[explorerKey] ? NEWS830_CONFIGS[explorerKey] : null;
-  const isNews830 = news830Config !== null;
-  const splitter = (html: string) =>
-    isNews830
-      ? html.split(EXPLORER_RE).filter((_, i) => i !== 1)
-      : [html, ''];
-  const [htmlBeforeNq, htmlAfterNq] = splitter(entry.explanationHtmlNq);
-  const [htmlBeforeGc, htmlAfterGc] = splitter(entry.explanationHtmlGc);
-  const [htmlBeforeEs, htmlAfterEs] = entry.explanationHtmlEs ? splitter(entry.explanationHtmlEs) : ['', ''];
-  const [htmlBeforeSi, htmlAfterSi] = entry.explanationHtmlSi ? splitter(entry.explanationHtmlSi) : ['', ''];
-  const [htmlBeforeYm, htmlAfterYm] = entry.explanationHtmlYm ? splitter(entry.explanationHtmlYm) : ['', ''];
-
   // Second pass: detect equity curve placeholder inside htmlBefore (it appears before the explorer)
   const equityMatchBefore = entry.explanationHtmlNq.match(EQUITY_RE);
   const equityKey = equityMatchBefore ? equityMatchBefore[1].toLowerCase() : null;
@@ -267,21 +240,7 @@ export default async function BacktestedDetail({ params }: PageProps) {
     ? entry.explanationHtmlNq.split(EQUITY_RE).filter((_, i) => i !== 1)
     : [entry.explanationHtmlNq, ''];
 
-  const mobileHasExplorer = !!(entry.mobileHtml && EXPLORER_RE.test(entry.mobileHtml));
-  const [mobileBefore, mobileAfter] = mobileHasExplorer
-    ? entry.mobileHtml!.split(EXPLORER_RE).filter((_, i) => i !== 1)
-    : [entry.mobileHtml ?? '', ''];
-
   const hasBilingualMobile = !!(entry.mobileHtmlNq && entry.mobileHtmlGc);
-  const [mobileBeforeNq, mobileAfterNq] =
-    hasBilingualMobile && EXPLORER_RE.test(entry.mobileHtmlNq!)
-      ? entry.mobileHtmlNq!.split(EXPLORER_RE).filter((_, i) => i !== 1)
-      : [entry.mobileHtmlNq ?? '', ''];
-  const [mobileBeforeGc, mobileAfterGc] =
-    hasBilingualMobile && EXPLORER_RE.test(entry.mobileHtmlGc!)
-      ? entry.mobileHtmlGc!.split(EXPLORER_RE).filter((_, i) => i !== 1)
-      : [entry.mobileHtmlGc ?? '', ''];
-
   const mobileH2Count = entry.mobileHtml ? (entry.mobileHtml.match(/<h2[\s>]/g) ?? []).length : 0;
   const useMobileTabs = mobileH2Count >= 2;
   const mobileTabs: MobileTab[] = [];
@@ -292,41 +251,14 @@ export default async function BacktestedDetail({ params }: PageProps) {
       if (!labelMatch) continue;
       const label = labelMatch[1].replace(/<[^>]+>/g, '').replace(/^Article\s+\d+\s*[—-]\s*/i, '').trim();
       const body = part.replace(/<h2[^>]*>[\s\S]*?<\/h2>/, '').trim();
-      const expMatch = body.match(EXPLORER_RE);
-      if (expMatch) {
+      if (EXPLORER_RE.test(body)) {
         const [hb, ha] = body.split(EXPLORER_RE).filter((_, i) => i !== 1);
-        const key = expMatch[1].toLowerCase();
-        let explorerNode: React.ReactNode = null;
-        if (isNews830 && NEWS830_CONFIGS[key]) {
-          explorerNode = (
-            <News830Explorer
-              dataUrl={NEWS830_CONFIGS[key].dataUrl}
-              pdfTitle={NEWS830_CONFIGS[key].pdfTitle}
-              dataUrlGc={NEWS830_CONFIGS[key].dataUrlGc}
-              pdfTitleGc={NEWS830_CONFIGS[key].pdfTitleGc}
-            />
-          );
-        }
-        mobileTabs.push({ label, htmlBefore: hb, explorer: explorerNode, htmlAfter: ha });
+        mobileTabs.push({ label, htmlBefore: hb, htmlAfter: ha });
       } else {
         mobileTabs.push({ label, htmlBefore: body });
       }
     }
   }
-
-  let desktopExplorerNode: React.ReactNode = null;
-  if (isNews830) {
-    desktopExplorerNode = (
-      <News830Explorer
-        dataUrl={news830Config!.dataUrl}
-        pdfTitle={news830Config!.pdfTitle}
-        dataUrlGc={news830Config!.dataUrlGc}
-        pdfTitleGc={news830Config!.pdfTitleGc}
-      />
-    );
-  }
-
-  const hasDesktopSplit = desktopExplorerNode !== null;
 
   // Pager shared between both layouts
   const pager = (
@@ -372,20 +304,6 @@ export default async function BacktestedDetail({ params }: PageProps) {
           <div className="bd-show-mobile">
             <MobileTabs tabs={mobileTabs} />
           </div>
-        ) : mobileHasExplorer && hasDesktopSplit ? (
-          <div className="bd-show-mobile">
-            {hasBilingualMobile ? (
-              <BilingualProse htmlNq={mobileBeforeNq} htmlGc={mobileBeforeGc} className="bd-prose" />
-            ) : (
-              <div className="bd-prose" dangerouslySetInnerHTML={{ __html: mobileBefore }} />
-            )}
-            {desktopExplorerNode}
-            {hasBilingualMobile ? (
-              <BilingualProse htmlNq={mobileAfterNq} htmlGc={mobileAfterGc} className="bd-prose" />
-            ) : (
-              <div className="bd-prose" dangerouslySetInnerHTML={{ __html: mobileAfter }} />
-            )}
-          </div>
         ) : hasBilingualMobile ? (
           <BilingualProse htmlNq={entry.mobileHtmlNq!} htmlGc={entry.mobileHtmlGc!} className="bd-prose bd-show-mobile" />
         ) : (
@@ -393,15 +311,7 @@ export default async function BacktestedDetail({ params }: PageProps) {
         )
       ) : null}
       <div className={entry.mobileHtml ? 'bd-show-desktop' : undefined}>
-        {hasDesktopSplit ? (
-          <>
-            <BilingualProse htmlNq={htmlBeforeNq} htmlGc={htmlBeforeGc} htmlEs={htmlBeforeEs || undefined} htmlSi={htmlBeforeSi || undefined} htmlYm={htmlBeforeYm || undefined} />
-            {desktopExplorerNode}
-            <BilingualProse htmlNq={htmlAfterNq} htmlGc={htmlAfterGc} htmlEs={htmlAfterEs || undefined} htmlSi={htmlAfterSi || undefined} htmlYm={htmlAfterYm || undefined} />
-          </>
-        ) : (
-          <BilingualProse htmlNq={entry.explanationHtmlNq} htmlGc={entry.explanationHtmlGc} htmlEs={entry.explanationHtmlEs} htmlSi={entry.explanationHtmlSi} htmlYm={entry.explanationHtmlYm} />
-        )}
+        <BilingualProse htmlNq={entry.explanationHtmlNq} htmlGc={entry.explanationHtmlGc} htmlEs={entry.explanationHtmlEs} htmlSi={entry.explanationHtmlSi} htmlYm={entry.explanationHtmlYm} />
       </div>
       {entry.pdfFileNq ? (
         <div className="bd-ctas" style={{ marginTop: 32 }}>
@@ -598,20 +508,6 @@ export default async function BacktestedDetail({ params }: PageProps) {
           <div className="bd-show-mobile">
             <MobileTabs tabs={mobileTabs} />
           </div>
-        ) : mobileHasExplorer && hasDesktopSplit ? (
-          <div className="bd-show-mobile">
-            {hasBilingualMobile ? (
-              <BilingualProse htmlNq={mobileBeforeNq} htmlGc={mobileBeforeGc} className="bd-prose" />
-            ) : (
-              <div className="bd-prose" dangerouslySetInnerHTML={{ __html: mobileBefore }} />
-            )}
-            {desktopExplorerNode}
-            {hasBilingualMobile ? (
-              <BilingualProse htmlNq={mobileAfterNq} htmlGc={mobileAfterGc} className="bd-prose" />
-            ) : (
-              <div className="bd-prose" dangerouslySetInnerHTML={{ __html: mobileAfter }} />
-            )}
-          </div>
         ) : hasBilingualMobile ? (
           <BilingualProse htmlNq={entry.mobileHtmlNq!} htmlGc={entry.mobileHtmlGc!} className="bd-prose bd-show-mobile" />
         ) : (
@@ -620,13 +516,7 @@ export default async function BacktestedDetail({ params }: PageProps) {
       ) : null}
 
       <div className={entry.mobileHtml ? 'bd-show-desktop' : undefined}>
-        {hasDesktopSplit ? (
-          <>
-            <BilingualProse htmlNq={htmlBeforeNq} htmlGc={htmlBeforeGc} htmlEs={htmlBeforeEs || undefined} htmlSi={htmlBeforeSi || undefined} htmlYm={htmlBeforeYm || undefined} />
-            {desktopExplorerNode}
-            <BilingualProse htmlNq={htmlAfterNq} htmlGc={htmlAfterGc} htmlEs={htmlAfterEs || undefined} htmlSi={htmlAfterSi || undefined} htmlYm={htmlAfterYm || undefined} />
-          </>
-        ) : equityDataUrl ? (
+        {equityDataUrl ? (
           <>
             <div className="bd-prose" dangerouslySetInnerHTML={{ __html: htmlBeforeEquity }} />
             <EquityCurveWidget dataPath={equityDataUrl} />

@@ -9,8 +9,6 @@
     "test": "node --test scripts/*.test.mjs functions/api/*.test.mjs functions/_shared/*.test.mjs"
   },
   "dependencies": {
-    "jspdf": "^4.2.1",
-    "jspdf-autotable": "^5.0.7",
     "lightweight-charts": "^5.2.0",
     "marked": "^18.0.3",
     "next": "15.5.27",

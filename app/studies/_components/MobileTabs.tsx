@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 
 export interface MobileTab {
   label: string;
   htmlBefore: string;
-  explorer?: ReactNode;
   htmlAfter?: string;
 }
 
@@ -31,7 +30,6 @@ export default function MobileTabs({ tabs }: { tabs: MobileTab[] }) {
       </div>
       <div className="bd-mobile-tab-panel">
         <div className="bd-prose" dangerouslySetInnerHTML={{ __html: tab.htmlBefore }} />
-        {tab.explorer ?? null}
         {tab.htmlAfter ? (
           <div className="bd-prose" dangerouslySetInnerHTML={{ __html: tab.htmlAfter }} />
         ) : null}

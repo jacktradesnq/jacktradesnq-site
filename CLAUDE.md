@@ -8,7 +8,7 @@
 - Animations : Framer Motion (reveal) + GSAP ScrollTrigger (parallax scroll)
 - Déploiement Cloudflare Pages via GitHub Actions (npm run build → deploy out/)
 - Client Components isolés pour JS interactif (prairieBackground, HeroReveal)
-- jsPDF + jspdf-autotable pour export PDF côté client
+- Plus d'export PDF côté client : News830Explorer + jsPDF retirés le 2026-10-07 (jamais affichés sur aucune page). Les PDF du site sont des fichiers statiques (public/downloads, BilingualPdfLink)
 - `marked` pour parser les explanation.md backtested-data
 
 ## Direction esthétique déclarée (ne PAS dévier)
@@ -117,7 +117,7 @@ Tout en anglais SAUF footer légal FR (mentions légales + disclaimer AMF D.321-
 - news-830-ifvg retire puis republie v2.0 avec chiffres rewritten engine (commits `96de475` + `9cb1c6e`)
 
 ### Interactive StraddleExplorer (sur main depuis 2026-05-09)
-- jsPDF + jspdf-autotable installes (commit `d99a412`)
+- jsPDF + jspdf-autotable installes (commit `d99a412`), retires le 2026-10-07
 - Embedded mode (commit `258ef81`)
 - CSS complet : filtres, stat cards, data table (commit `7eff650`)
 - Colonnes Wins/Losses/No-Fill (commit `38541f8`)
