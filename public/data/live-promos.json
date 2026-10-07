@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-06",
-  "builtFor": "2026-10-06",
+  "generatedAt": "2026-10-07",
+  "builtFor": "2026-10-07",
   "promos": [
     {
       "firmId": "blue-guardian",
@@ -29,7 +29,7 @@
       "consistency": "40%",
       "activationFee": null,
       "contracts": "4 Mini | 40 Micro",
-      "lastChecked": "2026-10-06"
+      "lastChecked": "2026-10-07"
     },
     {
       "firmId": "traders-launch",
@@ -57,7 +57,7 @@
       "consistency": null,
       "activationFee": null,
       "contracts": "5 Micros",
-      "lastChecked": "2026-10-06"
+      "lastChecked": "2026-10-07"
     }
   ]
 }
