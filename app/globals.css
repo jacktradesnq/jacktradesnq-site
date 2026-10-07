@@ -4039,6 +4039,21 @@ body:has(.page-legal) { background: oklch(0.15 0.028 165); }
   .v3-home-link {
     display: none;
   }
+  /* 4 assets (asia-open) must fit a 360px screen */
+  .v3-asset-pill { padding: 5px 8px; }
+  /* Tab row scrolls sideways instead of widening the page */
+  .v3-tabs {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+  .v3-tabs::-webkit-scrollbar { display: none; }
+  .v3-tab {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 12px 12px;
+    margin-bottom: 0;
+  }
 }
 
 /* BUG #2 — calendar/weekday grids: 3-col too tight at 375px */
@@ -5736,4 +5751,11 @@ body:has(.page-legal) { background: oklch(0.15 0.028 165); }
 @media (max-width: 640px) {
   .bd-root .rep-cards { grid-template-columns: 1fr; }
   .bd-root .rep-hrow { grid-template-columns: 110px 1fr 46px; }
+}
+/* 10+ year columns on a phone: tighter gaps and labels so the chart stays inside the screen */
+@media (max-width: 600px) {
+  .bd-root .rep-cols,
+  .bd-root .rep-daylabels { gap: 4px; padding: 0; }
+  .bd-root .rep-daylabels span { font-size: 10px; letter-spacing: 0; }
+  .bd-root .rep-v { font-size: 10px; }
 }

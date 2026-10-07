@@ -165,6 +165,7 @@ npm start         # serve out/ (preview)
 npx tsc --noEmit  # type check sans build
 npm test          # tests scripts/ + functions/ (lances aussi par la CI)
 node scripts/check-filterbar-layout.mjs  # barre de filtres sans chevauchement (site servi sur :8788, ou BASE=https://jacktradesnq.com)
+node scripts/check-page-width.mjs        # aucune page studies plus large qu'un téléphone (360/390/430px), même usage
 ```
 
 Deploy : push sur `main` -> GitHub Actions -> Cloudflare Pages auto.

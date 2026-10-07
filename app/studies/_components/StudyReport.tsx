@@ -47,7 +47,8 @@ function renderInline(text: string): React.ReactNode {
 
 function DivergingChart({ chart }: { chart: ReportChart }) {
   const bars = chart.bars ?? [];
-  const cols = `repeat(${bars.length}, 1fr)`;
+  // minmax(0, …) lets the columns shrink below their label width on a phone (1fr alone can't).
+  const cols = `repeat(${bars.length}, minmax(0, 1fr))`;
   const maxUp = Math.max(1, ...bars.filter((b) => b.value > 0).map((b) => b.value));
   const maxDown = Math.max(1, ...bars.filter((b) => b.value < 0).map((b) => -b.value));
   // Adapt zone heights to the data so an all-negative (or all-positive) chart
