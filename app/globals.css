@@ -3880,12 +3880,28 @@ body:has(.page-legal) { background: oklch(0.15 0.028 165); }
   .fb-animated { transition: none; }
   .fb-pill { transition: none; }
 }
+/* Bleed matches .v3-main's 20px side padding (≤860px), not the 40px desktop one */
+@media (max-width: 860px) {
+  .fb-sticky-wrap {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
 /* Mobile: allow wrap, tighten spacing */
 @media (max-width: 600px) {
   .fb-sticky-wrap {
     margin: 0 -20px 16px;
     padding: 0 20px;
   }
+  .fb-bar,
+  .fb-groups { row-gap: 8px; }
+  /* Filter groups take the full row so Best / Reset wrap below them instead of
+     sitting on top of the last pills; a group wider than the screen wraps too. */
+  .fb-groups { flex: 1 1 100%; }
+  .fb-group { flex-wrap: wrap; row-gap: 8px; }
+  .fb-bar > .fb-best { margin-left: 0; }
   .fb-pill {
     font-size: 0.75rem;
     padding: 4px 10px;

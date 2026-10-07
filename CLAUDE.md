@@ -164,6 +164,7 @@ npm run build     # static export -> out/
 npm start         # serve out/ (preview)
 npx tsc --noEmit  # type check sans build
 npm test          # tests scripts/ + functions/ (lances aussi par la CI)
+node scripts/check-filterbar-layout.mjs  # barre de filtres sans chevauchement (site servi sur :8788, ou BASE=https://jacktradesnq.com)
 ```
 
 Deploy : push sur `main` -> GitHub Actions -> Cloudflare Pages auto.
