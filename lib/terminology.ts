@@ -119,13 +119,6 @@ export const CONCEPTS: Record<string, ConceptEntry> = {
   BE:        { full: 'Break Even',                 gloss: 'moving the stop loss to the entry price'                   },
 };
 
-/**
- * Returns the gloss string for a concept code, or empty string if not found.
- */
-export function conceptGloss(code: string): string {
-  return CONCEPTS[code]?.gloss ?? '';
-}
-
 // ---------------------------------------------------------------------------
 // TradeMiniChart — EVENT_SHORT map (display name -> json slug)
 // Centralised here so TradeMiniChart imports from one place.

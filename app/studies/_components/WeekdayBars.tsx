@@ -3,50 +3,6 @@
 import { useMemo } from 'react';
 import type { WeekdayBreakdown } from '@/lib/study-stats';
 
-/* ── Simple bar mode (used by StudyCard, props: wr[] + n[]) ── */
-type SimpleProps = {
-  wr: number[];
-  n: number[];
-  asset?: string;
-};
-
-function simpleBarClass(w: number): string {
-  // Card teaser bars: single-tone gold (height encodes win rate). One accent like
-  // the home — the good/bad split lives on the full study page, not these minis.
-  if (w === 0) return 'bd-wd-bar--mute';
-  return 'bd-wd-bar--sage';
-}
-
-export function WeekdayBarsSimple({ wr, n, asset }: SimpleProps) {
-  const DAYS = ['M', 'T', 'W', 'T', 'F'];
-  const hasAnyData = n.some((v) => v > 0);
-  if (!hasAnyData) return null;
-  return (
-    <div className="bd-wd-block">
-      <div className="bd-wd-cap">
-        <span>win rate · weekday</span>
-        {asset && <span>{asset}</span>}
-      </div>
-      <div className="bd-wd-bars">
-        {wr.map((w, i) => {
-          const h = w > 0 ? Math.max(w, 8) : 4;
-          return (
-            <div key={i} className="bd-wd-bar-wrap">
-              <span className="bd-wd-bar-pct">{w > 0 ? `${w}%` : '\u2013'}</span>
-              <div
-                className={`bd-wd-bar ${simpleBarClass(w)}`}
-                style={{ height: `${h}%` }}
-                aria-label={`${DAYS[i]}: ${w > 0 ? `${w}% win rate` : 'no data'} (n=${n[i]})`}
-              />
-              <span className="bd-wd-bar-lbl">{DAYS[i]}</span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 /* ── Full SVG mode (used by V3Tabs, props: breakdown) ── */
 type Props = {
   breakdown: WeekdayBreakdown;

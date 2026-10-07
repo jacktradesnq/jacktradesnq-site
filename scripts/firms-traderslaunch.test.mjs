@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   TRADERSLAUNCH_URL,
+  TRADERSLAUNCH_SOURCE,
   fetchTradersLaunchPrograms,
   programsFromHtml,
 } from './lib/firms/traderslaunch.mjs';
@@ -191,6 +192,7 @@ test('fetchTradersLaunchPrograms : lit la page et rend les programmes', async ()
   assert.match(entetes['user-agent'], /Mozilla/);
   assert.equal(progs.length, 2);
   assert.equal(progs[1].plans[0].price, 99);
+  assert.equal(TRADERSLAUNCH_SOURCE, 'page traderslaunch.com');
 });
 
 test('fetchTradersLaunchPrograms : une panne se dit clairement, elle ne se devine pas', async () => {

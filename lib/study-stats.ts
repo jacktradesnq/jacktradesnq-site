@@ -4,7 +4,6 @@ import path from 'path';
 const contentDir = path.join(process.cwd(), 'content', 'studies');
 const dataDir = path.join(process.cwd(), 'public', 'data');
 
-export { MIN_DISPLAY_PF } from './study-display-config';
 import { MIN_DISPLAY_PF } from './study-display-config';
 import { eventFull } from '@/lib/terminology';
 
@@ -1201,9 +1200,7 @@ function processOneSlug(slug: string): StudyStats | null {
   };
 }
 
-// ── Straddle trade list / stats (for the 5-asset straddle explorer) ──────────
-
-const STRADDLE_SLUGS = ['cpi-day-stats', 'nfp', 'jobless-claims', 'ppi', 'retail-sales', 'durable-goods', 'pce'];
+// ── Straddle trades, all combos (for the 5-asset straddle explorer) ──────────
 
 interface StraddleTrade {
   date: string;
@@ -1232,43 +1229,6 @@ interface StraddleTradesJson {
     Y: number;
     trades: StraddleTrade[];
   }>;
-}
-
-function loadStraddleTrades(slug: string, asset: string): StraddleTradesJson | null {
-  const base = path.join(dataDir);
-  const dataKey = slug === 'cpi-day-stats' ? 'cpi' : slug;
-  const suffix = asset === 'nq' ? '' : `-${asset}`;
-  const fp = path.join(base, `${dataKey}-straddle-trades${suffix}.json`);
-  if (!fs.existsSync(fp)) return null;
-  try {
-    return JSON.parse(fs.readFileSync(fp, 'utf-8')) as StraddleTradesJson;
-  } catch {
-    return null;
-  }
-}
-
-const STRADDLE_STOPS: Record<string, number[]> = {
-  nq: [25, 30, 35, 40],
-  es: [5, 6, 7, 8],
-  ym: [50, 60, 70, 80],
-  gc: [3, 4, 5, 6],
-  si: [0.05, 0.07, 0.10, 0.12],
-};
-
-const STRADDLE_TPS: Record<string, number[]> = {
-  nq: [15, 20, 25],
-  es: [3, 4, 5],
-  ym: [30, 40, 50],
-  gc: [2, 2.5, 3],
-  si: [0.03, 0.05, 0.07],
-};
-
-export function getStraddleStopGrid(asset: string): number[] {
-  return STRADDLE_STOPS[asset] ?? STRADDLE_STOPS.nq;
-}
-
-export function getStraddleTpGrid(asset: string): number[] {
-  return STRADDLE_TPS[asset] ?? STRADDLE_TPS.nq;
 }
 
 export function getStraddleAllTrades(slug: string, asset: string): TradeRow[] {
@@ -1315,79 +1275,6 @@ export function getStraddleAllTrades(slug: string, asset: string): TradeRow[] {
   }
 
   return allTrades.sort((a, b) => (a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0));
-}
-
-export function getStraddleTradeList(slug: string, asset: string, stopKey: number, tpKey: number, sideFilter: 'long' | 'short' | 'all'): TradeRow[] {
-  const json = loadStraddleTrades(slug, asset);
-  if (!json) return [];
-
-  const combo = json.combos.find((c) => c.X === stopKey && c.Y === tpKey);
-  if (!combo) return [];
-
-  return combo.trades
-    .filter((t) => {
-      if (sideFilter === 'all') return true;
-      return t.filled_side === sideFilter;
-    })
-    .map((t) => {
-      const ts = t.fill_ts || t.ts;
-      const entryTs = t.fill_ts || undefined;
-      const exitTs = t.exit_ts || undefined;
-      const entryPrice = t.fill_price ?? t.entry_price;
-      const exitPrice = t.exit_price ?? undefined;
-      const tpPrice = t.filled_side === 'long' ? t.tp_buy : t.filled_side === 'short' ? t.tp_sell : undefined;
-      return {
-        ts,
-        year: new Date(t.ts).getUTCFullYear(),
-        side: t.filled_side || 'unknown',
-        pnl_pts: Math.round(t.pnl * 100) / 100,
-        outcome: t.outcome === 'tp_hit' ? 'win' : t.outcome === 'sl_hit' ? 'loss' : t.outcome === 'expired' ? 'timeout' : t.outcome,
-        x_stop: stopKey,
-        y_tp: tpKey,
-        entry_price: entryPrice,
-        sl_price: undefined,
-        tp_price: tpPrice,
-        entry_ts: entryTs,
-        exit_ts: exitTs,
-        exit_price: exitPrice,
-      };
-    })
-    .sort((a, b) => (a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0));
-}
-
-export function getStraddleStats(
-  slug: string, asset: string, stopKey: number, tpKey: number, sideFilter: 'long' | 'short' | 'all',
-): { pf: number; n: number; net: number; wr: number; dateFrom: string; dateTo: string } {
-  const json = loadStraddleTrades(slug, asset);
-  if (!json) return { pf: 0, n: 0, net: 0, wr: 0, dateFrom: '', dateTo: '' };
-
-  const combo = json.combos.find((c) => c.X === stopKey && c.Y === tpKey);
-  if (!combo) return { pf: 0, n: 0, net: 0, wr: 0, dateFrom: '', dateTo: '' };
-
-  const trades = sideFilter === 'all'
-    ? combo.trades
-    : combo.trades.filter((t) => t.filled_side === sideFilter);
-
-  const n = trades.length;
-  if (n === 0) return { pf: 0, n: 0, net: 0, wr: 0, dateFrom: '', dateTo: '' };
-
-  const wins = trades.filter((t) => t.pnl > 0);
-  const losses = trades.filter((t) => t.pnl < 0);
-  const winPnl = wins.reduce((s, t) => s + t.pnl, 0);
-  const lossPnl = Math.abs(losses.reduce((s, t) => s + t.pnl, 0));
-  const net = trades.reduce((s, t) => s + t.pnl, 0);
-  const pf = lossPnl > 0 ? winPnl / lossPnl : winPnl > 0 ? 99 : 0;
-  const wr = Math.round((wins.length / n) * 100);
-
-  const dates = trades.map((t) => t.date).sort();
-  return {
-    pf: Math.round(pf * 100) / 100,
-    n,
-    net: Math.round(net * 100) / 100,
-    wr,
-    dateFrom: dates[0] ?? '',
-    dateTo: dates[dates.length - 1] ?? '',
-  };
 }
 
 const FULLPORT_EVENTS: Array<{ slug: string; dataKey: string; eventName: string }> = [
