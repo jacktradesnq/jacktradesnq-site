@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "node --test scripts/*.test.mjs functions/api/*.test.mjs functions/_shared/*.test.mjs"
   },
   "dependencies": {
     "jspdf": "^4.2.1",

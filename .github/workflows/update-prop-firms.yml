@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Unit tests (parsers must pass before touching public data)
-        run: node --test scripts/*.test.mjs
+        run: npm test
 
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium

@@ -24,7 +24,7 @@ jobs:
         run: npm ci
 
       - name: Unit tests
-        run: node --test scripts/*.test.mjs
+        run: npm test
 
       - name: Build Next.js static export
         run: npm run build
