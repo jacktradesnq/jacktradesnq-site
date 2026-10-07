@@ -3,7 +3,7 @@
 import { useMemo, Suspense } from 'react';
 import { useAsset, type AssetKey } from './AssetContext';
 import V3Tabs from './V3Tabs';
-import type { TradeRow } from '@/lib/study-stats';
+import type { TradeRow } from '@/lib/strategy-stats';
 import { computeKPI, computeWeekdayBreakdown } from '@/lib/client-stats';
 import { assetShort, eventFull } from '@/lib/terminology';
 

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Fragment, Suspense, useState, useMemo, useEffect } from 'react';
-import type { WeekdayBreakdown, WeekdayStats, YearBreakdown, TradeRow, StrategyStats, ProfitableCombo } from '@/lib/study-stats';
+import type { WeekdayBreakdown, WeekdayStats, YearBreakdown, TradeRow, StrategyStats, ProfitableCombo } from '@/lib/strategy-stats';
 import { MIN_DISPLAY_PF } from '@/lib/study-display-config';
 import { aggregateYearTotals } from '@/lib/year-stats-utils';
 import { filterTradesByLookback, computeKPI, computeYearBreakdown, computeWeekdayBreakdown } from '@/lib/client-stats';

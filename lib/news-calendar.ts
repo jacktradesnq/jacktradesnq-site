@@ -1,4 +1,4 @@
-import type { EventStudyStats } from './study-stats';
+import type { EventStudyStats } from './strategy-stats';
 
 export type NewsCalendarItem = {
   date: string;     // YYYY-MM-DD

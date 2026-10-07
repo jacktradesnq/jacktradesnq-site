@@ -23,7 +23,8 @@ import StudyReport from '../_components/StudyReport';
 import ManipDataTabs, { type ContDataFile } from '../_components/ManipDataTabs';
 import { type ManipExample } from '../_components/ManipExampleChart';
 import { computeWeekdayBreakdown } from '@/lib/client-stats';
-import { getStrategyStats, getStrategyStatsByVariant, getStrategyStatsByVariantAndSmt, getWeekdayBreakdown, getTradeList, getStraddleAllTrades, getProfitableIfvgCombos, type TradeRow, type ProfitableCombo } from '@/lib/study-stats';
+import { getStrategyStats, getStrategyStatsByVariant, getStrategyStatsByVariantAndSmt, getWeekdayBreakdown, getTradeList, getProfitableIfvgCombos, type TradeRow, type ProfitableCombo } from '@/lib/strategy-stats';
+import { getStraddleAllTrades } from '@/lib/straddle-trades';
 
 const EXPLORER_RE =
   /<div data-explorer="(cpi|nfp|jobless-claims|ppi|retail-sales|durable-goods|pce|nfp-ifvg-smt|cpi-ifvg-smt|ppi-ifvg-smt|retailsales-ifvg-smt|pce-ifvg-smt|gdp-ifvg-smt|joblessclaims-ifvg-smt|empirestate-ifvg-smt|employmentcostindex-ifvg-smt)">\s*<\/div>/i;
@@ -419,7 +420,7 @@ export default async function BacktestedDetail({ params }: PageProps) {
     const barsSlug = STRADDLE_BARS_SLUG[slug] ?? slug;
     const eventName = EVENT_INFO[STRADDLE_BARS_KEY[slug] ?? slug]?.eventType ?? entry.title;
     const releaseTime = '8:30 ET';
-    const allTrades: Record<string, import('@/lib/study-stats').TradeRow[]> = {};
+    const allTrades: Record<string, TradeRow[]> = {};
     for (const asset of ['nq', 'gc', 'si', 'es']) {
       allTrades[asset] = getStraddleAllTrades(slug, asset);
     }

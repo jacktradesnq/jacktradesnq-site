@@ -1,7 +1,7 @@
 // Client-side stat helpers — isomorphic (no fs/path).
 // Used by V3Tabs to recompute KPI + breakdowns from raw trades after filter changes.
 
-import type { TradeRow, YearStats, YearBreakdown, WeekdayStats, WeekdayBreakdown } from './study-stats';
+import type { TradeRow, YearStats, YearBreakdown, WeekdayStats, WeekdayBreakdown } from './strategy-stats';
 
 type LookbackKey = '3mo' | '6mo' | '1y' | '5y' | 'all';
 

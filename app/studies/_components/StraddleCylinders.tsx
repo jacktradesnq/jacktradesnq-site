@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import type { TradeRow } from '@/lib/study-stats';
+import type { TradeRow } from '@/lib/strategy-stats';
 
 interface Segment {
   pct: number;

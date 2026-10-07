@@ -1,5 +1,5 @@
 import { loadNewsCalendar } from '@/lib/news-calendar-server';
-import { getEventStudyMap } from '@/lib/study-stats';
+import { getEventStudyMap } from '@/lib/strategy-stats';
 import CalendarView from './_components/CalendarView';
 
 export default function CalendarPage() {

@@ -12,7 +12,7 @@ import {
 } from '@/lib/news-calendar';
 import { RED_FOLDER_WHITELIST } from '@/lib/news-week';
 import { MARKET_HOLIDAYS, MARKET_EARLY_CLOSE } from '@/lib/market-holidays';
-import type { EventStudyStats } from '@/lib/study-stats';
+import type { EventStudyStats } from '@/lib/strategy-stats';
 
 type StudyMap = Record<string, EventStudyStats | null>;
 

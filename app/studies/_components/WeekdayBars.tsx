@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import type { WeekdayBreakdown } from '@/lib/study-stats';
+import type { WeekdayBreakdown } from '@/lib/strategy-stats';
 
 /* ── Full SVG mode (used by V3Tabs, props: breakdown) ── */
 type Props = {

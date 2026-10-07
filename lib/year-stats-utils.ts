@@ -1,4 +1,4 @@
-import type { TradeRow, YearStats } from './study-stats';
+import type { TradeRow, YearStats } from './strategy-stats';
 
 /**
  * Total row for the year table — computed from the raw trade list
