@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import ContactEmail from '../_legal/ContactEmail';
 
 export const metadata: Metadata = {
   title: 'Mentions légales — JackTradesNQ',
@@ -19,7 +20,7 @@ export default function MentionsLegales() {
           <p>
             <strong>Jack Chen</strong> — Entrepreneur individuel (EI)<br />
             Adresse : 65 rue du Faubourg du Temple, 75010 Paris, France<br />
-            Courriel : contact@jacktradesnq.com<br />
+            Courriel : <ContactEmail /><br />
             SIREN : 993 260 827<br />
             Directeur de la publication : Jack Chen
           </p>
@@ -49,7 +50,7 @@ export default function MentionsLegales() {
           <p>
             <strong>Jack Chen</strong> — Sole trader (Entrepreneur individuel)<br />
             Address: 65 rue du Faubourg du Temple, 75010 Paris, France<br />
-            Email: contact@jacktradesnq.com<br />
+            Email: <ContactEmail /><br />
             SIREN: 993 260 827
           </p>
 

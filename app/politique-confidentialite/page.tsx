@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import ContactEmail from '../_legal/ContactEmail';
 
 export const metadata: Metadata = {
   title: 'Politique de confidentialité — JackTradesNQ',
@@ -17,7 +18,7 @@ export default function PolitiqueConfidentialite() {
           <p className="updated">Dernière mise à jour : avril 2026</p>
 
           <h3>Responsable de traitement</h3>
-          <p>Jack Chen — contact@jacktradesnq.com — Paris, France</p>
+          <p>Jack Chen — <ContactEmail /> — Paris, France</p>
 
           <h3>Données collectées</h3>
           <table>
@@ -39,7 +40,7 @@ export default function PolitiqueConfidentialite() {
           </ul>
 
           <h3>Vos droits (RGPD)</h3>
-          <p>Vous disposez d&apos;un droit d&apos;accès, de rectification, d&apos;effacement, de limitation, de portabilité, d&apos;opposition et de définition de directives post-mortem (art. 85 loi I&amp;L). Pour exercer ces droits : contact@jacktradesnq.com. Réclamation possible auprès de la CNIL — 3 Place de Fontenoy, 75334 Paris Cedex 07 — cnil.fr.</p>
+          <p>Vous disposez d&apos;un droit d&apos;accès, de rectification, d&apos;effacement, de limitation, de portabilité, d&apos;opposition et de définition de directives post-mortem (art. 85 loi I&amp;L). Pour exercer ces droits : <ContactEmail />. Réclamation possible auprès de la CNIL — 3 Place de Fontenoy, 75334 Paris Cedex 07 — cnil.fr.</p>
         </div>
 
         <hr />
@@ -49,7 +50,7 @@ export default function PolitiqueConfidentialite() {
           <p className="updated">Last updated: April 2026</p>
 
           <h3>Data Controller</h3>
-          <p>Jack Chen — contact@jacktradesnq.com — Paris, France</p>
+          <p>Jack Chen — <ContactEmail /> — Paris, France</p>
 
           <h3>What We Collect</h3>
           <table>
@@ -71,7 +72,7 @@ export default function PolitiqueConfidentialite() {
           </ul>
 
           <h3>Your Rights</h3>
-          <p>Under GDPR you have the right to access, rectify, erase, restrict, port, and object to your data. Contact: contact@jacktradesnq.com. You may also lodge a complaint with the CNIL (French data protection authority) at cnil.fr.</p>
+          <p>Under GDPR you have the right to access, rectify, erase, restrict, port, and object to your data. Contact: <ContactEmail />. You may also lodge a complaint with the CNIL (French data protection authority) at cnil.fr.</p>
         </div>
       </div>
     </main>
