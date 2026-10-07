@@ -7,6 +7,8 @@
  * Numbers come from the same computeKPI() the existing KPI band uses.
  */
 
+import { LOOKBACK_LABELS } from '@/lib/lookback-labels';
+
 interface SimpleStatBandProps {
   wr: number;       // 0–100 integer
   pf: number;       // e.g. 1.34
@@ -21,9 +23,6 @@ interface SimpleStatBandProps {
   hideStatBand?: boolean;
 }
 
-const LOOKBACK_LABELS: Record<string, string> = {
-  '3mo': '3 months', '6mo': '6 months', '1y': '1 year', '5y': '5 years', 'all': 'all-time',
-};
 
 export default function SimpleStatBand({
   wr,

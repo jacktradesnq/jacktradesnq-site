@@ -183,6 +183,7 @@ Deploy : push sur `main` -> GitHub Actions -> Cloudflare Pages auto.
 - `functions/` = Cloudflare Pages Functions (newsletter), chargées par leur chemin, importées par personne : `knip.json` les déclare en entrées, ne pas les prendre pour du code mort.
 - `overrides` postcss/sharp dans package.json : versions corrigées que Next 15.5 et miniflare figent trop bas (npm audit ne proposait qu'un saut majeur). À retirer quand Next/wrangler embarquent eux-mêmes ces versions.
 - Études : `lib/study-stats.ts` = catalogue du hub, `lib/strategy-stats.ts` = stats par étude IFVG, `lib/straddle-trades.ts` = trades straddle (découpe 2026-10-07, chacun < 800 lignes).
+- Onglets d'étude : `V3Tabs.tsx` assemble, un fichier par onglet (`V3WeekdayTab`, `V3YearTab`, `V3TradesTab`) ; libellés de période dans `lib/lookback-labels.ts` (découpe 2026-10-07).
 
 ## <frontend_aesthetics>
 You tend to converge toward generic, "on distribution" outputs. In frontend design,
