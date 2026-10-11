@@ -22,7 +22,7 @@ export const META = {
   heroCfd: {
     eyebrow: 'CFD PROP FIRMS',
     phrase:
-      'The forex and indices programs I\u2019m partnered with \u2014 targets, drawdown and daily loss as a percentage of your balance, side by side. My tracked link on every button.',
+      'The CFD programs I\u2019m partnered with, traded on MetaTrader 5 \u2014 targets, drawdown and daily loss as a percentage of your balance, side by side. My code JTNQ and tracked link on every button.',
   },
   heroCrypto: {
     eyebrow: 'CRYPTO PROP FIRMS',
@@ -297,6 +297,21 @@ export const CSS = `
   text-transform: uppercase; color: var(--c-accent);
 }
 .jtnq-cmp .cfd-row-id .promo-chip{ grid-column: 2; justify-self: start; }
+
+/* ── CFD block under the futures table (CfdBlock.tsx) ── */
+.jtnq-cmp .cfd-section{ border-top: 1px solid var(--c-line-soft); padding-top: clamp(48px, 6vw, 64px); }
+.jtnq-cmp .cfd-head{ margin-bottom: 32px; }
+.jtnq-cmp .cfd-head .eyebrow{ margin-bottom: 16px; }
+.jtnq-cmp .cfd-title{
+  margin: 0; font-family: 'Zodiak', var(--f-serif); font-weight: 700;
+  font-size: clamp(40px, 5.5vw, 64px); line-height: .95; letter-spacing: -0.028em; color: var(--c-text);
+}
+.jtnq-cmp .cfd-title .dot{ color: var(--c-accent); }
+.jtnq-cmp .cfd-intro{
+  margin: 16px 0 0; max-width: 56ch;
+  font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-size: clamp(16px, 1.6vw, 19px); line-height: 1.45; color: var(--c-text-soft); text-wrap: pretty;
+}
 
 
 .jtnq-cmp .col-cta{ text-align: right; white-space: nowrap; }

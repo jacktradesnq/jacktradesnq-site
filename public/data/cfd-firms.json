@@ -1,0 +1,87 @@
+{
+  "generatedAt": "2026-10-11",
+  "firms": [
+    {
+      "id": "tradeify-fx",
+      "name": "Tradeify FX",
+      "logo": "/logos/tradeify-fx.png",
+      "payout": "Daily (Daily), every 14 days (Classic), on demand (Direct)",
+      "promo": {
+        "label": "My affiliate code",
+        "code": "JTNQ"
+      },
+      "url": "https://tracking.tradeifyfx.co/click?o=1&a=520",
+      "lastChecked": "2026-10-11",
+      "stale": false,
+      "sources": [
+        "https://www.tradeifyfx.co/#pricing",
+        "https://help.tradeifyfx.co/en/articles/16975771-account-sizes-and-pricing",
+        "https://help.tradeifyfx.co/en/articles/16975953-daily-1-step-guide",
+        "https://help.tradeifyfx.co/en/articles/16976039-classic-2-step-guide",
+        "https://help.tradeifyfx.co/en/articles/16976051-direct-instant-funding-guide",
+        "https://help.tradeifyfx.co/en/articles/16975783-account-add-ons"
+      ],
+      "programs": [
+        {
+          "name": "Daily",
+          "market": "cfd",
+          "steps": "1 step",
+          "profitTarget": "10%",
+          "dailyLoss": "None",
+          "maxDrawdown": "5%",
+          "ddType": "Trailing",
+          "minDays": null,
+          "split": "80%",
+          "leverage": "1:100 FX",
+          "note": "40% consistency in the evaluation only · funded payouts daily, up to 3% of the account per payout",
+          "plans": [
+            { "size": 10000, "price": 89 },
+            { "size": 25000, "price": 149 },
+            { "size": 50000, "price": 249 },
+            { "size": 100000, "price": 429 }
+          ]
+        },
+        {
+          "name": "Classic",
+          "market": "cfd",
+          "steps": "2 steps",
+          "profitTarget": "5% then 10%",
+          "dailyLoss": "3%",
+          "maxDrawdown": "10%",
+          "ddType": "Static",
+          "minDays": null,
+          "split": "80%",
+          "leverage": "1:100 FX",
+          "note": "No consistency rule · funded payouts every 14 days",
+          "plans": [
+            { "size": 5000, "price": 55 },
+            { "size": 10000, "price": 109 },
+            { "size": 25000, "price": 249 },
+            { "size": 50000, "price": 419 },
+            { "size": 100000, "price": 749 }
+          ]
+        },
+        {
+          "name": "Direct",
+          "market": "cfd",
+          "steps": "Instant funding",
+          "profitTarget": null,
+          "dailyLoss": "3%",
+          "maxDrawdown": "6%",
+          "ddType": "Trailing",
+          "minDays": null,
+          "split": "80%",
+          "leverage": "1:100 FX",
+          "note": "20% consistency to request a payout · payouts on demand · the loss limit locks at your starting balance on the first payout request",
+          "plans": [
+            { "size": 5000, "price": 85 },
+            { "size": 10000, "price": 119 },
+            { "size": 25000, "price": 299 },
+            { "size": 50000, "price": 579 },
+            { "size": 100000, "price": 999 }
+          ]
+        }
+      ]
+    }
+  ]
+}

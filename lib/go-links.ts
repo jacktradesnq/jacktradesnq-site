@@ -1,5 +1,6 @@
 import firmsData from '@/public/data/prop-firms.json';
 import promosData from '@/public/data/live-promos.json';
+import cfdData from '@/public/data/cfd-firms.json';
 
 /**
  * Every outbound partner link leaves through /go/<source>/<firm>/ instead of
@@ -25,6 +26,14 @@ const fromFirms: GoLink[] = firmsData.firms.map((f) => ({
   url: f.url,
 }));
 
+// CFD firms sit in their own block on /prop-firms, so their clicks count under the same source.
+const fromCfd: GoLink[] = cfdData.firms.map((f) => ({
+  source: 'prop-firms' as const,
+  firmId: f.id,
+  firmName: f.name,
+  url: f.url,
+}));
+
 const fromPromos: GoLink[] = promosData.promos.map((p) => ({
   source: 'promos' as const,
   firmId: p.firmId,
@@ -34,7 +43,7 @@ const fromPromos: GoLink[] = promosData.promos.map((p) => ({
 
 // A firm runs at most one promo at a time, so one page per (source, firm).
 const byKey = new Map<string, GoLink>();
-for (const link of [...fromFirms, ...fromPromos]) byKey.set(`${link.source}/${link.firmId}`, link);
+for (const link of [...fromFirms, ...fromCfd, ...fromPromos]) byKey.set(`${link.source}/${link.firmId}`, link);
 
 export const GO_LINKS: GoLink[] = [...byKey.values()];
 
