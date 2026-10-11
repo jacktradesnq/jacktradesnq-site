@@ -25,12 +25,21 @@ type CfdProgram = {
   note: string;
   plans: CfdPlan[];
 };
+// Firm-wide discount applied by the affiliate link itself (checked on the firm's checkout).
+type CfdDiscount = {
+  code: string;
+  discountPct: number;
+  appliedByLink: boolean;
+  endsAt: string | null;
+  lastChecked: string;
+};
 type CfdFirm = {
   id: string;
   name: string;
   logo: string | null;
   payout: string;
   promo: { label: string; code: string } | null;
+  discount?: CfdDiscount;
   url: string;
   lastChecked: string;
   stale: boolean;
@@ -45,7 +54,13 @@ const humanDate = (iso: string) =>
     day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC',
   });
 
-const NOTE = `List prices and rules read on each firm's own site and help center on ${humanDate(DATA.generatedAt)}, not auto-synced. Promos change fast; the live checkout price wins.`;
+const NOTE = `List prices and rules read on each firm's own site and help center on ${humanDate(DATA.generatedAt)}, not auto-synced. Discounted prices are the list price minus the firm's discount, checked on its checkout on ${humanDate(DATA.firms.find((f) => f.discount)?.discount?.lastChecked ?? DATA.generatedAt)}. Promos change fast; the live checkout price wins.`;
+
+// Same arithmetic as the firm's checkout: list price x (100 - pct) / 100, to the cent.
+// price * (100 - pct) is an integer, so the division by 100 is exact to the cent.
+const discounted = (price: number, pct: number) => Math.round(price * (100 - pct)) / 100;
+const finalPrice = (firm: CfdFirm, plan: CfdPlan) =>
+  firm.discount ? discounted(plan.price, firm.discount.discountPct) : plan.price;
 
 const DEFAULT_SIZE = 25000;
 
@@ -73,7 +88,7 @@ export function CfdBlock() {
         const plan = program.plans.find((p) => p.size === size);
         if (plan) out.push({ firm, program, plan });
       }
-    return out.sort((a, b) => a.plan.price - b.plan.price);
+    return out.sort((a, b) => finalPrice(a.firm, a.plan) - finalPrice(b.firm, b.plan));
   }, [size]);
 
   if (DATA.firms.length === 0) return null;
@@ -140,7 +155,16 @@ export function CfdBlock() {
                   </span>
                 </td>
                 <td className="num cell-price" data-label="Price">
-                  <span className="price-line">{money(plan.price)}</span>
+                  <span className="price-line">
+                    {money(finalPrice(firm, plan))}
+                    {firm.discount && <s className="price-was">{money(plan.price)}</s>}
+                  </span>
+                  {firm.discount && (
+                    <span className="activation-note">
+                      {firm.discount.discountPct}% off with code {firm.discount.code}
+                      {firm.discount.appliedByLink ? ', applied by the link' : ''}
+                    </span>
+                  )}
                   {program.minDays && <span className="activation-note">min {program.minDays}</span>}
                 </td>
                 <td className="num cell-target" data-label="Profit target">

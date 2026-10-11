@@ -11,6 +11,13 @@
         "code": "JTNQ"
       },
       "url": "https://tracking.tradeifyfx.co/click?o=1&a=520",
+      "discount": {
+        "code": "JTNQ",
+        "discountPct": 37,
+        "appliedByLink": true,
+        "endsAt": null,
+        "lastChecked": "2026-10-11"
+      },
       "lastChecked": "2026-10-11",
       "stale": false,
       "sources": [
