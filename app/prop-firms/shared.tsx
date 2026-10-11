@@ -13,21 +13,10 @@ export const META = {
   backToHome: { label: 'Jacktradesnq', url: '/' },
   brand: 'Jacktradesnq',
   hero: {
-    eyebrow: 'FUTURES PROP FIRMS',
+    eyebrow: 'FUTURES \u00b7 PERPS \u00b7 CFD',
     title: 'Prop firms',
     phrase:
       'Futures, perps and CFD firms I\u2019m partnered with. Pick one to see all of its plans side by side \u2014 account sizes, prices and risk rules. My code JTNQ or tracked link applied on every button.',
-  },
-  // Only read by the retired CfdBlock/PerpsBlock, still on disk: delete with them.
-  heroCfd: {
-    eyebrow: 'CFD PROP FIRMS',
-    phrase:
-      'The CFD programs I\u2019m partnered with, traded on MetaTrader 5 \u2014 targets, drawdown and daily loss as a percentage of your balance, side by side. My code JTNQ and tracked link on every button.',
-  },
-  heroPerps: {
-    eyebrow: 'PERPS PROP FIRMS',
-    phrase:
-      'The perpetuals programs I’m partnered with, on crypto, indices, forex, stocks and commodities — targets, drawdown and daily loss as a percentage of your balance, side by side. My code JTNQ and tracked link on every button.',
   },
   legal: {
     copyright: '\u00a9 2026 JackTradesNQ. All rights reserved.',

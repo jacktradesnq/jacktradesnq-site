@@ -17,7 +17,7 @@ const SITE = {
   ],
   studies: { url: '/studies/', tagline: '10 years of 1-minute futures data, every setup backtested' },
   nefarious: { name: 'Nefarious', url: '/nefarious/', tagline: 'Official partner · free Discord community' },
-  propFirms: { name: 'Prop firms', url: '/prop-firms/', tagline: 'Futures partners compared · code JTNQ' },
+  propFirms: { name: 'Prop firms', url: '/prop-firms/', tagline: 'Futures, perps & CFD partners · code JTNQ' },
   promos: { name: 'Promos', url: '/promos/' },
   legal: {
     copyright: '© 2026 JackTradesNQ. All rights reserved.',
