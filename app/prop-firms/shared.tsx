@@ -24,6 +24,11 @@ export const META = {
     phrase:
       'The CFD programs I\u2019m partnered with, traded on MetaTrader 5 \u2014 targets, drawdown and daily loss as a percentage of your balance, side by side. My code JTNQ and tracked link on every button.',
   },
+  heroPerps: {
+    eyebrow: 'PERPS PROP FIRMS',
+    phrase:
+      'The perpetuals programs I’m partnered with, on crypto, indices, forex, stocks and commodities — targets, drawdown and daily loss as a percentage of your balance, side by side. My code JTNQ and tracked link on every button.',
+  },
   heroCrypto: {
     eyebrow: 'CRYPTO PROP FIRMS',
     phrase:
