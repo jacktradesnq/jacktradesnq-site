@@ -1,6 +1,7 @@
 import firmsData from '@/public/data/prop-firms.json';
 import promosData from '@/public/data/live-promos.json';
 import cfdData from '@/public/data/cfd-firms.json';
+import perpsData from '@/public/data/perps-firms.json';
 
 /**
  * Every outbound partner link leaves through /go/<source>/<firm>/ instead of
@@ -42,8 +43,16 @@ const fromPromos: GoLink[] = promosData.promos.map((p) => ({
 }));
 
 // A firm runs at most one promo at a time, so one page per (source, firm).
+// Perpetuals firms live in their own block under the futures table, same source.
+const fromPerps: GoLink[] = perpsData.firms.map((f) => ({
+  source: 'prop-firms' as const,
+  firmId: f.id,
+  firmName: f.name,
+  url: f.url,
+}));
+
 const byKey = new Map<string, GoLink>();
-for (const link of [...fromFirms, ...fromCfd, ...fromPromos]) byKey.set(`${link.source}/${link.firmId}`, link);
+for (const link of [...fromFirms, ...fromCfd, ...fromPerps, ...fromPromos]) byKey.set(`${link.source}/${link.firmId}`, link);
 
 export const GO_LINKS: GoLink[] = [...byKey.values()];
 

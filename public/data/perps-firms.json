@@ -1,0 +1,85 @@
+{
+  "generatedAt": "2026-10-11",
+  "firms": [
+    {
+      "id": "myfundedperps",
+      "name": "MyFundedPerps",
+      "url": "https://myfundedperpetuals.com/@JTNQ",
+      "lastChecked": "2026-10-11",
+      "markets": ["Crypto", "Indices", "Forex", "Stocks", "Commodities"],
+      "common": "1-step evaluation · static drawdown · no consistency rule · no minimum days · no time limit · up to $300K funded in total",
+      "promo": {
+        "code": "JTNQ",
+        "discountPct": 30,
+        "endsAt": "2026-10-12T04:00:00Z",
+        "lastChecked": "2026-10-11"
+      },
+      "programs": [
+        {
+          "name": "Select",
+          "profitTarget": "9%",
+          "maxDrawdown": "3%",
+          "dailyLoss": "3%",
+          "split": "80% (90% option)",
+          "payouts": "Daily",
+          "ddAfterFirstPayout": "Locks at start balance",
+          "leverage": "Standard",
+          "plans": [
+            { "size": 10000, "price": 40, "promoPrice": 28 },
+            { "size": 25000, "price": 100, "promoPrice": 70 },
+            { "size": 50000, "price": 190, "promoPrice": 133 },
+            { "size": 100000, "price": 360, "promoPrice": 252 }
+          ]
+        },
+        {
+          "name": "Prime",
+          "profitTarget": "12%",
+          "maxDrawdown": "5%",
+          "dailyLoss": "3%",
+          "split": "80% (90% option)",
+          "payouts": "Daily",
+          "ddAfterFirstPayout": "Locks at start balance",
+          "leverage": "Standard",
+          "plans": [
+            { "size": 10000, "price": 60, "promoPrice": 42 },
+            { "size": 25000, "price": 160, "promoPrice": 112 },
+            { "size": 50000, "price": 300, "promoPrice": 210 },
+            { "size": 100000, "price": 595, "promoPrice": 416 }
+          ]
+        },
+        {
+          "name": "Signature",
+          "profitTarget": "10%",
+          "maxDrawdown": "6%",
+          "dailyLoss": "3%",
+          "split": "80% (90% option)",
+          "payouts": "Daily",
+          "ddAfterFirstPayout": "Locks at start balance",
+          "leverage": "Standard",
+          "plans": [
+            { "size": 10000, "price": 90, "promoPrice": 63 },
+            { "size": 25000, "price": 225, "promoPrice": 157 },
+            { "size": 50000, "price": 430, "promoPrice": 301 },
+            { "size": 100000, "price": 870, "promoPrice": 609 }
+          ]
+        },
+        {
+          "name": "Elite",
+          "profitTarget": "10%",
+          "maxDrawdown": "5%",
+          "dailyLoss": null,
+          "split": "80%",
+          "payouts": "On demand",
+          "ddAfterFirstPayout": "Stays at -5%",
+          "leverage": "Boosted (40x indices)",
+          "plans": [
+            { "size": 5000, "price": 100, "promoPrice": 70 },
+            { "size": 10000, "price": 200, "promoPrice": 140 },
+            { "size": 25000, "price": 500, "promoPrice": 350 },
+            { "size": 50000, "price": null, "promoPrice": null, "note": "Coming soon" }
+          ]
+        }
+      ]
+    }
+  ]
+}

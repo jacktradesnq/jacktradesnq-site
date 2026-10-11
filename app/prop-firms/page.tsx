@@ -5,6 +5,7 @@ import rawData from '@/public/data/prop-firms.json';
 import { AssetNav, CSS, META, money, sizeLabel } from './shared';
 import { DealSignup } from './DealSignup';
 import { CfdBlock } from './CfdBlock';
+import { PerpsBlock } from './PerpsBlock';
 import { goHref } from '@/lib/go-links';
 
 // Affiliate code applied on every firm link below.
@@ -298,6 +299,7 @@ export default function PropFirms() {
         </section>
 
         <CfdBlock />
+        <PerpsBlock />
 
         <DealSignup />
       </main>
