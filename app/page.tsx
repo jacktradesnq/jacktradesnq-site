@@ -2,8 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import livePromos from '@/public/data/live-promos.json';
-
 const SITE = {
   brand: 'Jacktradesnq',
   socials: [
@@ -18,7 +16,6 @@ const SITE = {
   studies: { url: '/studies/', tagline: '10 years of 1-minute futures data, every setup backtested' },
   nefarious: { name: 'Nefarious', url: '/nefarious/', tagline: 'Official partner · free Discord community' },
   propFirms: { name: 'Prop firms', url: '/prop-firms/', tagline: 'Futures, perps & CFD partners · code JTNQ' },
-  promos: { name: 'Promos', url: '/promos/' },
   legal: {
     copyright: '© 2026 JackTradesNQ. All rights reserved.',
     mentionsUrl: '/mentions-legales/',
@@ -48,13 +45,6 @@ export default function Home() {
   const headerRef = useRef<HTMLElement>(null);
   const socialsRef = useRef<HTMLDivElement>(null);
   const [socialsOpen, setSocialsOpen] = useState(false);
-
-  // Live count off public/data/live-promos.json, rebuilt every morning by the
-  // price sync. A card that says how many deals are running beats a card that
-  // says the word "promos", and it stays true on its own.
-  const promoCount = livePromos.promos.length;
-  const biggestOff = Math.max(...livePromos.promos.map((p) => p.discountPct));
-  const promoTagline = `${promoCount} running today \u00b7 up to ${biggestOff}% off`;
 
   useEffect(() => {
     if (!socialsOpen) return;
@@ -369,19 +359,6 @@ export default function Home() {
               </div>
               <p className="tagline">{SITE.propFirms.tagline}</p>
             </a>
-
-            <a className="hub-card" href={SITE.promos.url}>
-              <div className="row">
-                <h3 className="title">
-                  {SITE.promos.name}
-                  <span className="swash">.</span>
-                </h3>
-                <svg className="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M7 17L17 7M9 7h8v8" />
-                </svg>
-              </div>
-              <p className="tagline">{promoTagline}</p>
-            </a>
           </div>
         </section>
       </main>
@@ -624,7 +601,7 @@ const CSS = `
   display: grid; grid-template-columns: 1fr; gap: clamp(40px, 5vw, 64px);
 }
 .jtnq-home .hub-grid{
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(28px, 4vw, 56px); align-items: stretch;
 }
 .jtnq-home .hub-card-primary{ grid-column: 1 / -1; }

@@ -145,3 +145,6 @@
 /backtested-data/methodology /studies/methodology 301
 /backtested-data/methodology/ /studies/methodology/ 301
 /downloads/backtested-data/* /downloads/studies/:splat 301
+
+/promos /prop-firms/ 301
+/promos/ /prop-firms/ 301

@@ -1,9 +1,7 @@
 'use client';
 
-// Shared chrome for /prop-firms and /promos: the design tokens + component CSS,
-// the page copy and the number formatters. Both pages render the same shell, so
-// this lives outside either page to avoid pulling one page's data into the
-// other's bundle.
+// Shared chrome for /prop-firms: the design tokens + component CSS, the page copy
+// and the number formatters.
 
 export const money = (n: number) =>
   '$' + n.toLocaleString('en-US', Number.isInteger(n) ? undefined : { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -174,14 +172,6 @@ export const CSS = `
   font-size: 12px; line-height: 1.7; color: var(--c-text-deep); text-wrap: pretty;
 }
 
-/* ── hero link to /promos/ ── */
-.jtnq-cmp .hero-promos{
-  display: inline-flex; align-items: center; gap: 8px; margin-top: 28px;
-  font-family: var(--f-sans); font-size: 14px; font-weight: 700; color: var(--c-bg);
-  background: var(--c-accent); border-radius: 999px; padding: 12px 24px;
-  transition: transform .18s ease;
-}
-.jtnq-cmp .hero-promos svg{ width: 14px; height: 14px; }
 /* ── daily deal signup (DealSignup.tsx) ── */
 .jtnq-cmp .signup{ padding: 0 var(--pad-x) clamp(48px, 6vw, 80px); }
 .jtnq-cmp .signup-card{
@@ -232,8 +222,6 @@ export const CSS = `
 }
 
   .jtnq-cmp .signup-btn{ width: 100%; }
-
-.jtnq-cmp .hero-promos:hover{ transform: translateY(-1px); }
 
 @media (max-width: 720px){
   .jtnq-cmp .hero{ padding: 72px var(--pad-x) 32px; }
