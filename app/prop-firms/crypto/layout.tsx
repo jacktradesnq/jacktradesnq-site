@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Crypto prop firms — funded crypto programs compared · JackTradesNQ',
+  title: 'Perps prop firms · JackTradesNQ',
   description:
-    'Compare every crypto program from JackTradesNQ’s partner prop firms: account sizes, prices, profit targets, daily loss and drawdown as a percentage of your balance, leverage per coin. Every link is tracked.',
+    'The perps prop firms JackTradesNQ is partnered with: every plan, price and risk rule, with code JTNQ. Every link is tracked.',
 };
 
 export default function PropFirmsCryptoLayout({ children }: { children: React.ReactNode }) {

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-// Plus aucun partenaire CFD/crypto depuis le 27/09 : la page renvoie au comparateur futures.
+// Les familles vivent sur /prop-firms depuis le 11/10 (choix Futures / Perps / CFD) : on ouvre la bonne.
 export default function PropFirmsCfd() {
-  redirect('/prop-firms/');
+  redirect('/prop-firms/#cfd');
 }

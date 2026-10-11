@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'CFD prop firms — forex and indices programs compared · JackTradesNQ',
+  title: 'CFD prop firms · JackTradesNQ',
   description:
-    'Compare every forex and indices program from JackTradesNQ’s partner prop firms: account sizes, prices, profit targets, daily loss and drawdown as a percentage of your balance. Every link is tracked.',
+    'The CFD prop firms JackTradesNQ is partnered with: every plan, price and risk rule, with code JTNQ. Every link is tracked.',
 };
 
 export default function PropFirmsCfdLayout({ children }: { children: React.ReactNode }) {
