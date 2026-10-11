@@ -12,7 +12,6 @@
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { CSS, META, money } from './shared';
-import { DealSignup } from './DealSignup';
 import { FAMILIES, type Family, type FirmView } from './firm-view';
 import { FUTURES_FIRMS } from './futures';
 import { CFD_FIRMS } from './cfd';
@@ -202,7 +201,6 @@ export default function PropFirms() {
           </div>
         </section>
 
-        <DealSignup />
       </main>
 
       <footer className="site-footer">

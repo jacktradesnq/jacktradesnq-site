@@ -1,7 +1,6 @@
 {
   "entry": [
     "functions/**/*.js",
-    "functions/**/*.test.mjs",
     "scripts/*.{mjs,cjs}"
   ],
   "ignoreDependencies": ["wrangler"],

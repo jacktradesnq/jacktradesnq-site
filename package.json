@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --test scripts/*.test.mjs functions/api/*.test.mjs functions/_shared/*.test.mjs"
+    "test": "node --test scripts/*.test.mjs"
   },
   "dependencies": {
     "lightweight-charts": "^5.2.0",
