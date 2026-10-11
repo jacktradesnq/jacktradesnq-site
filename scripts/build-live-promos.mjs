@@ -2,8 +2,7 @@
 // Writes public/data/live-promos.json: every firm with a promo running right
 // now, in the order the page shows them.
 //
-// It reuses the newsletter engine on purpose. The page and the emails read the
-// same rules, so they cannot contradict each other: reference size first, his
+// The rules live in scripts/lib/promo-analysis.mjs: reference size first, his
 // code and never a public one, and a discount only when the arithmetic on one
 // plan's two prices supports it.
 //
@@ -11,7 +10,7 @@
 //   node scripts/build-live-promos.mjs [--dry]
 
 import { readFileSync, writeFileSync } from 'node:fs';
-import { analyzeFirms } from './lib/deal-of-day.mjs';
+import { analyzeFirms } from './lib/promo-analysis.mjs';
 
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
 const OUT_URL = new URL('../public/data/live-promos.json', import.meta.url);
@@ -40,7 +39,7 @@ for (const id of NEEDS_RENDERED_SCRAPE) {
 
 const promos = live
   .sort((a, b) => {
-    const urgency = Number(b.signals.includes('expiring')) - Number(a.signals.includes('expiring'));
+    const urgency = Number(b.expiring) - Number(a.expiring);
     if (urgency) return urgency;
     if (b.headline.discountPct !== a.headline.discountPct) {
       return b.headline.discountPct - a.headline.discountPct;
@@ -64,7 +63,7 @@ const promos = live
     priceNote: c.priceNote,
     note: c.note,
     endsAt: c.endsAt,
-    expiring: c.signals.includes('expiring'),
+    expiring: c.expiring,
     split: c.split,
     payout: c.payout,
     ddType: c.rules.ddType,

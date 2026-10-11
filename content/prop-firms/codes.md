@@ -37,11 +37,11 @@ e8-markets = JTNQ
 
 # Si tu changes une ligne
 
-`= link` fait disparaitre le code de tous les messages et de la page, et la
+`= link` fait disparaitre le code de la page, et la
 phrase devient "la remise est portee par le lien". Les liens portent ton
 attribution de toute facon (`coupon=JTNQ`), donc `link` ne te
 fait jamais perdre une commission, il te fait juste perdre l'occasion de
 faire taper ton nom.
 
-La machine n'imprimera jamais un code public a la place du tien : si un code
-public de la firme apparait dans un message, le build refuse d'emettre.
+La machine n'imprimera jamais un code public a la place du tien : le code public d'une firme n'est jamais lu
+par le build des promos.

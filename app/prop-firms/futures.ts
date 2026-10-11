@@ -93,7 +93,7 @@ const chipCode = (firm: Firm, promoCode: string | null) => (firm.code === undefi
 
 // Price paid through Angelo's link/code. His permanent code discount (Traders Launch
 // -15%) only applies when the firm shows no public promo (originalPrice == null) —
-// public promos already discount `price`. Same arithmetic as scripts/lib/deal-of-day.mjs.
+// public promos already discount `price`. Same arithmetic as scripts/lib/promo-analysis.mjs.
 function effectivePrice(firm: Firm, plan: Plan): { now: number; was: number | null; viaCode: boolean } {
   if (firm.codeDiscountPct != null && plan.originalPrice == null) {
     return { now: plan.price * (1 - firm.codeDiscountPct / 100), was: plan.price, viaCode: true };

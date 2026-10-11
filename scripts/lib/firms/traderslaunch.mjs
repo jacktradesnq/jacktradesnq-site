@@ -54,7 +54,7 @@
 
 export const TRADERSLAUNCH_URL = 'https://traderslaunch.com/';
 
-/** La source citee dans l'en-tete Discord quand la tournee lit cette page. */
+/** La source citee dans l'alerte de synchro quand la tournee lit cette page. */
 export const TRADERSLAUNCH_SOURCE = 'page traderslaunch.com';
 
 /**
