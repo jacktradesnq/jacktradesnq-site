@@ -102,8 +102,8 @@ Consistency rule: {consistency}.
 
 | trou | exemple aujourd'hui |
 |---|---|
-| `{firm}` | Blue Guardian |
-| `{plan}` | Reserve |
+| `{firm}` | E8 Markets |
+| `{plan}` | E8 Zero Starter Futures |
 | `{account}` | 50K challenge (ou 50K instant funded account) |
 | `{size}` | 50K |
 | `{price}` | $75 (avec /mo si c'est un abonnement) |

@@ -8,7 +8,7 @@
  *    tout ce que la firme vend. guardCatalog() + syncCatalog() creent les
  *    programmes et les tailles nouveaux, retirent ce qui n'est plus vendu, et
  *    gardent les regles curatees a la main que le lecteur n'encode pas.
- *    Traders Launch, Blue Guardian.
+ *    Traders Launch.
  *
  *  - `{ updates }` — le chemin historique, un metteur a jour de PRIX sur des
  *    programmes figes a la main : guard() + apply() ne touchent que price /
@@ -25,7 +25,6 @@
 import fs from 'node:fs';
 
 import { guardCatalog, syncCatalog } from './lib/catalog-sync.mjs';
-import { BLUE_GUARDIAN_URL, programsFromHtml as blueGuardianPrograms } from './lib/firms/blueguardian.mjs';
 import { fetchTradersLaunchPrograms } from './lib/firms/traderslaunch.mjs';
 
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
@@ -35,7 +34,6 @@ const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 
 const num = (s) => parseFloat(String(s).replace(/[,\s]/g, ''));
-const pctOff = (price, original) => Math.round((1 - price / original) * 100);
 
 async function fetchText(url) {
   const res = await fetch(url, {
@@ -44,100 +42,6 @@ async function fetchText(url) {
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
   return res.text();
-}
-
-// Most frequent value of an array (ties broken by first seen).
-function mode(values) {
-  const counts = new Map();
-  for (const v of values) counts.set(v, (counts.get(v) ?? 0) + 1);
-  let best = null;
-  let bestN = 0;
-  for (const [v, n] of counts) if (n > bestN) [best, bestN] = [v, n];
-  return { value: best, count: bestN };
-}
-
-/* ------------------------------------------------------------------ */
-/* Blue Guardian — RSC payload embedded in https://www.blueguardian.com/futures */
-/* ------------------------------------------------------------------ */
-
-const HTML_ENTITIES = { '&amp;': '&', '&quot;': '"', '&lt;': '<', '&gt;': '>', '&#x27;': "'", '&#39;': "'" };
-
-function decodePayloadHtml(html) {
-  let s = html;
-  let prev;
-  do {
-    prev = s;
-    s = s.replace(/&(amp|quot|lt|gt|#x27|#39);/g, (m) => HTML_ENTITIES[m]);
-  } while (s !== prev);
-  s = s.replace(/\\u([0-9a-fA-F]{4})/g, (_, h) => String.fromCharCode(parseInt(h, 16)));
-  s = s.split('\\"').join('"');
-  return s;
-}
-
-// Balanced-bracket extraction (string-aware), from the '[' at `start`.
-function extractBalancedArray(s, start) {
-  let depth = 0;
-  let inStr = false;
-  let esc = false;
-  for (let i = start; i < s.length; i++) {
-    const c = s[i];
-    if (inStr) {
-      if (esc) esc = false;
-      else if (c === '\\') esc = true;
-      else if (c === '"') inStr = false;
-      continue;
-    }
-    if (c === '"') inStr = true;
-    else if (c === '[') depth++;
-    else if (c === ']') {
-      depth--;
-      if (depth === 0) return s.slice(start, i + 1);
-    }
-  }
-  return null;
-}
-
-// Le CATALOGUE de Blue Guardian vient de scripts/lib/firms/blueguardian.mjs,
-// qui lit le meme payload RSC : produits, tailles, regles. Ce qui reste ici est
-// ce que le lecteur ne dit pas, parce que ce n'est pas du catalogue — le code
-// coupon porte par chaque taille, et le pourcentage qu'il retire.
-function blueGuardianPromo(html) {
-  const s = decodePayloadHtml(html);
-  const idx = s.indexOf('"plans":[');
-  if (idx === -1) throw new Error('"plans":[ payload not found');
-  const arrText = extractBalancedArray(s, s.indexOf('[', idx));
-  if (!arrText) throw new Error('unbalanced plans array');
-
-  const couponCodes = [];
-  const pcts = [];
-  for (const entry of JSON.parse(arrText)) {
-    if (!entry || entry.market !== 'futures') continue;
-    for (const size of entry.sizes ?? []) {
-      if (size.coupon?.code) couponCodes.push(size.coupon.code);
-      if (size.currentPrice != null && size.originalPrice != null)
-        pcts.push(pctOff(size.currentPrice, size.originalPrice));
-    }
-  }
-
-  if (couponCodes.length === 0) return null; // no coupon anywhere => promo really is off
-  const code = mode(couponCodes).value;
-  const pct = pcts.length > 0 ? mode(pcts).value : null;
-  return pct != null ? { label: `${pct}% OFF`, code } : undefined; // undefined => keep existing label
-}
-
-async function scrapeBlueGuardian() {
-  const html = await fetchText(BLUE_GUARDIAN_URL);
-  const programs = blueGuardianPrograms(html);
-
-  // Le catalogue vaut plus que la banniere : un coupon devenu illisible garde
-  // la promo deja publiee au lieu de faire perdre la firme entiere.
-  let firmPromo;
-  try {
-    firmPromo = blueGuardianPromo(html);
-  } catch (e) {
-    console.log(`  blue-guardian: coupons illisibles (${e.message}) — promo existante gardee`);
-  }
-  return { programs, firmPromo };
 }
 
 /* ------------------------------------------------------------------ */
@@ -328,7 +232,6 @@ function applyPromos(firm, res, changes) {
 }
 
 const SCRAPERS = {
-  'blue-guardian': scrapeBlueGuardian,
   'traders-launch': scrapeTradersLaunch,
   'e8-markets': scrapeE8Markets,
 };

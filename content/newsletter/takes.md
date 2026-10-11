@@ -17,6 +17,4 @@ Une phrase ou deux suffit. Vide = rien ne sort.
 
 ## e8-markets
 
-## blue-guardian
-
 ## traders-launch

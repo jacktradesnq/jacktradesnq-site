@@ -178,7 +178,7 @@ function caveatsOf(program, plan, messages) {
     out.push({ text: say('catch.monthly'), source: 'program.priceType' });
   }
   // No caveat derived from ddType. One buy screen says "EOD Drawdown" and
-  // never the word trailing, while Blue Guardian's own tooltip says "EOD,
+  // never the word trailing, while another firm's own tooltip says "EOD,
   // static, no trailing": the label means different things firm by firm, the
   // daily rule check cannot read it, so nothing here asserts a behaviour from
   // it. The amount and the label are printed as is.
@@ -193,7 +193,7 @@ function caveatsOf(program, plan, messages) {
 
 // His code, never the firm's public one.
 //
-// A public code (BG25) gives the reader the same discount
+// A public code gives the reader the same discount
 // while pushing him out of the transaction wherever a firm attributes by code,
 // and it wastes the point of the newsletter. So the only codes that can be
 // printed are the ones declared in content/newsletter/codes.md.

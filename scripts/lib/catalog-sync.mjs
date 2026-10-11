@@ -5,8 +5,7 @@
  * est un metteur a jour de prix : les programmes et les tailles sont figes a la
  * main dans public/data/prop-firms.json, et tout produit que ce fichier ne
  * liste pas n'existe pas sur le site. C'est comme ca que les comptes
- * « Legacy NYC » de Traders Launch n'ont jamais ete publies, et que les 25K de
- * Blue Guardian Express manquaient.
+ * « Legacy NYC » de Traders Launch n'ont jamais ete publies.
  *
  * Ici, ce que rend le LECTEUR de la firme est le catalogue : un programme ou
  * une taille qu'il rend et que le JSON ignore est CREE, un programme ou une

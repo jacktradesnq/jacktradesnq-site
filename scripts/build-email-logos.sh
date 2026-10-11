@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Builds public/logos/email/: the raster logo set the newsletter uses.
 #
-# Why a second set: Gmail and Outlook strip <img src="*.svg">, and two firm
-# logos (Blue Guardian, E8 Markets) only exist as SVG. Everything else is
+# Why a second set: Gmail and Outlook strip <img src="*.svg">, and one firm
+# logo (E8 Markets) only exists as SVG. Everything else is
 # copied as is. Run this after adding a firm logo to public/logos/.
 #
 # Needs rsvg-convert (brew install librsvg).

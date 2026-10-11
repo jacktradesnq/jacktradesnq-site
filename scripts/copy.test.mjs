@@ -30,7 +30,7 @@ afterEach(resetCopy);
 // Named on purpose: these tests render one kept firm, not whichever firm
 // happens to win the day. A promo ending sooner used to silently take that
 // slot and break eight of them.
-const deal = () => pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'blue-guardian' });
+const deal = () => pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'e8-markets' });
 
 // ── the parser ───────────────────────────────────────────────────────────────
 
@@ -43,7 +43,7 @@ test('the notes and the placeholder table never leak into the copy', () => {
 
 test('a hyphenated firm id is a heading, not text', () => {
   const blocks = parseCopy(TAKES);
-  for (const id of ['e8-markets', 'blue-guardian', 'traders-launch']) {
+  for (const id of ['e8-markets', 'traders-launch']) {
     assert.ok(id in blocks, `${id} was not read as a section`);
     assert.equal(blocks[id], '', `${id} should be empty until Angelo writes it`);
   }
@@ -108,20 +108,23 @@ test('a take written in takes.md shows up, an empty one shows nothing', () => {
   assert.ok(!plain.html.includes('What I watch'), 'an empty take should print nothing');
 
   resetCopy();
-  useCopy(SHIPPED, TAKES.replace('## blue-guardian', '## blue-guardian\nI size down after a green day here, the {maxdd} trails.'));
+  useCopy(SHIPPED, TAKES.replace('## e8-markets', '## e8-markets\nI size down after a green day here, the {maxdd} trails.'));
   const withTake = renderEmail(deal(), {});
   assert.match(withTake.html, /What I watch/);
-  assert.match(withTake.html, /size down after a green day here, the \$2,000 trails\./);
+  const maxdd = deal().rules.maxDrawdown.toLocaleString('en-US');
+  assert.match(withTake.html, new RegExp(`size down after a green day here, the \\$${maxdd} trails\\.`));
   assert.match(renderDiscord(deal()), /I size down after a green day/);
   assert.match(withTake.text, /I size down after a green day/);
 });
 
 test('a take on another firm stays on that firm', () => {
   useCopy(SHIPPED, TAKES.replace('## e8-markets', '## e8-markets\nE8 only pays fast if you pass.'));
-  assert.ok(!renderEmail(deal(), {}).html.includes('pays fast'), 'a take leaked across firms');
-  assert.match(
-    renderEmail(pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'e8-markets' }), {}).html,
-    /pays fast if you pass/
+  assert.match(renderEmail(deal(), {}).html, /pays fast if you pass/);
+  assert.ok(
+    !renderEmail(pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'traders-launch' }), {}).html.includes(
+      'pays fast'
+    ),
+    'a take leaked across firms'
   );
 });
 
@@ -134,7 +137,7 @@ test('stars become bold in the email and are left alone for Discord', () => {
   assert.ok(!email.text.includes('*'), 'a raw star reached the plain text');
 
   // Discord's own bold is **, which must survive untouched.
-  assert.match(renderDiscord(deal()), /^\*\*Blue Guardian, deal of the day\*\*/);
+  assert.match(renderDiscord(deal()), /^\*\*E8 Markets, deal of the day\*\*/);
 });
 
 // ── discounts never stack ────────────────────────────────────────────────────
@@ -144,13 +147,13 @@ test('a firm advertising two discounts never gets them added up', () => {
   // not exist. Injected on a kept firm so the test pins the engine, not a
   // partnership that no longer exists.
   const data = structuredClone(DATA);
-  const firm = data.firms.find((f) => f.id === 'blue-guardian');
-  firm.promo = { label: '45% OFF + 50% w/ code', code: 'BG25' };
-  const plan = firm.programs.find((p) => p.name === 'Reserve').plans.find((pl) => pl.size === 50000);
+  const firm = data.firms.find((f) => f.id === 'e8-markets');
+  firm.promo = { label: '45% OFF + 50% w/ code', code: 'E8X25' };
+  const plan = firm.programs.find((p) => p.name === 'E8 Zero Starter Futures').plans.find((pl) => pl.size === 50000);
   plan.price = 104.95;
   plan.originalPrice = 190;
 
-  const d = pickDeal(data, { today: '2026-08-20', history: [], forceFirmId: 'blue-guardian' });
+  const d = pickDeal(data, { today: '2026-08-20', history: [], forceFirmId: 'e8-markets' });
   const rendered = [renderTweet(d), renderDiscord(d), renderEmail(d, {}).text, renderEmail(d, {}).html].join('\n');
 
   for (const forbidden of ['95%', '95 %']) {
@@ -174,7 +177,7 @@ test("the firm's own promo text never reaches a message", () => {
     const rendered = [renderTweet(d), renderDiscord(d), renderEmail(d, {}).html].join('\n');
     assert.ok(!rendered.includes(firm.promo.label), `${firm.id}: the promo label leaked into a message`);
   }
-  assert.ok(checked >= 2, `only ${checked} firms rendered: this test would pass on nothing`);
+  assert.ok(checked >= 1, `only ${checked} firms rendered: this test would pass on nothing`);
 });
 
 test('a percentage typed by hand into the copy file is refused', () => {
@@ -185,12 +188,12 @@ test('a percentage typed by hand into the copy file is refused', () => {
     ),
     TAKES
   );
-  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'blue-guardian' });
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'e8-markets' });
   const email = renderEmail(d, {});
   const problems = auditDiscountClaims(d, { email: email.text });
   assert.equal(problems.length, 1, `expected one problem, got ${problems.length}`);
   assert.match(problems[0], /claims "50% off"/);
-  assert.match(problems[0], /only discount computed from the data is 25%/);
+  assert.match(problems[0], new RegExp(`only discount computed from the data is ${d.headline.discountPct}%`));
 });
 
 test('the shipped copy passes the audit on every firm', () => {
@@ -213,12 +216,22 @@ test('the shipped copy passes the audit on every firm', () => {
 
 // ── his code, not theirs ─────────────────────────────────────────────────────
 
-const PUBLIC_CODES = { 'blue-guardian': 'BG25' };
+const PUBLIC_CODES = { 'e8-markets': 'E8PUB' };
+// Injected on a kept firm: the public code is whatever the firm advertises, so
+// the test pins the guard, not a given partner's code.
+const withPublicCodes = () => {
+  const data = structuredClone(DATA);
+  for (const [id, code] of Object.entries(PUBLIC_CODES)) {
+    const f = data.firms.find((x) => x.id === id);
+    f.promo = { ...f.promo, code };
+  }
+  return data;
+};
 
 test('no message ever prints a firm public code', () => {
   let checked = 0;
   for (const [firmId, publicCode] of Object.entries(PUBLIC_CODES)) {
-    const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: firmId });
+    const d = pickDeal(withPublicCodes(), { today: '2026-08-20', history: [], forceFirmId: firmId });
     if (!d) continue; // held back today (a failed scrape): nothing is rendered for it
     checked++;
     const rendered = [renderTweet(d), renderDiscord(d), renderEmail(d, {}).html, renderEmail(d, {}).text].join('\n');
@@ -255,31 +268,31 @@ test('a code declared in codes.md is the one that gets printed', () => {
 });
 
 test('an undeclared firm falls back to JTNQ and says so', () => {
-  useCopy(SHIPPED, TAKES, '## codes\ne8-markets = JTNQ\n');
-  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'blue-guardian' });
+  useCopy(SHIPPED, TAKES, '## codes\ntraders-launch = link\n');
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'e8-markets' });
   assert.equal(d.code, 'JTNQ');
   assert.equal(d.codeUndeclared, true);
 
-  const declared = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'e8-markets' });
+  const declared = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'traders-launch' });
   assert.equal(declared.codeUndeclared, false);
 });
 
 test('a public code typed by hand into the copy file is refused', () => {
   useCopy(
-    SHIPPED.replace('## email.code\nCode at checkout: {code}', '## email.code\nCode at checkout: {code} or BG25'),
+    SHIPPED.replace('## email.code\nCode at checkout: {code}', '## email.code\nCode at checkout: {code} or E8PUB'),
     TAKES,
-    '## codes\nblue-guardian = JTNQ\n'
+    '## codes\ne8-markets = JTNQ\n'
   );
-  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'blue-guardian' });
+  const d = pickDeal(withPublicCodes(), { today: '2026-08-20', history: [], forceFirmId: 'e8-markets' });
   const email = renderEmail(d, {});
   const problems = auditCodeClaims(d, { html: email.html });
   assert.equal(problems.length, 1, `expected one problem, got ${problems.length}`);
-  assert.match(problems[0], /prints the public code "BG25" instead of "JTNQ"/);
+  assert.match(problems[0], /prints the public code "E8PUB" instead of "JTNQ"/);
 });
 
 test('"link" prints no code at all', () => {
-  useCopy(SHIPPED, TAKES, '## codes\nblue-guardian = link\n');
-  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'blue-guardian' });
+  useCopy(SHIPPED, TAKES, '## codes\ne8-markets = link\n');
+  const d = pickDeal(DATA, { today: '2026-08-20', history: [], forceFirmId: 'e8-markets' });
   assert.equal(d.code, null);
   const email = renderEmail(d, {});
   assert.ok(!email.html.includes('Code at checkout'), 'a code line survived');

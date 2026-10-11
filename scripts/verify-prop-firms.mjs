@@ -92,12 +92,12 @@ function expectRow(r, c, firm, label) {
   check('no inner table scroll @1440', innerScroll <= 0, innerScroll + 'px');
   await page.screenshot({ path: OUT + '/v7-desktop-default.png', fullPage: true });
 
-  // 2. Expand Blue Guardian: one sub-row per eval program at 100K, program details present
+  // 2. Expand E8 Markets: one sub-row per eval program at 100K, program details present
   const wrapHeights = () =>
     page.evaluate(() => [...document.querySelectorAll('.expand-wrap')].map((w) => w.offsetHeight));
   check('all expand panels collapsed by default', (await wrapHeights()).every((h) => h === 0),
     JSON.stringify(await wrapHeights()));
-  const bg = data.firms.find((f) => f.id === 'blue-guardian');
+  const bg = data.firms.find((f) => f.id === 'e8-markets');
   const bgRow = (await readRow(page, bg.name)).row;
   await bgRow.locator('.row-expand-btn').click();
   await page.waitForTimeout(350);

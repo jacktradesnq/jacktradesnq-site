@@ -60,7 +60,6 @@ type Firm = {
 type PropData = { generatedAt: string; firms: Firm[] };
 
 const FIRM_LOGOS: Record<string, string> = {
-  'blue-guardian': '/logos/blue-guardian.svg',
   'traders-launch': '/logos/traders-launch.png',
   'e8-markets': '/logos/e8-markets.svg',
 };

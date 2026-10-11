@@ -39,7 +39,7 @@ export const BROKEN = Symbol('broken'); // rules[field] === BROKEN => anchor pre
 /* Normalizers (task §4)                                               */
 /* ------------------------------------------------------------------ */
 
-// Money: strip $, $$ (Blue Guardian double le signe), thousands separators
+// Money: strip $, $$ (certaines firmes doublent le signe), thousands separators
 // (both "." and ","), "soft breach" wording. "None"/"—" => null.
 function money(v) {
   if (v == null) return null;
@@ -125,85 +125,12 @@ function htmlToLines(html) {
     .filter(Boolean);
 }
 
-const HTML_ENTITIES = { '&amp;': '&', '&quot;': '"', '&lt;': '<', '&gt;': '>', '&#x27;': "'", '&#39;': "'" };
-function decodePayloadHtml(html) {
-  let s = html;
-  let prev;
-  do {
-    prev = s;
-    s = s.replace(/&(amp|quot|lt|gt|#x27|#39);/g, (m) => HTML_ENTITIES[m]);
-  } while (s !== prev);
-  s = s.replace(/\\u([0-9a-fA-F]{4})/g, (_, h) => String.fromCharCode(parseInt(h, 16)));
-  s = s.split('\\"').join('"');
-  return s;
-}
-
-function extractBalancedArray(s, start) {
-  let depth = 0;
-  let inStr = false;
-  let esc = false;
-  for (let i = start; i < s.length; i++) {
-    const c = s[i];
-    if (inStr) {
-      if (esc) esc = false;
-      else if (c === '\\') esc = true;
-      else if (c === '"') inStr = false;
-      continue;
-    }
-    if (c === '"') inStr = true;
-    else if (c === '[') depth++;
-    else if (c === ']') {
-      depth--;
-      if (depth === 0) return s.slice(start, i + 1);
-    }
-  }
-  return null;
-}
-
 /* ================================================================== */
 /* Per-firm rule extractors                                            */
 /* Each returns [{ programName, size, rules }] where rules maps a       */
 /* compared field to a value (number/string/null) or BROKEN. A field    */
 /* absent from rules = "not auto-verified for this firm/program" (skip). */
 /* ================================================================== */
-
-/* ---- Blue Guardian — structured RSC payload ---- */
-const BG_PROGRAMS = { direct: 'Direct', express: 'Express', reserve: 'Reserve', standard: 'Standard' };
-async function extractBlueGuardian() {
-  const s = decodePayloadHtml(await fetchText('https://www.blueguardian.com/futures'));
-  const idx = s.indexOf('"plans":[');
-  if (idx === -1) throw new Error('"plans":[ payload not found');
-  const arrText = extractBalancedArray(s, s.indexOf('[', idx));
-  if (!arrText) throw new Error('unbalanced plans array');
-  const payload = JSON.parse(arrText);
-  const futures = payload.filter((p) => p && p.market === 'futures');
-  if (futures.length === 0) throw new Error('no futures entries in payload');
-
-  const out = [];
-  for (const entry of futures) {
-    const programName = BG_PROGRAMS[entry.key];
-    if (!programName) continue;
-    const instant = entry.key === 'direct';
-    for (const size of entry.sizes ?? []) {
-      const list = size.challengeRules?.length ? size.challengeRules : size.fundedRules ?? [];
-      const byLabel = (label) => list.find((r) => r.label === label)?.value;
-      const rules = {
-        maxDrawdown: byLabel('Max Drawdown') != null ? money(byLabel('Max Drawdown')) : BROKEN,
-        dailyLoss: byLabel('Daily Loss Limit') != null ? money(byLabel('Daily Loss Limit')) : null,
-        contracts: byLabel('Max Position') != null ? contracts(byLabel('Max Position')) : BROKEN,
-      };
-      if (!instant) {
-        // Eval programs advertise Profit Target + a single Consistency Rule.
-        rules.profitTarget = byLabel('Profit Target') != null ? money(byLabel('Profit Target')) : BROKEN;
-        rules.consistency = byLabel('Consistency Rule') != null ? consistency(byLabel('Consistency Rule')) : null;
-      }
-      // Direct (instant): profitTarget has no equivalent, consistency is a hand
-      // summary ("20→30% payouts") of per-payout rows => intentionally not emitted.
-      out.push({ programName, size: size.amount, rules });
-    }
-  }
-  return out;
-}
 
 /* ---- Traders Launch — server-rendered cards ---- */
 async function extractTradersLaunch() {
@@ -328,7 +255,6 @@ async function extractE8() {
 }
 
 const EXTRACTORS = {
-  'blue-guardian': extractBlueGuardian,
   'traders-launch': extractTradersLaunch,
   'e8-markets': extractE8,
 };
@@ -340,8 +266,6 @@ function skipReason(firmId, programName, field) {
   if (firmId === 'e8-markets' && field === 'dailyLoss') return 'never shown on E8 cards (manual null)';
   if (firmId === 'e8-markets' && field === 'contracts')
     return 'their cards stopped listing the contract limit (manual)';
-  if (firmId === 'blue-guardian' && field === 'profitTarget') return 'instant: no profit-target rule';
-  if (firmId === 'blue-guardian' && field === 'consistency') return 'instant: hand summary of per-payout rows';
   return 'not published on buy-screen (manual)';
 }
 
@@ -483,22 +407,22 @@ async function main() {
   const data = JSON.parse(fs.readFileSync(DATA_URL, 'utf8'));
 
   if (selfTest) {
-    // Inject a fake truth on a known, reliably-scraped plan (BG Express 50k
-    // profitTarget: 3000 -> 99999) WITHOUT writing the file, and prove the
+    // Inject a fake truth on a known, reliably-scraped plan (Traders Launch
+    // 1-Step 100k profitTarget -> 99999) WITHOUT writing the file, and prove the
     // engine classifies it as a REAL DRIFT.
-    const prog = data.firms.find((f) => f.id === 'blue-guardian').programs.find((p) => p.name === 'Express');
-    const plan = prog.plans.find((p) => p.size === 50000);
+    const prog = data.firms.find((f) => f.id === 'traders-launch').programs.find((p) => p.name === '1-Step');
+    const plan = prog.plans.find((p) => p.size === 100000);
     const original = plan.profitTarget;
     plan.profitTarget = 99999;
-    console.log(`[self-test] injected fake BG Express 50k profitTarget: ${original} -> 99999 (in memory only)`);
-    const { drifts } = await runChecks(data, 'blue-guardian');
+    console.log(`[self-test] injected fake Traders Launch 1-Step 100k profitTarget: ${original} -> 99999 (in memory only)`);
+    const { drifts } = await runChecks(data, 'traders-launch');
     const hit = drifts.find(
-      (d) => d.firm === 'Blue Guardian' && d.program === 'Express' && d.size === 50000 && d.field === 'profitTarget',
+      (d) => d.firm === 'Traders Launch' && d.program === '1-Step' && d.size === 100000 && d.field === 'profitTarget',
     );
     console.log('\n[self-test] drifts detected:', drifts.length);
     for (const d of drifts) console.log(`  DRIFT ${d.firm}/${d.program}/${d.size / 1000}k ${d.field}: ours=${d.ours} site=${d.site}`);
-    if (hit && hit.site === '3000') {
-      console.log('\n[self-test] PASS — injected value classified as REAL DRIFT (ours=99999, site=3000).');
+    if (hit && hit.site === String(original)) {
+      console.log(`\n[self-test] PASS — injected value classified as REAL DRIFT (ours=99999, site=${original}).`);
     } else {
       console.log('\n[self-test] FAIL — injected drift was not detected/classified correctly.');
     }

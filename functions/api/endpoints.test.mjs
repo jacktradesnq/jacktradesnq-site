@@ -152,7 +152,7 @@ const sendReq = (body, key) =>
   });
 
 const CONTENT = {
-  subject: 'Blue Guardian: 50K Reserve at $75',
+  subject: 'Traders Launch: 100K 1-Step at $75',
   html: '<p>deal</p><a href="{{unsubscribe_url}}">out</a>',
   text: 'deal\nUnsubscribe: {{unsubscribe_url}}',
 };

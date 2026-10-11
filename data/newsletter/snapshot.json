@@ -1,26 +1,6 @@
 {
   "generatedAt": "2026-08-19",
   "firms": {
-    "blue-guardian": {
-      "promoKey": "25% OFF|BG25|",
-      "prices": {
-        "Direct|25000": 230,
-        "Direct|50000": 371,
-        "Direct|100000": 494,
-        "Direct|150000": 618,
-        "Express|50000": 134,
-        "Express|100000": 212,
-        "Express|150000": 290,
-        "Reserve|25000": 83,
-        "Reserve|50000": 116,
-        "Reserve|100000": 186,
-        "Reserve|150000": 297,
-        "Standard|25000": 116,
-        "Standard|50000": 157,
-        "Standard|100000": 248,
-        "Standard|150000": 318
-      }
-    },
     "traders-launch": {
       "promoKey": null,
       "prices": {
