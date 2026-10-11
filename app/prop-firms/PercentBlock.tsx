@@ -44,6 +44,7 @@ export function PercentBlock({
   sizes,
   defaultSize,
   rowsFor,
+  commonRules,
   banner,
   legendFirst,
   note,
@@ -56,6 +57,7 @@ export function PercentBlock({
   sizes: number[];
   defaultSize: number;
   rowsFor: (size: number) => PercentRow[];
+  commonRules?: { label: string; items: string[] };
   banner?: ReactNode;
   legendFirst: string;
   note: string;
@@ -73,6 +75,17 @@ export function PercentBlock({
         </h2>
         <p className="cfd-intro">{intro}</p>
       </header>
+
+      {commonRules && (
+        <div className="common-rules">
+          <span className="common-rules-label">{commonRules.label}</span>
+          <ul className="common-rules-list">
+            {commonRules.items.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {banner}
 

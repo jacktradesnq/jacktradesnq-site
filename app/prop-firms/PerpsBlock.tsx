@@ -46,6 +46,16 @@ type PerpsFirm = {
 const DATA = rawData as unknown as { generatedAt: string; firms: PerpsFirm[] };
 const BUILD_TS = Number(process.env.NEXT_PUBLIC_BUILD_TS ?? 0);
 const DEFAULT_SIZE = 25000;
+// Rules shared by every MyFundedPerps plan. Angelo, 11/10/2026: « les gens savent qu'il y
+// a des règles communes, c'est précisé. Parce qu'il faut qu'ils le voient. »
+const COMMON_RULES = [
+  '1-step evaluation',
+  'Static drawdown',
+  'No consistency rule',
+  'No minimum trading days',
+  'No time limit',
+  'Up to $300K funded in total',
+];
 
 const pad = (n: number) => String(n).padStart(2, '0');
 function clock(msLeft: number): string {
@@ -144,6 +154,7 @@ export function PerpsBlock() {
         sizes={sizes}
         defaultSize={DEFAULT_SIZE}
         rowsFor={rowsFor}
+        commonRules={{ label: 'MyFundedPerps, every plan', items: COMMON_RULES }}
         banner={
           promo && (
             <p className="perps-promo">
@@ -165,6 +176,16 @@ export function PerpsBlock() {
 }
 
 const PERPS_CSS = `
+.jtnq-cmp .common-rules{ margin: 0 0 24px; }
+.jtnq-cmp .common-rules-label{
+  display: block; margin: 0 0 8px; font-family: var(--f-mono); font-size: 11px; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--c-text-mute);
+}
+.jtnq-cmp .common-rules-list{ list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.jtnq-cmp .common-rules-list li{
+  padding: 4px 12px; border: 1px solid var(--c-line); border-radius: 999px;
+  background: var(--c-bg-raise); color: var(--c-text); font-size: 14px; line-height: 24px;
+}
 .jtnq-cmp .perps-promo{
   display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 24px;
   padding: 12px 16px; border: 1px solid color-mix(in oklab, var(--c-accent) 45%, var(--c-line)); border-radius: 12px;
