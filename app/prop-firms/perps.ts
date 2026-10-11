@@ -103,7 +103,12 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
   const d = (p: PerpsProgram) => DETAILS[p.name];
 
   const { common, rules } = splitCommon([
-    { label: 'Profit target', cells: programs.map((p) => limit(p.profitTarget)), common: (c) => `${c.text} profit target` },
+    // No target is a rule (instant funding), as the old block showed it: "None", not "n/c".
+    {
+      label: 'Profit target',
+      cells: programs.map((p) => limit(p.profitTarget ?? 'None')),
+      common: (c) => (c.muted ? 'No profit target' : `${c.text} profit target`),
+    },
     { label: 'Max drawdown', cells: programs.map((p) => limit(p.maxDrawdown)), common: (c) => `${c.text} max drawdown` },
     { label: 'Daily loss limit', cells: programs.map((p) => limit(p.dailyLoss)), common: (c) => `${c.text} daily loss limit` },
     { label: 'Profit split', cells: programs.map((p) => text(d(p)?.split ?? p.split)), common: (c) => `${c.text} profit split` },

@@ -159,6 +159,8 @@ export const FAMILY_CSS = `
 .jtnq-cmp .ft-cell .ft-fig + .tag{ margin-left: 8px; }
 .jtnq-cmp .ft-cell .tag:only-child{ margin-left: 0; }
 .jtnq-cmp .ft-fig{ font-family: var(--f-mono); font-size: 15px; font-weight: 500; color: var(--c-text); }
+.jtnq-cmp .ft-word{ font-family: var(--f-sans); font-size: 15px; font-weight: 500; color: var(--c-text); line-height: 1.4; }
+.jtnq-cmp .ft-swipe{ display: none; }
 .jtnq-cmp .ft-cell--note{ vertical-align: top; }
 .jtnq-cmp .ft-sentence{
   display: block; max-width: 34ch; margin: 0 auto; text-align: left;
@@ -177,6 +179,7 @@ export const FAMILY_CSS = `
 .jtnq-cmp .ft-sec-sub{
   display: inline-block; font-family: var(--f-sans); font-size: 12px; font-weight: 400; font-style: italic; color: var(--c-text-mute);
 }
+.jtnq-cmp .ft-price .price-was{ white-space: nowrap; }
 .jtnq-cmp .ft-price{ display: inline-flex; align-items: baseline; justify-content: center; gap: 8px; flex-wrap: wrap; }
 .jtnq-cmp .ft-now{ font-family: var(--f-mono); font-size: 17px; font-weight: 500; color: var(--c-text); }
 .jtnq-cmp .price-was{ font-family: var(--f-mono); font-size: 12px; font-weight: 400; color: var(--c-text-mute); }
@@ -198,9 +201,14 @@ export const FAMILY_CSS = `
   .jtnq-cmp .perps-promo{ padding: 12px 16px; }
   .jtnq-cmp .ft-actions{ width: 100%; }
   .jtnq-cmp .ft-actions .row-cta{ margin-left: auto; }
-  .jtnq-cmp .ft-table{ min-width: calc(112px + var(--cols) * 136px); }
+  .jtnq-cmp .ft-table{ min-width: calc(104px + var(--cols) * 152px); }
+  .jtnq-cmp .ft-swipe{
+    display: block; margin: 0; padding: 12px 16px 0;
+    font-family: var(--f-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--c-text-mute);
+  }
   .jtnq-cmp .ft-table th, .jtnq-cmp .ft-table td{ padding: 12px 8px; }
-  .jtnq-cmp .ft-label{ width: 112px; font-size: 10px; letter-spacing: .1em; padding-left: 16px !important; }
+  .jtnq-cmp .ft-word{ font-size: 14px; }
+  .jtnq-cmp .ft-label{ width: 104px; font-size: 10px; letter-spacing: .1em; padding-left: 16px !important; }
   .jtnq-cmp .ft-col{ font-size: 17px; }
   .jtnq-cmp .ft-foot{ padding: 8px 16px 16px; }
 }

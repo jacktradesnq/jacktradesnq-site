@@ -37,8 +37,9 @@ function CellView({ cell }: { cell: Cell }) {
     );
   if (cell.note) return <span className="ft-sentence">{cell.text}</span>;
   if (cell.muted) return <span className="none">{cell.text}</span>;
+  // Figures read in mono, words ("Locks at start balance", "Daily") in the body face.
   return (
-    <span className="ft-fig">
+    <span className={/^[\d$+\-–]/.test(cell.text) ? 'ft-fig' : 'ft-word'}>
       {cell.text}
       {cell.soft && (
         <span className="soft-flag" title="Soft breach: position flattened, account not lost">
@@ -155,6 +156,7 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
         </section>
       )}
 
+      {cols > 1 && <p className="ft-swipe" aria-hidden="true">Swipe sideways for every program →</p>}
       <div className="ft-scroll" tabIndex={0} role="group" aria-label={`${firm.name} plan table, scrolls sideways`}>
         <table className="ft-table" style={{ ['--cols' as string]: cols }}>
           <thead>

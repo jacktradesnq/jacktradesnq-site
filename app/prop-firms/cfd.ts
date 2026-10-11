@@ -63,7 +63,12 @@ function firmView(firm: CfdFirm): FirmView {
 
   const { common, rules } = splitCommon([
     { label: 'Program', cells: programs.map((p) => ({ text: p.steps })), common: (c) => c.text },
-    { label: 'Profit target', cells: programs.map((p) => limit(p.profitTarget)), common: (c) => `${c.text} profit target` },
+    // No target is a rule (instant funding), as the old block showed it: "None", not "n/c".
+    {
+      label: 'Profit target',
+      cells: programs.map((p) => limit(p.profitTarget ?? 'None')),
+      common: (c) => (c.muted ? 'No profit target' : `${c.text} profit target`),
+    },
     {
       label: 'Max drawdown',
       cells: programs.map((p): Cell =>
