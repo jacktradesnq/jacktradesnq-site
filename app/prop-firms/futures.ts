@@ -204,7 +204,7 @@ const FUNDED: Record<string, Record<string, Funded>> = {
   'e8-markets': {
     'E8 Signature Futures': {
       pills: [
-        { label: 'Winning days', value: '5 between payouts (+0.3% day), not before the 1st' },
+        { label: 'Winning days', value: 'None for the 1st payout, then 5 between payouts (day ≥ +0.3%)' },
         { label: 'Buffer', value: 'Same as your EOD drawdown' },
         { label: 'Minimum payout', value: '$100' },
         { label: 'Payouts per account', value: '4, then a free challenge' },
