@@ -1,14 +1,17 @@
 'use client';
 
 // /prop-firms: pick a family (Futures · Perps · CFD), then a firm, and its whole table
-// opens below — every program and every size at once. Angelo, 11/10/2026: « un filtre
+// opens in a window over the page — every program and every size at once. Angelo, 11/10/2026: « un filtre
 // où tu tapes entre futures, perps et CFD […] chaque prop firm tu cliques dessus et ça
 // t'ouvre le tableau directement ».
 //
 // His partnership contracts forbid comparing firms or putting one forward (11/10/2026:
 // « faut pas que je compare et que je mette en avant l'un ou l'autre, c'est contre mes
 // contrats »): cards in alphabetical order, all alike, never two firms in one table,
-// nothing opened by default unless the family has a single firm.
+// nothing opened by default.
+//
+// The table opens over the page instead of folding out under the card (Angelo, 12/10/2026:
+// « j'ai pas envie que ça soit un toggle mais un truc qui s'ouvre »).
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { CSS, META, money } from './shared';
@@ -21,8 +24,6 @@ import { FAMILY_CSS } from './family-css';
 
 const byName = (a: FirmView, b: FirmView) => a.name.localeCompare(b.name, 'en');
 const isFamily = (s: string): s is Family => FAMILIES.some((f) => f.id === s);
-// A family with a single firm opens it; with several, the visitor picks.
-const defaultOpen = (firms: FirmView[]) => (firms.length === 1 ? firms[0].id : null);
 
 export default function PropFirms() {
   const promoLive = usePromoLive();
@@ -36,8 +37,9 @@ export default function PropFirms() {
   );
 
   const [family, setFamily] = useState<Family>('futures');
-  const [openId, setOpenId] = useState<string | null>(() => defaultOpen(firmsBy.futures));
+  const [openId, setOpenId] = useState<string | null>(null);
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const prev = document.body.style.background;
@@ -53,18 +55,17 @@ export default function PropFirms() {
       const h = window.location.hash.slice(1);
       if (!isFamily(h)) return;
       setFamily(h);
-      setOpenId(defaultOpen(firmsBy[h]));
+      setOpenId(null);
     };
     fromHash();
     window.addEventListener('hashchange', fromHash);
     return () => window.removeEventListener('hashchange', fromHash);
-    // firmsBy only changes with the promo; each family keeps the same firms.
   }, []);
 
   function pick(f: Family) {
     if (f === family) return;
     setFamily(f);
-    setOpenId(defaultOpen(firmsBy[f]));
+    setOpenId(null);
     window.history.replaceState(null, '', `#${f}`);
   }
 
@@ -84,6 +85,14 @@ export default function PropFirms() {
 
   const firms = firmsBy[family];
   const open = firms.find((f) => f.id === openId) ?? null;
+
+  // The native <dialog> gives Escape, focus trapping and the backdrop for free.
+  useEffect(() => {
+    const d = dialogRef.current;
+    if (!d) return;
+    if (open && !d.open) d.showModal();
+    if (!open && d.open) d.close();
+  }, [open]);
 
   return (
     <div className="jtnq-cmp">
@@ -140,15 +149,13 @@ export default function PropFirms() {
 
             <div className="firm-cards">
               {firms.map((firm) => {
-                const isOpen = open?.id === firm.id;
                 return (
                   <button
                     key={firm.id}
                     type="button"
-                    className={`firm-card${isOpen ? ' is-open' : ''}`}
-                    aria-expanded={isOpen}
-                    aria-controls={`firm-${firm.id}`}
-                    onClick={() => setOpenId(isOpen ? null : firm.id)}
+                    className="firm-card"
+                    aria-haspopup="dialog"
+                    onClick={() => setOpenId(firm.id)}
                   >
                     <FirmLogo firm={firm} size={40} />
                     <span className="fc-body">
@@ -170,9 +177,9 @@ export default function PropFirms() {
                         </span>
                       )}
                       <span className="fc-open">
-                        {isOpen ? 'Hide plans' : 'See all plans'}
+                        See all plans
                         <svg className="fc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <path d="M6 9l6 6 6-6" />
+                          <path d="M7 17L17 7M9 7h8v8" />
                         </svg>
                       </span>
                     </span>
@@ -181,7 +188,22 @@ export default function PropFirms() {
               })}
             </div>
 
-            {open && (
+            <dialog
+              ref={dialogRef}
+              className="firm-dialog"
+              aria-label={open ? `${open.name} plans` : undefined}
+              onClose={() => setOpenId(null)}
+              onClick={(e) => {
+                // A click on the dimmed backdrop (the dialog box itself, outside the table) closes it.
+                if (e.target === e.currentTarget) e.currentTarget.close();
+              }}
+            >
+              <button type="button" className="fd-close" aria-label="Close" onClick={() => dialogRef.current?.close()}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
+              {open && (
               <FirmTable
                 key={open.id}
                 firm={open}
@@ -197,7 +219,8 @@ export default function PropFirms() {
                   ) : null
                 }
               />
-            )}
+              )}
+            </dialog>
           </div>
         </section>
 

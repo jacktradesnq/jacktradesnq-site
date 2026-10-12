@@ -44,10 +44,6 @@ export const FAMILY_CSS = `
   transition: border-color .2s ease, background .2s ease, transform .2s ease;
 }
 .jtnq-cmp .firm-card:hover{ border-color: color-mix(in oklab, var(--c-accent) 50%, var(--c-line)); transform: translateY(-1px); }
-.jtnq-cmp .firm-card.is-open{
-  border-color: var(--c-accent);
-  background: color-mix(in oklab, var(--c-bg-raise) 90%, var(--c-accent) 6%);
-}
 .jtnq-cmp .firm-mark{ border-radius: 8px; object-fit: contain; flex-shrink: 0; }
 .jtnq-cmp .firm-mark--letter{
   display: inline-grid; place-items: center;
@@ -80,7 +76,24 @@ export const FAMILY_CSS = `
   font-family: var(--f-sans); font-size: 13px; font-weight: 500; color: var(--c-accent);
 }
 .jtnq-cmp .fc-chev{ width: 14px; height: 14px; transition: transform .2s ease; }
-.jtnq-cmp .firm-card.is-open .fc-chev{ transform: rotate(180deg); }
+.jtnq-cmp .firm-card:hover .fc-chev{ transform: translate(2px, -2px); }
+
+/* ── the window a firm's table opens in ── */
+.jtnq-cmp .firm-dialog{
+  position: fixed; inset: 0; margin: auto; padding: 48px 0 0; border: none; background: transparent; color: inherit;
+  width: min(1120px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px);
+  overflow-y: auto; overscroll-behavior: contain;
+}
+.jtnq-cmp .firm-dialog::backdrop{ background: oklch(0.07 0.02 165 / .8); backdrop-filter: blur(6px); }
+.jtnq-cmp .firm-dialog .ft{ margin-top: 0; }
+.jtnq-cmp .fd-close{
+  position: absolute; top: 0; right: 0; width: 40px; height: 40px; display: grid; place-items: center;
+  border: 1px solid var(--c-line); border-radius: 999px; background: var(--c-bg-raise); color: var(--c-text);
+  cursor: pointer; transition: border-color .2s ease, color .2s ease;
+}
+.jtnq-cmp .fd-close:hover{ border-color: var(--c-accent); color: var(--c-accent); }
+.jtnq-cmp .fd-close svg{ width: 18px; height: 18px; }
+html:has(.firm-dialog[open]){ overflow: hidden; }
 
 /* ── one firm's table ── */
 @keyframes ft-in{ from{ opacity: 0; transform: translateY(8px); } to{ opacity: 1; transform: none; } }
