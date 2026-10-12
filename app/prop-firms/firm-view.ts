@@ -1,10 +1,8 @@
 // One shape for every firm on /prop-firms, whatever its family. Angelo, 11/10/2026:
 // « ils choisissent juste entre les trois types de prop firm, et après […] ils cliquent
 // dessus, ça leur montre le tableau avec tout d'un coup ». Each family (futures.ts,
-// perps.ts, cfd.ts) turns its own JSON into FirmView; FirmTable.tsx only draws it,
-// in the layout of the MyFundedPerps comparison table he made (jtnq-promo,
-// out/myfundedperps/table.html): the rules shared by every plan in one box, then one
-// column per program, one row per rule, one row per account size for the prices.
+// perps.ts, cfd.ts) turns its own JSON into FirmView; FirmTable.tsx only draws it: one
+// program at a time, its rules as pills, one column per account size, Eval / Funded.
 
 export type Family = 'futures' | 'perps' | 'cfd';
 
@@ -76,7 +74,6 @@ export type FirmView = {
   priceLabel?: string;
   extraPrices?: { label: string; byProgram: (Record<number, { now: number; was: number | null }> | null)[] }[];
   legend: string[];
-  note: string;
   href: string;
 };
 
@@ -91,18 +88,23 @@ const cellKey = (c: Cell) => JSON.stringify([c.text, c.tag?.label ?? '', !!c.sof
 // plan" box, phrased as a sentence; the table keeps only what differs.
 export function splitCommon(
   // keep: always a column, even when every program reads the same.
-  rows: { label: string; cells: Cell[]; common: (c: Cell) => string; skip?: boolean; keep?: boolean }[],
+  rows: { label: string; cells: Cell[]; common: (c: Cell) => string; skip?: boolean }[],
 ): { common: string[]; rules: RuleRow[] } {
   const common: string[] = [];
   const rules: RuleRow[] = [];
   for (const row of rows) {
     if (row.skip) continue;
     const same = row.cells.length > 1 && row.cells.every((c) => cellKey(c) === cellKey(row.cells[0]));
-    if (!row.keep && (same || row.cells.length === 1)) common.push(row.common(row.cells[0]));
+    if (same || row.cells.length === 1) common.push(row.common(row.cells[0]));
     else rules.push({ label: row.label, cells: row.cells });
   }
   return { common, rules };
 }
+
+// A limit as perps and CFD firms publish it: "None" is a rule (no daily loss), null means
+// the firm does not publish it ("n/c").
+export const limitCell = (v: string | null): Cell =>
+  v == null ? { text: 'n/c', muted: true } : v === 'None' ? { text: 'None', muted: true } : { text: v };
 
 export function cheapest(sizes: FirmView['sizes']): FirmView['from'] {
   let best: FirmView['from'] = null;

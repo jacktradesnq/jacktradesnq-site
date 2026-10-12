@@ -215,7 +215,6 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
 .jtnq-cmp .ft-line .none{ font-size: 11px; }
 .jtnq-cmp .ft-line-k{ color: var(--c-text-mute); text-transform: uppercase; letter-spacing: .08em; font-size: 10px; }
 .jtnq-cmp .ft-foot{ padding: 8px 24px 24px; border-top: 1px solid var(--c-line-soft); }
-.jtnq-cmp .ft-foot .note{ margin-top: 16px; }
 
 @media (max-width: 720px){
   .jtnq-cmp .ft-filters{ display: flex; flex-direction: column; align-items: stretch; border-radius: 20px; }

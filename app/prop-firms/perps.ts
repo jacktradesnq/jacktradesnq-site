@@ -12,7 +12,7 @@
 import { useEffect, useState } from 'react';
 import rawData from '@/public/data/perps-firms.json';
 import { goHref } from '@/lib/go-links';
-import { cheapest, humanDate, splitCommon, type Cell, type FirmView, type Funded, type PriceCell } from './firm-view';
+import { cheapest, limitCell, splitCommon, type Cell, type FirmView, type Funded, type PriceCell } from './firm-view';
 
 // price null = announced but not on sale yet ("Coming soon").
 // dllPrice: Elite's cheaper version with a 3% daily loss limit, shown in the same cell after a « / »
@@ -78,15 +78,13 @@ export function usePromoLive(): boolean {
   return live;
 }
 
-// What the JSON keeps in a sentence (program.note), split into the rows of Angelo's
-// table. Same facts as perps-firms.json notes: daily payouts and a 90% split option
-// on Select/Prime/Signature, the loss limit locked at the starting balance on the 1st
-// payout; Elite pays on demand, 40x on indices, the limit stays at -5%.
-const DETAILS: Record<string, { split: string; payouts: string; afterPayout: string; leverage: string }> = {
-  Select: { split: '80% (90% option)', payouts: 'Daily', afterPayout: 'Locks at start balance', leverage: 'Standard' },
-  Prime: { split: '80% (90% option)', payouts: 'Daily', afterPayout: 'Locks at start balance', leverage: 'Standard' },
-  Signature: { split: '80% (90% option)', payouts: 'Daily', afterPayout: 'Locks at start balance', leverage: 'Standard' },
-  Elite: { split: '80% (90% option)', payouts: 'On demand', afterPayout: 'Stays at -5%', leverage: 'Boosted (40x indices)' },
+// Split and leverage per program, from the firm's checkout and docs (12/10/2026); the
+// payout rules live in FUNDED below.
+const DETAILS: Record<string, { split: string; leverage: string }> = {
+  Select: { split: '80% (90% option)', leverage: 'Standard' },
+  Prime: { split: '80% (90% option)', leverage: 'Standard' },
+  Signature: { split: '80% (90% option)', leverage: 'Standard' },
+  Elite: { split: '80% (90% option)', leverage: 'Boosted (40x indices)' },
 };
 
 // Rules MyFundedPerps applies to every program, from the same table.
@@ -142,8 +140,6 @@ const SUMMARY: Record<string, string> = {
   myfundedperps: '80–90% split',
 };
 
-const limit = (v: string | null): Cell =>
-  v == null ? { text: 'n/c', muted: true } : v === 'None' ? { text: 'None', muted: true } : { text: v };
 const text = (v: string | undefined): Cell => (v ? { text: v } : { text: 'n/c', muted: true });
 
 function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
@@ -155,11 +151,11 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     // No target is a rule (instant funding), as the old block showed it: "None", not "n/c".
     {
       label: 'Profit target',
-      cells: programs.map((p) => limit(p.profitTarget ?? 'None')),
+      cells: programs.map((p) => limitCell(p.profitTarget ?? 'None')),
       common: (c) => (c.muted ? 'No profit target' : `${c.text} profit target`),
     },
-    { label: 'Max drawdown', cells: programs.map((p) => limit(p.maxDrawdown)), common: (c) => `${c.text} max drawdown` },
-    { label: 'Daily loss limit', cells: programs.map((p) => limit(p.dailyLoss)), common: (c) => `${c.text} daily loss limit` },
+    { label: 'Max drawdown', cells: programs.map((p) => limitCell(p.maxDrawdown)), common: (c) => `${c.text} max drawdown` },
+    { label: 'Daily loss limit', cells: programs.map((p) => limitCell(p.dailyLoss)), common: (c) => `${c.text} daily loss limit` },
     { label: 'Profit split', cells: programs.map((p) => text(d(p)?.split ?? p.split)), common: (c) => `${c.text} profit split` },
     { label: 'Leverage', cells: programs.map((p) => text(d(p)?.leverage)), common: (c) => `${c.text} leverage` },
     // A program missing from DETAILS still shows its rules as the JSON writes them.
@@ -220,10 +216,6 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
       'Every limit is a percentage of your starting balance, the way perps firms publish them',
       ...(rules.some((r) => r.cells.some((c) => c.text === 'n/c')) ? ['n/c — the firm does not publish that rule per program'] : []),
     ],
-    note:
-      `Prices and rules read on the firm's own site on ${humanDate(firm.promo?.lastChecked ?? firm.lastChecked)}, not auto-synced.` +
-      (promo ? ` Crossed-out prices are the normal prices; code ${promo.code} takes ${promo.discountPct}% off${endsLabel ? ` until ${endsLabel} New York time` : ''}.` : '') +
-      ' The live checkout price wins.',
     href: goHref('prop-firms', firm.id),
   };
 }

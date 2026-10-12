@@ -40,7 +40,6 @@
           "minDays": null,
           "split": "80%",
           "leverage": "1:100 FX",
-          "note": "40% consistency in the evaluation only · funded payouts daily, up to 3% of the account per payout",
           "plans": [
             { "size": 10000, "price": 89 },
             { "size": 25000, "price": 149 },
@@ -59,7 +58,6 @@
           "minDays": null,
           "split": "80%",
           "leverage": "1:100 FX",
-          "note": "No consistency rule · funded payouts every 14 days",
           "plans": [
             { "size": 5000, "price": 55 },
             { "size": 10000, "price": 109 },
@@ -79,7 +77,6 @@
           "minDays": null,
           "split": "80%",
           "leverage": "1:100 FX",
-          "note": "20% consistency to request a payout · payouts on demand · the loss limit locks at your starting balance on the first payout request",
           "plans": [
             { "size": 5000, "price": 85 },
             { "size": 10000, "price": 119 },

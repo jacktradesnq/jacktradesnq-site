@@ -386,20 +386,12 @@ function firmView(firm: Firm): FirmView {
         }
       : {}),
     legend,
-    note: NOTE,
     href: goHref('prop-firms', firm.id),
   };
 }
 
 // A firm whose scraper failed keeps its old prices while generatedAt says today: name
 // the firms that are behind instead of advertising one sync date for everyone.
-const behindFirms = DATA.firms.filter((f) => f.lastChecked !== DATA.generatedAt);
-const SYNC_NOTE =
-  behindFirms.length === 0
-    ? `Prices and promo codes auto-checked daily — last sync ${humanDate(DATA.generatedAt)}.`
-    : `Prices and promo codes auto-checked daily — last sync ${humanDate(DATA.generatedAt)}, except ${behindFirms
-        .map((f) => `${f.name}, checked ${humanDate(f.lastChecked)}`)
-        .join('; ')}.`;
-const NOTE = `Figures pulled from each firm's official site. ${SYNC_NOTE} Risk rules verified manually 19 Jul 2026. Promos change fast; the live checkout price wins.`;
+
 
 export const FUTURES_FIRMS: FirmView[] = DATA.firms.map(firmView);

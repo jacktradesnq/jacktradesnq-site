@@ -145,10 +145,6 @@ export const CSS = `
   margin: 0; font-family: var(--f-mono); font-size: 11px; line-height: 1.5; color: var(--c-text-mute);
 }
 
-.jtnq-cmp .note{
-  margin: clamp(24px, 3vw, 32px) 0 0; max-width: 78ch;
-  font-family: var(--f-sans); font-size: 13px; line-height: 1.6; color: var(--c-text-mute); text-wrap: pretty;
-}
 
 .jtnq-cmp .site-footer{
   background: var(--c-bg-deep); border-top: 1px solid var(--c-line-soft); padding: 56px var(--pad-x) 48px;
