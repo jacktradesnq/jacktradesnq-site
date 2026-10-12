@@ -12,7 +12,7 @@
 import { useEffect, useState } from 'react';
 import rawData from '@/public/data/perps-firms.json';
 import { goHref } from '@/lib/go-links';
-import { cheapest, humanDate, splitCommon, type Cell, type FirmView, type PriceCell } from './firm-view';
+import { cheapest, humanDate, splitCommon, type Cell, type FirmView, type Funded, type PriceCell } from './firm-view';
 
 // price null = announced but not on sale yet ("Coming soon").
 // dllPrice: Elite's cheaper version with a 3% daily loss limit, shown in the same cell after a « / »
@@ -99,6 +99,41 @@ const COMMON: Record<string, string[]> = {
   ],
 };
 
+// Funded rules, read on the firm's docs and FAQ on 12/10/2026 (docs.myfundedperpetuals.com:
+// payouts « no minimum trading-day or qualifying-day requirement, consistency gate, or payout
+// count cap », « one payout request per New York calendar day », « $100 of gross profit
+// before the split », « at most $100,000 in total lifetime payouts »; elite-accounts: request
+// from the first funded day once flat, minimum 1% of the size, the limit stays at -5%).
+const MFP_STD: Funded = {
+  pills: [
+    { label: 'Winning days', value: 'None' },
+    { label: 'Consistency', value: 'None' },
+    { label: 'Payout request', value: 'Once per day' },
+    { label: 'Minimum payout', value: '$100 gross' },
+    { label: 'Drawdown after 1st payout', value: 'Locks at start balance' },
+    { label: 'Lifetime payouts', value: 'Up to $100K' },
+  ],
+  rows: [],
+};
+const FUNDED: Record<string, Record<string, Funded>> = {
+  myfundedperps: {
+    Select: MFP_STD,
+    Prime: MFP_STD,
+    Signature: MFP_STD,
+    Elite: {
+      pills: [
+        { label: 'Winning days', value: 'None' },
+        { label: 'Consistency', value: 'None' },
+        { label: 'Payout request', value: 'Any time, from day 1, positions closed' },
+        { label: 'Minimum payout', value: '1% of the account' },
+        { label: 'Drawdown after a payout', value: 'Stays at -5%' },
+        { label: 'Lifetime payouts', value: 'Up to $100K' },
+      ],
+      rows: [],
+    },
+  },
+};
+
 const SUMMARY: Record<string, string> = {
   myfundedperps: '80–90% split',
 };
@@ -122,12 +157,6 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     { label: 'Max drawdown', cells: programs.map((p) => limit(p.maxDrawdown)), common: (c) => `${c.text} max drawdown` },
     { label: 'Daily loss limit', cells: programs.map((p) => limit(p.dailyLoss)), common: (c) => `${c.text} daily loss limit` },
     { label: 'Profit split', cells: programs.map((p) => text(d(p)?.split ?? p.split)), common: (c) => `${c.text} profit split` },
-    { label: 'Payouts', cells: programs.map((p) => text(d(p)?.payouts)), common: (c) => `${c.text} payouts` },
-    {
-      label: 'Drawdown after 1st payout',
-      cells: programs.map((p) => text(d(p)?.afterPayout)),
-      common: (c) => `Drawdown after 1st payout: ${c.text}`,
-    },
     { label: 'Leverage', cells: programs.map((p) => text(d(p)?.leverage)), common: (c) => `${c.text} leverage` },
     // A program missing from DETAILS still shows its rules as the JSON writes them.
     {
@@ -180,6 +209,7 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     priceTitle: promo ? `Price with code ${promo.code}` : 'Price',
     priceSub: promo ? `${promo.discountPct}% off until ${endsLabel} New York time` : null,
     sizes: sizeRows,
+    funded: FUNDED[firm.id] ? programs.map((p) => FUNDED[firm.id][p.name.split(' ')[0]] ?? null) : undefined,
     legend: [
       'Every limit is a percentage of your starting balance, the way perps firms publish them',
       ...(rules.some((r) => r.cells.some((c) => c.text === 'n/c')) ? ['n/c — the firm does not publish that rule per program'] : []),

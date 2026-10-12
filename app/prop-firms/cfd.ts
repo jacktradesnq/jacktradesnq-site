@@ -4,7 +4,7 @@
 
 import rawCfdData from '@/public/data/cfd-firms.json';
 import { goHref } from '@/lib/go-links';
-import { cheapest, humanDate, splitCommon, type Cell, type FirmView, type PriceCell } from './firm-view';
+import { cheapest, humanDate, splitCommon, type Cell, type FirmView, type Funded, type PriceCell } from './firm-view';
 
 type CfdPlan = { size: number; price: number };
 type CfdProgram = {
@@ -51,8 +51,51 @@ const DD_TITLE: Record<string, string> = {
 const limit = (v: string | null): Cell =>
   v == null ? { text: 'n/c', muted: true } : v === 'None' ? { text: 'None', muted: true } : { text: v };
 
+// tradeifyfx.co home page, read 12/10/2026: « No activation costs ».
 const SUMMARY: Record<string, string> = {
-  'tradeify-fx': '80% split · payouts daily to on demand',
+  'tradeify-fx': '80% split · No activation fee',
+};
+
+// Evaluation consistency and funded rules, read on the checkout's Evaluation / Funded faces,
+// the help center guides and the Funded Trader Agreement on 12/10/2026. Daily: « Daily payouts
+// come from profit above a 4% buffer, which stays in your account. Maximum 3% of the account
+// size per payout. », +1% new profit between payouts from the 2nd, 40% consistency in the
+// evaluation only. Classic: « no minimum trading-day or profitable-day requirement before the
+// first payout », every 14 days. Direct: 20% consistency to request a payout, no cap, the max
+// loss locks at the starting balance « the moment you request your first payout ».
+const EVAL_CONSISTENCY: Record<string, string> = { Daily: '40%', Classic: 'None', Direct: '20% to request a payout' };
+const FUNDED: Record<string, Record<string, Funded>> = {
+  'tradeify-fx': {
+    Daily: {
+      pills: [
+        { label: 'Consistency', value: 'None' },
+        { label: 'Payout request', value: 'Daily' },
+        { label: 'Buffer', value: '4%, stays in the account' },
+        { label: 'Max per payout', value: '3% of the account' },
+        { label: 'Between payouts', value: '+1% new profit, from the 2nd' },
+        { label: 'Minimum payout', value: '$100' },
+      ],
+      rows: [],
+    },
+    Classic: {
+      pills: [
+        { label: 'Winning days', value: 'None' },
+        { label: 'Consistency', value: 'None' },
+        { label: 'Payout request', value: 'Every 14 days' },
+        { label: 'Minimum payout', value: '$100' },
+      ],
+      rows: [],
+    },
+    Direct: {
+      pills: [
+        { label: 'Consistency', value: '20% to request a payout' },
+        { label: 'Payout cap', value: 'None' },
+        { label: 'Minimum payout', value: '$100' },
+        { label: 'Max loss', value: 'Locks at start balance on the 1st payout request' },
+      ],
+      rows: [],
+    },
+  },
 };
 
 const NOTE = `List prices and rules read on each firm's own site and help center on ${humanDate(DATA.generatedAt)}, not auto-synced. Discounted prices are the list price minus the firm's discount, checked on its checkout on ${humanDate(DATA.firms.find((f) => f.discount)?.discount?.lastChecked ?? DATA.generatedAt)}. Promos change fast; the live checkout price wins.`;
@@ -90,7 +133,11 @@ function firmView(firm: CfdFirm): FirmView {
       common: (c) => (c.muted ? 'No minimum trading days' : `Minimum ${c.text}`),
       skip: programs.every((p) => !p.minDays),
     },
-    { label: 'Notes', cells: programs.map((p) => ({ text: p.note, note: true })), common: (c) => c.text },
+    {
+      label: 'Consistency',
+      cells: programs.map((p) => ({ text: EVAL_CONSISTENCY[p.name] ?? 'n/c', muted: !EVAL_CONSISTENCY[p.name] })),
+      common: (c) => `Consistency ${c.text}`,
+    },
   ]);
 
   const sizes = [...new Set(programs.flatMap((p) => p.plans.map((pl) => pl.size)))].sort((a, b) => a - b);
@@ -125,6 +172,7 @@ function firmView(firm: CfdFirm): FirmView {
     priceTitle: d ? `Price with code ${d.code}` : 'Price',
     priceSub: d ? `${d.discountPct}% off${d.appliedByLink ? ', applied by the link' : ''}` : null,
     sizes: sizeRows,
+    funded: FUNDED[firm.id] ? programs.map((p) => FUNDED[firm.id][p.name] ?? null) : undefined,
     legend: [
       'Every limit is a percentage of your starting balance, the way CFD firms publish them',
       ...(hasTrail ? ['Static — the loss limit never moves · Trailing — it follows your closed balance up to your starting balance, then stops'] : []),

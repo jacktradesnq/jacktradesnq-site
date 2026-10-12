@@ -22,8 +22,7 @@ type Plan = {
   ddType: DdType;
   dailyLoss?: number | null;
   dailyLossSoft?: boolean;
-  // A rule no source publishes has no key: the "Legacy NYC" cards of Traders Launch say
-  // nothing of their consistency, and inventing a value would be worse than saying so.
+  // A rule no source publishes has no key: inventing a value would be worse than saying so.
   consistency?: string;
   contracts: string;
   activationFee?: number | null;
@@ -138,6 +137,9 @@ const FIELDS: Field[] = [
     cell: (p) =>
       p.dailyLoss != null ? { text: money(p.dailyLoss), soft: !!p.dailyLossSoft } : { text: 'None', muted: true },
     common: (c) => (c.muted ? 'No daily loss limit' : `${c.text} daily loss${c.soft ? ' (soft)' : ''}`),
+    // No key: no source publishes a daily loss rule either way (Traders Launch, 12/10/2026),
+    // so nothing is said rather than "None".
+    optional: (p) => 'dailyLoss' in p,
   },
   {
     label: 'Consistency',
@@ -199,6 +201,8 @@ const TL_PILLS: Pill[] = [
   { label: 'Winning days', value: 'None' },
   { label: 'Consistency', value: 'None' },
   { label: 'Payout from', value: '+1% profit' },
+  { label: 'Payout cap', value: 'None' },
+  { label: 'Drawdown', value: 'Locks at start balance, payouts don\'t lower it' },
 ];
 const FUNDED: Record<string, Record<string, Funded>> = {
   'e8-markets': {

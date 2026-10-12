@@ -22,8 +22,6 @@
               "profitTarget": 2000,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
-              "dailyLoss": null,
-              "dailyLossSoft": false,
               "consistency": "40%",
               "contracts": "2 Mini or 20 Micros",
               "note": "Price shown for the 80% split."
@@ -34,8 +32,6 @@
               "profitTarget": 4000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
-              "dailyLoss": null,
-              "dailyLossSoft": false,
               "consistency": "40%",
               "contracts": "4 Mini or 40 Micros",
               "note": "Price shown for the 80% split."
@@ -46,8 +42,6 @@
               "profitTarget": 6000,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
-              "dailyLoss": null,
-              "dailyLossSoft": false,
               "consistency": "40%",
               "contracts": "6 Mini or 60 Micros",
               "note": "Price shown for the 80% split."
@@ -66,7 +60,8 @@
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
               "contracts": "5 Micros",
-              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Price shown for the 80% split."
+              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Price shown for the 80% split.",
+              "consistency": "40%"
             },
             {
               "size": 200000,
@@ -75,7 +70,8 @@
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
               "contracts": "1 Mini or 10 Micros",
-              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Price shown for the 80% split."
+              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Price shown for the 80% split.",
+              "consistency": "40%"
             },
             {
               "size": 300000,
@@ -84,7 +80,8 @@
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
               "contracts": "2 Mini or 20 Micros",
-              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Price shown for the 80% split."
+              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Price shown for the 80% split.",
+              "consistency": "40%"
             }
           ]
         }
