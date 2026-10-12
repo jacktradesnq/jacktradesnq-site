@@ -186,6 +186,9 @@ const WINNING_DAYS: Record<string, Record<string, number | null>> = {
     'E8 Zero MAX Futures': null,
     'E8 Zero Starter Futures': null,
   },
+  // traderslaunch.com/faq, read 12/10/2026: « Simfunded accounts have no minimum trading
+  // days before requesting a payout ».
+  'traders-launch': { '1-Step': null, 'Legacy NYC': null },
 };
 
 function firmView(firm: Firm): FirmView {
