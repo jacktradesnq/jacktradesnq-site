@@ -163,8 +163,9 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
         <table className="ft-table" style={{ ['--cols' as string]: cols }}>
           <thead>
             <tr>
-              <th className="ft-label" scope="col">
-                <span className="sr-only">Rule</span>
+              <th className="ft-label ft-corner" scope="col">
+                <span className="ft-sec-title">{firm.priceTitle}</span>
+                {firm.priceSub && <span className="ft-sec-sub">{firm.priceSub}</span>}
               </th>
               {firm.columns.map((c) => (
                 <th key={c.name} scope="col" className="ft-col">
@@ -199,12 +200,6 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
                 ))}
               </tr>
             ))}
-            <tr className="ft-sec">
-              <th scope="colgroup" colSpan={cols + 1} className="ft-sec-cell">
-                <span className="ft-sec-title">{firm.priceTitle}</span>
-                {firm.priceSub && <span className="ft-sec-sub">{firm.priceSub}</span>}
-              </th>
-            </tr>
             {firm.sizes.map((row) => (
               <tr key={row.size}>
                 <th scope="row" className="ft-label ft-size">

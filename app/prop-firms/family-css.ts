@@ -130,6 +130,9 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
   white-space: nowrap;
 }
 
+.jtnq-cmp thead .ft-corner{ vertical-align: middle; text-align: left; }
+.jtnq-cmp .ft-corner .ft-sec-title, .jtnq-cmp .ft-corner .ft-sec-sub{ position: static; display: block; }
+.jtnq-cmp .ft-corner .ft-sec-sub{ margin-top: 4px; }
 .jtnq-cmp .ft-check{ display: block; width: 18px; height: 18px; margin: 0 auto; color: var(--c-accent); }
 .jtnq-cmp .ft-common{ padding: 24px; border-bottom: 1px solid var(--c-line-soft); }
 .jtnq-cmp .ft-k{
