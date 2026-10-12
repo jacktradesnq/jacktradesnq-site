@@ -13,7 +13,6 @@ const SITE = {
     { name: 'X', url: 'https://x.com/jacktradesnq', handle: '@jacktradesnq' },
     { name: 'Discord', url: 'https://discord.gg/wpddBCAAU2', handle: 'Join the server' },
   ],
-  studies: { url: '/studies/', tagline: '10 years of 1-minute futures data, every setup backtested' },
   nefarious: { name: 'Nefarious', url: '/nefarious/', tagline: 'Official partner · free Discord community' },
   propFirms: { name: 'Prop firms', url: '/prop-firms/', tagline: 'Futures, perps & CFD partners · code JTNQ' },
   legal: {
@@ -290,12 +289,6 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <a className="nav-cta" href={SITE.studies.url}>
-            Studies
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M7 17L17 7M9 7h8v8" />
-            </svg>
-          </a>
         </nav>
       </header>
 
@@ -308,7 +301,6 @@ export default function Home() {
               {SITE.brand}
               <span className="dot">.</span>
             </h1>
-            <p className="hero-sub">Ten years of NQ, ES, GC &amp; SI futures data — every setup backtested to the minute.</p>
           </div>
           <div className="hero-foot">
             <span className="meta-l">&nbsp;</span>
@@ -322,18 +314,6 @@ export default function Home() {
 
         <section id="hub" className="hub">
           <div className="hub-grid">
-            <a className="hub-card hub-card-primary" href={SITE.studies.url}>
-              <div className="row">
-                <h3 className="title">
-                  Studies<span className="swash">.</span>
-                </h3>
-                <svg className="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M7 17L17 7M9 7h8v8" />
-                </svg>
-              </div>
-              <p className="tagline">{SITE.studies.tagline}</p>
-            </a>
-
             <a className="hub-card" href={SITE.nefarious.url}>
               <div className="row">
                 <h3 className="title">
@@ -457,14 +437,6 @@ const CSS = `
   white-space: nowrap;
 }
 .jtnq-home .nav a:hover{ color: var(--c-text); }
-.jtnq-home .nav .nav-cta{
-  margin-left: 12px; color: var(--c-accent); background: transparent;
-  border: 1px solid var(--c-accent); padding: 8px 16px; border-radius: 999px;
-  display: inline-flex; align-items: center; gap: 8px; font-weight: 500;
-  transition: color .2s ease, background .2s ease, transform .2s ease;
-}
-.jtnq-home .nav .nav-cta svg{ width: 11px; height: 11px; }
-.jtnq-home .nav .nav-cta:hover{ background: var(--c-accent); color: var(--c-bg); transform: translateY(-1px); }
 
 .jtnq-home .nav-socials{ position: relative; }
 .jtnq-home .nav-socials-trigger{
@@ -519,7 +491,6 @@ const CSS = `
 }
 @media (max-width: 520px){
   .jtnq-home .nav a, .jtnq-home .nav-socials-trigger{ font-size: 12px; padding: 8px 8px; }
-  .jtnq-home .nav .nav-cta{ margin-left: 4px; padding: 8px 12px; }
   .jtnq-home .socials-menu{ min-width: 216px; }
 }
 
@@ -554,15 +525,6 @@ const CSS = `
 @keyframes jtnqDotPulse{
   0%,100%{ transform: scale(1.5); opacity: 1; }
   50%{ transform: scale(1.75); opacity: .85; }
-}
-.jtnq-home .hero-sub{
-  margin: clamp(20px, 2.4vw, 32px) auto 0; max-width: 46ch;
-  font-family: var(--f-mono); font-size: clamp(11px, 1.05vw, 13px);
-  letter-spacing: .12em; line-height: 1.7; color: var(--c-text-mute);
-  text-transform: uppercase;
-}
-@media (max-width: 640px){
-  .jtnq-home .hero-sub{ letter-spacing: .08em; font-size: 11px; max-width: 32ch; }
 }
 .jtnq-home .hero-foot{
   position: relative; z-index: 2; display: grid;
@@ -604,12 +566,8 @@ const CSS = `
   display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(28px, 4vw, 56px); align-items: stretch;
 }
-.jtnq-home .hub-card-primary{ grid-column: 1 / -1; }
-.jtnq-home .hub-card-primary .title{ font-size: clamp(44px, 5.4vw, 78px); }
-.jtnq-home .hub-card-primary .tagline{ font-size: 12px; max-width: 52ch; }
 @media (max-width: 980px){
   .jtnq-home .hub-grid{ grid-template-columns: 1fr 1fr; gap: clamp(28px, 4vw, 48px); }
-  .jtnq-home .hub-card-primary{ grid-column: 1 / -1; }
 }
 @media (max-width: 640px){ .jtnq-home .hub-grid{ grid-template-columns: 1fr; gap: 32px; } }
 .jtnq-home .hub-card{

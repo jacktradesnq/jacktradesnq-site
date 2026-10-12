@@ -8,8 +8,6 @@
 - Animations : Framer Motion (reveal) + GSAP ScrollTrigger (parallax scroll)
 - Déploiement Cloudflare Pages via GitHub Actions (npm run build → deploy out/)
 - Client Components isolés pour JS interactif (prairieBackground, HeroReveal)
-- Plus d'export PDF côté client : News830Explorer + jsPDF retirés le 2026-10-07 (jamais affichés sur aucune page). Les PDF du site sont des fichiers statiques (public/downloads, BilingualPdfLink)
-- `marked` pour parser les explanation.md backtested-data
 
 ## Direction esthétique déclarée (ne PAS dévier)
 **dark editorial site-objet** (home + page partenaire, refonte 2026-05-25).
@@ -18,7 +16,7 @@
 - Ton : éditorial, magazine, premium ; pas de funnel marketing agressif
 - Point mémorable : wordmark italique géant + point doré (leitmotiv de marque) + bougies live
 - Anti-objectif explicite : ne PAS faire un link-in-bio déguisé ni un funnel de vente type Whop
-- Les pages `studies/` gardent leur traitement existant (globals.css) — la refonte dark couvre home + `/nefarious/` uniquement, CSS scopé sous `.jtnq-home` / `.jtnq-nef` pour ne pas polluer studies.
+- La refonte dark couvre home + `/nefarious/` (+ `/prop-firms/`), CSS scopé sous `.jtnq-home` / `.jtnq-nef` ; globals.css ne garde que la base (polices, tokens, pages légales).
 - (Ancienne direction warm-editorial prairie Kazuo Oga = abandonnée 2026-05-25, conservée nulle part.)
 
 ## Typographie (OBLIGATOIRE)
@@ -75,7 +73,7 @@ Tout en anglais SAUF footer légal FR (mentions légales + disclaimer AMF D.321-
 ## Features livrées (DO NOT re-implement)
 
 ### Site core
-- Home page (app/page.tsx) : refonte dark editorial site-objet 2026-05-25 (hero canvas candlesticks + wordmark Fraunces, hub Studies+Nefarious, socials icônes footer). Ancien hero prairie remplacé.
+- Home page (app/page.tsx) : refonte dark editorial site-objet 2026-05-25 (hero canvas candlesticks + wordmark Fraunces, hub Nefarious + Prop firms, socials icônes footer). Ancien hero prairie remplacé.
 - Page partenaire (app/nefarious/page.tsx) : Nefarious, testimonials Whop verbatim + Join CTA Discord (2026-05-25)
 - Layout global (app/layout.tsx) : nav + hamburger mobile wired (commit `3fac707`), theme-color + apple-touch-icon (commit `b591231`)
 - OG image 1200x630 (public/og-image.png, commit `6854b17`)
@@ -85,43 +83,6 @@ Tout en anglais SAUF footer légal FR (mentions légales + disclaimer AMF D.321-
 - noindex sur RSC .txt payloads (commit `bc67ec3`)
 - Trailing slash sur tous les Links internes (commit `a3dd397`)
 - Pages legales : /mentions-legales + /politique-confidentialite
-
-### Backtested-data mini-site
-- Hub /backtested-data (app/backtested-data/page.tsx) : liste auto depuis content/ + stats TradingView/Data/Updated
-- Dynamic slug routing (app/backtested-data/[slug]/page.tsx) : lit meta.json + explanation.md via lib/backtested-data.ts
-- Layout lateral avec sidebar (app/backtested-data/layout.tsx + _components/Sidebar.tsx)
-- BacktestedShell.tsx : wrapper shell pour pages slug
-- SubNav.tsx : navigation intra-page
-- AI disclaimer sur hub landing (commit `499c417`)
-- StraddleExplorer.tsx : widget interactif 20KB, filtres/stat cards/data table, embedded mode, JSON-driven via public/data/*.json
-
-### Entrees backtested-data publiees (content/backtested-data/)
-| slug | titre | categorie | date |
-|------|--------|-----------|------|
-| asia-open | Asia open (NWOG fill study) | data | 2026-05-04 |
-| cpi-day-stats | CPI straddle | data | 2026-05-03 |
-| killzone-past-vs-now | Killzone range | data | 2026-05-04 |
-| nfp | NFP straddle | data | 2026-05-04 |
-
-### Straddle data (public/data/)
-- `nfp-straddle.json` (163KB) — NFP straddle combos, exploite par StraddleExplorer
-- `cpi-straddle.json` (55.5KB) — CPI straddle combos, exploite par StraddleExplorer
-- Colonnes : Wins/Losses/No-Fill (Avg PnL + Worst PnL supprimes, commit `839fe94`)
-
-### NFP page
-- Delayed Feb 2026 release (Wed 11 Feb) ajoute (commit `ad3d7b0`)
-- Colonnes Wins/Losses/No-Fill, Avg/Worst PnL supprimes (commit `839fe94`)
-
-### news-830 entry (sur main)
-- Mirror jtnq : 108-variant grid (commit `6194ba9`)
-- news-830-ifvg retire puis republie v2.0 avec chiffres rewritten engine (commits `96de475` + `9cb1c6e`)
-
-### Interactive StraddleExplorer (sur main depuis 2026-05-09)
-- jsPDF + jspdf-autotable installes (commit `d99a412`), retires le 2026-10-07
-- Embedded mode (commit `258ef81`)
-- CSS complet : filtres, stat cards, data table (commit `7eff650`)
-- Colonnes Wins/Losses/No-Fill (commit `38541f8`)
-- Bouton PDF CTA style aligne (commit `d5c99dd`)
 
 ---
 
@@ -146,16 +107,6 @@ Tout en anglais SAUF footer légal FR (mentions légales + disclaimer AMF D.321-
 
 ---
 
-## Architecture backtested-data (content-driven)
-
-Pour ajouter une nouvelle entree :
-1. Creer `content/backtested-data/<slug>/meta.json` (title, category, date, excerpt, tradingviewUrl, pdfFile)
-2. Creer `content/backtested-data/<slug>/explanation.md`
-3. Optionnel : JSON dans `public/data/<slug>.json` si StraddleExplorer ou chart interactif
-4. La page `/backtested-data/<slug>/` est generee automatiquement via `[slug]/page.tsx`
-
----
-
 ## Commandes utiles
 
 ```bash
@@ -164,8 +115,6 @@ npm run build     # static export -> out/
 npm start         # serve out/ (preview)
 npx tsc --noEmit  # type check sans build
 npm test          # tests scripts/ (lances aussi par la CI)
-node scripts/check-filterbar-layout.mjs  # barre de filtres sans chevauchement (site servi sur :8788, ou BASE=https://jacktradesnq.com)
-node scripts/check-page-width.mjs        # aucune page studies plus large qu'un téléphone (360/390/430px), même usage
 ```
 
 Deploy : push sur `main` -> GitHub Actions -> Cloudflare Pages auto.
@@ -174,18 +123,15 @@ Deploy : push sur `main` -> GitHub Actions -> Cloudflare Pages auto.
 
 ## Gotchas
 
-- `output: 'export'` : pas de server-side runtime, pas d'API routes dynamiques. `lib/backtested-data.ts` utilise `fs` -> server component uniquement (pas 'use client').
+- `output: 'export'` : pas de server-side runtime, pas d'API routes dynamiques.
+- Section études (/studies, ex-/backtested-data, /print, PDF, data JSON, scripts de backtest) retirée le 12/10/2026 à la demande d'Angelo (« pas sur que ca sois un projet a mon image », puis « je veux bien » pour « Je les retire ») ; les anciennes URLs redirigent vers la home (public/_redirects). Tout reste dans l'historique git.
 - Fonts : ne plus importer via CDN Fontshare (bloque COEP). Self-hosted uniquement dans `public/fonts/`.
 - CSP `connect-src 'self'` obligatoire pour RSC payload fetch (Next.js 15 App Router).
 - `trailingSlash: true` dans next.config.js — tous les `<Link>` internes doivent finir par `/`.
 - Cloudflare cache agressif — apres merge sur main, forcer purge cache CF si assets semblent stales.
-- StraddleExplorer = Client Component lourd (20KB) — ne pas dupliquer, passer config via props `embedded` + `slugOverride`.
-- news-830-ifvg data retiree puis republiee — ne pas republier sans chiffres valides depuis engine rewritten.
 - Hook edit-rules.sh bloque Write/Edit sur main — toujours passer par une branche.
 - Newsletter retirée le 11/10/2026 à la demande d'Angelo (« les newsletters, c'était un truc qu'on voulait faire, mais en vrai, flemme. Supprime. » ; la newsletter classait ses firmes partenaires, ce que ses contrats interdisent) : formulaire /prop-firms, endpoints `functions/` (sauf `functions/api/community.js`, compteur Discord), workflow, envoi. Le moteur de prix réduit à l'essentiel (12/10/2026) : `scripts/lib/promo-analysis.mjs` (règles de prix) + `content/prop-firms/codes.md` (code d'Angelo par firme), lus par `build-live-promos.mjs` (feed des promos `/go/promos/*`) ; les logos `public/logos/email/` servent à ce feed.
 - `overrides` postcss/sharp dans package.json : versions corrigées que Next 15.5 et miniflare figent trop bas (npm audit ne proposait qu'un saut majeur). À retirer quand Next/wrangler embarquent eux-mêmes ces versions.
-- Études : `lib/study-stats.ts` = catalogue du hub, `lib/strategy-stats.ts` = stats par étude IFVG, `lib/straddle-trades.ts` = trades straddle (découpe 2026-10-07, chacun < 800 lignes).
-- Onglets d'étude : `V3Tabs.tsx` assemble, un fichier par onglet (`V3WeekdayTab`, `V3YearTab`, `V3TradesTab`) ; libellés de période dans `lib/lookback-labels.ts` (découpe 2026-10-07).
 
 ## <frontend_aesthetics>
 You tend to converge toward generic, "on distribution" outputs. In frontend design,
