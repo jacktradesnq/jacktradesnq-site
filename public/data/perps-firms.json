@@ -19,7 +19,8 @@
         "discountPct": 35,
         "endsAt": null,
         "firstPurchase": true,
-        "lastChecked": "2026-10-12"
+        "lastChecked": "2026-10-12",
+        "thenPct": 30
       },
       "programs": [
         {

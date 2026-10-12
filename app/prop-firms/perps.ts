@@ -44,7 +44,9 @@ type PerpsFirm = {
   lastChecked: string;
   markets: string[];
   // endsAt null: no announced end, no countdown. firstPurchase: the rate applies to a first order.
-  promo: { code: string; discountPct: number; endsAt: string | null; firstPurchase?: boolean; lastChecked: string } | null;
+  // thenPct: the rate on every later order (MFP, 12/10/2026: « 35% off your first purchase — 30%
+  // off every purchase after »).
+  promo: { code: string; discountPct: number; endsAt: string | null; firstPurchase?: boolean; thenPct?: number; lastChecked: string } | null;
   programs: PerpsProgram[];
 };
 
@@ -210,7 +212,7 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     rules,
     priceTitle: promo ? `Price with code ${promo.code}` : 'Price',
     priceSub: promo
-      ? `${promo.discountPct}% off${promo.firstPurchase ? ' your first purchase' : ''}${endsLabel ? ` until ${endsLabel} New York time` : ''}`
+      ? `${promo.discountPct}% off${promo.firstPurchase ? ' your first purchase' : ''}${promo.thenPct ? `, ${promo.thenPct}% off every purchase after` : ''}${endsLabel ? ` until ${endsLabel} New York time` : ''}`
       : null,
     sizes: sizeRows,
     funded: FUNDED[firm.id] ? programs.map((p) => FUNDED[firm.id][p.name.split(' ')[0]] ?? null) : undefined,
