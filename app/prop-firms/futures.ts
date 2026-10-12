@@ -175,15 +175,16 @@ const FIELDS: Field[] = [
 
 const cellKey = (c: Cell) => JSON.stringify([c.text, c.tag?.label ?? '', !!c.soft]);
 
-// Payout pace per program, where a firm's programs differ (the scraped data holds one pace
-// per firm). E8 help center, read 12/10/2026: Zero « You can request it every day! » and
-// « No minimum profitable days »; Signature « Minimum profitable days between each payout:
-// 5 (does not apply for first payout) », a profitable day being +0.3% closed PnL.
-const PROGRAM_PAYOUT: Record<string, Record<string, string>> = {
+// Winning days needed before a payout, per program: the figure, or "None" (Angelo,
+// 12/10/2026: « mets juste une colonne winning day et tu mets le chiffre, si y a pas tu
+// mets none »). E8 help center, read 12/10/2026: Zero « No minimum profitable days »;
+// Signature « Minimum profitable days between each payout: 5 (does not apply for first
+// payout) », a profitable day being +0.3% closed PnL.
+const WINNING_DAYS: Record<string, Record<string, number | null>> = {
   'e8-markets': {
-    'E8 Signature Futures': 'After 5 profitable days',
-    'E8 Zero MAX Futures': 'Daily',
-    'E8 Zero Starter Futures': 'Daily',
+    'E8 Signature Futures': 5,
+    'E8 Zero MAX Futures': null,
+    'E8 Zero Starter Futures': null,
   },
 };
 
@@ -199,8 +200,11 @@ function firmView(firm: Firm): FirmView {
 
   const kind = (pr: Program) => (pr.type === 'eval' ? 'Evaluation' : 'Instant funding');
   const fee = (pr: Program) => (pr.priceType === 'monthly' ? 'Monthly fee' : 'One-time fee');
-  const payoutBy = PROGRAM_PAYOUT[firm.id];
-  const payoutOf = (pr: Program) => payoutBy?.[pr.name] ?? firm.payout;
+  const winBy = WINNING_DAYS[firm.id];
+  const winCell = (pr: Program): Cell => {
+    const n = winBy?.[pr.name];
+    return n == null ? { text: 'None', muted: true } : { text: String(n) };
+  };
   const { common, rules } = splitCommon([
     // "Evaluation" only says something next to straight-to-funded accounts (Angelo, 12/10/2026:
     // « si la prop firm n'a pas de straight to funded ne précise pas évaluation »).
@@ -211,14 +215,19 @@ function firmView(firm: Firm): FirmView {
       skip: programs.every((pr) => pr.type === 'eval'),
     },
     { label: 'Fee', cells: programs.map((pr) => ({ text: fee(pr) })), common: (c) => c.text },
-    { label: 'Payouts', cells: programs.map((pr) => ({ text: payoutOf(pr) })), common: (c) => `${c.text} payouts`, skip: !payoutBy },
+    {
+      label: 'Winning days',
+      cells: programs.map(winCell),
+      common: (c) => (c.muted ? 'No winning days' : `${c.text} winning days`),
+      skip: !winBy,
+    },
     ...perProgram.map((f) => ({
       label: f.label,
       cells: programs.map((pr) => f.cell(pr.plans[0])),
       common: f.common,
     })),
   ]);
-  common.splice(2, 0, `${firm.split} profit split`, ...(payoutBy ? [] : [`${firm.payout} payouts`]));
+  common.splice(2, 0, `${firm.split} profit split`, `${firm.payout} payouts`);
   // A fee kind shared by every plan goes up into the firm's summary line, not a column
   // (Angelo, 12/10/2026: « mets-le ici et enlève la case […] si tous les plans n'ont pas
   // de activation fee, pourquoi le préciser ? »).
@@ -255,7 +264,7 @@ function firmView(firm: Firm): FirmView {
     id: firm.id,
     name: firm.name,
     logo: FIRM_LOGOS[firm.id] ?? null,
-    summary: `${firm.split} split${payoutBy ? '' : ` · ${firm.payout} payouts`}${sharedFee ? ` · ${sharedFee}` : ''}`,
+    summary: `${firm.split} split · ${firm.payout} payouts${sharedFee ? ` · ${sharedFee}` : ''}`,
     code: code ? { code, title: promo.title || 'My affiliate code' } : null,
     stale:
       firm.lastChecked !== DATA.generatedAt
