@@ -15,7 +15,16 @@ import { goHref } from '@/lib/go-links';
 import { cheapest, humanDate, splitCommon, type Cell, type FirmView, type PriceCell } from './firm-view';
 
 // price null = announced but not on sale yet ("Coming soon").
-type PerpsPlan = { size: number; price: number | null; promoPrice: number | null; note?: string };
+// dllPrice: Elite's cheaper version with a 3% daily loss limit, shown in the same cell after a « / »
+// (Angelo, 12/10/2026 : « dans la même colonne et dans chaque truc t'as un / qui met les 2 prix »).
+type PerpsPlan = {
+  size: number;
+  price: number | null;
+  promoPrice: number | null;
+  dllPrice?: number;
+  dllPromoPrice?: number;
+  note?: string;
+};
 type PerpsProgram = {
   name: string;
   steps: string;
@@ -74,7 +83,7 @@ const DETAILS: Record<string, { split: string; payouts: string; afterPayout: str
   Select: { split: '80% (90% option)', payouts: 'Daily', afterPayout: 'Locks at start balance', leverage: 'Standard' },
   Prime: { split: '80% (90% option)', payouts: 'Daily', afterPayout: 'Locks at start balance', leverage: 'Standard' },
   Signature: { split: '80% (90% option)', payouts: 'Daily', afterPayout: 'Locks at start balance', leverage: 'Standard' },
-  Elite: { split: '80%', payouts: 'On demand', afterPayout: 'Stays at -5%', leverage: 'Boosted (40x indices)' },
+  Elite: { split: '80% (90% option)', payouts: 'On demand', afterPayout: 'Stays at -5%', leverage: 'Boosted (40x indices)' },
 };
 
 // Rules MyFundedPerps applies to every program, from the same table.
@@ -100,7 +109,7 @@ const text = (v: string | undefined): Cell => (v ? { text: v } : { text: 'n/c', 
 function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
   const programs = firm.programs;
   const promo = promoLive ? firm.promo : null;
-  const d = (p: PerpsProgram) => DETAILS[p.name];
+  const d = (p: PerpsProgram) => DETAILS[p.name.split(' ')[0]];
 
   const { common, rules } = splitCommon([
     // No target is a rule (instant funding), as the old block showed it: "None", not "n/c".
@@ -137,10 +146,12 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
       if (!plan) return null;
       if (plan.price == null) return { kind: 'text', text: plan.note ?? 'Coming soon' };
       const promoPrice = promo ? plan.promoPrice : null;
+      const dllPromo = promo ? plan.dllPromoPrice ?? null : null;
       return {
         kind: 'price',
         now: promoPrice ?? plan.price,
         was: promoPrice != null ? plan.price : null,
+        alt: plan.dllPrice != null ? { now: dllPromo ?? plan.dllPrice, was: dllPromo != null ? plan.dllPrice : null } : null,
         per: null,
         from: false,
         lines: [],

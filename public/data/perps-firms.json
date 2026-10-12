@@ -1,18 +1,24 @@
 {
-  "generatedAt": "2026-10-11",
+  "generatedAt": "2026-10-12",
   "firms": [
     {
       "id": "myfundedperps",
       "name": "MyFundedPerps",
       "logo": null,
       "url": "https://myfundedperpetuals.com/@JTNQ",
-      "lastChecked": "2026-10-11",
-      "markets": ["Crypto", "Indices", "Forex", "Stocks", "Commodities"],
+      "lastChecked": "2026-10-12",
+      "markets": [
+        "Crypto",
+        "Indices",
+        "Forex",
+        "Stocks",
+        "Commodities"
+      ],
       "promo": {
         "code": "JTNQ",
         "discountPct": 30,
         "endsAt": "2026-10-12T04:00:00Z",
-        "lastChecked": "2026-10-11"
+        "lastChecked": "2026-10-12"
       },
       "programs": [
         {
@@ -25,10 +31,26 @@
           "dailyLoss": "3%",
           "note": "Daily payouts · 90% split option · the loss limit locks at your starting balance on the 1st payout",
           "plans": [
-            { "size": 10000, "price": 40, "promoPrice": 28 },
-            { "size": 25000, "price": 100, "promoPrice": 70 },
-            { "size": 50000, "price": 190, "promoPrice": 133 },
-            { "size": 100000, "price": 360, "promoPrice": 252 }
+            {
+              "size": 10000,
+              "price": 40,
+              "promoPrice": 28
+            },
+            {
+              "size": 25000,
+              "price": 100,
+              "promoPrice": 70
+            },
+            {
+              "size": 50000,
+              "price": 190,
+              "promoPrice": 133
+            },
+            {
+              "size": 100000,
+              "price": 360,
+              "promoPrice": 252
+            }
           ]
         },
         {
@@ -41,10 +63,26 @@
           "dailyLoss": "3%",
           "note": "Daily payouts · 90% split option · the loss limit locks at your starting balance on the 1st payout",
           "plans": [
-            { "size": 10000, "price": 60, "promoPrice": 42 },
-            { "size": 25000, "price": 160, "promoPrice": 112 },
-            { "size": 50000, "price": 300, "promoPrice": 210 },
-            { "size": 100000, "price": 595, "promoPrice": 416 }
+            {
+              "size": 10000,
+              "price": 60,
+              "promoPrice": 42
+            },
+            {
+              "size": 25000,
+              "price": 160,
+              "promoPrice": 112
+            },
+            {
+              "size": 50000,
+              "price": 300,
+              "promoPrice": 210
+            },
+            {
+              "size": 100000,
+              "price": 595,
+              "promoPrice": 416
+            }
           ]
         },
         {
@@ -57,26 +95,66 @@
           "dailyLoss": "3%",
           "note": "Daily payouts · 90% split option · the loss limit locks at your starting balance on the 1st payout",
           "plans": [
-            { "size": 10000, "price": 90, "promoPrice": 63 },
-            { "size": 25000, "price": 225, "promoPrice": 157 },
-            { "size": 50000, "price": 430, "promoPrice": 301 },
-            { "size": 100000, "price": 870, "promoPrice": 609 }
+            {
+              "size": 10000,
+              "price": 90,
+              "promoPrice": 63
+            },
+            {
+              "size": 25000,
+              "price": 225,
+              "promoPrice": 157
+            },
+            {
+              "size": 50000,
+              "price": 430,
+              "promoPrice": 301
+            },
+            {
+              "size": 100000,
+              "price": 870,
+              "promoPrice": 609
+            }
           ]
         },
         {
-          "name": "Elite",
+          "name": "Elite / Elite 3% DLL",
           "steps": "1 step",
           "split": "80%",
           "profitTarget": "10%",
           "maxDrawdown": "5%",
           "ddType": "Static",
-          "dailyLoss": "None",
-          "note": "Payouts on demand · boosted leverage, 40x on indices · the loss limit stays at -5% after the 1st payout",
+          "dailyLoss": "None / 3%",
+          "note": "Payouts on demand · boosted leverage, 40x on indices · the loss limit stays at -5% after the 1st payout · 3% DLL version: same rules plus a 3% daily loss limit, cheaper",
           "plans": [
-            { "size": 5000, "price": 100, "promoPrice": 70 },
-            { "size": 10000, "price": 200, "promoPrice": 140 },
-            { "size": 25000, "price": 500, "promoPrice": 350 },
-            { "size": 50000, "price": null, "promoPrice": null, "note": "Coming soon" }
+            {
+              "size": 5000,
+              "price": 89,
+              "promoPrice": 62,
+              "dllPrice": 49,
+              "dllPromoPrice": 34
+            },
+            {
+              "size": 10000,
+              "price": 175,
+              "promoPrice": 122,
+              "dllPrice": 95,
+              "dllPromoPrice": 66
+            },
+            {
+              "size": 25000,
+              "price": 449,
+              "promoPrice": 314,
+              "dllPrice": 249,
+              "dllPromoPrice": 174
+            },
+            {
+              "size": 50000,
+              "price": 889,
+              "promoPrice": 622,
+              "dllPrice": 495,
+              "dllPromoPrice": 346
+            }
           ]
         }
       ]

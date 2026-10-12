@@ -65,6 +65,18 @@ function PriceView({ cell }: { cell: PriceCell }) {
             {money(cell.was)}
           </s>
         )}
+        {cell.alt && (
+          <>
+            <span className="price-sep" aria-hidden="true">/</span>
+            <span className="ft-now">{money(cell.alt.now)}</span>
+            {cell.alt.was != null && (
+              <s className="price-was">
+                <span className="sr-only">normal price </span>
+                {money(cell.alt.was)}
+              </s>
+            )}
+          </>
+        )}
       </span>
       {cell.lines.length > 0 && (
         <span className="ft-lines">

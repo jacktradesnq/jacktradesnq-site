@@ -31,6 +31,7 @@ export type PriceCell =
       kind: 'price';
       now: number;
       was: number | null;
+      alt?: { now: number; was: number | null } | null; // second price after « / » (MFP Elite 3% DLL)
       per: string | null;
       // Several prices live for the same product: the cheapest is shown, prefixed "from".
       from: boolean;
@@ -89,6 +90,8 @@ export function cheapest(sizes: FirmView['sizes']): FirmView['from'] {
   let best: FirmView['from'] = null;
   for (const row of sizes)
     for (const c of row.cells)
-      if (c?.kind === 'price' && (best == null || c.now < best.now)) best = { now: c.now, per: c.per };
+      if (c?.kind === 'price')
+        for (const now of [c.now, c.alt?.now])
+          if (now != null && (best == null || now < best.now)) best = { now, per: c.per };
   return best;
 }

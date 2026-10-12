@@ -183,6 +183,7 @@ export const FAMILY_CSS = `
 .jtnq-cmp .ft-price{ display: inline-flex; align-items: baseline; justify-content: center; gap: 8px; flex-wrap: wrap; }
 .jtnq-cmp .ft-now{ font-family: var(--f-mono); font-size: 17px; font-weight: 500; color: var(--c-text); }
 .jtnq-cmp .price-was{ font-family: var(--f-mono); font-size: 12px; font-weight: 400; color: var(--c-text-mute); }
+.jtnq-cmp .price-sep{ font-family: var(--f-mono); font-size: 15px; color: var(--c-text-mute); }
 .jtnq-cmp .price-from{ font-family: var(--f-mono); font-size: 11px; font-weight: 400; color: var(--c-text-mute); }
 .jtnq-cmp .per{ font-family: var(--f-mono); font-size: 11px; color: var(--c-text-mute); }
 .jtnq-cmp .ft-lines{ display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 8px; }
