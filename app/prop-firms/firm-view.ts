@@ -43,6 +43,15 @@ export type PriceCell =
 
 export type RuleRow = { label: string; cells: Cell[] };
 
+// A rule shown as a pill above the table: a label, and its value when it has one.
+export type Pill = { label: string; value?: string };
+
+export type Funded = {
+  pills: Pill[];
+  // Funded rules that change with the account size, keyed by size.
+  rows: { label: string; bySize: Record<number, string> }[];
+};
+
 export type FirmView = {
   id: string;
   name: string;
@@ -58,6 +67,10 @@ export type FirmView = {
   priceTitle: string;
   priceSub: string | null;
   sizes: { size: number; cells: PriceCell[] }[];
+  // What changes once funded, per program (null: not documented for that program). The
+  // table switches between the evaluation and these rules (Angelo, 12/10/2026, after
+  // Lucid's « Funded Rules »: « peut-être un filtre Eval/Funded »).
+  funded?: (Funded | null)[];
   legend: string[];
   note: string;
   href: string;

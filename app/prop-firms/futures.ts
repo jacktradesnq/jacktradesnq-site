@@ -7,7 +7,7 @@
 import rawData from '@/public/data/prop-firms.json';
 import { goHref } from '@/lib/go-links';
 import { money } from './shared';
-import { cheapest, humanDate, splitCommon, type Cell, type FirmView, type PriceCell } from './firm-view';
+import { cheapest, humanDate, splitCommon, type Cell, type FirmView, type Funded, type Pill, type PriceCell } from './firm-view';
 
 // Affiliate code applied on every firm link.
 const CODE = 'JTNQ';
@@ -175,20 +175,55 @@ const FIELDS: Field[] = [
 
 const cellKey = (c: Cell) => JSON.stringify([c.text, c.tag?.label ?? '', !!c.soft]);
 
-// Winning days needed before a payout, per program: the figure, or "None" (Angelo,
-// 12/10/2026: « mets juste une colonne winning day et tu mets le chiffre, si y a pas tu
-// mets none »). E8 help center, read 12/10/2026: Zero « No minimum profitable days »;
-// Signature « Minimum profitable days between each payout: 5 (does not apply for first
-// payout) », a profitable day being +0.3% closed PnL.
-const WINNING_DAYS: Record<string, Record<string, number | null>> = {
+// Funded rules per program, read on each firm's own help pages on 12/10/2026. Winning
+// days always written as a figure or "None" (Angelo, 12/10/2026: « tu mets le chiffre, si y
+// a pas tu mets none »).
+// E8 (helpfutures.e8markets.com, articles « E8 Signature » and « E8 Zero (Starter and
+// Max) »): Signature « Minimum profitable days between each payout: 5 (does not apply for
+// first payout) », a profitable day being +0.3% closed PnL, buffer the size of the EOD
+// drawdown, 4 payouts per account; Zero « No consistency rules / No minimum profitable days
+// / Payout frequency: You can request it every day! », 4 payouts per account.
+// Traders Launch (traderslaunch.com/faq): no minimum days before a payout, account above
+// +1% profit, no consistency once Simfunded, a buffer to build before the first payout.
+const E8_ZERO: Funded = {
+  pills: [
+    { label: 'Winning days', value: 'None' },
+    { label: 'Consistency', value: 'None' },
+    { label: 'Payout request', value: 'Every day' },
+    { label: 'Minimum payout', value: '$100' },
+    { label: 'Payouts per account', value: '4, then a free challenge' },
+  ],
+  rows: [],
+};
+const TL_PILLS: Pill[] = [
+  { label: 'Winning days', value: 'None' },
+  { label: 'Consistency', value: 'None' },
+  { label: 'Payout from', value: '+1% profit' },
+];
+const FUNDED: Record<string, Record<string, Funded>> = {
   'e8-markets': {
-    'E8 Signature Futures': 5,
-    'E8 Zero MAX Futures': null,
-    'E8 Zero Starter Futures': null,
+    'E8 Signature Futures': {
+      pills: [
+        { label: 'Winning days', value: '5 between payouts (+0.3% day), not before the 1st' },
+        { label: 'Buffer', value: 'Same as your EOD drawdown' },
+        { label: 'Minimum payout', value: '$100' },
+        { label: 'Payouts per account', value: '4, then a free challenge' },
+      ],
+      rows: [],
+    },
+    'E8 Zero MAX Futures': E8_ZERO,
+    'E8 Zero Starter Futures': E8_ZERO,
   },
-  // traderslaunch.com/faq, read 12/10/2026: « Simfunded accounts have no minimum trading
-  // days before requesting a payout ».
-  'traders-launch': { '1-Step': null, 'Legacy NYC': null },
+  'traders-launch': {
+    '1-Step': {
+      pills: TL_PILLS,
+      rows: [{ label: 'Buffer before 1st payout', bySize: { 100000: '$1,000', 200000: '$2,000', 300000: '$3,000' } }],
+    },
+    'Legacy NYC': {
+      pills: TL_PILLS,
+      rows: [{ label: 'Buffer before 1st payout', bySize: { 100000: '$1,000', 200000: '$1,000', 300000: '$2,000' } }],
+    },
+  },
 };
 
 function firmView(firm: Firm): FirmView {
@@ -203,11 +238,7 @@ function firmView(firm: Firm): FirmView {
 
   const kind = (pr: Program) => (pr.type === 'eval' ? 'Evaluation' : 'Instant funding');
   const fee = (pr: Program) => (pr.priceType === 'monthly' ? 'Monthly fee' : 'One-time fee');
-  const winBy = WINNING_DAYS[firm.id];
-  const winCell = (pr: Program): Cell => {
-    const n = winBy?.[pr.name];
-    return n == null ? { text: 'None', muted: true } : { text: String(n) };
-  };
+  const fundedBy = FUNDED[firm.id];
   const { common, rules } = splitCommon([
     // "Evaluation" only says something next to straight-to-funded accounts (Angelo, 12/10/2026:
     // « si la prop firm n'a pas de straight to funded ne précise pas évaluation »).
@@ -218,20 +249,16 @@ function firmView(firm: Firm): FirmView {
       skip: programs.every((pr) => pr.type === 'eval'),
     },
     { label: 'Fee', cells: programs.map((pr) => ({ text: fee(pr) })), common: (c) => c.text },
-    {
-      label: 'Winning days',
-      cells: programs.map(winCell),
-      common: (c) => (c.muted ? 'No winning days' : `${c.text} winning days`),
-      skip: !winBy,
-      keep: true,
-    },
     ...perProgram.map((f) => ({
       label: f.label,
       cells: programs.map((pr) => f.cell(pr.plans[0])),
       common: f.common,
     })),
   ]);
-  common.splice(2, 0, `${firm.split} profit split`, `${firm.payout} payouts`);
+  // "On-demand payouts" tells a trader nothing (Angelo, 12/10/2026: « enlève le on demand
+  // payout, car point de vue trader ça veut rien dire »); a real pace (Daily) stays.
+  const pace = /on.?demand/i.test(firm.payout) ? null : `${firm.payout} payouts`;
+  common.splice(2, 0, `${firm.split} profit split`, ...(pace ? [pace] : []));
   // A fee kind shared by every plan goes up into the firm's summary line, not a column
   // (Angelo, 12/10/2026: « mets-le ici et enlève la case […] si tous les plans n'ont pas
   // de activation fee, pourquoi le préciser ? »).
@@ -268,7 +295,7 @@ function firmView(firm: Firm): FirmView {
     id: firm.id,
     name: firm.name,
     logo: FIRM_LOGOS[firm.id] ?? null,
-    summary: `${firm.split} split · ${firm.payout} payouts${sharedFee ? ` · ${sharedFee}` : ''}`,
+    summary: `${firm.split} split${pace ? ` · ${pace}` : ''}${sharedFee ? ` · ${sharedFee}` : ''}`,
     code: code ? { code, title: promo.title || 'My affiliate code' } : null,
     stale:
       firm.lastChecked !== DATA.generatedAt
@@ -284,6 +311,7 @@ function firmView(firm: Firm): FirmView {
     priceTitle: code ? `Price with code ${code}` : 'Price',
     priceSub: viaCode ? `${firm.codeDiscountPct}% off with code ${code}` : promo.title || null,
     sizes: sizeRows,
+    funded: fundedBy ? programs.map((pr) => fundedBy[pr.name] ?? null) : undefined,
     legend,
     note: NOTE,
     href: goHref('prop-firms', firm.id),

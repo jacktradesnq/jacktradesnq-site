@@ -146,6 +146,34 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
 .jtnq-cmp .ft-flat .ft-cell{ white-space: nowrap; }
 .jtnq-cmp .ft-flat .ft-cell--note{ white-space: normal; min-width: 200px; }
 .jtnq-cmp .ft-flat tr.ft-newprog > *{ border-top: 1px solid var(--c-line); }
+.jtnq-cmp .ft-bar{
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 16px 24px; border-bottom: 1px solid var(--c-line-soft);
+}
+.jtnq-cmp .ft-progs, .jtnq-cmp .ft-mode{
+  display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px;
+  border: 1px solid var(--c-line); border-radius: 999px; background: var(--c-bg-deep);
+}
+.jtnq-cmp .ft-prog, .jtnq-cmp .ft-mode-btn{
+  font-family: var(--f-sans); font-size: 13px; font-weight: 500; color: var(--c-text-mute);
+  background: none; border: none; border-radius: 999px; padding: 8px 16px; cursor: pointer;
+  transition: color .2s ease, background .2s ease;
+}
+.jtnq-cmp .ft-mode-btn{ font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+.jtnq-cmp .ft-prog:hover, .jtnq-cmp .ft-mode-btn:hover{ color: var(--c-accent); }
+.jtnq-cmp .ft-prog.active, .jtnq-cmp .ft-mode-btn.active{ color: var(--c-bg); background: var(--c-accent); }
+.jtnq-cmp .ft-pills{
+  list-style: none; margin: 0; padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 8px 24px;
+  border-bottom: 1px solid var(--c-line-soft);
+}
+.jtnq-cmp .ft-pill{ display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--c-text); }
+.jtnq-cmp .ft-pill .ft-check{ display: inline-block; margin: 0; width: 16px; height: 16px; }
+.jtnq-cmp .ft-pill-k{ color: var(--c-text-soft); }
+.jtnq-cmp .ft-pill-v{ font-weight: 500; color: var(--c-text); }
+.jtnq-cmp .ft-empty{ margin: 0; padding: 24px; font-size: 14px; color: var(--c-text-mute); }
+.jtnq-cmp .ft-sizes .ft-col--size{ font-family: var(--f-mono); font-style: normal; font-size: 15px; color: var(--c-accent); }
+.jtnq-cmp .ft-sizes .ft-label{ white-space: nowrap; }
+.jtnq-cmp .ft-sizes td, .jtnq-cmp .ft-sizes th{ padding-top: 12px; padding-bottom: 12px; }
 .jtnq-cmp .ft-check{ display: block; width: 18px; height: 18px; margin: 0 auto; color: var(--c-accent); }
 .jtnq-cmp .ft-common{ padding: 24px; border-bottom: 1px solid var(--c-line-soft); }
 .jtnq-cmp .ft-k{
@@ -225,6 +253,9 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
 .jtnq-cmp .ft-foot .note{ margin-top: 16px; }
 
 @media (max-width: 720px){
+  .jtnq-cmp .ft-bar, .jtnq-cmp .ft-pills{ padding-left: 16px; padding-right: 16px; }
+  .jtnq-cmp .ft-sizes .ft-label{ white-space: normal; min-width: 96px; max-width: 112px; }
+  .jtnq-cmp .ft-sizes .ft-col-sub{ font-size: 11px; }
   .jtnq-cmp .fam-tab{ padding: 12px 16px; font-size: 11px; }
   .jtnq-cmp .firm-card{ padding: 16px; }
   .jtnq-cmp .ft{ margin-top: 24px; }

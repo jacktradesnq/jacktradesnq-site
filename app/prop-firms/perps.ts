@@ -100,7 +100,7 @@ const COMMON: Record<string, string[]> = {
 };
 
 const SUMMARY: Record<string, string> = {
-  myfundedperps: '80–90% split · daily or on-demand payouts',
+  myfundedperps: '80–90% split',
 };
 
 const limit = (v: string | null): Cell =>
