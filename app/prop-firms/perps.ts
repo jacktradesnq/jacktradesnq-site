@@ -88,8 +88,9 @@ const DETAILS: Record<string, { split: string; payouts: string; afterPayout: str
 
 // Rules MyFundedPerps applies to every program, from the same table.
 const COMMON: Record<string, string[]> = {
+  // No "1-step evaluation": MyFundedPerps sells no straight-to-funded account (Angelo,
+  // 12/10/2026: « si la prop firm n'a pas de straight to funded ne précise pas évaluation »).
   myfundedperps: [
-    '1-step evaluation',
     'Static drawdown',
     'No consistency rule',
     'No minimum trading days',

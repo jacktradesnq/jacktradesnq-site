@@ -188,7 +188,14 @@ function firmView(firm: Firm): FirmView {
   const kind = (pr: Program) => (pr.type === 'eval' ? 'Evaluation' : 'Instant funding');
   const fee = (pr: Program) => (pr.priceType === 'monthly' ? 'Monthly fee' : 'One-time fee');
   const { common, rules } = splitCommon([
-    { label: 'Program type', cells: programs.map((pr) => ({ text: kind(pr) })), common: (c) => c.text },
+    // "Evaluation" only says something next to straight-to-funded accounts (Angelo, 12/10/2026:
+    // « si la prop firm n'a pas de straight to funded ne précise pas évaluation »).
+    {
+      label: 'Program type',
+      cells: programs.map((pr) => ({ text: kind(pr) })),
+      common: (c) => c.text,
+      skip: programs.every((pr) => pr.type === 'eval'),
+    },
     { label: 'Fee', cells: programs.map((pr) => ({ text: fee(pr) })), common: (c) => c.text },
     ...perProgram.map((f) => ({
       label: f.label,
