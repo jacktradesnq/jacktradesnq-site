@@ -223,6 +223,7 @@ function firmView(firm: Firm): FirmView {
       cells: programs.map(winCell),
       common: (c) => (c.muted ? 'No winning days' : `${c.text} winning days`),
       skip: !winBy,
+      keep: true,
     },
     ...perProgram.map((f) => ({
       label: f.label,

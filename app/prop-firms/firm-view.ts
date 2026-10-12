@@ -73,14 +73,15 @@ const cellKey = (c: Cell) => JSON.stringify([c.text, c.tag?.label ?? '', !!c.sof
 // A rule that reads the same on every program leaves the table for the "Same on every
 // plan" box, phrased as a sentence; the table keeps only what differs.
 export function splitCommon(
-  rows: { label: string; cells: Cell[]; common: (c: Cell) => string; skip?: boolean }[],
+  // keep: always a column, even when every program reads the same.
+  rows: { label: string; cells: Cell[]; common: (c: Cell) => string; skip?: boolean; keep?: boolean }[],
 ): { common: string[]; rules: RuleRow[] } {
   const common: string[] = [];
   const rules: RuleRow[] = [];
   for (const row of rows) {
     if (row.skip) continue;
     const same = row.cells.length > 1 && row.cells.every((c) => cellKey(c) === cellKey(row.cells[0]));
-    if (same || row.cells.length === 1) common.push(row.common(row.cells[0]));
+    if (!row.keep && (same || row.cells.length === 1)) common.push(row.common(row.cells[0]));
     else rules.push({ label: row.label, cells: row.cells });
   }
   return { common, rules };
