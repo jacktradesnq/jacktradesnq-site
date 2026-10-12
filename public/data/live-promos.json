@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-11",
-  "builtFor": "2026-10-11",
+  "generatedAt": "2026-10-12",
+  "builtFor": "2026-10-12",
   "promos": [
     {
       "firmId": "traders-launch",
@@ -28,7 +28,7 @@
       "consistency": null,
       "activationFee": null,
       "contracts": "5 Micros",
-      "lastChecked": "2026-10-11"
+      "lastChecked": "2026-10-12"
     }
   ]
 }
