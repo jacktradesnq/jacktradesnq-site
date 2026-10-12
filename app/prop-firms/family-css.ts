@@ -130,6 +130,7 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
   white-space: nowrap;
 }
 
+.jtnq-cmp .ft-check{ display: block; width: 18px; height: 18px; margin: 0 auto; color: var(--c-accent); }
 .jtnq-cmp .ft-common{ padding: 24px; border-bottom: 1px solid var(--c-line-soft); }
 .jtnq-cmp .ft-k{
   margin: 0 0 16px; font-family: var(--f-mono); font-size: 11px; font-weight: 400; letter-spacing: .18em;

@@ -15,6 +15,12 @@ const Arrow = () => (
   </svg>
 );
 
+const Check = () => (
+  <svg className="ft-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" role="img" aria-label="Yes">
+    <path d="M5 12.5l4.5 4.5L19 7" />
+  </svg>
+);
+
 export function FirmLogo({ firm, size }: { firm: Pick<FirmView, 'logo' | 'name'>; size: number }) {
   if (firm.logo) return <img className="firm-mark" src={firm.logo} alt="" width={size} height={size} loading="lazy" />;
   // No logo file for the firm: its initial, same footprint, so every card lines up.
@@ -152,22 +158,6 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
 
       {banner}
 
-      {firm.common.length > 0 && (
-        <section className="ft-common" aria-label="Same on every plan">
-          <h4 className="ft-k">Same on every plan</h4>
-          <ul>
-            {firm.common.map((t) => (
-              <li key={t}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M5 12.5l4.5 4.5L19 7" />
-                </svg>
-                {t}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
       {cols > 1 && <p className="ft-swipe" aria-hidden="true">Swipe sideways for every program →</p>}
       <div className="ft-scroll" tabIndex={0} role="group" aria-label={`${firm.name} plan table, scrolls sideways`}>
         <table className="ft-table" style={{ ['--cols' as string]: cols }}>
@@ -184,6 +174,19 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
             </tr>
           </thead>
           <tbody>
+            {/* Rules shared by every program: one row each, a tick in every column. */}
+            {firm.common.map((t) => (
+              <tr key={t} className="ft-row-common">
+                <th scope="row" className="ft-label">
+                  {t}
+                </th>
+                {firm.columns.map((c) => (
+                  <td key={c.name} className="ft-cell">
+                    <Check />
+                  </td>
+                ))}
+              </tr>
+            ))}
             {firm.rules.map((r) => (
               <tr key={r.label}>
                 <th scope="row" className="ft-label">
