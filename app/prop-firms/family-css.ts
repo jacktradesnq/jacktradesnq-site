@@ -130,22 +130,8 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
   white-space: nowrap;
 }
 
-.jtnq-cmp thead .ft-corner{ vertical-align: middle; text-align: left; }
-.jtnq-cmp .ft-corner .ft-sec-title, .jtnq-cmp .ft-corner .ft-sec-sub{ position: static; display: block; }
-.jtnq-cmp .ft-corner .ft-sec-sub{ margin-top: 4px; }
-.jtnq-cmp .ft-flat{ min-width: max-content; }
-.jtnq-cmp .ft-flat .ft-col--rule{
-  font-family: var(--f-mono); font-style: normal; font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--c-text-mute); white-space: normal; min-width: 96px; max-width: 140px; line-height: 1.4;
-}
-.jtnq-cmp .ft-flat .ft-col--price{ min-width: 128px; }
 .jtnq-cmp .ft-col-sub{ white-space: pre-line; display: block; margin-top: 4px; font-family: var(--f-sans); font-size: 12px; font-style: italic; color: var(--c-text-mute); }
-.jtnq-cmp .ft-flat .ft-acc{ position: sticky; left: 0; z-index: 1; min-width: 168px; text-align: left; }
-.jtnq-cmp .ft-acc-prog{ display: block; font-family: var(--f-serif); font-style: italic; font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--c-text); }
-.jtnq-cmp .ft-acc-size{ display: block; margin-top: 4px; font-family: var(--f-mono); font-size: 13px; color: var(--c-accent); }
-.jtnq-cmp .ft-flat .ft-cell{ white-space: nowrap; }
-.jtnq-cmp .ft-flat .ft-cell--note{ white-space: normal; min-width: 200px; }
-.jtnq-cmp .ft-flat tr.ft-newprog > *{ border-top: 1px solid var(--c-line); }
+
 .jtnq-cmp .ft-bar{
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
   padding: 16px 24px; border-bottom: 1px solid var(--c-line-soft);
@@ -156,18 +142,15 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
 }
 .jtnq-cmp .ft-seg{ display: inline-flex; flex-wrap: wrap; gap: 4px; }
 .jtnq-cmp .ft-divider{ width: 1px; align-self: stretch; margin: 4px 8px; background: var(--c-line); }
-.jtnq-cmp .ft-progs, .jtnq-cmp .ft-mode{
-  display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px;
-  border: 1px solid var(--c-line); border-radius: 999px; background: var(--c-bg-deep);
-}
-.jtnq-cmp .ft-prog, .jtnq-cmp .ft-mode-btn{
+
+.jtnq-cmp .ft-prog{
   font-family: var(--f-sans); font-size: 13px; font-weight: 500; color: var(--c-text-mute);
   background: none; border: none; border-radius: 999px; padding: 8px 16px; cursor: pointer;
   transition: color .2s ease, background .2s ease;
 }
-.jtnq-cmp .ft-mode-btn{ font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
-.jtnq-cmp .ft-prog:hover, .jtnq-cmp .ft-mode-btn:hover{ color: var(--c-accent); }
-.jtnq-cmp .ft-prog.active, .jtnq-cmp .ft-mode-btn.active{ color: var(--c-bg); background: var(--c-accent); }
+
+.jtnq-cmp .ft-prog:hover{ color: var(--c-accent); }
+.jtnq-cmp .ft-prog.active{ color: var(--c-bg); background: var(--c-accent); }
 .jtnq-cmp .ft-pills{
   list-style: none; margin: 0; padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 8px 24px;
   border-bottom: 1px solid var(--c-line-soft);
@@ -181,17 +164,6 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
 .jtnq-cmp .ft-sizes .ft-label{ white-space: nowrap; }
 .jtnq-cmp .ft-sizes td, .jtnq-cmp .ft-sizes th{ padding-top: 12px; padding-bottom: 12px; }
 .jtnq-cmp .ft-check{ display: block; width: 18px; height: 18px; margin: 0 auto; color: var(--c-accent); }
-.jtnq-cmp .ft-common{ padding: 24px; border-bottom: 1px solid var(--c-line-soft); }
-.jtnq-cmp .ft-k{
-  margin: 0 0 16px; font-family: var(--f-mono); font-size: 11px; font-weight: 400; letter-spacing: .18em;
-  text-transform: uppercase; color: var(--c-accent);
-}
-.jtnq-cmp .ft-common ul{
-  list-style: none; margin: 0; padding: 0;
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 12px 24px;
-}
-.jtnq-cmp .ft-common li{ display: flex; align-items: flex-start; gap: 8px; font-size: 15px; line-height: 1.4; color: var(--c-text); }
-.jtnq-cmp .ft-common li svg{ width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; color: var(--c-accent); }
 
 .jtnq-cmp .ft-scroll{ overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .jtnq-cmp .ft-table{
@@ -217,32 +189,19 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
   color: var(--c-text-soft); line-height: 1.4;
 }
 .jtnq-cmp thead .ft-label{ background: color-mix(in oklab, var(--c-bg-raise) 70%, var(--c-bg-deep) 30%); }
-.jtnq-cmp .ft-size{ font-size: 14px; letter-spacing: .06em; color: var(--c-text); font-weight: 500; }
+
 .jtnq-cmp .ft-cell{ text-align: center; }
 .jtnq-cmp .ft-cell .tag{ margin-left: 8px; }
 .jtnq-cmp .ft-cell .ft-fig + .tag{ margin-left: 8px; }
 .jtnq-cmp .ft-cell .tag:only-child{ margin-left: 0; }
 .jtnq-cmp .ft-fig{ font-family: var(--f-mono); font-size: 15px; font-weight: 500; color: var(--c-text); }
 .jtnq-cmp .ft-word{ font-family: var(--f-sans); font-size: 15px; font-weight: 500; color: var(--c-text); line-height: 1.4; }
-.jtnq-cmp .ft-swipe{ display: none; }
-.jtnq-cmp .ft-cell--note{ vertical-align: top; }
+
 .jtnq-cmp .ft-sentence{
   display: block; max-width: 34ch; margin: 0 auto; text-align: left;
   font-family: var(--f-sans); font-size: 12px; font-style: italic; line-height: 1.5; color: var(--c-text-soft);
 }
-.jtnq-cmp .ft-sec-cell{
-  text-align: left; background: color-mix(in oklab, var(--c-bg-raise) 75%, var(--c-bg-deep) 25%);
-  border-top: 1px solid var(--c-line); border-bottom: 1px solid var(--c-line) !important;
-}
-/* The section title stays pinned left like the rule names. */
-.jtnq-cmp .ft-sec-title, .jtnq-cmp .ft-sec-sub{ position: sticky; left: 16px; }
-.jtnq-cmp .ft-sec-title{
-  display: inline-block; font-family: var(--f-mono); font-size: 11px; font-weight: 400; letter-spacing: .18em;
-  text-transform: uppercase; color: var(--c-accent); margin-right: 16px;
-}
-.jtnq-cmp .ft-sec-sub{
-  display: inline-block; font-family: var(--f-sans); font-size: 12px; font-weight: 400; font-style: italic; color: var(--c-text-mute);
-}
+
 .jtnq-cmp .ft-price .price-was{ white-space: nowrap; }
 .jtnq-cmp .ft-price{ display: inline-flex; align-items: baseline; justify-content: center; gap: 8px; flex-wrap: wrap; }
 .jtnq-cmp .ft-now{ font-family: var(--f-mono); font-size: 17px; font-weight: 500; color: var(--c-text); }
@@ -267,15 +226,12 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
   .jtnq-cmp .fam-tab{ padding: 12px 16px; font-size: 11px; }
   .jtnq-cmp .firm-card{ padding: 16px; }
   .jtnq-cmp .ft{ margin-top: 24px; }
-  .jtnq-cmp .ft-head, .jtnq-cmp .ft-common{ padding: 16px; }
+.jtnq-cmp .ft-head{ padding: 16px; }
   .jtnq-cmp .perps-promo{ padding: 12px 16px; }
   .jtnq-cmp .ft-actions{ width: 100%; }
   .jtnq-cmp .ft-actions .row-cta{ margin-left: auto; }
   .jtnq-cmp .ft-table{ min-width: calc(104px + var(--cols) * 152px); }
-  .jtnq-cmp .ft-swipe{
-    display: block; margin: 0; padding: 12px 16px 0;
-    font-family: var(--f-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--c-text-mute);
-  }
+
   .jtnq-cmp .ft-table th, .jtnq-cmp .ft-table td{ padding: 12px 8px; }
   .jtnq-cmp .ft-word{ font-size: 14px; }
   .jtnq-cmp .ft-label{ width: 104px; font-size: 10px; letter-spacing: .1em; padding-left: 16px !important; }
