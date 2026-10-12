@@ -16,8 +16,9 @@
       ],
       "promo": {
         "code": "JTNQ",
-        "discountPct": 30,
-        "endsAt": "2026-10-12T04:00:00Z",
+        "discountPct": 35,
+        "endsAt": null,
+        "firstPurchase": true,
         "lastChecked": "2026-10-12"
       },
       "programs": [
@@ -34,22 +35,22 @@
             {
               "size": 10000,
               "price": 40,
-              "promoPrice": 28
+              "promoPrice": 26
             },
             {
               "size": 25000,
               "price": 100,
-              "promoPrice": 70
+              "promoPrice": 65
             },
             {
               "size": 50000,
               "price": 190,
-              "promoPrice": 133
+              "promoPrice": 123
             },
             {
               "size": 100000,
               "price": 360,
-              "promoPrice": 252
+              "promoPrice": 234
             }
           ]
         },
@@ -66,22 +67,22 @@
             {
               "size": 10000,
               "price": 60,
-              "promoPrice": 42
+              "promoPrice": 39
             },
             {
               "size": 25000,
               "price": 160,
-              "promoPrice": 112
+              "promoPrice": 104
             },
             {
               "size": 50000,
               "price": 300,
-              "promoPrice": 210
+              "promoPrice": 195
             },
             {
               "size": 100000,
               "price": 595,
-              "promoPrice": 416
+              "promoPrice": 386
             }
           ]
         },
@@ -98,22 +99,22 @@
             {
               "size": 10000,
               "price": 90,
-              "promoPrice": 63
+              "promoPrice": 58
             },
             {
               "size": 25000,
               "price": 225,
-              "promoPrice": 157
+              "promoPrice": 146
             },
             {
               "size": 50000,
               "price": 430,
-              "promoPrice": 301
+              "promoPrice": 279
             },
             {
               "size": 100000,
               "price": 870,
-              "promoPrice": 609
+              "promoPrice": 565
             }
           ]
         },
@@ -130,30 +131,30 @@
             {
               "size": 5000,
               "price": 89,
-              "promoPrice": 62,
+              "promoPrice": 57,
               "dllPrice": 49,
-              "dllPromoPrice": 34
+              "dllPromoPrice": 31
             },
             {
               "size": 10000,
               "price": 175,
-              "promoPrice": 122,
+              "promoPrice": 113,
               "dllPrice": 95,
-              "dllPromoPrice": 66
+              "dllPromoPrice": 61
             },
             {
               "size": 25000,
               "price": 449,
-              "promoPrice": 314,
+              "promoPrice": 291,
               "dllPrice": 249,
-              "dllPromoPrice": 174
+              "dllPromoPrice": 161
             },
             {
               "size": 50000,
               "price": 889,
-              "promoPrice": 622,
+              "promoPrice": 577,
               "dllPrice": 495,
-              "dllPromoPrice": 346
+              "dllPromoPrice": 321
             }
           ]
         }

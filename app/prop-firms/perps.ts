@@ -43,7 +43,8 @@ type PerpsFirm = {
   url: string;
   lastChecked: string;
   markets: string[];
-  promo: { code: string; discountPct: number; endsAt: string; lastChecked: string } | null;
+  // endsAt null: no announced end, no countdown. firstPurchase: the rate applies to a first order.
+  promo: { code: string; discountPct: number; endsAt: string | null; firstPurchase?: boolean; lastChecked: string } | null;
   programs: PerpsProgram[];
 };
 
@@ -54,8 +55,8 @@ const BUILD_TS = Number(process.env.NEXT_PUBLIC_BUILD_TS ?? 0);
 const PROMO_FIRM = DATA.firms.find((f) => f.promo) ?? null;
 export const PERPS_PROMO = PROMO_FIRM?.promo ?? null;
 export const PERPS_PROMO_FIRM_ID = PROMO_FIRM?.id ?? null;
-export const PROMO_ENDS_MS = PERPS_PROMO ? Date.parse(PERPS_PROMO.endsAt) : null;
-const LIVE_AT_BUILD = PROMO_ENDS_MS != null && BUILD_TS < PROMO_ENDS_MS;
+export const PROMO_ENDS_MS = PERPS_PROMO?.endsAt ? Date.parse(PERPS_PROMO.endsAt) : null;
+const LIVE_AT_BUILD = PERPS_PROMO != null && (PROMO_ENDS_MS == null || BUILD_TS < PROMO_ENDS_MS);
 
 // True while the promo runs. Starts from the build state (static HTML), re-checks the
 // clock once mounted, and flips to false at endsAt without re-rendering every second.
@@ -189,7 +190,7 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     }),
   }));
 
-  const endsLabel = promo
+  const endsLabel = promo?.endsAt
     ? new Date(promo.endsAt).toLocaleString('en-US', {
         month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York',
       })
@@ -207,7 +208,9 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     common: [...firmCommon, ...common.filter(Boolean)],
     rules,
     priceTitle: promo ? `Price with code ${promo.code}` : 'Price',
-    priceSub: promo ? `${promo.discountPct}% off until ${endsLabel} New York time` : null,
+    priceSub: promo
+      ? `${promo.discountPct}% off${promo.firstPurchase ? ' your first purchase' : ''}${endsLabel ? ` until ${endsLabel} New York time` : ''}`
+      : null,
     sizes: sizeRows,
     funded: FUNDED[firm.id] ? programs.map((p) => FUNDED[firm.id][p.name.split(' ')[0]] ?? null) : undefined,
     legend: [
@@ -216,7 +219,7 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     ],
     note:
       `Prices and rules read on the firm's own site on ${humanDate(firm.promo?.lastChecked ?? firm.lastChecked)}, not auto-synced.` +
-      (promo ? ` Crossed-out prices are the normal prices; code ${promo.code} takes ${promo.discountPct}% off until ${endsLabel} New York time.` : '') +
+      (promo ? ` Crossed-out prices are the normal prices; code ${promo.code} takes ${promo.discountPct}% off${endsLabel ? ` until ${endsLabel} New York time` : ''}.` : '') +
       ' The live checkout price wins.',
     href: goHref('prop-firms', firm.id),
   };
