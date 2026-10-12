@@ -204,6 +204,11 @@ function firmView(firm: Firm): FirmView {
     })),
   ]);
   common.splice(2, 0, `${firm.split} profit split`, `${firm.payout} payouts`);
+  // A fee kind shared by every plan goes up into the firm's summary line, not a column
+  // (Angelo, 12/10/2026: « mets-le ici et enlève la case […] si tous les plans n'ont pas
+  // de activation fee, pourquoi le préciser ? »).
+  const sharedFee = common.find((t) => t === 'One-time fee' || t === 'Monthly fee');
+  if (sharedFee) common.splice(common.indexOf(sharedFee), 1);
 
   const sizes = [...new Set(allPlans.map((p) => p.size))].sort((a, b) => a - b);
   const sizeRows = sizes.map((size) => ({
@@ -235,7 +240,7 @@ function firmView(firm: Firm): FirmView {
     id: firm.id,
     name: firm.name,
     logo: FIRM_LOGOS[firm.id] ?? null,
-    summary: `${firm.split} split · ${firm.payout} payouts`,
+    summary: `${firm.split} split · ${firm.payout} payouts${sharedFee ? ` · ${sharedFee}` : ''}`,
     code: code ? { code, title: promo.title || 'My affiliate code' } : null,
     stale:
       firm.lastChecked !== DATA.generatedAt
