@@ -187,16 +187,18 @@ const cellKey = (c: Cell) => JSON.stringify([c.text, c.tag?.label ?? '', !!c.sof
 // / Payout frequency: You can request it every day! », 4 payouts per account.
 // Traders Launch (traderslaunch.com/faq): no minimum days before a payout, account above
 // +1% profit, no consistency once Simfunded, a buffer to build before the first payout.
-const E8_ZERO: Funded = {
-  pills: [
-    { label: 'Winning days', value: 'None' },
-    { label: 'Consistency', value: 'None' },
-    { label: 'Payout request', value: 'Every day' },
-    { label: 'Minimum payout', value: '$100' },
-    { label: 'Payouts per account', value: '4, then a free challenge' },
-  ],
-  rows: [],
-};
+// E8 re-checked on its checkout and configurator on 12/10/2026: Signature has a 35% best-day
+// rule and a 2% soft daily pause once funded only, and per-payout caps by size; Zero splits
+// 80% or 100% (paid option), funded contracts start lower and scale with locked profit.
+const E8_ZERO_PILLS: Pill[] = [
+  { label: 'Winning days', value: 'None' },
+  { label: 'Consistency', value: 'None' },
+  { label: 'Payout request', value: 'Every day' },
+  { label: 'Minimum payout', value: '$100' },
+  { label: 'Profit split', value: '80% (100% option)' },
+  { label: 'Payouts per account', value: '4, then a free challenge' },
+];
+const E8_ZERO_CONTRACTS = { 25000: '1 → 2 → 3', 50000: '2 → 3 → 5', 100000: '3 → 5 → 8', 200000: '4 → 7 → 10' };
 const TL_PILLS: Pill[] = [
   { label: 'Winning days', value: 'None' },
   { label: 'Consistency', value: 'None' },
@@ -209,14 +211,36 @@ const FUNDED: Record<string, Record<string, Funded>> = {
     'E8 Signature Futures': {
       pills: [
         { label: 'Winning days', value: 'None for the 1st payout, then 5 between payouts (day ≥ +0.3%)' },
+        { label: 'Consistency', value: '35% best day' },
+        { label: 'Daily pause', value: '2%, soft: trading stops for the day' },
         { label: 'Buffer', value: 'Same as your EOD drawdown' },
         { label: 'Minimum payout', value: '$100' },
         { label: 'Payouts per account', value: '4, then a free challenge' },
       ],
-      rows: [],
+      rows: [
+        { label: 'Daily pause', bySize: { 25000: '$500', 50000: '$1,000', 100000: '$2,000', 150000: '$3,000' } },
+        {
+          label: 'Payout caps 1 / 2 / 3 / 4',
+          bySize: {
+            25000: '$1,000 / 1,000 / 1,250 / 1,250',
+            50000: '$1,250 / 1,250 / 2,000 / 2,000',
+            100000: '$2,000 / 2,000 / 3,000 / 3,000',
+            150000: '$3,000 / 3,000 / 3,500 / 3,500',
+          },
+        },
+      ],
     },
-    'E8 Zero MAX Futures': E8_ZERO,
-    'E8 Zero Starter Futures': E8_ZERO,
+    'E8 Zero MAX Futures': {
+      pills: E8_ZERO_PILLS,
+      rows: [
+        { label: 'Payout cap', bySize: { 25000: '$1,500', 50000: '$3,000', 100000: '$5,000', 200000: '$7,000' } },
+        { label: 'Funded contracts (minis)', bySize: E8_ZERO_CONTRACTS },
+      ],
+    },
+    'E8 Zero Starter Futures': {
+      pills: E8_ZERO_PILLS,
+      rows: [{ label: 'Payout cap', bySize: { 25000: '$600', 50000: '$1,000', 100000: '$1,500', 150000: '$2,000' } }],
+    },
   },
   'traders-launch': {
     '1-Step': {

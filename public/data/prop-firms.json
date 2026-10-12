@@ -94,13 +94,13 @@
       "split": "80%",
       "payout": "On-demand",
       "promo": {
-        "label": "Up to 40% off",
+        "label": "Up to 35% off",
         "code": "JTNQ"
       },
       "code": "JTNQ",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-09-18",
-      "stale": true,
+      "lastChecked": "2026-10-12",
+      "stale": false,
       "programs": [
         {
           "name": "E8 Signature Futures",
@@ -121,8 +121,8 @@
             },
             {
               "size": 50000,
-              "price": 120,
-              "originalPrice": 160,
+              "price": 128,
+              "originalPrice": 170,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -148,7 +148,7 @@
               "price": 338,
               "originalPrice": 450,
               "profitTarget": 9000,
-              "maxDrawdown": 4500,
+              "maxDrawdown": 3990,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
@@ -162,6 +162,18 @@
           "type": "eval",
           "priceType": "one-time",
           "plans": [
+            {
+              "size": 25000,
+              "price": 149,
+              "originalPrice": 228,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "3 minis / 30 micros"
+            },
             {
               "size": 50000,
               "price": 214,
@@ -206,9 +218,21 @@
           "priceType": "one-time",
           "plans": [
             {
+              "size": 25000,
+              "price": 84,
+              "originalPrice": 128,
+              "profitTarget": 1500,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "dailyLossSoft": false,
+              "consistency": "40%",
+              "contracts": "3 minis / 30 micros"
+            },
+            {
               "size": 50000,
-              "price": 116,
-              "originalPrice": 178,
+              "price": 142,
+              "originalPrice": 218,
               "profitTarget": 3000,
               "maxDrawdown": 1500,
               "ddType": "EOD Trailing",
@@ -219,8 +243,8 @@
             },
             {
               "size": 100000,
-              "price": 181,
-              "originalPrice": 278,
+              "price": 220,
+              "originalPrice": 338,
               "profitTarget": 6500,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
@@ -230,11 +254,11 @@
               "contracts": "8 minis / 80 micros"
             },
             {
-              "size": 200000,
-              "price": 363,
-              "originalPrice": 558,
-              "profitTarget": 13500,
-              "maxDrawdown": 6000,
+              "size": 150000,
+              "price": 285,
+              "originalPrice": 438,
+              "profitTarget": 9000,
+              "maxDrawdown": 3990,
               "ddType": "EOD Trailing",
               "dailyLoss": null,
               "dailyLossSoft": false,
@@ -244,7 +268,7 @@
           ]
         }
       ],
-      "rulesCheckedAt": "2026-08-21"
+      "rulesCheckedAt": "2026-10-12"
     }
   ]
 }
