@@ -226,6 +226,10 @@ const FUNDED: Record<string, Record<string, Funded>> = {
   },
 };
 
+// Firms whose own pages say there is no activation fee. Traders Launch, traderslaunch.com/faq
+// read 12/10/2026: « None. You pay the evaluation fee once. No activation fee when you pass ».
+const NO_ACTIVATION_FEE = new Set(['traders-launch']);
+
 function firmView(firm: Firm): FirmView {
   const programs = firm.programs;
   const allPlans = programs.flatMap((p) => p.plans);
@@ -262,8 +266,11 @@ function firmView(firm: Firm): FirmView {
   // A fee kind shared by every plan goes up into the firm's summary line, not a column
   // (Angelo, 12/10/2026: « mets-le ici et enlève la case […] si tous les plans n'ont pas
   // de activation fee, pourquoi le préciser ? »).
-  const sharedFee = common.find((t) => t === 'One-time fee' || t === 'Monthly fee');
-  if (sharedFee) common.splice(common.indexOf(sharedFee), 1);
+  const oneFee = common.find((t) => t === 'One-time fee' || t === 'Monthly fee');
+  if (oneFee) common.splice(common.indexOf(oneFee), 1);
+  // Said as "No activation fee" where the firm writes it (Angelo, 12/10/2026: « faut juste
+  // préciser "no activation fee" à la place de one-time fee »).
+  const sharedFee = oneFee === 'One-time fee' && NO_ACTIVATION_FEE.has(firm.id) ? 'No activation fee' : oneFee;
 
   const sizes = [...new Set(allPlans.map((p) => p.size))].sort((a, b) => a - b);
   const sizeRows = sizes.map((size) => ({
