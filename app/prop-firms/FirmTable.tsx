@@ -126,6 +126,17 @@ export function PromoClock({ endsMs }: { endsMs: number }) {
 
 export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; banner?: React.ReactNode }) {
   const cols = firm.columns.length;
+  // One row per account sold (program × size), every rule on the same line (Angelo,
+  // 12/10/2026: « mettre dans la même ligne les prix, les size et les règles ensemble »).
+  const rows = firm.columns.flatMap((c, i) =>
+    firm.sizes.flatMap((r) => {
+      const cell = r.cells[i];
+      return cell ? [{ prog: c.name, i, size: r.size, cell }] : [];
+    }),
+  );
+  const lineLabels = [
+    ...new Set(rows.flatMap(({ cell }) => (cell.kind === 'price' ? cell.lines.map((l) => l.label) : []))),
+  ];
   return (
     <div className="ft" id={id} role="region" aria-label={`${firm.name} plans`}>
       <header className="ft-head">
@@ -158,56 +169,49 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
 
       {banner}
 
-      {cols > 1 && <p className="ft-swipe" aria-hidden="true">Swipe sideways for every program →</p>}
-      <div className="ft-scroll" tabIndex={0} role="group" aria-label={`${firm.name} plan table, scrolls sideways`}>
-        <table className="ft-table" style={{ ['--cols' as string]: cols }}>
+      <p className="ft-swipe" aria-hidden="true">Swipe sideways for every rule →</p>
+      <div className="ft-scroll" tabIndex={0} role="group" aria-label={`${firm.name} accounts, scrolls sideways`}>
+        <table className="ft-table ft-flat">
           <thead>
             <tr>
-              <th className="ft-label ft-corner" scope="col">
-                <span className="ft-sec-title">{firm.priceTitle}</span>
-                {firm.priceSub && <span className="ft-sec-sub">{firm.priceSub}</span>}
+              <th scope="col" className="ft-label ft-acc">Account</th>
+              <th scope="col" className="ft-col ft-col--price">
+                {firm.priceTitle}
+                {firm.priceSub && <span className="ft-col-sub">{firm.priceSub}</span>}
               </th>
-              {firm.columns.map((c) => (
-                <th key={c.name} scope="col" className="ft-col">
-                  {c.name}
-                </th>
+              {lineLabels.map((l) => (
+                <th key={l} scope="col" className="ft-col ft-col--rule">{l}</th>
+              ))}
+              {firm.rules.map((r) => (
+                <th key={r.label} scope="col" className="ft-col ft-col--rule">{r.label}</th>
+              ))}
+              {firm.common.map((t) => (
+                <th key={t} scope="col" className="ft-col ft-col--rule">{t}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {/* Rules shared by every program: one row each, a tick in every column. */}
-            {firm.common.map((t) => (
-              <tr key={t} className="ft-row-common">
-                <th scope="row" className="ft-label">
-                  {t}
+            {rows.map(({ prog, i, size, cell }, k) => (
+              <tr key={`${prog}-${size}`} className={k > 0 && rows[k - 1].i !== i ? 'ft-newprog' : undefined}>
+                <th scope="row" className="ft-label ft-acc">
+                  <span className="ft-acc-prog">{prog}</span>
+                  <span className="ft-acc-size">{sizeLabel(size)}</span>
                 </th>
-                {firm.columns.map((c) => (
-                  <td key={c.name} className="ft-cell">
+                <td className="ft-cell">
+                  <PriceView cell={cell.kind === 'price' ? { ...cell, lines: [] } : cell} />
+                </td>
+                {lineLabels.map((l) => {
+                  const c = cell.kind === 'price' ? cell.lines.find((x) => x.label === l)?.cell : undefined;
+                  return <td key={l} className="ft-cell">{c ? <CellView cell={c} /> : <span className="none">–</span>}</td>;
+                })}
+                {firm.rules.map((r) => (
+                  <td key={r.label} className={r.cells[i].note ? 'ft-cell ft-cell--note' : 'ft-cell'}>
+                    <CellView cell={r.cells[i]} />
+                  </td>
+                ))}
+                {firm.common.map((t) => (
+                  <td key={t} className="ft-cell">
                     <Check />
-                  </td>
-                ))}
-              </tr>
-            ))}
-            {firm.rules.map((r) => (
-              <tr key={r.label}>
-                <th scope="row" className="ft-label">
-                  {r.label}
-                </th>
-                {r.cells.map((c, i) => (
-                  <td key={i} className={c.note ? 'ft-cell ft-cell--note' : 'ft-cell'}>
-                    <CellView cell={c} />
-                  </td>
-                ))}
-              </tr>
-            ))}
-            {firm.sizes.map((row) => (
-              <tr key={row.size}>
-                <th scope="row" className="ft-label ft-size">
-                  {sizeLabel(row.size)}
-                </th>
-                {row.cells.map((c, i) => (
-                  <td key={i} className="ft-cell">
-                    <PriceView cell={c} />
                   </td>
                 ))}
               </tr>
@@ -216,16 +220,15 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
         </table>
       </div>
 
-      <footer className="ft-foot">
-        {firm.legend.length > 0 && (
+      {firm.legend.length > 0 && (
+        <footer className="ft-foot">
           <div className="legend">
             {firm.legend.map((t) => (
               <p key={t}>{t}</p>
             ))}
           </div>
-        )}
-        <p className="note">{firm.note}</p>
-      </footer>
+        </footer>
+      )}
     </div>
   );
 }

@@ -133,6 +133,19 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
 .jtnq-cmp thead .ft-corner{ vertical-align: middle; text-align: left; }
 .jtnq-cmp .ft-corner .ft-sec-title, .jtnq-cmp .ft-corner .ft-sec-sub{ position: static; display: block; }
 .jtnq-cmp .ft-corner .ft-sec-sub{ margin-top: 4px; }
+.jtnq-cmp .ft-flat{ min-width: max-content; }
+.jtnq-cmp .ft-flat .ft-col--rule{
+  font-family: var(--f-mono); font-style: normal; font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--c-text-mute); white-space: normal; min-width: 96px; max-width: 140px; line-height: 1.4;
+}
+.jtnq-cmp .ft-flat .ft-col--price{ min-width: 128px; }
+.jtnq-cmp .ft-col-sub{ display: block; margin-top: 4px; font-family: var(--f-sans); font-size: 12px; font-style: italic; color: var(--c-text-mute); }
+.jtnq-cmp .ft-flat .ft-acc{ position: sticky; left: 0; z-index: 1; min-width: 168px; text-align: left; }
+.jtnq-cmp .ft-acc-prog{ display: block; font-family: var(--f-serif); font-style: italic; font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--c-text); }
+.jtnq-cmp .ft-acc-size{ display: block; margin-top: 4px; font-family: var(--f-mono); font-size: 13px; color: var(--c-accent); }
+.jtnq-cmp .ft-flat .ft-cell{ white-space: nowrap; }
+.jtnq-cmp .ft-flat .ft-cell--note{ white-space: normal; min-width: 200px; }
+.jtnq-cmp .ft-flat tr.ft-newprog > *{ border-top: 1px solid var(--c-line); }
 .jtnq-cmp .ft-check{ display: block; width: 18px; height: 18px; margin: 0 auto; color: var(--c-accent); }
 .jtnq-cmp .ft-common{ padding: 24px; border-bottom: 1px solid var(--c-line-soft); }
 .jtnq-cmp .ft-k{
