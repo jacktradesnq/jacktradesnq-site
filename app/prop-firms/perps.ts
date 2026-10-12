@@ -125,7 +125,8 @@ const FUNDED: Record<string, Record<string, Funded>> = {
       pills: [
         { label: 'Winning days', value: 'None' },
         { label: 'Consistency', value: 'None' },
-        { label: 'Payout request', value: 'Any time, from day 1, positions closed' },
+        // Checkout, 12/10/2026: « Payout Eligibility Day one » / « Payout Frequency Daily ».
+        { label: 'Payout request', value: 'Daily, from day one' },
         { label: 'Minimum payout', value: '1% of the account' },
         { label: 'Drawdown after a payout', value: 'Stays at -5%' },
         { label: 'Lifetime payouts', value: 'Up to $100K' },
