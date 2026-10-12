@@ -169,9 +169,13 @@ const FIELDS: Field[] = [
   {
     label: 'Notes',
     short: 'Note',
-    cell: (p) => (p.note ? { text: p.note, note: true } : { text: '–', muted: true }),
+    cell: (p) => {
+      // The price rows now say which split they are for.
+      const note = p.note?.replace(SPLIT_NOTE, '').trim();
+      return note ? { text: note, note: true } : { text: '–', muted: true };
+    },
     common: (c) => c.text,
-    optional: (p) => !!p.note,
+    optional: (p) => !!p.note?.replace(SPLIT_NOTE, '').trim(),
   },
 ];
 
@@ -258,6 +262,16 @@ const FUNDED: Record<string, Record<string, Funded>> = {
 // read 12/10/2026: « None. You pay the evaluation fee once. No activation fee when you pass ».
 const NO_ACTIVATION_FEE = new Set(['traders-launch']);
 
+// The 60% split version of the same accounts, list prices from the firm's checkout read on
+// 12/10/2026 (« 60% Profit Split $159 $99 evaluation fee »; /pricing: « Choose a 60% profit
+// split from $99 or an 80% profit split from $159 »). Same target, loss limit and buffer.
+// The scraper reads the 80% prices; the JSON plans are those. Legacy NYC sells at 80% only
+// on the checkout (its 55% shows on the home page alone), so it has none.
+const SPLIT_60: Record<string, Record<string, Record<number, number>>> = {
+  'traders-launch': { '1-Step': { 100000: 99, 200000: 199, 300000: 399 } },
+};
+const SPLIT_NOTE = / ?Price shown for the 80% split\./;
+
 function firmView(firm: Firm): FirmView {
   const programs = firm.programs;
   const allPlans = programs.flatMap((p) => p.plans);
@@ -290,7 +304,10 @@ function firmView(firm: Firm): FirmView {
   // "On-demand payouts" tells a trader nothing (Angelo, 12/10/2026: « enlève le on demand
   // payout, car point de vue trader ça veut rien dire »); a real pace (Daily) stays.
   const pace = /on.?demand/i.test(firm.payout) ? null : `${firm.payout} payouts`;
-  common.splice(2, 0, `${firm.split} profit split`, ...(pace ? [pace] : []));
+  // With a 60% version the price rows name each split; the firm line says « Up to 80% »,
+  // the checkout's own words (« Up to 80% profit split »).
+  const splitText = SPLIT_60[firm.id] ? `Up to ${firm.split}` : firm.split;
+  common.splice(2, 0, ...(SPLIT_60[firm.id] ? [] : [`${firm.split} profit split`]), ...(pace ? [pace] : []));
   // A fee kind shared by every plan goes up into the firm's summary line, not a column
   // (Angelo, 12/10/2026: « mets-le ici et enlève la case […] si tous les plans n'ont pas
   // de activation fee, pourquoi le préciser ? »).
@@ -330,7 +347,7 @@ function firmView(firm: Firm): FirmView {
     id: firm.id,
     name: firm.name,
     logo: FIRM_LOGOS[firm.id] ?? null,
-    summary: `${firm.split} split${pace ? ` · ${pace}` : ''}${sharedFee ? ` · ${sharedFee}` : ''}`,
+    summary: `${splitText} split${pace ? ` · ${pace}` : ''}${sharedFee ? ` · ${sharedFee}` : ''}`,
     code: code ? { code, title: promo.title || 'My affiliate code' } : null,
     stale:
       firm.lastChecked !== DATA.generatedAt
@@ -347,6 +364,27 @@ function firmView(firm: Firm): FirmView {
     priceSub: viaCode ? `${firm.codeDiscountPct}% off with code ${code}` : promo.title || null,
     sizes: sizeRows,
     funded: fundedBy ? programs.map((pr) => fundedBy[pr.name] ?? null) : undefined,
+    ...(SPLIT_60[firm.id]
+      ? {
+          priceLabel: `${firm.split} split`,
+          extraPrices: [
+            {
+              label: '60% split',
+              byProgram: programs.map((pr) => {
+                const list = SPLIT_60[firm.id][pr.name];
+                if (!list) return null;
+                const pct = firm.codeDiscountPct ?? 0;
+                return Object.fromEntries(
+                  Object.entries(list).map(([size, price]) => [
+                    Number(size),
+                    { now: Math.round(price * (100 - pct)) / 100, was: pct ? price : null },
+                  ]),
+                );
+              }),
+            },
+          ],
+        }
+      : {}),
     legend,
     note: NOTE,
     href: goHref('prop-firms', firm.id),

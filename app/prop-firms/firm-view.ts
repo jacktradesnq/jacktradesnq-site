@@ -71,6 +71,10 @@ export type FirmView = {
   // table switches between the evaluation and these rules (Angelo, 12/10/2026, after
   // Lucid's « Funded Rules »: « peut-être un filtre Eval/Funded »).
   funded?: (Funded | null)[];
+  // A second price for the same account (Traders Launch sells each size at a 60% and an 80%
+  // split): the main price row is then named priceLabel, the others by their own label.
+  priceLabel?: string;
+  extraPrices?: { label: string; byProgram: (Record<number, { now: number; was: number | null }> | null)[] }[];
   legend: string[];
   note: string;
   href: string;

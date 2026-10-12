@@ -141,7 +141,8 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
   ];
   const evalPills: Pill[] = [
     ...firm.common.map((t) => ({ label: t })),
-    ...firm.rules.map((r) => ({ label: r.label, value: r.cells[pi].text })),
+    // A rule this program does not have ("–") is not a pill.
+    ...firm.rules.filter((r) => r.cells[pi].text !== '–').map((r) => ({ label: r.label, value: r.cells[pi].text })),
   ];
   const pills = showFunded ? funded.pills : evalPills;
 
@@ -177,39 +178,46 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
 
       {banner}
 
-      <div className="ft-bar">
-        {cols > 1 && (
-          <div className="ft-progs" role="tablist" aria-label={`${firm.name} programs`}>
-            {firm.columns.map((c, i) => (
-              <button
-                key={c.name}
-                type="button"
-                role="tab"
-                aria-selected={pi === i}
-                className={`ft-prog${pi === i ? ' active' : ''}`}
-                onClick={() => setPi(i)}
-              >
-                {c.name}
-              </button>
-            ))}
+      {(cols > 1 || hasFunded) && (
+        // One bar for every filter: the programs, then Eval / Funded after a rule (Angelo,
+        // 12/10/2026, picking « tout dans une seule barre »).
+        <div className="ft-bar">
+          <div className="ft-filters">
+            {cols > 1 && (
+              <div className="ft-seg" role="tablist" aria-label={`${firm.name} programs`}>
+                {firm.columns.map((c, i) => (
+                  <button
+                    key={c.name}
+                    type="button"
+                    role="tab"
+                    aria-selected={pi === i}
+                    className={`ft-prog${pi === i ? ' active' : ''}`}
+                    onClick={() => setPi(i)}
+                  >
+                    {c.name}
+                  </button>
+                ))}
+              </div>
+            )}
+            {cols > 1 && hasFunded && <span className="ft-divider" aria-hidden="true" />}
+            {hasFunded && (
+              <div className="ft-seg" role="group" aria-label="Evaluation or funded rules">
+                {(['eval', 'funded'] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    aria-pressed={mode === m}
+                    className={`ft-prog${mode === m ? ' active' : ''}`}
+                    onClick={() => setMode(m)}
+                  >
+                    {m === 'eval' ? 'Eval' : 'Funded'}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-        )}
-        {hasFunded && (
-          <div className="ft-mode" role="group" aria-label="Evaluation or funded rules">
-            {(['eval', 'funded'] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                aria-pressed={mode === m}
-                className={`ft-mode-btn${mode === m ? ' active' : ''}`}
-                onClick={() => setMode(m)}
-              >
-                {m === 'eval' ? 'Eval' : 'Funded'}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {mode === 'funded' && funded == null ? (
         <p className="ft-empty">Funded rules for this program aren&apos;t written here yet.</p>
@@ -256,8 +264,12 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
                 <>
                   <tr className="ft-row-price">
                     <th scope="row" className="ft-label">
-                      {firm.priceTitle}
-                      {firm.priceSub && <span className="ft-col-sub">{firm.priceSub}</span>}
+                      {firm.priceLabel ?? firm.priceTitle}
+                      {firm.priceLabel ? (
+                        <span className="ft-col-sub">{firm.priceSub ?? firm.priceTitle}</span>
+                      ) : (
+                        firm.priceSub && <span className="ft-col-sub">{firm.priceSub}</span>
+                      )}
                     </th>
                     {sizes.map((r) => {
                       const c = priceOf(r);
@@ -268,6 +280,25 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
                       );
                     })}
                   </tr>
+                  {(firm.extraPrices ?? [])
+                    .filter((x) => x.byProgram[pi])
+                    .map((x) => (
+                      <tr key={x.label} className="ft-row-price">
+                        <th scope="row" className="ft-label">{x.label}</th>
+                        {sizes.map((r) => {
+                          const p = x.byProgram[pi]?.[r.size];
+                          return (
+                            <td key={r.size} className="ft-cell">
+                              {p ? (
+                                <PriceView cell={{ kind: 'price', now: p.now, was: p.was, per: null, from: false, lines: [] }} />
+                              ) : (
+                                <span className="none">–</span>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
                   {lineLabels.map((l) => (
                     <tr key={l}>
                       <th scope="row" className="ft-label">{l}</th>
