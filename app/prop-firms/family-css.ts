@@ -139,7 +139,7 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
   color: var(--c-text-mute); white-space: normal; min-width: 96px; max-width: 140px; line-height: 1.4;
 }
 .jtnq-cmp .ft-flat .ft-col--price{ min-width: 128px; }
-.jtnq-cmp .ft-col-sub{ display: block; margin-top: 4px; font-family: var(--f-sans); font-size: 12px; font-style: italic; color: var(--c-text-mute); }
+.jtnq-cmp .ft-col-sub{ white-space: pre-line; display: block; margin-top: 4px; font-family: var(--f-sans); font-size: 12px; font-style: italic; color: var(--c-text-mute); }
 .jtnq-cmp .ft-flat .ft-acc{ position: sticky; left: 0; z-index: 1; min-width: 168px; text-align: left; }
 .jtnq-cmp .ft-acc-prog{ display: block; font-family: var(--f-serif); font-style: italic; font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--c-text); }
 .jtnq-cmp .ft-acc-size{ display: block; margin-top: 4px; font-family: var(--f-mono); font-size: 13px; color: var(--c-accent); }

@@ -212,7 +212,7 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     rules,
     priceTitle: promo ? `Price with code ${promo.code}` : 'Price',
     priceSub: promo
-      ? `${promo.discountPct}% off${promo.firstPurchase ? ' your first purchase' : ''}${promo.thenPct ? `, ${promo.thenPct}% off every purchase after` : ''}${endsLabel ? ` until ${endsLabel} New York time` : ''}`
+      ? `${promo.discountPct}% off${promo.firstPurchase ? ' your first purchase' : ''}${promo.thenPct ? `\n${promo.thenPct}% off every purchase after` : ''}${endsLabel ? ` until ${endsLabel} New York time` : ''}`
       : null,
     sizes: sizeRows,
     funded: FUNDED[firm.id] ? programs.map((p) => FUNDED[firm.id][p.name.split(' ')[0]] ?? null) : undefined,
