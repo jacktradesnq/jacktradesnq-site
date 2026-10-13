@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-12",
-  "builtFor": "2026-10-12",
+  "generatedAt": "2026-10-13",
+  "builtFor": "2026-10-13",
   "promos": [
     {
       "firmId": "traders-launch",
@@ -25,10 +25,10 @@
       "ddType": "EOD Trailing",
       "profitTarget": 2000,
       "maxDrawdown": 1000,
-      "consistency": null,
+      "consistency": "40%",
       "activationFee": null,
       "contracts": "5 Micros",
-      "lastChecked": "2026-10-12"
+      "lastChecked": "2026-10-13"
     }
   ]
 }
