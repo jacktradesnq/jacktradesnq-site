@@ -3,11 +3,9 @@ import { goHref } from '@/lib/go-links';
 /*
  * /trade-copier — Tradecopia, the copier Angelo uses (affiliate, code JTNQ). Asked 13/10/2026.
  *
- * Audience discount: none shown. On 08/09/2026 tradecopia.com/affiliates said the audience got
- * « 30% off the first month »; read again on 13/10/2026, neither /affiliates nor
- * /legal/affiliate-terms mentions any discount for referred users any more (only the
- * affiliate's « Up to 15% recurring commission »). The page only shows what is still stated:
- * the code.
+ * Audience discount: « 30% off the first month ». Stated on tradecopia.com/affiliates on
+ * 08/09/2026; gone from /affiliates and /legal/affiliate-terms when read again on 13/10/2026.
+ * Angelo, 13/10/2026: show « 30% off first month » anyway (he knows the code still gives it).
  *
  * Cards: Tradecopia share cards from Angelo's Lucid group, wins and losses mixed (his choice),
  * newest first. Label retouched to « CODE JTNQ » with recode.py like the cards he posts.
@@ -68,6 +66,7 @@ export default function TradeCopier() {
               </svg>
             </a>
           </div>
+          <p className="code-note">30% off your first month</p>
         </section>
 
         <section className="days" aria-labelledby="days-title">
@@ -199,6 +198,10 @@ body:has(.jtnq-tc){ background: oklch(0.13 0.028 165); }
 }
 .jtnq-tc .code-v{
   font-family: var(--f-mono); font-weight: 500; font-size: 20px; letter-spacing: .12em; color: var(--c-accent);
+}
+.jtnq-tc .code-note{
+  margin: 16px 0 0; text-align: center;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--c-text-mute);
 }
 .jtnq-tc .cta{
   display: inline-flex; align-items: center; gap: 8px;
