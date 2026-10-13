@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-12",
+  "generatedAt": "2026-10-13",
   "firms": [
     {
       "id": "myfundedperps",
@@ -156,6 +156,147 @@
               "promoPrice": 577,
               "dllPrice": 495,
               "dllPromoPrice": 321
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "breakout",
+      "name": "Breakout",
+      "logo": null,
+      "url": "https://breakoutprop.com",
+      "lastChecked": "2026-10-13",
+      "markets": [
+        "Crypto",
+        "Indices",
+        "Commodities"
+      ],
+      "promo": {
+        "code": "JTNQ",
+        "discountPct": 5,
+        "endsAt": null,
+        "lastChecked": "2026-10-13"
+      },
+      "programs": [
+        {
+          "name": "Classic",
+          "steps": "1 step",
+          "split": "80%",
+          "profitTarget": "10%",
+          "maxDrawdown": "6%",
+          "ddType": "Static",
+          "dailyLoss": "3%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 45,
+              "promoPrice": null
+            },
+            {
+              "size": 10000,
+              "price": 85,
+              "promoPrice": null
+            },
+            {
+              "size": 25000,
+              "price": 215,
+              "promoPrice": null
+            },
+            {
+              "size": 50000,
+              "price": 400,
+              "promoPrice": null
+            },
+            {
+              "size": 100000,
+              "price": 800,
+              "promoPrice": null
+            }
+          ]
+        },
+        {
+          "name": "Pro",
+          "steps": "1 step",
+          "split": "80%",
+          "profitTarget": "12%",
+          "maxDrawdown": "5%",
+          "ddType": "Static",
+          "dailyLoss": "3%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 33,
+              "promoPrice": null
+            },
+            {
+              "size": 10000,
+              "price": 65,
+              "promoPrice": null
+            },
+            {
+              "size": 25000,
+              "price": 150,
+              "promoPrice": null
+            },
+            {
+              "size": 50000,
+              "price": 280,
+              "promoPrice": null
+            },
+            {
+              "size": 100000,
+              "price": 545,
+              "promoPrice": null
+            },
+            {
+              "size": 200000,
+              "price": 1090,
+              "promoPrice": null
+            }
+          ]
+        },
+        {
+          "name": "Turbo",
+          "steps": "1 step",
+          "split": "80%",
+          "profitTarget": "9%",
+          "maxDrawdown": "3%",
+          "ddType": "Static",
+          "dailyLoss": "3%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 20,
+              "promoPrice": null
+            },
+            {
+              "size": 10000,
+              "price": 40,
+              "promoPrice": null
+            },
+            {
+              "size": 25000,
+              "price": 95,
+              "promoPrice": null
+            },
+            {
+              "size": 50000,
+              "price": 180,
+              "promoPrice": null
+            },
+            {
+              "size": 100000,
+              "price": 330,
+              "promoPrice": null
+            },
+            {
+              "size": 200000,
+              "price": 660,
+              "promoPrice": null
             }
           ]
         }

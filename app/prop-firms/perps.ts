@@ -53,8 +53,10 @@ type PerpsFirm = {
 const DATA = rawData as unknown as { generatedAt: string; firms: PerpsFirm[] };
 const BUILD_TS = Number(process.env.NEXT_PUBLIC_BUILD_TS ?? 0);
 
-// One promo on the page: the first firm that has one (MyFundedPerps today).
-const PROMO_FIRM = DATA.firms.find((f) => f.promo) ?? null;
+// Several firms can run a JTNQ promo at once (MyFundedPerps, Breakout since 13/10/2026). Only a
+// promo with an end date needs the clock below; the page tracks the first such firm, or else the
+// first firm with any promo. A promo without endsAt is always on (see promoOf).
+const PROMO_FIRM = DATA.firms.find((f) => f.promo?.endsAt) ?? DATA.firms.find((f) => f.promo) ?? null;
 export const PERPS_PROMO = PROMO_FIRM?.promo ?? null;
 export const PERPS_PROMO_FIRM_ID = PROMO_FIRM?.id ?? null;
 export const PROMO_ENDS_MS = PERPS_PROMO?.endsAt ? Date.parse(PERPS_PROMO.endsAt) : null;
@@ -78,13 +80,35 @@ export function usePromoLive(): boolean {
   return live;
 }
 
-// Split and leverage per program, from the firm's checkout and docs (12/10/2026); the
-// payout rules live in FUNDED below.
-const DETAILS: Record<string, { split: string; leverage: string }> = {
-  Select: { split: '80% (90% option)', leverage: 'Standard' },
-  Prime: { split: '80% (90% option)', leverage: 'Standard' },
-  Signature: { split: '80% (90% option)', leverage: 'Standard' },
-  Elite: { split: '80% (90% option)', leverage: 'Boosted (40x indices)' },
+// The promo a firm shows right now: one without endsAt always; a timed one while the page's
+// clock says it runs (PROMO_FIRM), or, for another timed firm, while the build predates its end.
+function promoOf(firm: PerpsFirm, promoLive: boolean): PerpsFirm['promo'] {
+  const p = firm.promo;
+  if (!p) return null;
+  if (p.endsAt == null) return p;
+  if (firm.id === PERPS_PROMO_FIRM_ID) return promoLive ? p : null;
+  return BUILD_TS < Date.parse(p.endsAt) ? p : null;
+}
+
+// Split and leverage per program, by firm, from the firm's checkout and docs; the payout rules
+// live in FUNDED below.
+const DETAILS: Record<string, Record<string, { split: string; leverage: string }>> = {
+  // MyFundedPerps checkout and docs, 12/10/2026.
+  myfundedperps: {
+    Select: { split: '80% (90% option)', leverage: 'Standard' },
+    Prime: { split: '80% (90% option)', leverage: 'Standard' },
+    Signature: { split: '80% (90% option)', leverage: 'Standard' },
+    Elite: { split: '80% (90% option)', leverage: 'Boosted (40x indices)' },
+  },
+  // breakoutprop.com/pricing/, read 13/10/2026: every card « ONE-TIME, 80/20 SPLIT », « Upgrade to
+  // 90/10 split » and « Max leverage 10x »; « 80/20 is the standard on every plan. Upgrade to 90/10
+  // at checkout »; « Up to 10x leverage depending on the asset ». The portal checkout
+  // (portal.breakoutprop.com/checkout) shows nothing without an account.
+  breakout: {
+    Classic: { split: '80% (90% option)', leverage: 'Up to 10x' },
+    Pro: { split: '80% (90% option)', leverage: 'Up to 10x' },
+    Turbo: { split: '80% (90% option)', leverage: 'Up to 10x' },
+  },
 };
 
 // Rules MyFundedPerps applies to every program, from the same table.
@@ -97,6 +121,19 @@ const COMMON: Record<string, string[]> = {
     'No minimum trading days',
     'No time limit',
     'Up to $300K funded in total',
+  ],
+  // Breakout, read 13/10/2026. No "1-step evaluation" either: Breakout sells no straight-to-funded
+  // account (intercom.help/breakoutprop « What types of Breakout Evaluations can I purchase? »: three
+  // 1-Step variants, Classic, Pro, Turbo). Sources: breakoutprop.com/pricing/ (« 6% static »,
+  // « What is static drawdown? », « No min trading days », « No time limits », « You can hold up to
+  // $200K in total funded capital across all accounts combined »); breakoutprop.com FAQ (« There is
+  // no consistency rule on any Breakout account »).
+  breakout: [
+    'Static drawdown',
+    'No consistency rule',
+    'No minimum trading days',
+    'No time limit',
+    'Up to $200K funded in total',
   ],
 };
 
@@ -116,7 +153,26 @@ const MFP_STD: Funded = {
   ],
   rows: [],
 };
+// Breakout funded rules, read 13/10/2026, the same for Classic, Pro and Turbo:
+// - Winning days: breakoutprop.com « Your first payout can come the same day you're funded »;
+//   intercom « When can I request a payout from my funded account? » lists the only conditions
+//   (« at any time, on weekdays or weekends, as long as you have no open positions and haven't
+//   breached your account »).
+// - Consistency: breakoutprop.com FAQ « There is no consistency rule on any Breakout account ».
+// - Minimum payout: intercom « What is the minimum payout amount? »: « $50, after Breakout's
+//   performance-split percentage is applied ».
+// Not shown, not written by the firm: a lifetime payout cap, what a payout does to the drawdown.
+const BREAKOUT_FUNDED: Funded = {
+  pills: [
+    { label: 'Winning days', value: 'None' },
+    { label: 'Consistency', value: 'None' },
+    { label: 'Payout request', value: 'Any time, with no open position' },
+    { label: 'Minimum payout', value: '$50 after the split' },
+  ],
+  rows: [],
+};
 const FUNDED: Record<string, Record<string, Funded>> = {
+  breakout: { Classic: BREAKOUT_FUNDED, Pro: BREAKOUT_FUNDED, Turbo: BREAKOUT_FUNDED },
   myfundedperps: {
     Select: MFP_STD,
     Prime: MFP_STD,
@@ -138,14 +194,23 @@ const FUNDED: Record<string, Record<string, Funded>> = {
 
 const SUMMARY: Record<string, string> = {
   myfundedperps: '80–90% split',
+  // breakoutprop.com, 13/10/2026: « Keep 80-90% of the profits ».
+  breakout: '80–90% split',
+};
+
+// How the limits are measured. Breakout, intercom 13/10/2026: max drawdown « 6% [5%, 3%] of your
+// initial account balance »; daily loss « 3% of your […] account balance at 00:30 UTC,
+// recalculated every day at that time ».
+const LEGEND: Record<string, string> = {
+  breakout: 'Max drawdown is a percentage of your starting balance; the daily loss limit is a percentage of your balance at 00:30 UTC, reset every day',
 };
 
 const text = (v: string | undefined): Cell => (v ? { text: v } : { text: 'n/c', muted: true });
 
 function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
   const programs = firm.programs;
-  const promo = promoLive ? firm.promo : null;
-  const d = (p: PerpsProgram) => DETAILS[p.name.split(' ')[0]];
+  const promo = promoOf(firm, promoLive);
+  const d = (p: PerpsProgram) => DETAILS[firm.id]?.[p.name.split(' ')[0]];
 
   const { common, rules } = splitCommon([
     // No target is a rule (instant funding), as the old block showed it: "None", not "n/c".
@@ -189,6 +254,7 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     }),
   }));
 
+  const hasPromoPrices = programs.some((p) => p.plans.some((pl) => pl.promoPrice != null));
   const endsLabel = promo?.endsAt
     ? new Date(promo.endsAt).toLocaleString('en-US', {
         month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York',
@@ -206,14 +272,17 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     columns: programs.map((p) => ({ name: p.name })),
     common: [...firmCommon, ...common.filter(Boolean)],
     rules,
-    priceTitle: promo ? `Price with code ${promo.code}` : 'Price',
+    // Prices with the code are shown only where they were read on the firm's checkout (promoPrice);
+    // never computed from the rate. Without them the table keeps the normal prices and only names
+    // the rate (Breakout, Angelo 13/10/2026: « 5% off with code JTNQ »).
+    priceTitle: promo && hasPromoPrices ? `Price with code ${promo.code}` : 'Price',
     priceSub: promo
-      ? `${promo.discountPct}% off${promo.firstPurchase ? ' your first purchase' : ''}${promo.thenPct ? `\n${promo.thenPct}% off every purchase after` : ''}${endsLabel ? ` until ${endsLabel} New York time` : ''}`
+      ? `${promo.discountPct}% off${promo.firstPurchase ? ' your first purchase' : ''}${hasPromoPrices ? '' : ` with code ${promo.code}`}${promo.thenPct ? `\n${promo.thenPct}% off every purchase after` : ''}${endsLabel ? ` until ${endsLabel} New York time` : ''}`
       : null,
     sizes: sizeRows,
     funded: FUNDED[firm.id] ? programs.map((p) => FUNDED[firm.id][p.name.split(' ')[0]] ?? null) : undefined,
     legend: [
-      'Every limit is a percentage of your starting balance, the way perps firms publish them',
+      LEGEND[firm.id] ?? 'Every limit is a percentage of your starting balance, the way perps firms publish them',
       ...(rules.some((r) => r.cells.some((c) => c.text === 'n/c')) ? ['n/c — the firm does not publish that rule per program'] : []),
     ],
     href: goHref('prop-firms', firm.id),
