@@ -14,7 +14,7 @@ import perpsData from '@/public/data/perps-firms.json';
  * and from /promos/ are two different questions.
  */
 export type GoLink = {
-  source: 'prop-firms' | 'promos';
+  source: 'prop-firms' | 'promos' | 'trade-copier';
   firmId: string;
   firmName: string;
   url: string;
@@ -51,8 +51,14 @@ const fromPerps: GoLink[] = perpsData.firms.map((f) => ({
   url: f.url,
 }));
 
+// The trade copier Angelo uses, linked from /trade-copier/. No Tradecopia affiliate link
+// is known yet (13/10/2026), so it points at the plain site and the page shows code JTNQ.
+const fromTradeCopier: GoLink[] = [
+  { source: 'trade-copier', firmId: 'tradecopia', firmName: 'Tradecopia', url: 'https://tradecopia.com' },
+];
+
 const byKey = new Map<string, GoLink>();
-for (const link of [...fromFirms, ...fromCfd, ...fromPerps, ...fromPromos]) byKey.set(`${link.source}/${link.firmId}`, link);
+for (const link of [...fromFirms, ...fromCfd, ...fromPerps, ...fromPromos, ...fromTradeCopier]) byKey.set(`${link.source}/${link.firmId}`, link);
 
 export const GO_LINKS: GoLink[] = [...byKey.values()];
 
