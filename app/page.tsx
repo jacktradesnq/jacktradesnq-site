@@ -35,7 +35,7 @@ const SITE = {
   // current = the figure Angelo shows on his videos; null until he gives it.
   challenge: {
     month: 'October 2026',
-    current: null as number | null,
+    current: 0 as number | null,
     goal: 10000,
     text: [
       "Right now, I'm doing a challenge where I document my way to making $10K a month with day trading.",
