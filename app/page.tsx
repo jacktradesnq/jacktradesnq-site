@@ -39,7 +39,7 @@ const SITE = {
     goal: 10000,
     text: [
       "Right now, I'm doing a challenge where I document my way to making $10K a month with day trading.",
-      "I chose $10K a month because five figures is a good milestone in my opinion. That's the point where I think, okay, this guy is making money.",
+      "I chose $10K a month because five figures is a good milestone in my opinion.",
     ],
   },
   tradeCopier: { name: 'Trade copier', url: '/trade-copier/', tagline: 'Tradecopia · my real days · code JTNQ' },
