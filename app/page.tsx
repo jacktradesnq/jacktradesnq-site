@@ -356,7 +356,7 @@ export default function Home() {
         </section>
 
         <section className="payouts" aria-label="Payout certificates">
-          <span className="eyebrow">Payouts</span>
+          <span className="eyebrow">Payouts · before the challenge (June – August 2026)</span>
           <div className="payouts-grid">
             {SITE.payouts.map((p) => (
               <img key={p.file} src={p.file} width={900} height={645} loading="lazy" alt={`Lucid Trading payout certificate, ${p.date}: ${p.amount}`} />
