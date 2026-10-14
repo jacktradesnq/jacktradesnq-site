@@ -23,6 +23,14 @@ const SITE = {
       'I started day trading four years ago. I trade the New York AM session with ICT.',
     ],
   },
+  // Lucid payout certificates, downloaded from his dashboard (Certificates) on 14/10/2026.
+  // All before the $10K challenge started (16/09/2026), so they sit with the bio, not the counter.
+  payouts: [
+    { file: '/payouts/lucid-2026-08-21-689.webp', date: 'August 21, 2026', amount: '$689' },
+    { file: '/payouts/lucid-2026-08-12-994.webp', date: 'August 12, 2026', amount: '$994' },
+    { file: '/payouts/lucid-2026-06-18-532.webp', date: 'June 18, 2026', amount: '$532' },
+    { file: '/payouts/lucid-2026-06-17-568.webp', date: 'June 17, 2026', amount: '$568' },
+  ],
   // $10K a month challenge (series started 16/09/2026): payouts received this month, reset to 0 if missed.
   // current = the figure Angelo shows on his videos; null until he gives it.
   challenge: {
@@ -347,6 +355,15 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="payouts" aria-label="Payout certificates">
+          <span className="eyebrow">Payouts</span>
+          <div className="payouts-grid">
+            {SITE.payouts.map((p) => (
+              <img key={p.file} src={p.file} width={900} height={645} loading="lazy" alt={`Lucid Trading payout certificate, ${p.date}: ${p.amount}`} />
+            ))}
+          </div>
+        </section>
+
         <section className="challenge" aria-labelledby="challenge-title">
           <div className="challenge-head">
             <span className="eyebrow">The challenge · {SITE.challenge.month}</span>
@@ -647,6 +664,17 @@ const CSS = `
   margin: 0 0 24px; font-size: clamp(17px, 1.5vw, 21px); line-height: 1.6; color: var(--c-text-soft); max-width: 52ch;
 }
 .jtnq-home .about-body p:first-child{ color: var(--c-text); }
+.jtnq-home .payouts{
+  max-width: var(--maxw); margin: 0 auto; padding: clamp(48px, 6vw, 96px) var(--pad-x) 0;
+}
+.jtnq-home .payouts-grid{
+  margin-top: 24px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 1.6vw, 24px);
+}
+@media (max-width: 980px){ .jtnq-home .payouts-grid{ grid-template-columns: 1fr 1fr; } }
+.jtnq-home .payouts-grid img{
+  display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--c-line);
+  box-shadow: 0 1px 2px oklch(0.05 0.02 165 / .4), 0 16px 40px -16px oklch(0.05 0.02 165 / .6);
+}
 .jtnq-home .challenge-count{
   margin: 24px 0 0; font-family: var(--f-mono); font-weight: 500;
   font-size: clamp(40px, 5vw, 72px); letter-spacing: -0.02em; line-height: 1; color: var(--c-text);
