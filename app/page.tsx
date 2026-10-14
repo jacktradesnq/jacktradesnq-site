@@ -15,6 +15,25 @@ const SITE = {
   ],
   nefarious: { name: 'Nefarious', url: '/nefarious/', tagline: 'Official partner · free Discord community' },
   propFirms: { name: 'Prop firms', url: '/prop-firms/', tagline: 'Futures, perps & CFD partners · code JTNQ' },
+  // Bio: Angelo's own sentences (dictated 13-14/10/2026), English corrected only.
+  bio: {
+    hello: "Hi, I'm Jack",
+    paragraphs: [
+      "I'm a futures trader from France, I trade NQ on prop firm accounts, and I'm a profitable day trader.",
+      'I started day trading four years ago. I trade the New York AM session with ICT.',
+    ],
+  },
+  // $10K a month challenge (series started 16/09/2026): payouts received this month, reset to 0 if missed.
+  // current = the figure Angelo shows on his videos; null until he gives it.
+  challenge: {
+    month: 'October 2026',
+    current: null as number | null,
+    goal: 10000,
+    text: [
+      "Right now, I'm doing a challenge where I document my way to making $10K a month with day trading.",
+      "I chose $10K a month because five figures is a good milestone in my opinion. That's the point where I think, okay, this guy is making money.",
+    ],
+  },
   tradeCopier: { name: 'Trade copier', url: '/trade-copier/', tagline: 'Tradecopia · my real days · code JTNQ' },
   legal: {
     copyright: '© 2026 JackTradesNQ. All rights reserved.',
@@ -313,6 +332,41 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="about" aria-labelledby="about-title">
+          <div className="about-head">
+            <span className="eyebrow">About</span>
+            <h2 className="about-title" id="about-title">
+              {SITE.bio.hello}
+              <span className="swash">.</span>
+            </h2>
+          </div>
+          <div className="about-body">
+            {SITE.bio.paragraphs.map((t) => (
+              <p key={t}>{t}</p>
+            ))}
+          </div>
+        </section>
+
+        <section className="challenge" aria-labelledby="challenge-title">
+          <div className="challenge-head">
+            <span className="eyebrow">The challenge · {SITE.challenge.month}</span>
+            <h2 className="challenge-count" id="challenge-title">
+              <span className="cur">{SITE.challenge.current == null ? '$—' : `$${SITE.challenge.current.toLocaleString('en-US')}`}</span>
+              <span className="sep"> / </span>
+              <span className="goal">${(SITE.challenge.goal / 1000).toFixed(0)}K</span>
+            </h2>
+            <div className="challenge-bar" aria-hidden="true">
+              <span style={{ width: `${Math.min(100, ((SITE.challenge.current ?? 0) / SITE.challenge.goal) * 100)}%` }} />
+            </div>
+            <span className="challenge-label">Payouts received this month</span>
+          </div>
+          <div className="about-body">
+            {SITE.challenge.text.map((t) => (
+              <p key={t}>{t}</p>
+            ))}
+          </div>
+        </section>
+
         <section id="hub" className="hub">
           <div className="hub-grid">
             <a className="hub-card" href={SITE.nefarious.url}>
@@ -569,6 +623,43 @@ const CSS = `
     -webkit-mask-image: radial-gradient(ellipse 58% 30% at 50% 50%, transparent 0%, transparent 24%, rgba(0,0,0,.55) 52%, #000 74%);
     mask-image: radial-gradient(ellipse 58% 30% at 50% 50%, transparent 0%, transparent 24%, rgba(0,0,0,.55) 52%, #000 74%);
   }
+}
+
+.jtnq-home .about, .jtnq-home .challenge{
+  max-width: var(--maxw); margin: 0 auto;
+  padding: clamp(64px, 9vw, 128px) var(--pad-x) 0;
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(32px, 6vw, 96px); align-items: start;
+}
+@media (max-width: 860px){ .jtnq-home .about, .jtnq-home .challenge{ grid-template-columns: 1fr; gap: 24px; } }
+.jtnq-home .eyebrow{
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--c-accent);
+}
+.jtnq-home .eyebrow::before{ content: ""; width: 28px; height: 1px; background: var(--c-accent); }
+.jtnq-home .about-title{
+  font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-size: clamp(44px, 5.6vw, 88px); line-height: .95; letter-spacing: -0.03em;
+  margin: 24px 0 0; color: var(--c-text);
+}
+.jtnq-home .about-title .swash{ color: var(--c-accent); }
+.jtnq-home .about-body{ padding-top: clamp(0px, 3vw, 48px); }
+.jtnq-home .about-body p{
+  margin: 0 0 24px; font-size: clamp(17px, 1.5vw, 21px); line-height: 1.6; color: var(--c-text-soft); max-width: 52ch;
+}
+.jtnq-home .about-body p:first-child{ color: var(--c-text); }
+.jtnq-home .challenge-count{
+  margin: 24px 0 0; font-family: var(--f-mono); font-weight: 500;
+  font-size: clamp(40px, 5vw, 72px); letter-spacing: -0.02em; line-height: 1; color: var(--c-text);
+}
+.jtnq-home .challenge-count .cur{ color: var(--c-accent); }
+.jtnq-home .challenge-count .sep, .jtnq-home .challenge-count .goal{ color: var(--c-text-mute); }
+.jtnq-home .challenge-bar{
+  margin-top: 24px; height: 4px; border-radius: 999px; background: var(--c-line); overflow: hidden; max-width: 420px;
+}
+.jtnq-home .challenge-bar span{ display: block; height: 100%; background: var(--c-accent); border-radius: 999px; }
+.jtnq-home .challenge-label{
+  display: block; margin-top: 12px;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--c-text-mute);
 }
 
 .jtnq-home .hub{
