@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-18",
+  "generatedAt": "2026-10-19",
   "firms": [
     {
       "id": "traders-launch",
@@ -9,7 +9,7 @@
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
       "lastChecked": "2026-10-18",
-      "stale": false,
+      "stale": true,
       "programs": [
         {
           "name": "1-Step",
