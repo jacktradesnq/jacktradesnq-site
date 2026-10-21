@@ -28,6 +28,8 @@
 
 import fs from 'node:fs';
 
+import { fetchE8Panels, parseE8Panel, plansFromPanels } from './lib/firms/e8.mjs';
+
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
@@ -162,40 +164,27 @@ async function extractTradersLaunch() {
   return out;
 }
 
-/* ---- E8 Markets — playwright (Configure Challenge widget) ---- */
-const E8_TABS = {
-  'E8 Signature': 'E8 Signature Futures',
-  'E8 Zero MAX': 'E8 Zero MAX Futures',
-  'E8 Zero Starter': 'E8 Zero Starter Futures',
-};
+/* ---- E8 Markets — playwright (configurateur « Configure Your Account ») ---- */
 /**
- * One "Configure Challenge" card, as innerText, into the rules it states.
- * A row the card does not carry is left unemitted (manual), never guessed:
- * their Signature cards stopped listing the contract limit in August 2026, and
- * the word "contract" no longer appears anywhere on that page. Demanding it
- * reported four broken fields a day on a firm whose card had simply changed.
+ * One configurator detail panel, as innerText, into the rules it states — read
+ * by scripts/lib/firms/e8.mjs, from the CHALLENGE RULES section only.
+ * A row the panel does not carry is left unemitted (manual), never guessed:
+ * their Signature cards stopped listing the contract limit in August 2026.
  * If the row comes back, it is read again — presence decides, not this comment.
+ * A row that is there but unreadable is BROKEN.
  */
-export function e8CardRules(programName, text) {
-  const sizeM = /\$(\d+)K/i.exec(text);
-  if (!sizeM) return null;
-  const after = (re) => {
-    const m = text.match(re);
-    return m ? m[1] : undefined;
-  };
-  const pt = after(/Profit Target\s*\n\s*\$([\d,]+)/i);
-  const dd = after(/Max drawdown\s*\n\s*\$([\d,]+)/i);
-  const cons = after(/Consistency rule\s*\n\s*(\d+%)/i);
-  const ct = after(/Max contracts\s*\n\s*(\d+)/i);
+export function e8CardRules(text) {
+  const p = parseE8Panel(text);
   const rules = {
-    profitTarget: pt != null ? money(pt) : BROKEN,
-    maxDrawdown: dd != null ? money(dd) : BROKEN,
-    consistency: cons != null ? consistency(cons) : null, // Signature shows none => None
-    // dailyLoss never shown on E8 cards => not emitted (manual, JSON null).
+    profitTarget: p.rules.profitTarget ?? BROKEN,
+    maxDrawdown: p.rules.maxDrawdown ?? BROKEN,
+    // Signature: no consistency in CHALLENGE RULES => None. Its 35% sits in
+    // PERFORMANCE RULES (funded account), which the JSON does not carry.
+    consistency: 'consistencyUnreadable' in p.rules ? BROKEN : consistency(p.rules.consistency),
+    // dailyLoss never shown in CHALLENGE RULES => not emitted (manual, JSON null).
   };
-  if (/max contracts/i.test(text))
-    rules.contracts = ct != null ? { minis: parseInt(ct, 10), micros: null } : BROKEN;
-  return { programName, size: parseInt(sizeM[1], 10) * 1000, rules };
+  if ('contracts' in p.rules) rules.contracts = p.rules.contracts ?? BROKEN;
+  return { programName: p.programName, size: p.size, rules };
 }
 async function extractE8() {
   let pw;
@@ -204,54 +193,10 @@ async function extractE8() {
   } catch {
     throw new Error('playwright not installed');
   }
-  const browser = await pw.chromium.launch({ headless: true });
-  try {
-    const page = await browser.newPage({ userAgent: UA });
-    await page.setViewportSize({ width: 1280, height: 1000 });
-    await page.goto('https://e8futures.com', { waitUntil: 'load', timeout: 60000 });
-    await page.waitForTimeout(3000);
-    const cfg = page.getByText('Configure Challenge', { exact: true }).first();
-    await cfg.scrollIntoViewIfNeeded();
-    await cfg.click();
-    await page.waitForTimeout(2000);
-
-    const readCards = () =>
-      page.evaluate(() => {
-        const all = Array.from(document.querySelectorAll('p, span, div, h1, h2, h3, h4'));
-        const labels = all.filter(
-          (el) => el.children.length === 0 && el.textContent.trim().toLowerCase() === 'account size',
-        );
-        const cards = [];
-        for (const label of labels) {
-          let node = label;
-          let container = null;
-          for (let i = 0; i < 10 && node.parentElement; i++) {
-            node = node.parentElement;
-            const t = node.textContent.toLowerCase();
-            if (t.includes('challenge rules') && t.includes('get started')) {
-              container = node;
-              break;
-            }
-          }
-          if (container) cards.push(container.innerText);
-        }
-        return cards;
-      });
-
-    const out = [];
-    for (const [tabText, programName] of Object.entries(E8_TABS)) {
-      await page.locator('button', { hasText: tabText }).first().click({ timeout: 15000 });
-      await page.waitForTimeout(1500);
-      const cards = await readCards();
-      for (const text of cards) {
-        const card = e8CardRules(programName, text);
-        if (card) out.push(card);
-      }
-    }
-    return out;
-  } finally {
-    await browser.close();
-  }
+  const launch = process.env.PLAYWRIGHT_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHANNEL } : {};
+  const panels = await fetchE8Panels(pw, launch);
+  plansFromPanels(panels); // throws if a panel does not show the tile that was clicked
+  return panels.map(({ text }) => e8CardRules(text));
 }
 
 const EXTRACTORS = {
