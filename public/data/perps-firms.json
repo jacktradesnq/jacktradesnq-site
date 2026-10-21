@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-13",
+  "generatedAt": "2026-10-21",
   "firms": [
     {
       "id": "myfundedperps",
@@ -133,29 +133,29 @@
               "size": 5000,
               "price": 89,
               "promoPrice": 57,
-              "dllPrice": 49,
-              "dllPromoPrice": 31
+              "altPrice": 49,
+              "altPromoPrice": 31
             },
             {
               "size": 10000,
               "price": 175,
               "promoPrice": 113,
-              "dllPrice": 95,
-              "dllPromoPrice": 61
+              "altPrice": 95,
+              "altPromoPrice": 61
             },
             {
               "size": 25000,
               "price": 449,
               "promoPrice": 291,
-              "dllPrice": 249,
-              "dllPromoPrice": 161
+              "altPrice": 249,
+              "altPromoPrice": 161
             },
             {
               "size": 50000,
               "price": 889,
               "promoPrice": 577,
-              "dllPrice": 495,
-              "dllPromoPrice": 321
+              "altPrice": 495,
+              "altPromoPrice": 321
             }
           ]
         }
@@ -297,6 +297,435 @@
               "size": 200000,
               "price": 660,
               "promoPrice": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vest-markets",
+      "name": "Vest Markets",
+      "logo": "/logos/vest-markets.svg",
+      "url": "https://next.vestmarkets.com/r/jtnq",
+      "lastChecked": "2026-10-21",
+      "markets": [
+        "Crypto",
+        "Indices",
+        "Stocks",
+        "Commodities",
+        "Forex"
+      ],
+      "promo": {
+        "code": "JTNQ",
+        "discountPct": 5,
+        "endsAt": null,
+        "lastChecked": "2026-10-21"
+      },
+      "programs": [
+        {
+          "name": "1-Step · 10% · 3% DLL",
+          "steps": "1 step",
+          "split": "80% / 90%",
+          "profitTarget": "10%",
+          "maxDrawdown": "6%",
+          "ddType": "Static",
+          "dailyLoss": "3%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 40,
+              "promoPrice": 38,
+              "altPrice": 48,
+              "altPromoPrice": 45.6,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$300"
+                }
+              ]
+            },
+            {
+              "size": 10000,
+              "price": 80,
+              "promoPrice": 76,
+              "altPrice": 96,
+              "altPromoPrice": 91.2,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$600"
+                }
+              ]
+            },
+            {
+              "size": 25000,
+              "price": 210,
+              "promoPrice": 199.5,
+              "altPrice": 252,
+              "altPromoPrice": 239.4,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1-Step · 10% · 4% DLL",
+          "steps": "1 step",
+          "split": "80% / 90%",
+          "profitTarget": "10%",
+          "maxDrawdown": "6%",
+          "ddType": "Static",
+          "dailyLoss": "4%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 60,
+              "promoPrice": 57,
+              "altPrice": 72,
+              "altPromoPrice": 68.4,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$300"
+                }
+              ]
+            },
+            {
+              "size": 10000,
+              "price": 110,
+              "promoPrice": 104.5,
+              "altPrice": 132,
+              "altPromoPrice": 125.4,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$600"
+                }
+              ]
+            },
+            {
+              "size": 25000,
+              "price": 280,
+              "promoPrice": 266,
+              "altPrice": 330,
+              "altPromoPrice": 313.5,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1-Step · 10% · No DLL",
+          "steps": "1 step",
+          "split": "80% / 90%",
+          "profitTarget": "10%",
+          "maxDrawdown": "6%",
+          "ddType": "Static",
+          "dailyLoss": "None",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 75,
+              "promoPrice": 71.25,
+              "altPrice": 90,
+              "altPromoPrice": 85.5,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$300"
+                }
+              ]
+            },
+            {
+              "size": 10000,
+              "price": 150,
+              "promoPrice": 142.5,
+              "altPrice": 180,
+              "altPromoPrice": 171,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$600"
+                }
+              ]
+            },
+            {
+              "size": 25000,
+              "price": 375,
+              "promoPrice": 356.25,
+              "altPrice": 450,
+              "altPromoPrice": 427.5,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1-Step · 20% · 3% DLL",
+          "steps": "1 step",
+          "split": "80% / 90%",
+          "profitTarget": "20%",
+          "maxDrawdown": "6%",
+          "ddType": "Static",
+          "dailyLoss": "3%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 25,
+              "promoPrice": 23.75,
+              "altPrice": 30,
+              "altPromoPrice": 28.5,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$300"
+                }
+              ]
+            },
+            {
+              "size": 10000,
+              "price": 50,
+              "promoPrice": 47.5,
+              "altPrice": 60,
+              "altPromoPrice": 57,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$600"
+                }
+              ]
+            },
+            {
+              "size": 25000,
+              "price": 130,
+              "promoPrice": 123.5,
+              "altPrice": 156,
+              "altPromoPrice": 148.2,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1-Step · 20% · 4% DLL",
+          "steps": "1 step",
+          "split": "80% / 90%",
+          "profitTarget": "20%",
+          "maxDrawdown": "6%",
+          "ddType": "Static",
+          "dailyLoss": "4%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 33,
+              "promoPrice": 31.35,
+              "altPrice": 40,
+              "altPromoPrice": 38,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$300"
+                }
+              ]
+            },
+            {
+              "size": 10000,
+              "price": 65,
+              "promoPrice": 61.75,
+              "altPrice": 78,
+              "altPromoPrice": 74.1,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$600"
+                }
+              ]
+            },
+            {
+              "size": 25000,
+              "price": 170,
+              "promoPrice": 161.5,
+              "altPrice": 204,
+              "altPromoPrice": 193.8,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "1-Step · 20% · No DLL",
+          "steps": "1 step",
+          "split": "80% / 90%",
+          "profitTarget": "20%",
+          "maxDrawdown": "6%",
+          "ddType": "Static",
+          "dailyLoss": "None",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 50,
+              "promoPrice": 47.5,
+              "altPrice": 60,
+              "altPromoPrice": 57,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$300"
+                }
+              ]
+            },
+            {
+              "size": 10000,
+              "price": 95,
+              "promoPrice": 90.25,
+              "altPrice": 114,
+              "altPromoPrice": 108.3,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$600"
+                }
+              ]
+            },
+            {
+              "size": 25000,
+              "price": 250,
+              "promoPrice": 237.5,
+              "altPrice": 300,
+              "altPromoPrice": 285,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "2-Step",
+          "steps": "2 steps",
+          "split": "80%",
+          "profitTarget": "10% → 5%",
+          "maxDrawdown": "6%",
+          "ddType": "Static",
+          "dailyLoss": "3%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 15,
+              "promoPrice": 14.25,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$300"
+                }
+              ]
+            },
+            {
+              "size": 10000,
+              "price": 35,
+              "promoPrice": 33.25,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$600"
+                }
+              ]
+            },
+            {
+              "size": 25000,
+              "price": 90,
+              "promoPrice": 85.5,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Instant",
+          "steps": "Instant",
+          "split": "95%",
+          "profitTarget": null,
+          "maxDrawdown": "2–4%",
+          "ddType": "Static",
+          "dailyLoss": "None",
+          "note": "",
+          "plans": [
+            {
+              "size": 500,
+              "price": 10,
+              "promoPrice": 9.5,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$10 (2%)"
+                }
+              ]
+            },
+            {
+              "size": 5000,
+              "price": 200,
+              "promoPrice": 190,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$200 (4%)"
+                }
+              ]
+            },
+            {
+              "size": 10000,
+              "price": 400,
+              "promoPrice": 380,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$400 (4%)"
+                }
+              ]
+            },
+            {
+              "size": 25000,
+              "price": 1000,
+              "promoPrice": 950,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,000 (4%)"
+                }
+              ]
             }
           ]
         }

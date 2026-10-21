@@ -15,14 +15,17 @@ import { goHref } from '@/lib/go-links';
 import { cheapest, limitCell, splitCommon, type Cell, type FirmView, type Funded, type PriceCell } from './firm-view';
 
 // price null = announced but not on sale yet ("Coming soon").
-// dllPrice: Elite's cheaper version with a 3% daily loss limit, shown in the same cell after a « / »
-// (Angelo, 12/10/2026 : « dans la même colonne et dans chaque truc t'as un / qui met les 2 prix »).
+// altPrice: a second version of the same account, shown in the same cell after a « / » (Angelo,
+// 12/10/2026 : « dans la même colonne et dans chaque truc t'as un / qui met les 2 prix »): MFP
+// Elite's cheaper 3% DLL version, Vest 1-Step's 90% split (the first price is the 80% split).
+// lines: rules that change with the size (Vest's max drawdown in dollars), a row under the price.
 type PerpsPlan = {
   size: number;
   price: number | null;
   promoPrice: number | null;
-  dllPrice?: number;
-  dllPromoPrice?: number;
+  altPrice?: number;
+  altPromoPrice?: number;
+  lines?: { label: string; value: string }[];
   note?: string;
 };
 type PerpsProgram = {
@@ -109,6 +112,14 @@ const DETAILS: Record<string, Record<string, { split: string; leverage: string }
     Pro: { split: '80% (90% option)', leverage: 'Up to 10x' },
     Turbo: { split: '80% (90% option)', leverage: 'Up to 10x' },
   },
+  // Vest, read 21/10/2026 on next.vestmarkets.com/vest-capital/evaluation (« Create Bespoke
+  // Account »: 1-Step « Profit Split 80% 90% », 2-Step « 80% », Instant « 95% profit split ») and
+  // docs.vestmarkets.com/vest-capital/overview (« Up to 75x leverage (market-dependent) »).
+  'vest-markets': {
+    '1-Step': { split: '80% / 90%', leverage: 'Up to 75x' },
+    '2-Step': { split: '80%', leverage: 'Up to 75x' },
+    Instant: { split: '95%', leverage: 'Up to 75x' },
+  },
 };
 
 // Rules MyFundedPerps applies to every program, from the same table.
@@ -134,6 +145,15 @@ const COMMON: Record<string, string[]> = {
     'No minimum trading days',
     'No time limit',
     'Up to $200K funded in total',
+  ],
+  // Vest, docs.vestmarkets.com/vest-capital, read 21/10/2026: loss-limits « A fixed floor, set once
+  // when your account is created. It never moves »; overview « No time limits » and « Maximum 10 Live
+  // Funded Accounts per user, across both paths combined ». The docs say nothing about a consistency
+  // rule or minimum trading days, so neither is claimed here.
+  'vest-markets': [
+    'Static drawdown',
+    'No time limit',
+    'Up to 10 live funded accounts',
   ],
 };
 
@@ -171,7 +191,23 @@ const BREAKOUT_FUNDED: Funded = {
   ],
   rows: [],
 };
+// Vest funded rules, docs.vestmarkets.com/vest-capital read 21/10/2026, the same whether the account
+// came from an evaluation or an Instant purchase (claiming-profit: « This flow works identically »):
+// - claiming-profit: « Claim as often as you like. There's no cap on frequency and no cap on the amount
+//   you can claim »; « 24 hours for every claim »; « the USDC is credited to your Primary Account ».
+// - loss-limits: « Whatever applies during the Evaluation Phase carries through unchanged once you're
+//   Live » (evaluation accounts only: Instant has no evaluation).
+const VEST_PAYOUT: Funded['pills'] = [
+  { label: 'Payout request', value: 'Any time, no cap' },
+  { label: 'Paid in', value: 'USDC, within 24 hours' },
+];
+const VEST_EVAL_FUNDED: Funded = {
+  pills: [...VEST_PAYOUT, { label: 'Loss limits', value: 'Same as in the evaluation' }],
+  rows: [],
+};
+const VEST_INSTANT_FUNDED: Funded = { pills: [{ label: 'Live', value: 'From purchase' }, ...VEST_PAYOUT], rows: [] };
 const FUNDED: Record<string, Record<string, Funded>> = {
+  'vest-markets': { '1-Step': VEST_EVAL_FUNDED, '2-Step': VEST_EVAL_FUNDED, Instant: VEST_INSTANT_FUNDED },
   breakout: { Classic: BREAKOUT_FUNDED, Pro: BREAKOUT_FUNDED, Turbo: BREAKOUT_FUNDED },
   myfundedperps: {
     Select: MFP_STD,
@@ -196,13 +232,22 @@ const SUMMARY: Record<string, string> = {
   myfundedperps: '80–90% split',
   // breakoutprop.com, 13/10/2026: « Keep 80-90% of the profits ».
   breakout: '80–90% split',
+  // docs.vestmarkets.com/vest-capital/overview, 21/10/2026: « keep 80–95% of your profits ».
+  'vest-markets': '80–95% split',
 };
 
 // How the limits are measured. Breakout, intercom 13/10/2026: max drawdown « 6% [5%, 3%] of your
 // initial account balance »; daily loss « 3% of your […] account balance at 00:30 UTC,
 // recalculated every day at that time ».
-const LEGEND: Record<string, string> = {
-  breakout: 'Max drawdown is a percentage of your starting balance; the daily loss limit is a percentage of your balance at 00:30 UTC, reset every day',
+// Vest, docs loss-limits 21/10/2026: the max drawdown is « Calculated as a percentage of your starting
+// capital »; the daily loss limit is « 3% or 4% of your reset balance », « The daily reset boundary is
+// 20:00 ET ».
+const LEGEND: Record<string, string[]> = {
+  breakout: ['Max drawdown is a percentage of your starting balance; the daily loss limit is a percentage of your balance at 00:30 UTC, reset every day'],
+  'vest-markets': [
+    'Max drawdown is a fixed floor, a percentage of your starting balance; the daily loss limit is a percentage of your balance at the 20:00 New York reset',
+    '1-Step: the first price is the 80% split, the second the 90% split',
+  ],
 };
 
 const text = (v: string | undefined): Cell => (v ? { text: v } : { text: 'n/c', muted: true });
@@ -241,15 +286,15 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
       if (!plan) return null;
       if (plan.price == null) return { kind: 'text', text: plan.note ?? 'Coming soon' };
       const promoPrice = promo ? plan.promoPrice : null;
-      const dllPromo = promo ? plan.dllPromoPrice ?? null : null;
+      const altPromo = promo ? plan.altPromoPrice ?? null : null;
       return {
         kind: 'price',
         now: promoPrice ?? plan.price,
         was: promoPrice != null ? plan.price : null,
-        alt: plan.dllPrice != null ? { now: dllPromo ?? plan.dllPrice, was: dllPromo != null ? plan.dllPrice : null } : null,
+        alt: plan.altPrice != null ? { now: altPromo ?? plan.altPrice, was: altPromo != null ? plan.altPrice : null } : null,
         per: null,
         from: false,
-        lines: [],
+        lines: (plan.lines ?? []).map((l) => ({ label: l.label, cell: { text: l.value } })),
       };
     }),
   }));
@@ -273,7 +318,9 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     common: [...firmCommon, ...common.filter(Boolean)],
     rules,
     // Prices with the code are shown only where they were read on the firm's checkout (promoPrice);
-    // never computed from the rate. Without them the table keeps the normal prices and only names
+    // never computed from the rate. Vest: every price with code JTNQ read 21/10/2026 in the purchase
+    // configurator of next.vestmarkets.com/vest-capital/evaluation, code typed in « Enter Discount
+    // Code » (« 5% Discount »). Without them the table keeps the normal prices and only names
     // the rate (Breakout, Angelo 13/10/2026: « 5% off with code JTNQ »).
     priceTitle: promo && hasPromoPrices ? `Price with code ${promo.code}` : 'Price',
     priceSub: promo
@@ -282,7 +329,7 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     sizes: sizeRows,
     funded: FUNDED[firm.id] ? programs.map((p) => FUNDED[firm.id][p.name.split(' ')[0]] ?? null) : undefined,
     legend: [
-      LEGEND[firm.id] ?? 'Every limit is a percentage of your starting balance, the way perps firms publish them',
+      ...(LEGEND[firm.id] ?? ['Every limit is a percentage of your starting balance, the way perps firms publish them']),
       ...(rules.some((r) => r.cells.some((c) => c.text === 'n/c')) ? ['n/c — the firm does not publish that rule per program'] : []),
     ],
     href: goHref('prop-firms', firm.id),
