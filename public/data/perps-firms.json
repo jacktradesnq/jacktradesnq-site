@@ -4,7 +4,7 @@
     {
       "id": "myfundedperps",
       "name": "MyFundedPerps",
-      "logo": null,
+      "logo": "/logos/myfundedperps.png",
       "url": "https://myfundedperpetuals.com/@JTNQ",
       "lastChecked": "2026-10-12",
       "markets": [
@@ -164,7 +164,7 @@
     {
       "id": "breakout",
       "name": "Breakout",
-      "logo": null,
+      "logo": "/logos/breakout.svg",
       "url": "https://breakoutprop.com",
       "lastChecked": "2026-10-13",
       "markets": [
