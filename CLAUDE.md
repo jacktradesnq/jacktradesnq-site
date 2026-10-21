@@ -123,6 +123,7 @@ Deploy : push sur `main` -> GitHub Actions -> Cloudflare Pages auto.
 
 ## Gotchas
 
+- /prop-firms reprend TOUT ce que la firme publie sur son propre site (plans, splits, prix, règles), sans demander à Angelo plan par plan (21/10/2026 : « tant que y a sur leur site faut que ca sois sur nôtre site aussi »). Une nouvelle firme affiliée qu'il mentionne s'ajoute à la page (Vest Markets, 21/10). Le code imprimé est JTNQ partout où il marche tapé au checkout, même si le lien porte déjà la remise (Traders Launch, 21/10).
 - `output: 'export'` : pas de server-side runtime, pas d'API routes dynamiques.
 - Section études (/studies, ex-/backtested-data, /print, PDF, data JSON, scripts de backtest) retirée le 12/10/2026 à la demande d'Angelo (« pas sur que ca sois un projet a mon image », puis « je veux bien » pour « Je les retire ») ; les anciennes URLs redirigent vers la home (public/_redirects). Tout reste dans l'historique git.
 - Fonts : ne plus importer via CDN Fontshare (bloque COEP). Self-hosted uniquement dans `public/fonts/`.
