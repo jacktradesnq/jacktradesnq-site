@@ -116,6 +116,15 @@ const DETAILS: Record<string, Record<string, { split: string; leverage: string }
     Pro: { split: '80% (90% option)', leverage: 'Up to 10x' },
     Turbo: { split: '80% (90% option)', leverage: 'Up to 10x' },
   },
+  // Vest 50K (perps-firms.json), added after Vest's tweet of 21/10/2026, read 22/10/2026:
+  // next.vestmarkets.com/vest-capital, Instant card « $50,000 Trading Capital », « Max. Drawdown
+  // $2,000 », « One-Time Payment $2,000 »; Evaluation card « EMERALD », « Max. Drawdown $3,000 »;
+  // www.vestmarkets.com « $50,000 … Max. Daily Loss 3% … Max. Drawdown $3,000 … Evaluation Goal
+  // 10% … Profit Split 80% … One-Time Payment $415 »; « Create Your Bespoke Account » at $50,000
+  // (tier « Emerald », « Max. Drawdown $3,000 (6%) »): 1-Step 10% 3%/4%/no DLL $415/$555/$745 at
+  // 80%, $498/$666/$894 at 90%; 1-Step 20% $255/$335/$495 at 80%, $306/$402/$594 at 90%; 2-Step
+  // « 10% → 5% » $175; Instant « $2,000 (4%) » $2,000. No 50K-specific rule published; the docs
+  // (docs.vestmarkets.com/vest-capital/account-tiers) still say « from $500 up to $25,000 ».
   // Vest, read 21/10/2026 on next.vestmarkets.com/vest-capital/evaluation (« Create Bespoke
   // Account »: 1-Step « Profit Split 80% 90% », 2-Step « 80% », Instant « 95% profit split ») and
   // docs.vestmarkets.com/vest-capital/overview (« Up to 75x leverage (market-dependent) »).
@@ -343,7 +352,11 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     // Prices with the code are shown only where they were read on the firm's checkout (promoPrice);
     // never computed from the rate. Vest: every price with code JTNQ read 21/10/2026 in the purchase
     // configurator of next.vestmarkets.com/vest-capital/evaluation, code typed in « Enter Discount
-    // Code » (« 5% Discount »). Without them the table keeps the normal prices and only names
+    // Code » (« 5% Discount »); each one is the price × 0.95 to the cent (43 out of 43). Exception,
+    // Vest 50K: its prices with the code are the price × 0.95, computed (Angelo, 22/10/2026: « non
+    // mais tant que c -5% c bon nan? »). Cross-check: the same 14 prices showed in that
+    // configurator, logged in, with JTNQ typed, on 22/10/2026 (1-Step 10% 3% DLL 80%: « $415 »
+    // then « $394.25 »). Without them the table keeps the normal prices and only names
     // the rate (Breakout, Angelo 13/10/2026: « 5% off with code JTNQ »).
     priceTitle: promo && hasPromoPrices ? `Price with code ${promo.code}` : 'Price',
     priceSub: promo

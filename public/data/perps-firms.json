@@ -307,7 +307,7 @@
       "name": "Vest Markets",
       "logo": "/logos/vest-markets.svg",
       "url": "https://next.vestmarkets.com/r/jtnq",
-      "lastChecked": "2026-10-21",
+      "lastChecked": "2026-10-22",
       "markets": [
         "Crypto",
         "Indices",
@@ -418,6 +418,35 @@
                   "altPromoPrice": 427.5
                 }
               ]
+            },
+            {
+              "size": 50000,
+              "price": 415,
+              "promoPrice": 394.25,
+              "altPrice": 498,
+              "altPromoPrice": 473.1,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$3,000"
+                }
+              ],
+              "more": [
+                {
+                  "label": "4% DLL",
+                  "price": 555,
+                  "promoPrice": 527.25,
+                  "altPrice": 666,
+                  "altPromoPrice": 632.7
+                },
+                {
+                  "label": "No DLL",
+                  "price": 745,
+                  "promoPrice": 707.75,
+                  "altPrice": 894,
+                  "altPromoPrice": 849.3
+                }
+              ]
             }
           ],
           "priceLabel": "3% DLL"
@@ -518,6 +547,35 @@
                   "altPromoPrice": 285
                 }
               ]
+            },
+            {
+              "size": 50000,
+              "price": 255,
+              "promoPrice": 242.25,
+              "altPrice": 306,
+              "altPromoPrice": 290.7,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$3,000"
+                }
+              ],
+              "more": [
+                {
+                  "label": "4% DLL",
+                  "price": 335,
+                  "promoPrice": 318.25,
+                  "altPrice": 402,
+                  "altPromoPrice": 381.9
+                },
+                {
+                  "label": "No DLL",
+                  "price": 495,
+                  "promoPrice": 470.25,
+                  "altPrice": 594,
+                  "altPromoPrice": 564.3
+                }
+              ]
             }
           ],
           "priceLabel": "3% DLL"
@@ -562,6 +620,17 @@
                 {
                   "label": "Max drawdown",
                   "value": "$1,500"
+                }
+              ]
+            },
+            {
+              "size": 50000,
+              "price": 175,
+              "promoPrice": 166.25,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$3,000"
                 }
               ]
             }
@@ -618,6 +687,17 @@
                 {
                   "label": "Max drawdown",
                   "value": "$1,000 (4%)"
+                }
+              ]
+            },
+            {
+              "size": 50000,
+              "price": 2000,
+              "promoPrice": 1900.0,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$2,000 (4%)"
                 }
               ]
             }
