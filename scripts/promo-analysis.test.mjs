@@ -161,13 +161,13 @@ test('a firm whose promo expires is flagged, the others are not', () => {
 });
 
 test('a firm priced by affiliate code shows the same price as the site', () => {
-  // Traders Launch has no struck price in the data, it has codeDiscountPct 15,
-  // and app/prop-firms/page.tsx renders $135.15 instead of $159 for the 100K.
+  // Traders Launch has no struck price in the data, it has codeDiscountPct 20,
+  // and app/prop-firms/page.tsx renders $127.20 instead of $159 for the 100K.
   const deal = pickDeal(DATA, { today: '2026-08-20', forceFirmId: 'traders-launch' });
   assert.equal(deal.headline.size, 100000);
-  assert.equal(deal.headline.price, 135.15);
+  assert.equal(deal.headline.price, 127.2);
   assert.equal(deal.headline.originalPrice, 159);
-  assert.equal(deal.headline.discountPct, 15);
+  assert.equal(deal.headline.discountPct, 20);
 });
 
 test('the logo of every firm exists on disk', () => {

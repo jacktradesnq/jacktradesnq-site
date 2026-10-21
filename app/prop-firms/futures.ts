@@ -107,7 +107,7 @@ const CODES: Record<string, string> = parseCodes(codesMd);
 const discountViaLink = (firmId: string) => CODES[firmId]?.toLowerCase() === 'link';
 
 // Price paid through Angelo's link/code. His permanent code discount (Traders Launch
-// -15%) only applies when the firm shows no public promo (originalPrice == null) —
+// -20% since 21/10/2026, was 15%) only applies when the firm shows no public promo (originalPrice == null) —
 // public promos already discount `price`. Same arithmetic as scripts/lib/promo-analysis.mjs.
 function effectivePrice(firm: Firm, plan: Plan): { now: number; was: number | null; viaCode: boolean } {
   if (firm.codeDiscountPct != null && plan.originalPrice == null) {
