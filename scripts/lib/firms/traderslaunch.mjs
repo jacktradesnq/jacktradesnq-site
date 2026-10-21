@@ -34,10 +34,9 @@
  * « tant que y a sur leur site faut que ca sois sur nôtre site aussi », « si y a
  * une option 90% pk tu mettrais pas a 90% ».
  *
- * La perte journaliere n'est publiee que la ou la page la tranche : la FAQ
- * Static (sous #pricing) ecrit « There is no separate daily loss limit », donc
- * les plans Static portent `dailyLoss: null` (la source dit « aucune »). Premium
- * et Legacy n'en disent rien : cle omise.
+ * Aucune perte journaliere, sur tous les programmes (`dailyLoss: null`) : la page
+ * traderslaunch.com/futures/rules n'en cite aucune, la FAQ Static ecrit « There
+ * is no separate daily loss limit » (21/10/2026, voir programFrom).
  *
  * L'onglet Early Access (des « drops » limites en quantite et en duree) devient
  * un programme « Early Access » des qu'un drop y est en vente ; sans drop, il
@@ -256,11 +255,12 @@ function programFrom(name, splits, faq, drop = false) {
     p.splitPrices = Object.fromEntries(keys.map((k) => [k, p.splitPrices[k]]));
   }
 
-  // « There is no separate daily loss limit » dans la FAQ de CET onglet (Static) :
-  // la source dit qu'il n'y en a pas.
-  if (faq?.title === name && /there is no separate daily loss limit/i.test(faq.text ?? '')) {
-    for (const p of plans) p.dailyLoss = null;
-  }
+  // Pas de perte journaliere chez Traders Launch, sur aucun compte : leur page de regles
+  // (traderslaunch.com/futures/rules, lue le 21/10/2026) liste toutes les regles de
+  // l'evaluation et du compte finance sans en citer, et la FAQ Static ecrit « There is
+  // no separate daily loss limit ». Angelo, 21/10/2026 : « si y a pas écrit de daily
+  // loss limit.. peut être que par ce que y en a pas ».
+  for (const p of plans) p.dailyLoss = null;
 
   return { name, type: 'eval', priceType: 'one-time', plans: plans.sort((a, b) => a.size - b.size) };
 }

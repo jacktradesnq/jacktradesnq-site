@@ -104,12 +104,12 @@ test('Traders Launch: the card rules, read as the drift check compares them', ()
     maxDrawdown: 1000,
     contracts: { minis: 2, micros: 20 },
     consistency: '40%',
+    dailyLoss: null,
   });
-  // Static: the page states there is no daily loss limit; Premium says nothing.
+  // No daily loss limit on any account (traderslaunch.com/futures/rules, 21/10/2026).
   const stat = rules.find((r) => r.programName === 'Static' && r.size === 50000).rules;
   assert.equal(stat.dailyLoss, null);
   assert.equal(stat.consistency, '50%');
-  assert.equal('dailyLoss' in premium, false);
 });
 
 test('Traders Launch: a card that lost its fee throws, the firm is reported broken', () => {

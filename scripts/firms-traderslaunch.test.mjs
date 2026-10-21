@@ -128,10 +128,10 @@ test('programsFromSnapshot : un split propose sans carte arrete tout (pas de lig
   assert.throws(() => programsFromSnapshot(s), /aucune carte au split 90 %/);
 });
 
-test('programsFromSnapshot : pas de FAQ Static lue, pas de perte journaliere publiee', () => {
+test('programsFromSnapshot : pas de perte journaliere, meme sans FAQ Static lue (regles du site)', () => {
   const s = clone();
   view(s, 'Static').faq = null;
-  assert.ok(programsFromSnapshot(s).find((p) => p.name === 'Static').plans.every((p) => !('dailyLoss' in p)));
+  assert.ok(programsFromSnapshot(s).every((p) => p.plans.every((x) => x.dailyLoss === null)));
 });
 
 test('programsFromSnapshot : aucune regle inventee, aucune valeur nulle', () => {
@@ -142,9 +142,8 @@ test('programsFromSnapshot : aucune regle inventee, aucune valeur nulle', () => 
       for (const k of ['dailyLossSoft', 'activationFee', 'originalPrice']) {
         assert.ok(!(k in x), `${k} invente sur ${p.name} ${x.size}`);
       }
-      // La perte journaliere : seule la FAQ Static la tranche (« no separate daily loss limit »).
-      if (p.name === 'Static') assert.equal(x.dailyLoss, null);
-      else assert.ok(!('dailyLoss' in x), `dailyLoss invente sur ${p.name} ${x.size}`);
+      // Pas de perte journaliere chez eux (traderslaunch.com/futures/rules, 21/10/2026).
+      assert.equal(x.dailyLoss, null, `${p.name} ${x.size} : dailyLoss`);
       for (const [k, v] of Object.entries(x)) {
         if (k !== 'dailyLoss') assert.notEqual(v, null, `${p.name} ${x.size} : ${k} est null`);
       }
