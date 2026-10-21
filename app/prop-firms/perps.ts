@@ -12,7 +12,7 @@
 import { useEffect, useState } from 'react';
 import rawData from '@/public/data/perps-firms.json';
 import { goHref } from '@/lib/go-links';
-import { cheapest, limitCell, splitCommon, type Cell, type FirmView, type Funded, type PriceCell } from './firm-view';
+import { cheapest, hasDailyLoss, limitCell, splitCommon, type Cell, type FirmView, type Funded, type PriceCell } from './firm-view';
 
 // price null = announced but not on sale yet ("Coming soon").
 // altPrice: a second version of the same account, shown in the same cell after a « / » (Angelo,
@@ -261,7 +261,9 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
       common: (c) => (c.muted ? 'No profit target' : `${c.text} profit target`),
     },
     { label: 'Max drawdown', cells: programs.map((p) => limitCell(p.maxDrawdown)), common: (c) => `${c.text} max drawdown` },
-    { label: 'Daily loss limit', cells: programs.map((p) => limitCell(p.dailyLoss)), common: (c) => `${c.text} daily loss limit` },
+    ...(hasDailyLoss(programs.map((p) => p.dailyLoss))
+      ? [{ label: 'Daily loss limit', cells: programs.map((p) => limitCell(p.dailyLoss)), common: (c: Cell) => `${c.text} daily loss limit` }]
+      : []),
     { label: 'Profit split', cells: programs.map((p) => text(d(p)?.split ?? p.split)), common: (c) => `${c.text} profit split` },
     { label: 'Leverage', cells: programs.map((p) => text(d(p)?.leverage)), common: (c) => `${c.text} leverage` },
     // A program missing from DETAILS still shows its rules as the JSON writes them.

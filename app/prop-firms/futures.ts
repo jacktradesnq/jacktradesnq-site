@@ -162,10 +162,9 @@ const FIELDS: Field[] = [
         : c.muted
           ? 'No daily loss limit'
           : `${c.text} daily loss${c.soft ? ' (soft)' : ''}`,
-    // No key: the source says nothing either way, so "Not published" rather than "None".
-    // Shown once one plan of the firm has a rule (Traders Launch Static, whose FAQ reads
-    // « There is no separate daily loss limit », 21/10/2026).
-    optional: (p) => 'dailyLoss' in p,
+    // Shown only when one plan of the firm has a daily loss figure: no limit is not
+    // mentioned (Angelo, 21/10/2026 : « si y a pas de daily loss limit ne le mentionne pas »).
+    optional: (p) => p.dailyLoss != null,
   },
   {
     label: 'Consistency',

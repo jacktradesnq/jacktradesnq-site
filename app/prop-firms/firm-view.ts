@@ -111,6 +111,10 @@ export function splitCommon(
 export const limitCell = (v: string | null): Cell =>
   v == null ? { text: 'n/c', muted: true } : v === 'None' ? { text: 'None', muted: true } : { text: v };
 
+// No daily loss limit (or none published) on any program: the row is left out, the page
+// does not mention it. Angelo, 21/10/2026: « si y a pas de daily loss limit ne le mentionne pas ».
+export const hasDailyLoss = (values: (string | null)[]): boolean => values.some((v) => v != null && v !== 'None');
+
 export function cheapest(sizes: FirmView['sizes']): FirmView['from'] {
   let best: FirmView['from'] = null;
   for (const row of sizes)

@@ -4,7 +4,7 @@
 
 import rawCfdData from '@/public/data/cfd-firms.json';
 import { goHref } from '@/lib/go-links';
-import { cheapest, limitCell, splitCommon, type Cell, type FirmView, type Funded, type PriceCell } from './firm-view';
+import { cheapest, hasDailyLoss, limitCell, splitCommon, type Cell, type FirmView, type Funded, type PriceCell } from './firm-view';
 
 type CfdPlan = { size: number; price: number };
 type CfdProgram = {
@@ -118,7 +118,9 @@ function firmView(firm: CfdFirm): FirmView {
       ),
       common: (c) => `${c.text} ${c.tag ? `${c.tag.label.toLowerCase()} ` : ''}max drawdown`,
     },
-    { label: 'Daily loss limit', cells: programs.map((p) => limitCell(p.dailyLoss)), common: (c) => `${c.text} daily loss limit` },
+    ...(hasDailyLoss(programs.map((p) => p.dailyLoss))
+      ? [{ label: 'Daily loss limit', cells: programs.map((p) => limitCell(p.dailyLoss)), common: (c: Cell) => `${c.text} daily loss limit` }]
+      : []),
     { label: 'Profit split', cells: programs.map((p) => ({ text: p.split })), common: (c) => `${c.text} profit split` },
     { label: 'Leverage', cells: programs.map((p) => ({ text: p.leverage })), common: (c) => `${c.text} leverage` },
     {
