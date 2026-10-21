@@ -3,7 +3,7 @@
 Une ligne par firme. Deux valeurs possibles :
 
     e8-markets = JTNQ      -> la page dit "code JTNQ"
-    traders-launch = link  -> aucun code a taper, le lien porte la remise
+    une-firme = link       -> aucun code a taper, le lien porte la remise
 
 ## Pourquoi c'est JTNQ partout
 
@@ -21,16 +21,19 @@ Donc le prix de la page est le prix qu'on paie avec ton code, et c'est ton code
 qui est imprime. Jamais le leur : ca te sortirait de la transaction partout ou
 une firme attribue par code.
 
-## Le cas particulier de Traders Launch
+## Traders Launch
 
-Eux n'ont pas de code public du tout. Leur remise de 15% arrive par le lien
-(`coupon=JTNQ` dans l'URL), donc la page dit qu'il n'y a rien a taper. Mettre
-`JTNQ` la ferait taper un code qui n'existe pas chez eux.
+Le lien applique deja la remise (`coupon=JTNQ` dans l'URL), mais le code JTNQ
+marche aussi tape a la main au checkout : Josh l'a attribue le 21/06/2026 et il a
+ete verifie applique au checkout le 29/06 (vault, partnerships/traderslaunch.md).
+Quelqu'un qui revient sur leur site sans le lien doit donc voir le code
+(Angelo, 21/10/2026 : « si ils veulent ils peuvent egalement utiliser mon code
+non ? imagine ils ont pas clique mon lien »).
 
 ---
 
 ## codes
-traders-launch = link
+traders-launch = JTNQ
 e8-markets = JTNQ
 
 ---

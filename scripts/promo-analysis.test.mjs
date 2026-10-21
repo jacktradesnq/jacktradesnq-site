@@ -183,10 +183,10 @@ test('the logo of every firm exists on disk', () => {
 
 test('only the "## codes" block of codes.md is read', () => {
   const codes = parseCodes('# Notes\n\n    a = JTNQ\n\n## codes\ne8-markets = JTNQ\ntraders-launch = link\n\n---\n\nx = y\n');
-  assert.deepEqual(codes, { 'e8-markets': 'JTNQ', 'traders-launch': 'link' });
+  assert.deepEqual(codes, { 'e8-markets': 'JTNQ', 'traders-launch': 'link' }); // parser only: sample text, not the live file
 });
 
-test('every firm prints JTNQ, except Traders Launch where the link carries it', () => {
+test('every firm prints JTNQ, except a firm declared « link » in codes.md', () => {
   const codes = loadCodes();
   for (const c of analyzeFirms(DATA, { today: '2026-08-20' })) {
     if (codes[c.firmId]?.toLowerCase() === 'link') {
