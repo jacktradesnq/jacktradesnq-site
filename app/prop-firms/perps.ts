@@ -154,10 +154,18 @@ const COMMON: Record<string, string[]> = {
   // when your account is created. It never moves »; overview « No time limits » and « Maximum 10 Live
   // Funded Accounts per user, across both paths combined ». The docs say nothing about a consistency
   // rule or minimum trading days, so neither is claimed here.
+  // Payouts, claiming-profit: « Claim as often as you like. There's no cap on frequency and no cap on
+  // the amount you can claim »; « 24 hours for every claim »; « the USDC is credited to your Primary
+  // Account ». Same for an evaluation or an Instant account (« This flow works identically »), and
+  // loss-limits: « Whatever applies during the Evaluation Phase carries through unchanged once you're
+  // Live ». So Vest has no Funded tab: it would repeat the evaluation (Angelo, 21/10/2026: « funded
+  // c presque pareil que eval partout »).
   'vest-markets': [
     'Static drawdown',
     'No time limit',
     'Up to 10 live funded accounts',
+    'Payouts any time, no cap',
+    'Paid in USDC within 24 hours',
   ],
 };
 
@@ -195,23 +203,7 @@ const BREAKOUT_FUNDED: Funded = {
   ],
   rows: [],
 };
-// Vest funded rules, docs.vestmarkets.com/vest-capital read 21/10/2026, the same whether the account
-// came from an evaluation or an Instant purchase (claiming-profit: « This flow works identically »):
-// - claiming-profit: « Claim as often as you like. There's no cap on frequency and no cap on the amount
-//   you can claim »; « 24 hours for every claim »; « the USDC is credited to your Primary Account ».
-// - loss-limits: « Whatever applies during the Evaluation Phase carries through unchanged once you're
-//   Live » (evaluation accounts only: Instant has no evaluation).
-const VEST_PAYOUT: Funded['pills'] = [
-  { label: 'Payout request', value: 'Any time, no cap' },
-  { label: 'Paid in', value: 'USDC, within 24 hours' },
-];
-const VEST_EVAL_FUNDED: Funded = {
-  pills: [...VEST_PAYOUT, { label: 'Loss limits', value: 'Same as in the evaluation' }],
-  rows: [],
-};
-const VEST_INSTANT_FUNDED: Funded = { pills: [{ label: 'Live', value: 'From purchase' }, ...VEST_PAYOUT], rows: [] };
 const FUNDED: Record<string, Record<string, Funded>> = {
-  'vest-markets': { '1-Step': VEST_EVAL_FUNDED, '2-Step': VEST_EVAL_FUNDED, Instant: VEST_INSTANT_FUNDED },
   breakout: { Classic: BREAKOUT_FUNDED, Pro: BREAKOUT_FUNDED, Turbo: BREAKOUT_FUNDED },
   myfundedperps: {
     Select: MFP_STD,
