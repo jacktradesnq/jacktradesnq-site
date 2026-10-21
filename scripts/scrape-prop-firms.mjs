@@ -25,6 +25,7 @@
 import fs from 'node:fs';
 
 import { guardCatalog, syncCatalog } from './lib/catalog-sync.mjs';
+import { fetchE8Plans } from './lib/firms/e8.mjs';
 import { fetchTradersLaunchPrograms } from './lib/firms/traderslaunch.mjs';
 
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
@@ -80,83 +81,41 @@ async function scrapeTradersLaunch() {
 /* E8 Markets — client-rendered pricing on https://e8futures.com, needs playwright (optional) */
 /* ------------------------------------------------------------------ */
 
-const E8_TABS = {
-  'E8 Signature': 'E8 Signature Futures',
-  'E8 Zero MAX': 'E8 Zero MAX Futures',
-  'E8 Zero Starter': 'E8 Zero Starter Futures',
-};
-
-async function scrapeE8Markets() {
-  let pw;
-  try {
-    pw = await import('playwright');
-  } catch {
-    console.log('e8-markets: playwright not installed, skipped');
-    return null;
-  }
-  const browser = await pw.chromium.launch({ headless: true });
-  try {
-    const page = await browser.newPage({ userAgent: UA });
-    await page.setViewportSize({ width: 1280, height: 1000 });
-    await page.goto('https://e8futures.com', { waitUntil: 'load', timeout: 60000 });
-    await page.waitForTimeout(3000);
-
-    const configBtn = page.getByText('Configure Challenge', { exact: true }).first();
-    await configBtn.scrollIntoViewIfNeeded();
-    await configBtn.click();
-    await page.waitForTimeout(2000);
-
-    const updates = [];
-    for (const [tabText, programName] of Object.entries(E8_TABS)) {
-      await page.locator('button', { hasText: tabText }).first().click({ timeout: 15000 });
-      await page.waitForTimeout(1200);
-
-      const cardsText = await page.evaluate(() => {
-        const all = Array.from(document.querySelectorAll('p, span, div, h1, h2, h3, h4'));
-        const labels = all.filter(
-          (el) => el.children.length === 0 && el.textContent.trim().toLowerCase() === 'account size',
-        );
-        const cards = [];
-        for (const label of labels) {
-          let node = label;
-          let container = null;
-          for (let i = 0; i < 10 && node.parentElement; i++) {
-            node = node.parentElement;
-            const t = node.textContent.toLowerCase();
-            if (t.includes('challenge rules') && t.includes('get started')) {
-              container = node;
-              break;
-            }
-          }
-          if (container) cards.push(container.innerText);
-        }
-        return cards;
-      });
-
-      for (const cardText of cardsText) {
-        const sizeM = /\$(\d+)K/i.exec(cardText);
-        const priceM = /PRICE\s*\n*\$([\d.]+)\s*\n*\$([\d.,]+)/.exec(cardText);
-        if (!sizeM || !priceM) continue;
-        updates.push({
-          programName,
-          size: parseInt(sizeM[1], 10) * 1000,
-          price: num(priceM[1]),
-          originalPrice: num(priceM[2]),
-        });
-      }
+// E8 : le configurateur de e8futures.com, lu tuile par tuile (scripts/lib/firms/e8.mjs).
+// Chemin `updates` : seuls price / originalPrice bougent ; les programmes et les
+// tailles du JSON restent decides a la main.
+export async function scrapeE8Markets(read) {
+  if (!read) {
+    let pw;
+    try {
+      pw = await import('playwright');
+    } catch {
+      console.log('e8-markets: playwright not installed, skipped');
+      return null;
     }
-    if (updates.length === 0) throw new Error('no plan cards parsed from Configure Challenge widget');
-    return { updates }; // promo stays manual — site banner label is vaguer than the curated JSON copy
-  } finally {
-    await browser.close();
+    // PLAYWRIGHT_CHANNEL=chrome : le Chrome installe plutot que le Chromium de Playwright (local).
+    const launch = process.env.PLAYWRIGHT_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHANNEL } : {};
+    read = () => fetchE8Plans(pw, launch);
   }
+  const plans = await read();
+  return {
+    updates: plans.map(({ programName, size, price, originalPrice }) => ({
+      programName,
+      size,
+      price,
+      originalPrice,
+    })),
+  }; // promo stays manual — site banner label is vaguer than the curated JSON copy
 }
 
-/* ------------------------------------------------------------------ */
-/* Guards + apply                                                      */
-/* ------------------------------------------------------------------ */
+/** Ce que la firme vend et que le JSON n'a pas : signale, jamais ajoute (choix d'Angelo). */
+export function unlistedPlans(firm, res) {
+  return res.updates
+    .filter((u) => !firm.programs.some((p) => p.name === u.programName && p.plans.some((x) => x.size === u.size)))
+    .map((u) => `${u.programName} $${u.size / 1000}K (${u.price}/${u.originalPrice})`);
+}
 
-function guard(firm, res) {
+export function guard(firm, res) {
   const plansTotal = firm.programs.reduce((n, p) => n + p.plans.length, 0);
   let matched = 0;
   for (const program of firm.programs) {
@@ -177,7 +136,7 @@ function guard(firm, res) {
     throw new Error(`scraped ${matched}/${plansTotal} expected plans — refusing partial update`);
 }
 
-function apply(firm, res, changes) {
+export function apply(firm, res, changes) {
   for (const program of firm.programs) {
     for (const plan of program.plans) {
       const u = res.updates.find((x) => x.programName === program.name && x.size === plan.size);
@@ -261,6 +220,8 @@ async function main() {
         // Chemin historique : des prix sur des programmes figes a la main.
         guard(firm, res);
         apply(firm, res, changes);
+        for (const extra of unlistedPlans(firm, res))
+          console.log(`${firm.id}: NOTICE — sold on their site, not on ours (not added): ${extra}`);
       }
       totalChanges += changes.length;
       const plansTotal = firm.programs.reduce((n, p) => n + p.plans.length, 0);
