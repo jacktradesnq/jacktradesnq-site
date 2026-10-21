@@ -5,7 +5,8 @@
 
 export const money = (n: number) =>
   '$' + n.toLocaleString('en-US', Number.isInteger(n) ? undefined : { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-export const sizeLabel = (n: number) => '$' + n / 1000 + 'K';
+// Under $1K (Vest's $500 Instant account) the size reads in dollars, not "$0.5K".
+export const sizeLabel = (n: number) => (n < 1000 ? '$' + n : '$' + n / 1000 + 'K');
 
 export const META = {
   backToHome: { label: 'Jacktradesnq', url: '/' },

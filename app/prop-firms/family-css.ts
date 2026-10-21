@@ -142,6 +142,10 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
 }
 .jtnq-cmp .ft-seg{ display: inline-flex; flex-wrap: wrap; gap: 4px; }
 .jtnq-cmp .ft-divider{ width: 1px; align-self: stretch; margin: 4px 8px; background: var(--c-line); }
+/* Six programs or more (Vest Markets, 8) wrap the tabs on any screen: the bar turns into the phone
+   layout below, programs on top, Eval / Funded under a rule, instead of a pill split over 3 lines. */
+.jtnq-cmp .ft-filters:has(> .ft-seg > .ft-prog:nth-child(6)){ display: flex; flex-direction: column; align-items: stretch; border-radius: 20px; }
+.jtnq-cmp .ft-filters:has(> .ft-seg > .ft-prog:nth-child(6)) .ft-divider{ width: auto; height: 1px; margin: 4px 8px; }
 
 .jtnq-cmp .ft-prog{
   font-family: var(--f-sans); font-size: 13px; font-weight: 500; color: var(--c-text-mute);
