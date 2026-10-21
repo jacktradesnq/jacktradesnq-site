@@ -169,6 +169,8 @@ const COMMON: Record<string, string[]> = {
   ],
 };
 
+// No « Winning days: None » on a funded account whose payout pace is written (once a day, any
+// time), the pace says it (Angelo, 22/10/2026 : « si c écrit daily payout c bon »).
 // Funded rules, read on the firm's docs and FAQ on 12/10/2026 (docs.myfundedperpetuals.com:
 // payouts « no minimum trading-day or qualifying-day requirement, consistency gate, or payout
 // count cap », « one payout request per New York calendar day », « $100 of gross profit
@@ -176,7 +178,6 @@ const COMMON: Record<string, string[]> = {
 // from the first funded day once flat, minimum 1% of the size, the limit stays at -5%).
 const MFP_STD: Funded = {
   pills: [
-    { label: 'Winning days', value: 'None' },
     { label: 'Consistency', value: 'None' },
     { label: 'Payout request', value: 'Once per day' },
     { label: 'Minimum payout', value: '$100 gross' },
@@ -196,7 +197,6 @@ const MFP_STD: Funded = {
 // Not shown, not written by the firm: a lifetime payout cap, what a payout does to the drawdown.
 const BREAKOUT_FUNDED: Funded = {
   pills: [
-    { label: 'Winning days', value: 'None' },
     { label: 'Consistency', value: 'None' },
     { label: 'Payout request', value: 'Any time, with no open position' },
     { label: 'Minimum payout', value: '$50 after the split' },
@@ -211,7 +211,6 @@ const FUNDED: Record<string, Record<string, Funded>> = {
     Signature: MFP_STD,
     Elite: {
       pills: [
-        { label: 'Winning days', value: 'None' },
         { label: 'Consistency', value: 'None' },
         // Checkout, 12/10/2026: « Payout Eligibility Day one » / « Payout Frequency Daily ».
         { label: 'Payout request', value: 'Daily, from day one' },

@@ -150,18 +150,9 @@ const FIELDS: Field[] = [
   {
     label: 'Daily loss',
     short: 'Daily loss',
-    cell: (p) =>
-      !('dailyLoss' in p)
-        ? { text: 'Not published', muted: true }
-        : p.dailyLoss != null
-          ? { text: money(p.dailyLoss), soft: !!p.dailyLossSoft }
-          : { text: 'None', muted: true },
-    common: (c) =>
-      c.text === 'Not published'
-        ? 'Daily loss not published'
-        : c.muted
-          ? 'No daily loss limit'
-          : `${c.text} daily loss${c.soft ? ' (soft)' : ''}`,
+    // A program without one gets no pill ("–"), the same rule as the row itself.
+    cell: (p) => (p.dailyLoss != null ? { text: money(p.dailyLoss), soft: !!p.dailyLossSoft } : { text: '–', muted: true }),
+    common: (c) => `${c.text} daily loss${c.soft ? ' (soft)' : ''}`,
     // Shown only when one plan of the firm has a daily loss figure: no limit is not
     // mentioned (Angelo, 21/10/2026 : « si y a pas de daily loss limit ne le mentionne pas »).
     optional: (p) => p.dailyLoss != null,
@@ -181,8 +172,10 @@ const FIELDS: Field[] = [
   {
     label: 'Days to pass',
     short: 'Min days',
-    cell: (p) => (p.minDays != null ? { text: `${p.minDays} minimum` } : { text: 'Not published', muted: true }),
-    common: (c) => (c.muted ? 'Minimum days not published' : `Days to pass: ${c.text}`),
+    // No figure, no pill: Traders Launch Static has none, its consistency says it (Angelo, 22/10/2026 : « le
+    // 40% consistency fait comprendre indicrement que c du 3 wining day minimum. donc oui pas besoin »).
+    cell: (p) => (p.minDays != null ? { text: `${p.minDays} minimum` } : { text: '–', muted: true }),
+    common: (c) => `Days to pass: ${c.text}`,
     optional: (p) => p.minDays != null,
   },
   {
@@ -226,8 +219,9 @@ const cellKey = (c: Cell) => JSON.stringify([c.text, c.tag?.label ?? '', !!c.sof
 // E8 re-checked on its checkout and configurator on 12/10/2026: Signature has a 35% best-day
 // rule and a 2% soft daily pause once funded only, and per-payout caps by size; Zero splits
 // 80% or 100% (paid option), funded contracts start lower and scale with locked profit.
+// No « Winning days: None » where the payout pace is written (Angelo, 22/10/2026 : « si c écrit daily
+// payout c bon »).
 const E8_ZERO_PILLS: Pill[] = [
-  { label: 'Winning days', value: 'None' },
   { label: 'Consistency', value: 'None' },
   { label: 'Payout request', value: 'Every day' },
   { label: 'Minimum payout', value: '$100' },
@@ -245,8 +239,9 @@ const TL_ACCOUNT_PILLS: Pill[] = [
   { label: 'Funded accounts', value: 'Up to 5 at a time' },
   { label: 'At $100K paid out', value: 'Paused, then eligible for scaling' },
 ];
+// Daily payouts are in the firm line, so no « Winning days: None » (Angelo, 22/10/2026 : « si on a préicser
+// que c " daily payout " alors oui on enleve le winnoing day »).
 const TL_PILLS: Pill[] = [
-  { label: 'Winning days', value: 'None' },
   { label: 'Consistency', value: 'None' },
   { label: 'Payout from', value: '+1% profit' },
   { label: 'Payout cap', value: 'None' },
@@ -315,7 +310,6 @@ const FUNDED: Record<string, Record<string, Funded>> = {
           label: 'Daily earnings cap, 60% / 80% split',
           bySize: { 25000: '$1,000', 50000: '$2,000', 100000: '$4,000' },
         },
-        { label: 'Daily earnings cap, 90% split', bySize: { 25000: 'None', 50000: 'None', 100000: 'None' } },
       ],
     },
     'Legacy NYC': {

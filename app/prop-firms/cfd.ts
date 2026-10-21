@@ -100,10 +100,11 @@ function firmView(firm: CfdFirm): FirmView {
 
   const { common, rules } = splitCommon([
     { label: 'Program', cells: programs.map((p) => ({ text: p.steps })), common: (c) => c.text },
-    // No target is a rule (instant funding), as the old block showed it: "None", not "n/c".
+    // No target on instant funding is not said (Angelo, 22/10/2026 : « pk y aurait un target si c du straight
+    // to funded »): no pill ("–").
     {
       label: 'Profit target',
-      cells: programs.map((p) => limitCell(p.profitTarget ?? 'None')),
+      cells: programs.map((p) => (p.profitTarget ? limitCell(p.profitTarget) : { text: '–', muted: true })),
       common: (c) => (c.muted ? 'No profit target' : `${c.text} profit target`),
     },
     {
@@ -119,7 +120,12 @@ function firmView(firm: CfdFirm): FirmView {
       common: (c) => `${c.text} ${c.tag ? `${c.tag.label.toLowerCase()} ` : ''}max drawdown`,
     },
     ...(hasDailyLoss(programs.map((p) => p.dailyLoss))
-      ? [{ label: 'Daily loss limit', cells: programs.map((p) => limitCell(p.dailyLoss)), common: (c: Cell) => `${c.text} daily loss limit` }]
+      ? [{
+          label: 'Daily loss limit',
+          // A program without one gets no pill (Angelo, 22/10/2026 : « no daily loss limit pas besoin de préciser »).
+          cells: programs.map((p) => (p.dailyLoss === 'None' ? { text: '–', muted: true } : limitCell(p.dailyLoss))),
+          common: (c: Cell) => `${c.text} daily loss limit`,
+        }]
       : []),
     { label: 'Profit split', cells: programs.map((p) => ({ text: p.split })), common: (c) => `${c.text} profit split` },
     { label: 'Leverage', cells: programs.map((p) => ({ text: p.leverage })), common: (c) => `${c.text} leverage` },
