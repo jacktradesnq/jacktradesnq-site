@@ -5,6 +5,8 @@
 
 import { readFileSync } from 'node:fs';
 
+import { parseCodes } from '../../lib/firm-codes.mjs';
+
 const URGENCY_WINDOW_H = 96; // a promo ending inside 4 days is flagged "expiring"
 const REFERENCE_SIZE = 50000;
 const AFFILIATE_CODE = 'JTNQ';
@@ -88,21 +90,8 @@ function headlineOf(firm) {
   return { program: best.program, plan: best.plan, pct: best.pct, pctSource: 'plan.originalPrice' };
 }
 
-// content/prop-firms/codes.md: the "## codes" block holds "firm-id = JTNQ" or
-// "firm-id = link" lines (link: nothing to type, the URL carries the discount).
-export function parseCodes(text) {
-  const out = {};
-  let inCodes = false;
-  for (const line of text.split('\n')) {
-    if (/^##\s+codes\s*$/.test(line)) inCodes = true;
-    else if (/^---+\s*$/.test(line) || /^#\s+/.test(line)) inCodes = false;
-    else if (inCodes) {
-      const m = /^([a-z0-9_-]+)\s*=\s*(.+)$/.exec(line.trim());
-      if (m) out[m[1]] = m[2].trim();
-    }
-  }
-  return out;
-}
+// content/prop-firms/codes.md: parsed by lib/firm-codes.mjs, shared with the /prop-firms page.
+export { parseCodes };
 
 export function loadCodes() {
   return parseCodes(readFileSync(new URL('../../content/prop-firms/codes.md', import.meta.url), 'utf8'));

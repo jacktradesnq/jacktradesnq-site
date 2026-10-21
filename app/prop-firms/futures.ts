@@ -8,6 +8,8 @@ import rawData from '@/public/data/prop-firms.json';
 import { goHref } from '@/lib/go-links';
 import { money } from './shared';
 import { cheapest, humanDate, splitCommon, type Cell, type FirmView, type Funded, type Pill, type PriceCell } from './firm-view';
+import codesMd from '@/content/prop-firms/codes.md';
+import { parseCodes } from '@/lib/firm-codes.mjs';
 
 // Affiliate code applied on every firm link.
 const CODE = 'JTNQ';
@@ -24,6 +26,8 @@ type Plan = {
   dailyLossSoft?: boolean;
   // A rule no source publishes has no key: inventing a value would be worse than saying so.
   consistency?: string;
+  // « Days to Pass: 3 minimum » where the firm's card prints it (Traders Launch).
+  minDays?: number;
   contracts: string;
   activationFee?: number | null;
   // One product live at several prices at once: the cheapest is shown, and said.
@@ -31,6 +35,8 @@ type Plan = {
   // What qualifies the price, written by the source (Legacy NYC hours, the split the
   // price is for). A plan cheaper for a stated reason carries that reason.
   note?: string;
+  // The same account sold at other profit splits, list prices: {"60": 119, "90": 169}.
+  splitPrices?: Record<string, number>;
 };
 type Program = {
   name: string;
@@ -94,6 +100,12 @@ function promoFor(firm: Firm, program: Program): { code: string | null; title: s
 // without the field use Angelo's code, code:null falls back to the firm's public code.
 const chipCode = (firm: Firm, promoCode: string | null) => (firm.code === undefined ? CODE : firm.code ?? promoCode);
 
+// content/prop-firms/codes.md decides what the page prints: « firm = link » means nothing to
+// type, the link carries the discount, so no code chip (Traders Launch: « Mettre JTNQ la
+// ferait taper un code qui n'existe pas chez eux »). Same file the promo feed reads.
+const CODES: Record<string, string> = parseCodes(codesMd);
+const discountViaLink = (firmId: string) => CODES[firmId]?.toLowerCase() === 'link';
+
 // Price paid through Angelo's link/code. His permanent code discount (Traders Launch
 // -15%) only applies when the firm shows no public promo (originalPrice == null) —
 // public promos already discount `price`. Same arithmetic as scripts/lib/promo-analysis.mjs.
@@ -139,10 +151,20 @@ const FIELDS: Field[] = [
     label: 'Daily loss',
     short: 'Daily loss',
     cell: (p) =>
-      p.dailyLoss != null ? { text: money(p.dailyLoss), soft: !!p.dailyLossSoft } : { text: 'None', muted: true },
-    common: (c) => (c.muted ? 'No daily loss limit' : `${c.text} daily loss${c.soft ? ' (soft)' : ''}`),
-    // No key: no source publishes a daily loss rule either way (Traders Launch, 12/10/2026),
-    // so nothing is said rather than "None".
+      !('dailyLoss' in p)
+        ? { text: 'Not published', muted: true }
+        : p.dailyLoss != null
+          ? { text: money(p.dailyLoss), soft: !!p.dailyLossSoft }
+          : { text: 'None', muted: true },
+    common: (c) =>
+      c.text === 'Not published'
+        ? 'Daily loss not published'
+        : c.muted
+          ? 'No daily loss limit'
+          : `${c.text} daily loss${c.soft ? ' (soft)' : ''}`,
+    // No key: the source says nothing either way, so "Not published" rather than "None".
+    // Shown once one plan of the firm has a rule (Traders Launch Static, whose FAQ reads
+    // « There is no separate daily loss limit », 21/10/2026).
     optional: (p) => 'dailyLoss' in p,
   },
   {
@@ -156,6 +178,13 @@ const FIELDS: Field[] = [
           : { text: p.consistency },
     common: (c) =>
       c.text === 'None' ? 'No consistency rule' : c.muted ? 'Consistency not published' : `${c.text} consistency rule`,
+  },
+  {
+    label: 'Days to pass',
+    short: 'Min days',
+    cell: (p) => (p.minDays != null ? { text: `${p.minDays} minimum` } : { text: 'Not published', muted: true }),
+    common: (c) => (c.muted ? 'Minimum days not published' : `Days to pass: ${c.text}`),
+    optional: (p) => p.minDays != null,
   },
   {
     label: 'Contracts',
@@ -207,23 +236,37 @@ const E8_ZERO_PILLS: Pill[] = [
   { label: 'Payouts per account', value: '4, then a free challenge' },
 ];
 const E8_ZERO_CONTRACTS = { 25000: '1 → 2 → 3', 50000: '2 → 3 → 5', 100000: '3 → 5 → 8', 200000: '4 → 7 → 10' };
+// Their #pricing cards and FAQ (traderslaunch.com, read 21/10/2026): Premium and Legacy NYC
+// « Starts at 2 minis or 20 micros, up to 15 minis. At least 1 trade a week »; FAQ « Up to 5
+// funded futures accounts at a time », « At $100,000 in cumulative payouts you are paused and
+// become eligible for scaling opportunities », « You must place at least 1 trade per week,
+// both during the evaluation and in your SimFunded account ».
+const TL_ACCOUNT_PILLS: Pill[] = [
+  { label: 'Activity', value: 'At least 1 trade a week' },
+  { label: 'Funded accounts', value: 'Up to 5 at a time' },
+  { label: 'At $100K paid out', value: 'Paused, then eligible for scaling' },
+];
 const TL_PILLS: Pill[] = [
   { label: 'Winning days', value: 'None' },
   { label: 'Consistency', value: 'None' },
   { label: 'Payout from', value: '+1% profit' },
   { label: 'Payout cap', value: 'None' },
   { label: 'Drawdown', value: 'Locks at start balance, payouts don\'t lower it' },
+  { label: 'Contracts', value: 'Scale up to 15 minis' },
+  ...TL_ACCOUNT_PILLS,
 ];
 // Traders Launch Static, its cards and « Static Accounts FAQ » on traderslaunch.com read
 // 21/10/2026: « No consistency rule » once sim funded, « No buffer to build », « $200 minimum
 // withdrawal, measured on profit before your split », and on 60% / 80% « positions are
 // auto-flattened » at the daily earnings limit ($1,000 / $2,000 / $4,000); « The 90% option
-// has unlimited daily earnings once SimFunded ».
+// has unlimited daily earnings once SimFunded »; minimum payout « $200 of trading profit [...]
+// measured before your split: $120 to you at 60%, $160 at 80%, or $180 at 90% ».
 const TL_STATIC_PILLS: Pill[] = [
   { label: 'Consistency', value: 'None' },
   { label: 'Buffer', value: 'None' },
-  { label: 'Minimum payout', value: '$200 profit, before your split' },
-  { label: 'Daily earnings cap', value: 'Positions flattened at the cap (none on the 90% split)' },
+  { label: 'Minimum payout', value: '$200 profit before your split ($120 / $160 / $180 to you at 60 / 80 / 90%)' },
+  { label: 'Daily earnings cap', value: 'Positions flattened at the cap on 60% and 80%, none on 90%' },
+  ...TL_ACCOUNT_PILLS,
 ];
 const FUNDED: Record<string, Record<string, Funded>> = {
   'e8-markets': {
@@ -270,9 +313,10 @@ const FUNDED: Record<string, Record<string, Funded>> = {
       pills: TL_STATIC_PILLS,
       rows: [
         {
-          label: 'Daily earnings cap (60% / 80% split)',
+          label: 'Daily earnings cap, 60% / 80% split',
           bySize: { 25000: '$1,000', 50000: '$2,000', 100000: '$4,000' },
         },
+        { label: 'Daily earnings cap, 90% split', bySize: { 25000: 'None', 50000: 'None', 100000: 'None' } },
       ],
     },
     'Legacy NYC': {
@@ -286,17 +330,32 @@ const FUNDED: Record<string, Record<string, Funded>> = {
 // read 12/10/2026: « None. You pay the evaluation fee once. No activation fee when you pass ».
 const NO_ACTIVATION_FEE = new Set(['traders-launch']);
 
-// The 60% split version of the same accounts, list prices read on the « 60% » tab of
-// traderslaunch.com #pricing on 21/10/2026 (Premium « $99 One-Time Fee / 80% profit split
-// fee $159 »; Static $119 / $239 / $479). Same target and loss limit. The scraper reads the
-// 80% prices; the JSON plans are those. Legacy NYC shows its 80% cards only, so it has none.
-const SPLIT_60: Record<string, Record<string, Record<number, number>>> = {
-  'traders-launch': {
-    Premium: { 100000: 99, 200000: 199, 300000: 399 },
-    Static: { 25000: 119, 50000: 239, 100000: 479 },
-  },
+// Rules a firm publishes for every account, outside its price cards. Traders Launch FAQ
+// (traderslaunch.com, 21/10/2026): « The evaluation window is 60 days. If you haven't passed
+// by day 60 but you're above 50% of your profit target, you get a free 30-day extension ».
+const FIRM_RULES: Record<string, string[]> = {
+  'traders-launch': ['60 days to pass, +30 free if above 50% of the target'],
 };
+
 const SPLIT_NOTE = / ?Price shown for the 80% split\./;
+
+// The other profit splits a firm sells each account at (scraped into plan.splitPrices:
+// Traders Launch Premium 60%, Static 60% and 90%, Legacy NYC 55%), lowest first.
+function otherSplits(plans: Plan[]): string[] {
+  const keys = new Set(plans.flatMap((p) => Object.keys(p.splitPrices ?? {})));
+  return [...keys].sort((a, b) => Number(a) - Number(b));
+}
+
+// "from $X" on the firm's card: the cheapest price on sale, other splits included (Traders
+// Launch Legacy NYC 55% is below every 80% price).
+function cheapestWithSplits(from: FirmView['from'], extra: NonNullable<FirmView['extraPrices']>): FirmView['from'] {
+  let best = from;
+  for (const x of extra)
+    for (const byProgram of x.byProgram)
+      for (const p of Object.values(byProgram ?? {}))
+        if (best == null || p.now < best.now) best = { now: p.now, per: null };
+  return best;
+}
 
 function firmView(firm: Firm): FirmView {
   const programs = firm.programs;
@@ -332,8 +391,13 @@ function firmView(firm: Firm): FirmView {
   const pace = /on.?demand/i.test(firm.payout) ? null : `${firm.payout} payouts`;
   // With a 60% version the price rows name each split; the firm line says « Up to 80% »,
   // the checkout's own words (« Up to 80% profit split »).
-  const splitText = SPLIT_60[firm.id] ? `Up to ${firm.split}` : firm.split;
-  common.splice(2, 0, ...(SPLIT_60[firm.id] ? [] : [`${firm.split} profit split`]), ...(pace ? [pace] : []));
+  // The header gives the best split on sale (Angelo, 21/10/2026: « si y a une option 90% pk
+  // tu mettrais pas a 90% »).
+  const splits = otherSplits(allPlans);
+  const topSplit = Math.max(parseFloat(firm.split) || 0, ...splits.map(Number));
+  const splitText = splits.length ? `Up to ${topSplit}%` : firm.split;
+  common.splice(2, 0, ...(splits.length ? [] : [`${firm.split} profit split`]), ...(pace ? [pace] : []));
+  common.push(...(FIRM_RULES[firm.id] ?? []));
   // A fee kind shared by every plan goes up into the firm's summary line, not a column
   // (Angelo, 12/10/2026: « mets-le ici et enlève la case […] si tous les plans n'ont pas
   // de activation fee, pourquoi le préciser ? »).
@@ -361,8 +425,24 @@ function firmView(firm: Firm): FirmView {
     }),
   }));
 
+  const pct = firm.codeDiscountPct ?? 0;
+  const extraPrices: NonNullable<FirmView['extraPrices']> = splits.map((split) => ({
+    label: `${split}% split`,
+    byProgram: programs.map((pr) => {
+      const priced = pr.plans.filter((pl) => pl.splitPrices?.[split] != null);
+      if (!priced.length) return null;
+      return Object.fromEntries(
+        priced.map((pl) => {
+          const price = pl.splitPrices![split];
+          return [pl.size, { now: Math.round(price * (100 - pct)) / 100, was: pct ? price : null }];
+        }),
+      );
+    }),
+  }));
+
   const promo = programs.length ? promoFor(firm, programs[0]) : { code: null, title: '' };
-  const code = chipCode(firm, promo.code);
+  const viaLink = discountViaLink(firm.id);
+  const code = viaLink ? null : chipCode(firm, promo.code);
   const viaCode = allPlans.some((p) => effectivePrice(firm, p).viaCode);
   const ddTypes = [...new Set(allPlans.map((p) => p.ddType))];
   const legend = ddTypes.map((t) => DD_LEGEND[t]);
@@ -382,35 +462,19 @@ function firmView(firm: Firm): FirmView {
             title: `Prices last verified on ${humanDate(firm.lastChecked)}, not at the last daily sync (${humanDate(DATA.generatedAt)}). Check the live checkout price.`,
           }
         : null,
-    from: cheapest(sizeRows),
+    from: cheapestWithSplits(cheapest(sizeRows), extraPrices),
     columns: programs.map((pr) => ({ name: pr.name })),
     common,
     rules,
-    priceTitle: code ? `Price with code ${code}` : 'Price',
-    priceSub: viaCode ? `${firm.codeDiscountPct}% off with code ${code}` : promo.title || null,
+    priceTitle: code ? `Price with code ${code}` : viaLink && viaCode ? 'Price via my link' : 'Price',
+    priceSub: viaCode
+      ? viaLink
+        ? `${firm.codeDiscountPct}% off via my link, no code to type`
+        : `${firm.codeDiscountPct}% off with code ${code}`
+      : promo.title || null,
     sizes: sizeRows,
     funded: fundedBy ? programs.map((pr) => fundedBy[pr.name] ?? null) : undefined,
-    ...(SPLIT_60[firm.id]
-      ? {
-          priceLabel: `${firm.split} split`,
-          extraPrices: [
-            {
-              label: '60% split',
-              byProgram: programs.map((pr) => {
-                const list = SPLIT_60[firm.id][pr.name];
-                if (!list) return null;
-                const pct = firm.codeDiscountPct ?? 0;
-                return Object.fromEntries(
-                  Object.entries(list).map(([size, price]) => [
-                    Number(size),
-                    { now: Math.round(price * (100 - pct)) / 100, was: pct ? price : null },
-                  ]),
-                );
-              }),
-            },
-          ],
-        }
-      : {}),
+    ...(splits.length ? { priceLabel: `${firm.split} split`, extraPrices } : {}),
     legend,
     href: goHref('prop-firms', firm.id),
   };

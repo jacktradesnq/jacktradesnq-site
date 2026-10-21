@@ -32,6 +32,7 @@ const RULE_FIELDS = [
   'dailyLoss',
   'dailyLossSoft',
   'consistency',
+  'minDays',
   'contracts',
   'activationFee',
   'maxPayout',
@@ -48,11 +49,14 @@ const RULE_FIELDS = [
  * `priceAmbiguous` / `variants` : un meme nom peut etre actif a plusieurs
  * prix en meme temps. Le lecteur publie le moins cher et dit que ce n'est pas
  * le seul ; ce fait se garde tel quel plutot que de se taire.
+ *
+ * `splitPrices` : le meme compte vendu a d'autres splits ({"60": 119, "90": 169},
+ * Traders Launch). Un split que la firme ne vend plus disparait du site.
  */
-const READER_OWNED = ['originalPrice', 'priceAmbiguous', 'variants'];
+const READER_OWNED = ['originalPrice', 'priceAmbiguous', 'variants', 'splitPrices'];
 
 /** L'ordre des cles d'un plan cree, pour que le JSON reste lisible en diff. */
-const PLAN_KEY_ORDER = ['size', 'price', 'originalPrice', ...RULE_FIELDS, 'priceAmbiguous', 'variants'];
+const PLAN_KEY_ORDER = ['size', 'price', 'originalPrice', ...RULE_FIELDS, 'priceAmbiguous', 'variants', 'splitPrices'];
 
 const sizeTag = (size) => `$${size / 1000}K`;
 
@@ -95,6 +99,11 @@ export function guardCatalog(firm, programs) {
         }
         if (plan.price > plan.originalPrice) {
           throw new Error(`${tag}: price ${plan.price} > originalPrice ${plan.originalPrice}`);
+        }
+      }
+      for (const [split, price] of Object.entries(plan.splitPrices ?? {})) {
+        if (!Number.isFinite(price) || price < 10 || price > 6000) {
+          throw new Error(`${tag}: split ${split} % price ${price} out of range [10, 6000]`);
         }
       }
       plansRead++;

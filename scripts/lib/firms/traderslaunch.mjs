@@ -26,18 +26,22 @@
  * du titre, du lien et de l'onglet choisi, le badge Legacy et `hours=1`. Un
  * desaccord arrete la firme (stale) plutot que de publier un prix mal attribue.
  *
- * Le prix publie est celui du split 80 % (le choix par defaut de la page, et la
- * convention du site depuis le 13/09) ; chaque plan le dit dans son `note`.
- * Les prix 60 % / 90 % ne sont pas dans ce JSON : futures.ts les porte (SPLIT_60).
+ * Chaque split propose par un onglet est lu (Premium 60 / 80 %, Static 60 / 80 /
+ * 90 %, Legacy NYC 55 / 80 % le 21/10/2026). Le prix principal du plan reste
+ * celui du split 80 % (le choix par defaut de la page, et la convention du site
+ * depuis le 13/09) ; les autres splits vont dans `splitPrices` ({"60": 119,
+ * "90": 169}), que futures.ts affiche en lignes de prix. Angelo, 21/10/2026 :
+ * « tant que y a sur leur site faut que ca sois sur nôtre site aussi », « si y a
+ * une option 90% pk tu mettrais pas a 90% ».
  *
- * Ce que les cartes NE disent PAS, et qu'on n'invente donc pas : la perte
- * journaliere (cle omise). La FAQ Static ecrit « There is no separate daily loss
- * limit », mais la publier ajouterait une colonne au tableau de la firme :
- * decision d'affichage laissee a Angelo.
+ * La perte journaliere n'est publiee que la ou la page la tranche : la FAQ
+ * Static (sous #pricing) ecrit « There is no separate daily loss limit », donc
+ * les plans Static portent `dailyLoss: null` (la source dit « aucune »). Premium
+ * et Legacy n'en disent rien : cle omise.
  *
- * L'onglet Early Access (des « drops » limites en quantite et en duree) n'est
- * PAS publie : decision d'affichage d'Angelo en attente. Il est releve quand
- * meme, pour que le journal dise s'il y a un drop en vente.
+ * L'onglet Early Access (des « drops » limites en quantite et en duree) devient
+ * un programme « Early Access » des qu'un drop y est en vente ; sans drop, il
+ * n'ajoute rien. Un drop illisible est signale au journal sans arreter la firme.
  */
 
 export const TRADERSLAUNCH_URL = 'https://traderslaunch.com/';
@@ -45,11 +49,11 @@ export const TRADERSLAUNCH_URL = 'https://traderslaunch.com/';
 /** La source citee dans l'alerte de synchro quand la tournee lit cette page. */
 export const TRADERSLAUNCH_SOURCE = 'page traderslaunch.com';
 
-/** Le split dont le prix est publie. */
+/** Le split dont le prix est le prix principal du plan. */
 export const PUBLISHED_SPLIT = 80;
 
-/** Les onglets releves mais pas publies (voir l'en-tete). */
-const NOT_PUBLISHED = new Set(['Early Access']);
+/** L'onglet des drops : publie seulement quand un drop est en vente. */
+const EARLY_ACCESS = 'Early Access';
 
 const BROWSER_UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ' +
@@ -139,7 +143,8 @@ function parseCard(programme, chosenSplit, card) {
 
   const split = money(params.get('split'));
   const splitAffiche = money(ls.find((l) => /^\d+% Profit Split$/i.test(l))?.match(/^(\d+)/)?.[1]);
-  if (split == null || splitAffiche == null || split !== splitAffiche || split !== chosenSplit) {
+  // chosenSplit null : un onglet sans selecteur de split (un drop Early Access).
+  if (split == null || splitAffiche == null || split !== splitAffiche || (chosenSplit != null && split !== chosenSplit)) {
     throw new Error(
       `${tag} : split incoherent (lien ${split}, carte ${splitAffiche}, onglet choisi ${chosenSplit})`,
     );
@@ -170,6 +175,13 @@ function parseCard(programme, chosenSplit, card) {
   plan.ddType = dd.type;
 
   // « Best Day — Under 40% of profit » (Premium, Legacy) ou « Consistency Rule — 50% » (Static).
+  const days = after(ev, 'Days to Pass');
+  if (days != null) {
+    const d = days.match(/^(\d+)\s+minimum$/i);
+    if (!d) throw new Error(`${tag} : « Days to Pass » illisible (« ${days} »)`);
+    plan.minDays = Number(d[1]);
+  }
+
   const bestDay = after(ev, 'Best Day');
   const consRule = after(ev, 'Consistency Rule');
   const cons = (bestDay ?? consRule ?? '').match(/(\d+)\s*%/);
@@ -181,10 +193,10 @@ function parseCard(programme, chosenSplit, card) {
   if (contracts) plan.contracts = contracts;
 
   const note = [];
-  if (legacy) {
-    const hours = starts?.match(/(Trading hours: [^.]*?ET \(Legacy NYC\))/i)?.[1];
-    if (hours) note.push(`${hours}.`);
-  }
+  // « Trading hours: 6:00pm – 4:00pm ET the following day » (Premium, Static),
+  // « Trading hours: 9:30am – 4:00pm ET (Legacy NYC) » : chaque carte a les siennes.
+  const hours = starts?.match(/(Trading hours: [^.]*?ET\b[^.]*?)\s*(?:\.|$)/i)?.[1]?.trim();
+  if (hours) note.push(`${hours}.`);
   note.push(`Price shown for the ${split}% split.`);
   plan.note = note.join(' ');
 
@@ -192,41 +204,101 @@ function parseCard(programme, chosenSplit, card) {
 }
 
 /**
+ * Un programme a partir de ses splits lus. Le prix principal est celui du split
+ * 80 % ; les autres splits vont dans `splitPrices`, apres verification que leurs
+ * cartes decrivent les memes comptes (meme objectif, meme perte max).
+ *
+ * @param {string} name
+ * @param {Array<{split: number|null, cards: Array<{href: string, text: string}>}>} splits
+ * @param {{title: string, text: string}|null} faq  la FAQ affichee sous l'onglet, si elle existe
+ * @param {boolean} drop  un drop Early Access : pas de split 80 % exige
+ */
+function programFrom(name, splits, faq, drop = false) {
+  const all = Array.isArray(splits) ? splits : [];
+  const read = all.filter((s) => s.cards?.length);
+  if (!read.length) throw new Error(`${name} : aucune carte de prix dans son onglet (la mise en page a change)`);
+  const empty = all.find((s) => !s.cards?.length);
+  if (empty) {
+    // Un split propose sans carte : la ligne de prix disparaitrait du site en silence.
+    throw new Error(`${name} : aucune carte au split ${empty.split} %, la lecture est partielle`);
+  }
+  let main = read.find((s) => s.split === PUBLISHED_SPLIT);
+  if (!main) {
+    if (!drop) {
+      throw new Error(
+        `${name} : le split ${PUBLISHED_SPLIT} % n'a pas pu etre choisi (splits lus : ${read.map((s) => s.split).join(', ')})`,
+      );
+    }
+    main = read[0];
+  }
+
+  const plans = main.cards.map((c) => parseCard(name, main.split, c));
+  const sizes = plans.map((p) => p.size);
+  if (new Set(sizes).size !== sizes.length) throw new Error(`${name} : deux cartes pour la meme taille`);
+
+  for (const s of read) {
+    if (s === main) continue;
+    for (const card of s.cards) {
+      const other = parseCard(name, s.split, card);
+      const base = plans.find((p) => p.size === other.size);
+      const tag = `${name} ${other.size / 1000}K`;
+      if (!base) throw new Error(`${tag} : vendu au split ${s.split} % mais pas au ${main.split} %`);
+      if (base.profitTarget !== other.profitTarget || base.maxDrawdown !== other.maxDrawdown) {
+        throw new Error(`${tag} : le split ${s.split} % n'a pas les memes regles d'evaluation que le ${main.split} %`);
+      }
+      if (base.splitPrices?.[String(s.split)] != null) throw new Error(`${tag} : deux cartes au split ${s.split} %`);
+      base.splitPrices = { ...base.splitPrices, [String(s.split)]: other.price };
+    }
+  }
+  for (const p of plans) {
+    if (!p.splitPrices) continue;
+    const keys = Object.keys(p.splitPrices).sort((a, b) => Number(a) - Number(b));
+    p.splitPrices = Object.fromEntries(keys.map((k) => [k, p.splitPrices[k]]));
+  }
+
+  // « There is no separate daily loss limit » dans la FAQ de CET onglet (Static) :
+  // la source dit qu'il n'y en a pas.
+  if (faq?.title === name && /there is no separate daily loss limit/i.test(faq.text ?? '')) {
+    for (const p of plans) p.dailyLoss = null;
+  }
+
+  return { name, type: 'eval', priceType: 'one-time', plans: plans.sort((a, b) => a.size - b.size) };
+}
+
+/**
  * Les programmes vendus, dans la forme du dataset.
  *
- * @param {{views: Array<{account: string, split: number|null, cards: Array<{href: string, text: string}>, text?: string}>,
- *          legacy: {split: number|null, cards: Array<{href: string, text: string}>}}} snap
+ * @param {{views: Array<{account: string, splits: Array<{split: number|null, cards: Array<{href: string, text: string}>}>,
+ *                        faq?: {title: string, text: string}|null, text?: string}>,
+ *          legacy: {splits: Array<{split: number|null, cards: Array<{href: string, text: string}>}>}}} snap
  *        le releve de `readTradersLaunchPage`
+ * @param {{log?: (s: string) => void}} [opts]
  * @returns {Array<{name: string, type: 'eval', priceType: 'one-time', plans: object[]}>}
  * @throws  quand un onglet vendu n'a plus de carte lisible, ou quand deux lectures d'un fait se contredisent
  */
-export function programsFromSnapshot(snap) {
+export function programsFromSnapshot(snap, { log = () => {} } = {}) {
   const views = snap?.views;
   if (!Array.isArray(views) || views.length === 0) {
     throw new Error('traderslaunch.com : aucun onglet « Account » dans #pricing, la mise en page a change');
   }
 
   const programmes = [];
-  const add = (name, split, cards) => {
-    const plans = cards.map((c) => parseCard(name, split, c));
-    const sizes = plans.map((p) => p.size);
-    if (new Set(sizes).size !== sizes.length) throw new Error(`${name} : deux cartes pour la meme taille`);
-    programmes.push({ name, type: 'eval', priceType: 'one-time', plans: plans.sort((a, b) => a.size - b.size) });
-  };
-
   for (const v of views) {
-    if (NOT_PUBLISHED.has(v.account)) continue;
-    if (!v.cards?.length) {
-      throw new Error(`${v.account} : aucune carte de prix dans son onglet (la mise en page a change)`);
+    if (v.account === EARLY_ACCESS) {
+      if (!v.splits?.some((s) => s.cards?.length)) continue; // aucun drop en vente
+      try {
+        programmes.push(programFrom(EARLY_ACCESS, v.splits, v.faq, true));
+      } catch (err) {
+        // Un drop au gabarit inconnu ne doit pas geler Premium / Static / Legacy.
+        log(`Early Access : drop en vente mais illisible, NON publie (${err.message})`);
+      }
+      continue;
     }
-    if (v.split !== PUBLISHED_SPLIT) {
-      throw new Error(`${v.account} : le split ${PUBLISHED_SPLIT} % n'a pas pu etre choisi (onglet a ${v.split})`);
-    }
-    add(v.account, v.split, v.cards);
+    programmes.push(programFrom(v.account, v.splits, v.faq));
   }
 
   const legacy = snap.legacy;
-  if (legacy?.cards?.length) add('Legacy NYC', legacy.split ?? PUBLISHED_SPLIT, legacy.cards);
+  if (legacy?.splits?.some((s) => s.cards?.length)) programmes.push(programFrom('Legacy NYC', legacy.splits, null));
 
   if (!programmes.length) throw new Error('traderslaunch.com : aucune carte de prix futures sur la page');
   return programmes;
@@ -234,19 +306,17 @@ export function programsFromSnapshot(snap) {
 
 /** Une phrase pour le journal sur l'onglet Early Access, ou null s'il n'existe plus. */
 export function earlyAccessStatus(snap) {
-  const v = snap?.views?.find((x) => x.account === 'Early Access');
+  const v = snap?.views?.find((x) => x.account === EARLY_ACCESS);
   if (!v) return null;
-  if (v.cards?.length) return `Early Access : ${v.cards.length} carte(s) en vente, NON publiees (decision d'Angelo)`;
+  const n = (v.splits ?? []).reduce((k, s) => k + (s.cards?.length ?? 0), 0);
+  if (n) return `Early Access : ${n} carte(s) en vente, publiees comme programme « ${EARLY_ACCESS} »`;
   return 'Early Access : aucun drop en vente';
 }
 
-/* ------------------------------------------------------------------ */
-/* Lecture dans le navigateur                                          */
-/* ------------------------------------------------------------------ */
-
 /**
  * Ouvre la page dans Chromium headless, clique chaque onglet « Account » de
- * #pricing, choisit le split publie, et releve les cartes. Rien n'est parse ici.
+ * #pricing puis chacun de ses splits, et releve les cartes (et la FAQ de
+ * l'onglet quand il en a une). Idem pour les Legacy NYC. Rien n'est parse ici.
  *
  * @param {{chromium: object, url?: string, settleMs?: number}} opts  `chromium` de playwright
  */
@@ -255,7 +325,6 @@ export async function readTradersLaunchPage({ chromium, url = TRADERSLAUNCH_URL,
   try {
     browser = await chromium.launch({ headless: true });
   } catch (err) {
-    // En local le Chromium de Playwright n'est pas toujours telecharge : le Chrome installe suffit.
     try {
       browser = await chromium.launch({ headless: true, channel: 'chrome' });
     } catch {
@@ -267,7 +336,6 @@ export async function readTradersLaunchPage({ chromium, url = TRADERSLAUNCH_URL,
     const page = await ctx.newPage();
     const res = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
     if (res && !res.ok()) throw new Error(`${url} : HTTP ${res.status()}`);
-    // networkidle n'arrive jamais sur cette page (flux de payouts en direct).
     await page.waitForTimeout(settleMs);
 
     const inPage = {
@@ -275,68 +343,114 @@ export async function readTradersLaunchPage({ chromium, url = TRADERSLAUNCH_URL,
         const sec = document.querySelector('#pricing');
         if (!sec) return null;
         const norm = (e) => e.innerText.trim().split('\n')[0].trim();
-        // Les onglets « Account » : boutons a aria-pressed, au texte non vide et qui ne sont pas un split.
         return [...sec.querySelectorAll('button[aria-pressed]')]
           .filter((b) => b.innerText.trim() && !/^\d+%$/.test(b.innerText.trim()))
           .map(norm);
       },
-      click: ([kind, label]) => {
+      clickAccount: (label) => {
         const sec = document.querySelector('#pricing');
         const vis = (e) => !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
-        const btns = [...sec.querySelectorAll('button')].filter(vis);
-        const b =
-          kind === 'account'
-            ? btns.find((x) => x.hasAttribute('aria-pressed') && x.innerText.trim().split('\n')[0].trim() === label)
-            : kind === 'split'
-              ? btns.find((x) => x.innerText.trim() === label)
-              : btns.find((x) => new RegExp(label).test(x.innerText));
+        const b = [...sec.querySelectorAll('button[aria-pressed]')]
+          .filter(vis)
+          .find((x) => x.innerText.trim().split('\n')[0].trim() === label);
         if (!b) return false;
-        if (kind !== 'legacy' && b.getAttribute('aria-pressed') === 'true') return true;
+        if (b.getAttribute('aria-pressed') !== 'true') b.click();
+        return true;
+      },
+      // Les boutons « 60% » / « 80% » ... : ceux des onglets sont avant le bouton
+      // « View Legacy Accounts », ceux des Legacy apres.
+      splits: ([legacy, pct]) => {
+        const sec = document.querySelector('#pricing');
+        const vis = (e) => !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
+        const all = [...sec.querySelectorAll('button')];
+        const legacyBtn = all.find((b) => /View Legacy Accounts/i.test(b.innerText));
+        const isAfter = (b) =>
+          !!legacyBtn && !!(legacyBtn.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+        const btns = all
+          .filter(vis)
+          .filter((b) => /^\d+%$/.test(b.innerText.trim()))
+          .filter((b) => (legacy ? isAfter(b) : !isAfter(b)));
+        if (pct == null) {
+          return {
+            list: btns.map((b) => Number(b.innerText.trim().replace('%', ''))),
+            pressed: btns.filter((b) => b.getAttribute('aria-pressed') === 'true').map((b) => Number(b.innerText.trim().replace('%', '')))[0] ?? null,
+          };
+        }
+        const b = btns.find((x) => x.innerText.trim() === `${pct}%`);
+        if (!b) return false;
+        if (b.getAttribute('aria-pressed') !== 'true') b.click();
+        return true;
+      },
+      openLegacy: () => {
+        const sec = document.querySelector('#pricing');
+        const b = [...sec.querySelectorAll('button')].find((x) => /View Legacy Accounts/i.test(x.innerText));
+        if (!b) return false;
         b.click();
         return true;
       },
-      state: (wantLegacy) => {
+      cards: (wantLegacy) => {
         const sec = document.querySelector('#pricing');
         const vis = (e) => !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
-        const split = [...sec.querySelectorAll('button[aria-pressed="true"]')]
-          .filter(vis)
-          .map((b) => b.innerText.trim())
-          .find((t) => /^\d+%$/.test(t));
         const links = [...sec.querySelectorAll('a[href*="purchasing-signup?"]')].filter((a) =>
           wantLegacy ? /[?&]hours=1\b/.test(a.href) : !/[?&]hours=1\b/.test(a.href),
         );
-        const cards = links.filter(vis).map((a) => {
-          // La carte = le plus haut ancetre qui ne contient que ce lien.
+        return links.filter(vis).map((a) => {
           let n = a;
           while (n.parentElement && n.parentElement.querySelectorAll('a[href*="purchasing-signup?"]').length === 1) {
             n = n.parentElement;
           }
           return { href: a.href, text: n.innerText };
         });
-        return { split: split ? Number(split.replace('%', '')) : null, cards, text: sec.innerText };
       },
+      // La FAQ affichee sous l'onglet (« Static Accounts FAQ ») : questions ouvertes,
+      // puis son texte, reponses comprises.
+      faq: () => {
+        const sec = document.querySelector('#pricing');
+        const vis = (e) => !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
+        const head = [...sec.querySelectorAll('h1, h2, h3, h4, p, span, div')]
+          .filter(vis)
+          .find((e) => e.children.length === 0 && /^.+ Accounts FAQ$/.test(e.innerText.trim()));
+        if (!head) return null;
+        const title = head.innerText.trim().replace(/ Accounts FAQ$/, '');
+        const all = sec.textContent.replace(/\s+/g, ' ');
+        const at = all.indexOf(`${title} Accounts FAQ`);
+        return { title, text: at === -1 ? '' : all.slice(at, at + 8000) };
+      },
+      text: () => document.querySelector('#pricing').innerText,
     };
 
     const accounts = await page.evaluate(inPage.accounts);
     if (!accounts?.length) throw new Error('traderslaunch.com : pas de section #pricing ou pas d onglet « Account »');
 
+    const readSplits = async (legacy) => {
+      const { list } = await page.evaluate(inPage.splits, [legacy, null]);
+      if (!list.length) return [{ split: null, cards: await page.evaluate(inPage.cards, legacy) }];
+      const out = [];
+      for (const pct of [...new Set(list)]) {
+        if (!(await page.evaluate(inPage.splits, [legacy, pct]))) throw new Error(`split ${pct} % introuvable`);
+        await page.waitForTimeout(1500);
+        const { pressed } = await page.evaluate(inPage.splits, [legacy, null]);
+        out.push({ split: pressed, cards: await page.evaluate(inPage.cards, legacy) });
+      }
+      return out;
+    };
+
     const views = [];
     for (const account of [...new Set(accounts)]) {
-      if (!(await page.evaluate(inPage.click, ['account', account]))) {
-        throw new Error(`onglet « ${account} » introuvable`);
-      }
+      if (!(await page.evaluate(inPage.clickAccount, account))) throw new Error(`onglet « ${account} » introuvable`);
       await page.waitForTimeout(1500);
-      await page.evaluate(inPage.click, ['split', `${PUBLISHED_SPLIT}%`]);
-      await page.waitForTimeout(1500);
-      const st = await page.evaluate(inPage.state, false);
-      views.push({ account, split: st.split, cards: st.cards, text: st.cards.length ? undefined : st.text });
+      const splits = await readSplits(false);
+      const faq = await page.evaluate(inPage.faq);
+      const view = { account, splits, faq };
+      if (!splits.some((s) => s.cards.length)) view.text = await page.evaluate(inPage.text);
+      views.push(view);
     }
 
-    await page.evaluate(inPage.click, ['legacy', 'View Legacy Accounts']);
+    await page.evaluate(inPage.openLegacy);
     await page.waitForTimeout(2000);
-    const leg = await page.evaluate(inPage.state, true);
+    const legacy = { splits: await readSplits(true) };
 
-    return { url, readAt: new Date().toISOString(), views, legacy: { split: PUBLISHED_SPLIT, cards: leg.cards } };
+    return { url, readAt: new Date().toISOString(), views, legacy };
   } finally {
     await browser.close();
   }
@@ -363,5 +477,5 @@ export async function fetchTradersLaunchPrograms({ read, log = () => {} } = {}) 
   }
   const ea = earlyAccessStatus(snap);
   if (ea) log(ea);
-  return programsFromSnapshot(snap);
+  return programsFromSnapshot(snap, { log });
 }

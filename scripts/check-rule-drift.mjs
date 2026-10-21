@@ -29,10 +29,9 @@
 import fs from 'node:fs';
 
 import { fetchE8Panels, parseE8Panel, plansFromPanels } from './lib/firms/e8.mjs';
+import { programsFromSnapshot, readTradersLaunchPage } from './lib/firms/traderslaunch.mjs';
 
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
-const UA =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 
 const FIELDS = ['profitTarget', 'maxDrawdown', 'dailyLoss', 'consistency', 'contracts'];
 export const BROKEN = Symbol('broken'); // rules[field] === BROKEN => anchor present-but-unreadable
@@ -103,30 +102,6 @@ function show(field, v) {
   return m == null ? 'null' : String(m);
 }
 
-/* ------------------------------------------------------------------ */
-/* Fetch + generic HTML helpers                                         */
-/* ------------------------------------------------------------------ */
-
-async function fetchText(url) {
-  const res = await fetch(url, {
-    headers: { 'user-agent': UA, accept: 'text/html,application/xhtml+xml' },
-    redirect: 'follow',
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-  return res.text();
-}
-
-// Strip scripts/styles/tags, one trimmed non-empty string per surviving text node.
-function htmlToLines(html) {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/g, ' ')
-    .replace(/<style[\s\S]*?<\/style>/g, ' ')
-    .replace(/<[^>]+>/g, '\n')
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean);
-}
-
 /* ================================================================== */
 /* Per-firm rule extractors                                            */
 /* Each returns [{ programName, size, rules }] where rules maps a       */
@@ -134,34 +109,39 @@ function htmlToLines(html) {
 /* absent from rules = "not auto-verified for this firm/program" (skip). */
 /* ================================================================== */
 
-/* ---- Traders Launch — server-rendered cards ---- */
+/* ---- Traders Launch — #pricing de traderslaunch.com (playwright) ---- */
+/**
+ * The rules their cards state, per program and size, read through the same
+ * snapshot as the price sync (scripts/lib/firms/traderslaunch.mjs: every
+ * « Account » tab, every split, the Legacy NYC cards). Since 19/10/2026 the page
+ * renders its cards in the browser and names its programs Premium / Static /
+ * Legacy NYC: the old server-rendered « 1-Step » cards are gone.
+ * A card the parser cannot read throws: the firm is then BROKEN, never guessed.
+ * dailyLoss is emitted only where the page decides it (Static FAQ: « There is no
+ * separate daily loss limit »); Premium / Legacy say nothing, so it stays manual.
+ */
+export function tradersLaunchRules(snap) {
+  return programsFromSnapshot(snap).flatMap((pr) =>
+    pr.plans.map((p) => {
+      const rules = {
+        profitTarget: p.profitTarget ?? BROKEN,
+        maxDrawdown: p.maxDrawdown ?? BROKEN,
+        contracts: p.contracts != null ? contracts(p.contracts) : BROKEN,
+      };
+      if (p.consistency != null) rules.consistency = consistency(p.consistency);
+      if ('dailyLoss' in p) rules.dailyLoss = p.dailyLoss;
+      return { programName: pr.name, size: p.size, rules };
+    }),
+  );
+}
 async function extractTradersLaunch() {
-  const lines = htmlToLines(await fetchText('https://traderslaunch.com'));
-  const out = [];
-  for (const size of [100000, 200000, 300000]) {
-    const label = `$${size.toLocaleString('en-US')}`;
-    const i = lines.findIndex((l) => l === label && /Starting Capital/i.test(lines[lines.indexOf(l) + 1] || ''));
-    if (i === -1) continue; // plan not found => reported as BROKEN plan
-    const win = lines.slice(i, i + 30);
-    const after = (labels) => {
-      const j = win.findIndex((l) => labels.some((lb) => new RegExp(lb, 'i').test(l)));
-      return j === -1 ? undefined : win[j + 1];
-    };
-    const pt = after(['^Profit Target'] );
-    const dd = after(['^Max Drawdown']);
-    const ct = after(['^Starting Size']);
-    out.push({
-      programName: '1-Step',
-      size,
-      rules: {
-        profitTarget: pt != null ? money(pt) : BROKEN,
-        maxDrawdown: dd != null ? money(dd) : BROKEN,
-        contracts: ct != null ? contracts(ct) : BROKEN,
-        // consistency (FAQ-only "40% rule") + dailyLoss (not advertised) stay manual.
-      },
-    });
+  let pw;
+  try {
+    pw = await import('playwright');
+  } catch {
+    throw new Error('playwright not installed');
   }
-  return out;
+  return tradersLaunchRules(await readTradersLaunchPage({ chromium: pw.chromium }));
 }
 
 /* ---- E8 Markets — playwright (configurateur « Configure Your Account ») ---- */
@@ -206,8 +186,7 @@ const EXTRACTORS = {
 
 // Human-readable reason for the fields we knowingly do not auto-verify.
 function skipReason(firmId, programName, field) {
-  if (firmId === 'traders-launch' && field === 'consistency') return 'FAQ-only "40% rule" (not on card)';
-  if (firmId === 'traders-launch' && field === 'dailyLoss') return 'not advertised (manual null)';
+  if (firmId === 'traders-launch' && field === 'dailyLoss') return 'not stated for Premium / Legacy NYC (manual)';
   if (firmId === 'e8-markets' && field === 'dailyLoss') return 'never shown on E8 cards (manual null)';
   if (firmId === 'e8-markets' && field === 'contracts')
     return 'their cards stopped listing the contract limit (manual)';
@@ -353,16 +332,16 @@ async function main() {
 
   if (selfTest) {
     // Inject a fake truth on a known, reliably-scraped plan (Traders Launch
-    // 1-Step 100k profitTarget -> 99999) WITHOUT writing the file, and prove the
+    // Premium 100k profitTarget -> 99999) WITHOUT writing the file, and prove the
     // engine classifies it as a REAL DRIFT.
-    const prog = data.firms.find((f) => f.id === 'traders-launch').programs.find((p) => p.name === '1-Step');
+    const prog = data.firms.find((f) => f.id === 'traders-launch').programs.find((p) => p.name === 'Premium');
     const plan = prog.plans.find((p) => p.size === 100000);
     const original = plan.profitTarget;
     plan.profitTarget = 99999;
-    console.log(`[self-test] injected fake Traders Launch 1-Step 100k profitTarget: ${original} -> 99999 (in memory only)`);
+    console.log(`[self-test] injected fake Traders Launch Premium 100k profitTarget: ${original} -> 99999 (in memory only)`);
     const { drifts } = await runChecks(data, 'traders-launch');
     const hit = drifts.find(
-      (d) => d.firm === 'Traders Launch' && d.program === '1-Step' && d.size === 100000 && d.field === 'profitTarget',
+      (d) => d.firm === 'Traders Launch' && d.program === 'Premium' && d.size === 100000 && d.field === 'profitTarget',
     );
     console.log('\n[self-test] drifts detected:', drifts.length);
     for (const d of drifts) console.log(`  DRIFT ${d.firm}/${d.program}/${d.size / 1000}k ${d.field}: ours=${d.ours} site=${d.site}`);
