@@ -257,7 +257,8 @@ const TL_PILLS: Pill[] = [
 // measured before your split: $120 to you at 60%, $160 at 80%, or $180 at 90% ».
 const TL_STATIC_PILLS: Pill[] = [
   { label: 'Consistency', value: 'None' },
-  { label: 'Buffer', value: 'None' },
+  // Angelo, 22/10/2026 : « met " no buffer required " ».
+  { label: 'No buffer required' },
   { label: 'Minimum payout', value: '$200 profit before your split ($120 / $160 / $180 to you at 60 / 80 / 90%)' },
   { label: 'Daily earnings cap', value: 'Positions flattened at the cap on 60% and 80%, none on 90%' },
   ...TL_ACCOUNT_PILLS,
