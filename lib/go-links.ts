@@ -35,7 +35,10 @@ const fromCfd: GoLink[] = cfdData.firms.map((f) => ({
   url: f.url,
 }));
 
-const fromPromos: GoLink[] = promosData.promos.map((p) => ({
+// The daily sync can leave no promo running (21/10/2026): an empty array types as never[],
+// so the shape is spelled out here.
+type LivePromo = { firmId: string; firmName: string; url: string };
+const fromPromos: GoLink[] = (promosData.promos as LivePromo[]).map((p) => ({
   source: 'promos' as const,
   firmId: p.firmId,
   firmName: p.firmName,
