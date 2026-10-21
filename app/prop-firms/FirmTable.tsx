@@ -136,6 +136,7 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
 
   const sizes = firm.sizes.filter((r) => r.cells[pi] != null);
   const priceOf = (r: (typeof sizes)[number]) => r.cells[pi] as Exclude<PriceCell, null>;
+  const rowLabel = firm.priceLabels?.[pi] ?? firm.priceLabel;
   const lineLabels = [
     ...new Set(sizes.flatMap((r) => { const c = priceOf(r); return c.kind === 'price' ? c.lines.map((l) => l.label) : []; })),
   ];
@@ -267,8 +268,8 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
                 <>
                   <tr className="ft-row-price">
                     <th scope="row" className="ft-label">
-                      {firm.priceLabel ?? firm.priceTitle}
-                      {firm.priceLabel ? (
+                      {rowLabel ?? firm.priceTitle}
+                      {rowLabel ? (
                         <span className="ft-col-sub">{firm.priceSub ?? firm.priceTitle}</span>
                       ) : (
                         firm.priceSub && <span className="ft-col-sub">{firm.priceSub}</span>
@@ -293,7 +294,7 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
                           return (
                             <td key={r.size} className="ft-cell">
                               {p ? (
-                                <PriceView cell={{ kind: 'price', now: p.now, was: p.was, per: null, from: false, lines: [] }} />
+                                <PriceView cell={{ kind: 'price', now: p.now, was: p.was, alt: p.alt ?? null, per: null, from: false, lines: [] }} />
                               ) : (
                                 <span className="none">–</span>
                               )}

@@ -26,6 +26,9 @@ type PerpsPlan = {
   altPrice?: number;
   altPromoPrice?: number;
   lines?: { label: string; value: string }[];
+  // more: other versions of the same account, one price row each under the main one (Vest 1-Step:
+  // 3% DLL on the main row, then 4% DLL and No DLL; Angelo 21/10/2026: « les regrouper »).
+  more?: { label: string; price: number; promoPrice: number | null; altPrice?: number; altPromoPrice?: number }[];
   note?: string;
 };
 type PerpsProgram = {
@@ -37,6 +40,7 @@ type PerpsProgram = {
   ddType: string | null;
   dailyLoss: string | null;
   note: string;
+  priceLabel?: string; // name of the main price row when the plans carry `more` rows
   plans: PerpsPlan[];
 };
 type PerpsFirm = {
@@ -299,6 +303,26 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     }),
   }));
 
+  const moreLabels = [...new Set(programs.flatMap((p) => p.plans.flatMap((pl) => (pl.more ?? []).map((m) => m.label))))];
+  const extraPrices: NonNullable<FirmView['extraPrices']> = moreLabels.map((label) => ({
+    label,
+    byProgram: programs.map((p) => {
+      const rows = p.plans.flatMap((pl) => (pl.more ?? []).filter((m) => m.label === label).map((m) => [pl.size, m] as const));
+      if (!rows.length) return null;
+      return Object.fromEntries(
+        rows.map(([size, m]) => {
+          const now = promo ? m.promoPrice : null;
+          const altNow = promo ? m.altPromoPrice ?? null : null;
+          return [size, {
+            now: now ?? m.price,
+            was: now != null ? m.price : null,
+            alt: m.altPrice != null ? { now: altNow ?? m.altPrice, was: altNow != null ? m.altPrice : null } : null,
+          }];
+        }),
+      );
+    }),
+  }));
+
   const hasPromoPrices = programs.some((p) => p.plans.some((pl) => pl.promoPrice != null));
   const endsLabel = promo?.endsAt
     ? new Date(promo.endsAt).toLocaleString('en-US', {
@@ -324,9 +348,10 @@ function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
     // the rate (Breakout, Angelo 13/10/2026: « 5% off with code JTNQ »).
     priceTitle: promo && hasPromoPrices ? `Price with code ${promo.code}` : 'Price',
     priceSub: promo
-      ? `${promo.discountPct}% off${promo.firstPurchase ? ' your first purchase' : ''}${hasPromoPrices ? '' : ` with code ${promo.code}`}${promo.thenPct ? `\n${promo.thenPct}% off every purchase after` : ''}${endsLabel ? ` until ${endsLabel} New York time` : ''}`
+      ? `${promo.discountPct}% off${promo.firstPurchase ? ' your first purchase' : ''}${hasPromoPrices && !extraPrices.length ? '' : ` with code ${promo.code}`}${promo.thenPct ? `\n${promo.thenPct}% off every purchase after` : ''}${endsLabel ? ` until ${endsLabel} New York time` : ''}`
       : null,
     sizes: sizeRows,
+    ...(extraPrices.length ? { priceLabels: programs.map((p) => p.priceLabel ?? null), extraPrices } : {}),
     funded: FUNDED[firm.id] ? programs.map((p) => FUNDED[firm.id][p.name.split(' ')[0]] ?? null) : undefined,
     legend: [
       ...(LEGEND[firm.id] ?? ['Every limit is a percentage of your starting balance, the way perps firms publish them']),

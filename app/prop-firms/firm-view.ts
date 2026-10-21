@@ -72,7 +72,12 @@ export type FirmView = {
   // A second price for the same account (Traders Launch sells each size at a 60% and an 80%
   // split): the main price row is then named priceLabel, the others by their own label.
   priceLabel?: string;
-  extraPrices?: { label: string; byProgram: (Record<number, { now: number; was: number | null }> | null)[] }[];
+  // The same, program by program (Vest: « 3% DLL » on the 1-Step tabs, nothing on 2-Step / Instant).
+  priceLabels?: (string | null)[];
+  extraPrices?: {
+    label: string;
+    byProgram: (Record<number, { now: number; was: number | null; alt?: { now: number; was: number | null } | null }> | null)[];
+  }[];
   legend: string[];
   href: string;
 };
