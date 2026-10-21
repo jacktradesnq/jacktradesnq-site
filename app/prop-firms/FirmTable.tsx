@@ -142,7 +142,10 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
   const evalPills: Pill[] = [
     ...firm.common.map((t) => ({ label: t })),
     // A rule this program does not have ("–") is not a pill.
-    ...firm.rules.filter((r) => r.cells[pi].text !== '–').map((r) => ({ label: r.label, value: r.cells[pi].text })),
+    // A drawdown-kind cell carries its value in its tag (EOD Trail, Static), not in its text.
+    ...firm.rules
+      .filter((r) => r.cells[pi].text !== '–')
+      .map((r) => ({ label: r.label, value: r.cells[pi].text || r.cells[pi].tag?.label })),
   ];
   const pills = showFunded ? funded.pills : evalPills;
 

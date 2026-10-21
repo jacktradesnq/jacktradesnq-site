@@ -1,55 +1,43 @@
 /**
- * Traders Launch, lu sur sa page d'accueil (Next.js rendu cote serveur).
+ * Traders Launch, lu sur sa page d'accueil (https://traderslaunch.com), section #pricing.
  *
- * Pourquoi la page et pas le dataset du site : le dataset ne connait qu'UN
- * produit chez eux (« 1-Step », 3 tailles) alors que la page en vend deux. Les
- * comptes « Legacy NYC », deux fois moins chers et aux horaires restreints,
- * n'arrivaient jamais dans la tournee du matin (audit du 2026-09-13).
+ * Depuis le 19/10/2026 la page n'a plus de cartes rendues cote serveur pour tout
+ * ce qu'elle vend : un selecteur « Account » (Premium / Static / Early Access)
+ * et un selecteur « Profit Split » (60 / 80 %, et 90 % sur Static) changent les
+ * cartes dans le navigateur. Le HTML brut ne montre que l'etat par defaut
+ * (Premium 80 % + Legacy NYC) : un fetch simple ne verrait jamais Static, et la
+ * synchro du catalogue le retirerait du site. La lecture passe donc par
+ * Playwright (installe dans le workflow), qui clique chaque onglet et relit les
+ * cartes rendues (`readTradersLaunchPage`). Le parsing, lui, est une fonction
+ * pure sur ce releve (`programsFromSnapshot`), testee sur une fixture.
  *
- * Pourquoi PAS le JSON-LD de la page, qui serait pourtant plus simple a lire :
- * il ment. Son `ItemList` annonce $79 / $149 / $299 pour les comptes 100K /
- * 200K / 300K la ou les cartes affichees disent $159 / $299 / $599. C'est une
- * fiche SEO qui n'a pas suivi les prix, et publier $79 parce que c'etait du
- * JSON bien range aurait ete une erreur silencieuse. On lit donc ce que le
- * client voit : les cartes de prix rendues dans le HTML.
+ * Ce qu'on lit, carte par carte (texte rendu, `innerText`) :
  *
- * L'ancre du parsing est le lien « Get Funded » de chaque carte :
+ *     Static 25K                      <- titre : programme + taille
+ *     80% Profit Split
+ *     $25,000 starting capital        <- « · Legacy NYC » sur les Legacy
+ *     $149                            <- le prix, juste avant « One-Time Fee »
+ *     One-Time Fee
+ *     EVALUATION ... SIMFUNDED ...    <- les regles de l'evaluation entre les deux
  *
- *     /auth/purchasing-signup?type=futures&size=100000&split=80&hours=2
+ * plus le lien « Get Funded » de la carte
+ * (`/auth/purchasing-signup?type=futures&size=25000&split=80&hours=2`).
+ * Chaque fait est RECOUPE : la taille du titre, du capital et du lien, le split
+ * du titre, du lien et de l'onglet choisi, le badge Legacy et `hours=1`. Un
+ * desaccord arrete la firme (stale) plutot que de publier un prix mal attribue.
  *
- * C'est la seule partie machine de cette page, elle porte la taille, le split
- * et les horaires, et chaque carte en a exactement un, qui la clot. Le prix et
- * les regles se lisent dans la carte qui precede ce lien, et chaque fait lu est
- * RECOUPE avec lui : une carte dont le titre, le capital affiche et le lien ne
- * s'accordent pas sur la taille arrete tout, plutot que d'annoncer un prix de
- * 100K sur un compte 200K.
+ * Le prix publie est celui du split 80 % (le choix par defaut de la page, et la
+ * convention du site depuis le 13/09) ; chaque plan le dit dans son `note`.
+ * Les prix 60 % / 90 % ne sont pas dans ce JSON : futures.ts les porte (SPLIT_60).
  *
- * Les deux programmes se distinguent dans ce meme lien : `hours=2` et aucun
- * badge = le 1-Step standard ; `hours=1` et le badge « Legacy NYC » = les
- * comptes NYC, 9:30-16:00 ET. Les deux temoins doivent dire la meme chose.
+ * Ce que les cartes NE disent PAS, et qu'on n'invente donc pas : la perte
+ * journaliere (cle omise). La FAQ Static ecrit « There is no separate daily loss
+ * limit », mais la publier ajouterait une colonne au tableau de la firme :
+ * decision d'affichage laissee a Angelo.
  *
- * Ce que la page NE dit PAS, et qu'on n'invente donc pas :
- *
- *  - LA PERTE JOURNALIERE. Aucune carte n'en parle. La cle est OMISE, elle
- *    n'est pas mise a `null` : ici `null` voudrait dire « pas de regle », et la
- *    page ne dit pas ca non plus. Une cle absente n'affirme rien.
- *
- *  - LA CONSISTENCY. La banniere « No Consistency Rules » est suivie, en toutes
- *    lettres, de « Trade your way once funded » : elle parle du compte FINANCE,
- *    pas de l'evaluation. Le help center, lui, annonce 40 % pendant l'eval et
- *    rien une fois finance — c'est knowledge/traders-launch.json qui le porte.
- *    Lire cette banniere comme « consistency : None » contredirait la vraie
- *    regle de l'evaluation, celle qui fait echouer un compte.
- *
- *  - LES FRAIS D'ACTIVATION. « No Additional Fees Once Funded » parle de
- *    l'apres-financement, pas d'un frais d'activation. Le knowledge le couvre.
- *
- * Reste le split, qui qualifie le PRIX et ne peut donc pas etre passe sous
- * silence : les deux sections ont un selecteur 55 % / 80 %, seul celui des
- * Legacy est rendu cote serveur (`aria-pressed="true"` sur 80 %), et les six
- * liens portent `split=80`. Les prix lus sont ceux du split 80 %, chaque plan
- * le dit dans son `note`, et le prix du split 55 % n'existe nulle part dans le
- * HTML : il n'est donc pas publie.
+ * L'onglet Early Access (des « drops » limites en quantite et en duree) n'est
+ * PAS publie : decision d'affichage d'Angelo en attente. Il est releve quand
+ * meme, pour que le journal dise s'il y a un drop en vente.
  */
 
 export const TRADERSLAUNCH_URL = 'https://traderslaunch.com/';
@@ -57,103 +45,91 @@ export const TRADERSLAUNCH_URL = 'https://traderslaunch.com/';
 /** La source citee dans l'alerte de synchro quand la tournee lit cette page. */
 export const TRADERSLAUNCH_SOURCE = 'page traderslaunch.com';
 
-/**
- * Le nom du produit principal. La page l'appelle « Futures 100K » sur la carte
- * et « one-step evaluation » dans sa description ; le dataset du site et
- * knowledge/traders-launch.json l'appellent « 1-Step ». On garde « 1-Step »
- * pour que `knowledgeFor()` continue de s'apparier — c'est lui qui apporte la
- * consistency de 40 % et le mode de drawdown que la page ne detaille pas.
- *
- * Le programme Legacy, lui, prend le nom AFFICHE sur ses cartes (« Legacy
- * NYC »), et surtout pas « 1-Step Legacy NYC » : ce nom-la s'apparierait
- * faussement a l'entree « 1-Step » du knowledge et lui collerait des regles
- * d'evaluation qui ne sont pas les siennes.
- */
-const MAIN_PROGRAM = '1-Step';
+/** Le split dont le prix est publie. */
+export const PUBLISHED_SPLIT = 80;
 
-/**
- * Un navigateur, par prudence. Node repond 200 sans (mesure le 2026-09-13,
- * meme page a l'octet pres), mais un front qui se met a filtrer les clients
- * sans en-tete couterait une tournee, et cet en-tete ne coute rien.
- */
+/** Les onglets releves mais pas publies (voir l'en-tete). */
+const NOT_PUBLISHED = new Set(['Early Access']);
+
 const BROWSER_UA =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
-  '(KHTML, like Gecko) Chrome/126.0 Safari/537.36';
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ' +
+  '(KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 
-/** Le lien « Get Funded », avec ses parametres. Les liens nus (menu, CTA) n'ont pas de « ? ». */
-const CARD_LINK = /purchasing-signup\?([^"'<>\s]+)/g;
-
-/** Les seules entites que cette page met dans ses attributs et ses libelles. */
-const decode = (s) =>
-  String(s)
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#0?39;|&#x27;/gi, "'")
-    .replace(/&nbsp;/g, ' ');
-
-/** « $1,000 » -> 1000. Toute autre forme -> null, jamais NaN. */
+/** « $1,000 », « $1 000 » (espace fine de leur formatage) -> 1000. Sinon null, jamais NaN. */
 function money(raw) {
   if (raw == null) return null;
-  const n = Number(String(raw).replace(/[$,\s]/g, ''));
-  return Number.isFinite(n) ? n : null;
+  const s = String(raw).replace(/[$,\s  ]/g, '');
+  if (!/^\d+(\.\d+)?$/.test(s)) return null;
+  return Number(s);
 }
 
-/**
- * La DERNIERE occurrence, pas la premiere.
- *
- * Une tranche de carte va de la fin du lien precedent a la fin du sien, donc
- * elle traine devant elle tout ce qui separe les deux cartes — et, pour la
- * premiere, tout le haut de la page. Ce qui appartient a la carte est toujours
- * ce qui touche son lien, c'est-a-dire la fin de la tranche. Prendre la
- * premiere occurrence faisait lire a la carte 100K un `<h3>` du haut de page,
- * et le recoupement des tailles ne verifiait plus rien (mesure le 2026-09-13).
- */
-function lastMatch(text, re) {
-  const rx = new RegExp(re.source, re.flags.includes('g') ? re.flags : `${re.flags}g`);
-  let last = null;
-  for (const m of text.matchAll(rx)) last = m;
-  return last;
-}
-
-/** Le premier groupe capture de la derniere occurrence, nettoye, ou null. */
-function grab(text, re) {
-  const m = lastMatch(text, re);
-  return m ? m[1].replace(/\s+/g, ' ').trim() : null;
-}
-
-/** « Futures 100K » -> 100000. Le « K » est le seul multiplicateur de cette page. */
+/** « Futures 100K » / « Static 25K » -> 100000 / 25000. */
 function sizeFromHeading(heading) {
   const m = String(heading ?? '').match(/([\d.]+)\s*K\b/i);
   return m ? Math.round(Number(m[1]) * 1000) : null;
 }
 
+const lines = (text) =>
+  String(text ?? '')
+    .split('\n')
+    .map((l) => l.replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+
+/** La ligne qui suit `label` dans `ls` (exact, insensible a la casse), ou null. */
+function after(ls, label) {
+  const i = ls.findIndex((l) => l.toLowerCase() === label.toLowerCase());
+  return i === -1 || i + 1 >= ls.length ? null : ls[i + 1];
+}
+
+/** Les libelles de la zone EVALUATION, pour savoir ou s'arrete une valeur. */
+const EVAL_LABELS = ['Profit Target', 'Max Drawdown', 'Best Day', 'Days to Pass', 'Consistency Rule'];
+
 /**
- * Une carte de prix : le texte qui precede son lien « Get Funded », plus les
- * parametres de ce lien.
- *
- * Les trois temoins de la taille (le titre, le capital affiche, le lien)
- * doivent s'accorder. Ils sont rendus par trois bouts de code differents chez
- * eux ; le jour ou ils divergent, leur page est cassee ou leur gabarit a
- * change, et dans les deux cas se taire vaut mieux qu'un prix mal attribue.
+ * « $1 000 EODLocks at starting balance », « $1 000 EOD » + « Locks at starting
+ * balance » (les Legacy le mettent sur deux lignes), « $500 staticDoes not trail ».
+ * Rend le montant et une forme normalisee « EOD - Locks at starting balance ».
  */
-function parseCard(slice, params) {
+function drawdown(ls) {
+  const i = ls.findIndex((l) => l.toLowerCase() === 'max drawdown');
+  if (i === -1 || i + 1 >= ls.length) return null;
+  let raw = ls[i + 1];
+  const next = ls[i + 2];
+  if (next && !EVAL_LABELS.some((lb) => lb.toLowerCase() === next.toLowerCase()) && /^[A-Z][a-z]/.test(next)) {
+    raw += ` ${next}`;
+  }
+  const m = raw.match(/^\$([\d,\s  ]+?)\s*(EOD|static)\s*(.*)$/i);
+  if (!m) throw new Error(`drawdown illisible : « ${raw} »`);
+  const kind = /^eod$/i.test(m[2]) ? 'EOD' : 'static';
+  const qualifier = m[3].trim();
+  return { amount: money(m[1]), type: qualifier ? `${kind} - ${qualifier}` : kind };
+}
+
+/**
+ * Une carte : son texte rendu et son lien « Get Funded ».
+ * @param {string} programme  l'onglet sous lequel la carte a ete lue (ou 'Legacy NYC')
+ * @param {number} chosenSplit  le split selectionne dans l'onglet au moment de la lecture
+ */
+function parseCard(programme, chosenSplit, card) {
+  const href = String(card?.href ?? '');
+  const q = href.indexOf('?');
+  const params = new URLSearchParams(q === -1 ? '' : href.slice(q + 1));
   const size = money(params.get('size'));
-  const heading = grab(slice, /<h3[^>]*>([^<]+)<\/h3>/);
-  const capital = money(grab(slice, /\$([\d,.]+)\s*<\/p>\s*<p[^>]*>\s*Starting Capital/));
-  const price = money(grab(slice, /\$([\d,.]+)\s*<\/p>\s*<p[^>]*>\s*One-time fee/));
+  if (size == null || size <= 0) throw new Error(`un lien « Get Funded » sans taille lisible (${href})`);
+  const tag = `${programme} ${size / 1000}K`;
 
-  if (size == null || size <= 0) {
-    throw new Error(`un lien « Get Funded » sans taille lisible (size=${params.get('size')})`);
-  }
-  if (price == null) {
-    throw new Error(
-      `compte ${size} : aucun prix « One-time fee » dans sa carte, la mise en page a change`,
-    );
-  }
+  const ls = lines(card.text);
+  const heading = ls[0] ?? '';
+  const capitalLine = ls.find((l) => /starting capital/i.test(l)) ?? null;
+  const capital = capitalLine ? money(capitalLine.match(/^\$([\d,\s]+)/)?.[1]) : null;
 
-  const duTitre = sizeFromHeading(heading);
-  for (const [quoi, vu] of [['son titre', duTitre], ['son capital affiche', capital]]) {
-    if (vu != null && vu !== size) {
+  const feeAt = ls.findIndex((l) => /^one-time fee$/i.test(l));
+  if (feeAt < 1) throw new Error(`${tag} : aucun prix « One-Time Fee » dans sa carte, la mise en page a change`);
+  const price = money(ls[feeAt - 1]);
+  if (price == null) throw new Error(`${tag} : prix illisible avant « One-Time Fee » (« ${ls[feeAt - 1]} »)`);
+
+  for (const [quoi, vu] of [['son titre', sizeFromHeading(heading)], ['son capital affiche', capital]]) {
+    if (vu == null) throw new Error(`${tag} : ${quoi} est illisible, le gabarit a change`);
+    if (vu !== size) {
       throw new Error(
         `le lien du compte ${size} et ${quoi} (${vu}) ne parlent pas du meme compte : ` +
           'leur gabarit a change, le mapping doit etre relu avant de publier un prix',
@@ -161,131 +137,231 @@ function parseCard(slice, params) {
     }
   }
 
-  // Le split vient du lien ; le libelle de la carte est le second temoin.
   const split = money(params.get('split'));
-  const splitAffiche = money(grab(slice, />\s*([\d.]+)\s*%\s*Profit Split/));
-  if (split != null && splitAffiche != null && split !== splitAffiche) {
+  const splitAffiche = money(ls.find((l) => /^\d+% Profit Split$/i.test(l))?.match(/^(\d+)/)?.[1]);
+  if (split == null || splitAffiche == null || split !== splitAffiche || split !== chosenSplit) {
     throw new Error(
-      `compte ${size} : le lien annonce un split de ${split} % et la carte ${splitAffiche} %`,
+      `${tag} : split incoherent (lien ${split}, carte ${splitAffiche}, onglet choisi ${chosenSplit})`,
     );
   }
 
-  // Le badge est le nom affiche du produit Legacy ; `hours=1` dit la meme chose
-  // cote machine. Un seul des deux = on ne sait plus quel produit on regarde.
-  const badge = grab(slice, />\s*(Legacy NYC)\s*</i);
-  const heuresRestreintes = params.get('hours') === '1';
-  if (Boolean(badge) !== heuresRestreintes) {
+  const legacy = /Legacy NYC/i.test(capitalLine ?? '');
+  if (legacy !== (params.get('hours') === '1') || legacy !== (programme === 'Legacy NYC')) {
     throw new Error(
-      `compte ${size} : badge ${badge ? `« ${badge} »` : 'absent'} et hours=${params.get('hours')} ` +
+      `${tag} : badge Legacy ${legacy ? 'present' : 'absent'} et hours=${params.get('hours')} ` +
         'se contredisent sur le produit vendu',
     );
   }
 
-  const drawdown = lastMatch(slice, /Max Drawdown:\s*\$([\d,.]+)([^<]*)/);
+  // Les regles de l'evaluation, entre EVALUATION et SIMFUNDED.
+  const evalAt = ls.findIndex((l) => /^evaluation$/i.test(l));
+  const fundedAt = ls.findIndex((l) => /^simfunded$/i.test(l));
+  if (evalAt === -1 || fundedAt <= evalAt) throw new Error(`${tag} : zones EVALUATION / SIMFUNDED introuvables`);
+  const ev = ls.slice(evalAt + 1, fundedAt);
 
-  return {
-    programme: badge || MAIN_PROGRAM,
-    legacy: Boolean(badge),
-    split,
-    plan: {
-      size,
-      price,
-      profitTarget: money(grab(slice, /Profit Target:\s*\$([\d,.]+)/)),
-      maxDrawdown: drawdown ? money(drawdown[1]) : null,
-      // La page ecrit « EOD - Locks at Starting Balance ». On garde SA
-      // formulation : elle dit ou le plancher se bloque, ce que « EOD Trailing »
-      // ne dit pas.
-      ddType: drawdown ? drawdown[2].replace(/^[\s-]+/, '').replace(/\s+/g, ' ').trim() || null : null,
-      contracts: grab(slice, /Starting Size:\s*([^<]+)/),
-    },
-  };
+  const plan = { size, price };
+  const target = money(after(ev, 'Profit Target'));
+  if (target == null) throw new Error(`${tag} : profit target illisible`);
+  plan.profitTarget = target;
+
+  const dd = drawdown(ev);
+  if (!dd || dd.amount == null) throw new Error(`${tag} : max drawdown illisible`);
+  plan.maxDrawdown = dd.amount;
+  plan.ddType = dd.type;
+
+  // « Best Day — Under 40% of profit » (Premium, Legacy) ou « Consistency Rule — 50% » (Static).
+  const bestDay = after(ev, 'Best Day');
+  const consRule = after(ev, 'Consistency Rule');
+  const cons = (bestDay ?? consRule ?? '').match(/(\d+)\s*%/);
+  if (cons) plan.consistency = `${cons[1]}%`;
+  else if (/^none$/i.test(consRule ?? '')) plan.consistency = 'None';
+
+  const starts = ls.find((l) => /^Starts at /i.test(l));
+  const contracts = starts?.match(/^Starts at (.+?)(?:, up to [^.]*)?\.(?:\s|$)/i)?.[1];
+  if (contracts) plan.contracts = contracts;
+
+  const note = [];
+  if (legacy) {
+    const hours = starts?.match(/(Trading hours: [^.]*?ET \(Legacy NYC\))/i)?.[1];
+    if (hours) note.push(`${hours}.`);
+  }
+  note.push(`Price shown for the ${split}% split.`);
+  plan.note = note.join(' ');
+
+  return plan;
 }
 
 /**
- * Les programmes vendus sur la page, dans la forme du dataset.
+ * Les programmes vendus, dans la forme du dataset.
  *
- * @param {string} html  le corps de https://traderslaunch.com/
+ * @param {{views: Array<{account: string, split: number|null, cards: Array<{href: string, text: string}>, text?: string}>,
+ *          legacy: {split: number|null, cards: Array<{href: string, text: string}>}}} snap
+ *        le releve de `readTradersLaunchPage`
  * @returns {Array<{name: string, type: 'eval', priceType: 'one-time', plans: object[]}>}
- * @throws  quand plus aucune carte de prix n'est lisible, ou quand deux
- *          lectures d'un meme fait se contredisent.
+ * @throws  quand un onglet vendu n'a plus de carte lisible, ou quand deux lectures d'un fait se contredisent
  */
-export function programsFromHtml(html) {
-  // React seme des `<!-- -->` au milieu de ses textes : « 80<!-- -->% Profit
-  // Split », « Max Drawdown: <!-- -->$1,000<!-- --> EOD ». Les retirer une fois
-  // ici evite de les porter dans chaque expression.
-  const page = String(html ?? '').replace(/<!-- -->/g, '');
-  if (!page.trim()) throw new Error('traderslaunch.com : page vide');
-
-  const cartes = [];
-  let debut = 0;
-  for (const m of page.matchAll(CARD_LINK)) {
-    const fin = m.index + m[0].length;
-    const slice = page.slice(debut, fin);
-    debut = fin;
-    const params = new URLSearchParams(decode(m[1]));
-    // Le compte crypto se vend sur /crypto, avec ses propres regles : il n'a
-    // rien a faire dans la tournee futures.
-    if (params.get('type') !== 'futures') continue;
-    cartes.push(parseCard(slice, params));
+export function programsFromSnapshot(snap) {
+  const views = snap?.views;
+  if (!Array.isArray(views) || views.length === 0) {
+    throw new Error('traderslaunch.com : aucun onglet « Account » dans #pricing, la mise en page a change');
   }
 
-  if (!cartes.length) {
-    throw new Error(
-      'traderslaunch.com : aucune carte de prix futures sur la page ' +
-        '(leur mise en page a change, on repart sur le dataset)',
-    );
+  const programmes = [];
+  const add = (name, split, cards) => {
+    const plans = cards.map((c) => parseCard(name, split, c));
+    const sizes = plans.map((p) => p.size);
+    if (new Set(sizes).size !== sizes.length) throw new Error(`${name} : deux cartes pour la meme taille`);
+    programmes.push({ name, type: 'eval', priceType: 'one-time', plans: plans.sort((a, b) => a.size - b.size) });
+  };
+
+  for (const v of views) {
+    if (NOT_PUBLISHED.has(v.account)) continue;
+    if (!v.cards?.length) {
+      throw new Error(`${v.account} : aucune carte de prix dans son onglet (la mise en page a change)`);
+    }
+    if (v.split !== PUBLISHED_SPLIT) {
+      throw new Error(`${v.account} : le split ${PUBLISHED_SPLIT} % n'a pas pu etre choisi (onglet a ${v.split})`);
+    }
+    add(v.account, v.split, v.cards);
   }
 
-  // Les horaires NYC sont ecrits une seule fois, dans l'encart Legacy, pas sur
-  // chaque carte. On cite leur phrase telle quelle plutot que de la reecrire.
-  const horaires = grab(page, />\s*(NYC trading hours:[^<]*)</);
+  const legacy = snap.legacy;
+  if (legacy?.cards?.length) add('Legacy NYC', legacy.split ?? PUBLISHED_SPLIT, legacy.cards);
 
-  const programmes = new Map();
-  for (const carte of cartes) {
-    const p =
-      programmes.get(carte.programme) ??
-      { name: carte.programme, type: 'eval', priceType: 'one-time', plans: [] };
+  if (!programmes.length) throw new Error('traderslaunch.com : aucune carte de prix futures sur la page');
+  return programmes;
+}
 
-    // Une cle n'existe que si la page porte le fait.
-    const plan = {};
-    for (const [k, v] of Object.entries(carte.plan)) {
-      if (v != null) plan[k] = v;
+/** Une phrase pour le journal sur l'onglet Early Access, ou null s'il n'existe plus. */
+export function earlyAccessStatus(snap) {
+  const v = snap?.views?.find((x) => x.account === 'Early Access');
+  if (!v) return null;
+  if (v.cards?.length) return `Early Access : ${v.cards.length} carte(s) en vente, NON publiees (decision d'Angelo)`;
+  return 'Early Access : aucun drop en vente';
+}
+
+/* ------------------------------------------------------------------ */
+/* Lecture dans le navigateur                                          */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Ouvre la page dans Chromium headless, clique chaque onglet « Account » de
+ * #pricing, choisit le split publie, et releve les cartes. Rien n'est parse ici.
+ *
+ * @param {{chromium: object, url?: string, settleMs?: number}} opts  `chromium` de playwright
+ */
+export async function readTradersLaunchPage({ chromium, url = TRADERSLAUNCH_URL, settleMs = 8000 }) {
+  let browser;
+  try {
+    browser = await chromium.launch({ headless: true });
+  } catch (err) {
+    // En local le Chromium de Playwright n'est pas toujours telecharge : le Chrome installe suffit.
+    try {
+      browser = await chromium.launch({ headless: true, channel: 'chrome' });
+    } catch {
+      throw err;
+    }
+  }
+  try {
+    const ctx = await browser.newContext({ userAgent: BROWSER_UA, viewport: { width: 1440, height: 1000 } });
+    const page = await ctx.newPage();
+    const res = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    if (res && !res.ok()) throw new Error(`${url} : HTTP ${res.status()}`);
+    // networkidle n'arrive jamais sur cette page (flux de payouts en direct).
+    await page.waitForTimeout(settleMs);
+
+    const inPage = {
+      accounts: () => {
+        const sec = document.querySelector('#pricing');
+        if (!sec) return null;
+        const norm = (e) => e.innerText.trim().split('\n')[0].trim();
+        // Les onglets « Account » : boutons a aria-pressed, au texte non vide et qui ne sont pas un split.
+        return [...sec.querySelectorAll('button[aria-pressed]')]
+          .filter((b) => b.innerText.trim() && !/^\d+%$/.test(b.innerText.trim()))
+          .map(norm);
+      },
+      click: ([kind, label]) => {
+        const sec = document.querySelector('#pricing');
+        const vis = (e) => !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
+        const btns = [...sec.querySelectorAll('button')].filter(vis);
+        const b =
+          kind === 'account'
+            ? btns.find((x) => x.hasAttribute('aria-pressed') && x.innerText.trim().split('\n')[0].trim() === label)
+            : kind === 'split'
+              ? btns.find((x) => x.innerText.trim() === label)
+              : btns.find((x) => new RegExp(label).test(x.innerText));
+        if (!b) return false;
+        if (kind !== 'legacy' && b.getAttribute('aria-pressed') === 'true') return true;
+        b.click();
+        return true;
+      },
+      state: (wantLegacy) => {
+        const sec = document.querySelector('#pricing');
+        const vis = (e) => !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
+        const split = [...sec.querySelectorAll('button[aria-pressed="true"]')]
+          .filter(vis)
+          .map((b) => b.innerText.trim())
+          .find((t) => /^\d+%$/.test(t));
+        const links = [...sec.querySelectorAll('a[href*="purchasing-signup?"]')].filter((a) =>
+          wantLegacy ? /[?&]hours=1\b/.test(a.href) : !/[?&]hours=1\b/.test(a.href),
+        );
+        const cards = links.filter(vis).map((a) => {
+          // La carte = le plus haut ancetre qui ne contient que ce lien.
+          let n = a;
+          while (n.parentElement && n.parentElement.querySelectorAll('a[href*="purchasing-signup?"]').length === 1) {
+            n = n.parentElement;
+          }
+          return { href: a.href, text: n.innerText };
+        });
+        return { split: split ? Number(split.replace('%', '')) : null, cards, text: sec.innerText };
+      },
+    };
+
+    const accounts = await page.evaluate(inPage.accounts);
+    if (!accounts?.length) throw new Error('traderslaunch.com : pas de section #pricing ou pas d onglet « Account »');
+
+    const views = [];
+    for (const account of [...new Set(accounts)]) {
+      if (!(await page.evaluate(inPage.click, ['account', account]))) {
+        throw new Error(`onglet « ${account} » introuvable`);
+      }
+      await page.waitForTimeout(1500);
+      await page.evaluate(inPage.click, ['split', `${PUBLISHED_SPLIT}%`]);
+      await page.waitForTimeout(1500);
+      const st = await page.evaluate(inPage.state, false);
+      views.push({ account, split: st.split, cards: st.cards, text: st.cards.length ? undefined : st.text });
     }
 
-    const note = [];
-    if (carte.legacy && horaires) note.push(horaires);
-    if (carte.split != null) note.push(`Price shown for the ${carte.split}% split.`);
-    if (note.length) plan.note = note.join(' ');
+    await page.evaluate(inPage.click, ['legacy', 'View Legacy Accounts']);
+    await page.waitForTimeout(2000);
+    const leg = await page.evaluate(inPage.state, true);
 
-    p.plans.push(plan);
-    programmes.set(carte.programme, p);
+    return { url, readAt: new Date().toISOString(), views, legacy: { split: PUBLISHED_SPLIT, cards: leg.cards } };
+  } finally {
+    await browser.close();
   }
-
-  return [...programmes.values()].map((p) => ({
-    ...p,
-    plans: p.plans.sort((a, b) => a.size - b.size),
-  }));
 }
 
 /**
- * Telecharge et parse. Toute erreur est parlante : l'appelant (bin/matin.mjs)
- * la journalise et retombe sur le dataset du site, il ne l'avale pas.
+ * Lit et parse. Toute erreur est parlante : l'appelant la journalise et garde
+ * les anciennes donnees (stale), il ne l'avale pas.
+ *
+ * @param {{read?: () => Promise<object>, log?: (s: string) => void}} [opts]  `read` injectable pour les tests
  */
-export async function fetchTradersLaunchPrograms({ fetchImpl = fetch, url = TRADERSLAUNCH_URL } = {}) {
-  let res;
-  try {
-    res = await fetchImpl(url, { headers: { 'user-agent': BROWSER_UA } });
-  } catch (err) {
-    throw new Error(`${url} injoignable : ${err.message}`);
+export async function fetchTradersLaunchPrograms({ read, log = () => {} } = {}) {
+  let snap;
+  if (read) {
+    snap = await read();
+  } else {
+    let pw;
+    try {
+      pw = await import('playwright');
+    } catch {
+      throw new Error('playwright absent : la page Traders Launch ne se lit plus sans navigateur');
+    }
+    snap = await readTradersLaunchPage({ chromium: pw.chromium });
   }
-  if (!res?.ok) throw new Error(`${url} : HTTP ${res?.status ?? '?'}`);
-
-  let html;
-  try {
-    html = await res.text();
-  } catch (err) {
-    throw new Error(`${url} : reponse illisible (${err.message})`);
-  }
-
-  return programsFromHtml(html);
+  const ea = earlyAccessStatus(snap);
+  if (ea) log(ea);
+  return programsFromSnapshot(snap);
 }

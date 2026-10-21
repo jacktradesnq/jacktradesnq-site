@@ -8,11 +8,11 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-10-18",
-      "stale": true,
+      "lastChecked": "2026-10-21",
+      "stale": false,
       "programs": [
         {
-          "name": "1-Step",
+          "name": "Premium",
           "type": "eval",
           "priceType": "one-time",
           "plans": [
@@ -23,7 +23,7 @@
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
               "consistency": "40%",
-              "contracts": "2 Mini or 20 Micros",
+              "contracts": "2 minis or 20 micros",
               "note": "Price shown for the 80% split."
             },
             {
@@ -33,7 +33,7 @@
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
               "consistency": "40%",
-              "contracts": "4 Mini or 40 Micros",
+              "contracts": "4 minis or 40 micros",
               "note": "Price shown for the 80% split."
             },
             {
@@ -43,7 +43,44 @@
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
               "consistency": "40%",
-              "contracts": "6 Mini or 60 Micros",
+              "contracts": "6 minis or 60 micros",
+              "note": "Price shown for the 80% split."
+            }
+          ]
+        },
+        {
+          "name": "Static",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 149,
+              "profitTarget": 1500,
+              "maxDrawdown": 500,
+              "ddType": "Static",
+              "consistency": "50%",
+              "contracts": "1 mini or 10 micros",
+              "note": "Price shown for the 80% split."
+            },
+            {
+              "size": 50000,
+              "price": 299,
+              "profitTarget": 3000,
+              "maxDrawdown": 1000,
+              "ddType": "Static",
+              "consistency": "50%",
+              "contracts": "2 minis or 20 micros",
+              "note": "Price shown for the 80% split."
+            },
+            {
+              "size": 100000,
+              "price": 599,
+              "profitTarget": 6000,
+              "maxDrawdown": 2000,
+              "ddType": "Static",
+              "consistency": "50%",
+              "contracts": "4 minis or 40 micros",
               "note": "Price shown for the 80% split."
             }
           ]
@@ -59,8 +96,8 @@
               "profitTarget": 2000,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
-              "contracts": "5 Micros",
-              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Price shown for the 80% split.",
+              "contracts": "5 micros",
+              "note": "Trading hours: 9:30am – 4:00pm ET (Legacy NYC). Price shown for the 80% split.",
               "consistency": "40%"
             },
             {
@@ -69,8 +106,8 @@
               "profitTarget": 3000,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
-              "contracts": "1 Mini or 10 Micros",
-              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Price shown for the 80% split.",
+              "contracts": "1 mini or 10 micros",
+              "note": "Trading hours: 9:30am – 4:00pm ET (Legacy NYC). Price shown for the 80% split.",
               "consistency": "40%"
             },
             {
@@ -79,8 +116,8 @@
               "profitTarget": 5000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
-              "contracts": "2 Mini or 20 Micros",
-              "note": "NYC trading hours: 9:30am–4:00pm ET. Legacy pricing and rules apply. Price shown for the 80% split.",
+              "contracts": "2 minis or 20 micros",
+              "note": "Trading hours: 9:30am – 4:00pm ET (Legacy NYC). Price shown for the 80% split.",
               "consistency": "40%"
             }
           ]

@@ -1,5 +1,34 @@
 {
   "generatedAt": "2026-10-21",
   "builtFor": "2026-10-21",
-  "promos": []
+  "promos": [
+    {
+      "firmId": "traders-launch",
+      "firmName": "Traders Launch",
+      "logo": "/logos/email/traders-launch.png",
+      "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
+      "code": null,
+      "codeViaLink": true,
+      "program": "Static",
+      "programType": "eval",
+      "priceType": "one-time",
+      "size": 50000,
+      "price": 254.15,
+      "originalPrice": 299,
+      "discountPct": 15,
+      "priceNote": null,
+      "note": "Price shown for the 80% split.",
+      "endsAt": null,
+      "expiring": false,
+      "split": "80%",
+      "payout": "Daily",
+      "ddType": "Static",
+      "profitTarget": 3000,
+      "maxDrawdown": 1000,
+      "consistency": "50%",
+      "activationFee": null,
+      "contracts": "2 minis or 20 micros",
+      "lastChecked": "2026-10-21"
+    }
+  ]
 }

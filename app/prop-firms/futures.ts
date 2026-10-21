@@ -12,7 +12,7 @@ import { cheapest, humanDate, splitCommon, type Cell, type FirmView, type Funded
 // Affiliate code applied on every firm link.
 const CODE = 'JTNQ';
 
-type DdType = 'EOD' | 'EOD Trailing' | 'Intraday';
+type DdType = 'EOD' | 'EOD Trailing' | 'Intraday' | 'Static';
 type Plan = {
   size: number;
   price: number;
@@ -66,16 +66,20 @@ const DD_LABEL: Record<DdType, string> = {
   EOD: 'No trail',
   'EOD Trailing': 'EOD Trail',
   Intraday: 'Intraday Trail',
+  Static: 'Static',
 };
 const DD_TITLE: Record<DdType, string> = {
   EOD: 'Static drawdown — fixed loss limit from your starting balance',
   'EOD Trailing': 'Trailing drawdown — the limit follows your end-of-day balance highs',
   Intraday: 'Trailing drawdown — the limit follows your equity in real time',
+  // Traders Launch Static cards, read 21/10/2026: « static — Does not trail ».
+  Static: 'Static drawdown — fixed loss limit, does not trail',
 };
 const DD_LEGEND: Record<DdType, string> = {
   EOD: 'No trail — fixed loss limit, never moves',
   'EOD Trailing': 'EOD Trail — limit follows your end-of-day balance',
   Intraday: 'Intraday Trail — limit follows your equity in real time',
+  Static: 'Static — fixed loss limit, does not trail',
 };
 
 // A program-level promo wins, otherwise the firm-level promo.
@@ -127,7 +131,7 @@ const FIELDS: Field[] = [
     short: 'Type',
     cell: (p) => ({
       text: '',
-      tag: { label: DD_LABEL[p.ddType], title: DD_TITLE[p.ddType], accent: p.ddType !== 'EOD' },
+      tag: { label: DD_LABEL[p.ddType], title: DD_TITLE[p.ddType], accent: p.ddType !== 'EOD' && p.ddType !== 'Static' },
     }),
     common: (c) => `${c.tag?.label} loss limit`,
   },
@@ -210,6 +214,17 @@ const TL_PILLS: Pill[] = [
   { label: 'Payout cap', value: 'None' },
   { label: 'Drawdown', value: 'Locks at start balance, payouts don\'t lower it' },
 ];
+// Traders Launch Static, its cards and « Static Accounts FAQ » on traderslaunch.com read
+// 21/10/2026: « No consistency rule » once sim funded, « No buffer to build », « $200 minimum
+// withdrawal, measured on profit before your split », and on 60% / 80% « positions are
+// auto-flattened » at the daily earnings limit ($1,000 / $2,000 / $4,000); « The 90% option
+// has unlimited daily earnings once SimFunded ».
+const TL_STATIC_PILLS: Pill[] = [
+  { label: 'Consistency', value: 'None' },
+  { label: 'Buffer', value: 'None' },
+  { label: 'Minimum payout', value: '$200 profit, before your split' },
+  { label: 'Daily earnings cap', value: 'Positions flattened at the cap (none on the 90% split)' },
+];
 const FUNDED: Record<string, Record<string, Funded>> = {
   'e8-markets': {
     'E8 Signature Futures': {
@@ -247,9 +262,18 @@ const FUNDED: Record<string, Record<string, Funded>> = {
     },
   },
   'traders-launch': {
-    '1-Step': {
+    Premium: {
       pills: TL_PILLS,
       rows: [{ label: 'Buffer before 1st payout', bySize: { 100000: '$1,000', 200000: '$2,000', 300000: '$3,000' } }],
+    },
+    Static: {
+      pills: TL_STATIC_PILLS,
+      rows: [
+        {
+          label: 'Daily earnings cap (60% / 80% split)',
+          bySize: { 25000: '$1,000', 50000: '$2,000', 100000: '$4,000' },
+        },
+      ],
     },
     'Legacy NYC': {
       pills: TL_PILLS,
@@ -262,13 +286,15 @@ const FUNDED: Record<string, Record<string, Funded>> = {
 // read 12/10/2026: « None. You pay the evaluation fee once. No activation fee when you pass ».
 const NO_ACTIVATION_FEE = new Set(['traders-launch']);
 
-// The 60% split version of the same accounts, list prices from the firm's checkout read on
-// 12/10/2026 (« 60% Profit Split $159 $99 evaluation fee »; /pricing: « Choose a 60% profit
-// split from $99 or an 80% profit split from $159 »). Same target, loss limit and buffer.
-// The scraper reads the 80% prices; the JSON plans are those. Legacy NYC sells at 80% only
-// on the checkout (its 55% shows on the home page alone), so it has none.
+// The 60% split version of the same accounts, list prices read on the « 60% » tab of
+// traderslaunch.com #pricing on 21/10/2026 (Premium « $99 One-Time Fee / 80% profit split
+// fee $159 »; Static $119 / $239 / $479). Same target and loss limit. The scraper reads the
+// 80% prices; the JSON plans are those. Legacy NYC shows its 80% cards only, so it has none.
 const SPLIT_60: Record<string, Record<string, Record<number, number>>> = {
-  'traders-launch': { '1-Step': { 100000: 99, 200000: 199, 300000: 399 } },
+  'traders-launch': {
+    Premium: { 100000: 99, 200000: 199, 300000: 399 },
+    Static: { 25000: 119, 50000: 239, 100000: 479 },
+  },
 };
 const SPLIT_NOTE = / ?Price shown for the 80% split\./;
 

@@ -19,7 +19,7 @@
  * garde ses donnees avec stale: true — les autres firmes continuent.
  * Exit code is 0 unless the JSON write fails.
  *
- * Usage: node scripts/scrape-prop-firms.mjs [--dry]
+ * Usage: node scripts/scrape-prop-firms.mjs [--dry] [--only=<firm id>]
  */
 
 import fs from 'node:fs';
@@ -29,6 +29,8 @@ import { fetchTradersLaunchPrograms } from './lib/firms/traderslaunch.mjs';
 
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
 const DRY = process.argv.includes('--dry');
+// --only=<firm id> : ne relit que cette firme (les autres gardent leurs donnees telles quelles).
+const ONLY = process.argv.find((a) => a.startsWith('--only='))?.slice('--only='.length) ?? null;
 const TODAY = new Date().toISOString().slice(0, 10);
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
@@ -45,25 +47,24 @@ async function fetchText(url) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Traders Launch — server-rendered cards on https://traderslaunch.com  */
+/* Traders Launch — #pricing de https://traderslaunch.com (Playwright)  */
 /* ------------------------------------------------------------------ */
 
-// Le comparateur n'etiquette que trois drawdowns ("No trail", "EOD Trail",
-// "Intraday Trail"). Leurs cartes ecrivent "EOD - Locks at Starting Balance" :
-// un drawdown de fin de journee qui suit les plus hauts jusqu'a revenir au
-// solde de depart, ou il se fige — "EOD Trailing" dans notre vocabulaire, et
-// la legende du tableau dit ce que l'etiquette veut dire. Une formulation
-// inconnue arrete la firme plutot que de publier un drawdown que la page ne
-// sait pas nommer.
+// Les cartes ecrivent leur drawdown en deux mots (lus par le lecteur sous la
+// forme « <type> - <precision> ») :
+//  - « EOD — Locks at starting balance » (Premium, Legacy NYC) : un drawdown de
+//    fin de journee qui suit les plus hauts jusqu'au solde de depart, ou il se
+//    fige — "EOD Trailing" dans notre vocabulaire.
+//  - « static — Does not trail » (Static) : une perte max fixe — "Static".
+// Une formulation inconnue arrete la firme plutot que de publier un drawdown
+// que la page ne sait pas nommer.
 const TRADERSLAUNCH_DD = {
-  'EOD - Locks at Starting Balance': 'EOD Trailing',
-  'EOD': 'EOD',
-  'EOD Trailing': 'EOD Trailing',
-  'Intraday': 'Intraday',
+  'EOD - Locks at starting balance': 'EOD Trailing',
+  'static - Does not trail': 'Static',
 };
 
 async function scrapeTradersLaunch() {
-  const programs = await fetchTradersLaunchPrograms();
+  const programs = await fetchTradersLaunchPrograms({ log: (l) => console.log(`traders-launch: ${l}`) });
   for (const program of programs) {
     for (const plan of program.plans) {
       if (plan.ddType == null) continue;
@@ -241,6 +242,7 @@ async function main() {
   let totalChanges = 0;
 
   for (const firm of data.firms) {
+    if (ONLY && firm.id !== ONLY) continue;
     const scraper = SCRAPERS[firm.id];
     if (!scraper) {
       console.log(`${firm.id}: no scraper defined, skipped`);
