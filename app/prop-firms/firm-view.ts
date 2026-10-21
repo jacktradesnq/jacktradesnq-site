@@ -22,6 +22,8 @@ export type Cell = {
   muted?: boolean;
   // A sentence rather than a figure (plan notes): smaller, wraps.
   note?: boolean;
+  // Said on its own, without the row's label (« One-day pass per step » for a consistency).
+  alone?: boolean;
 };
 
 export type PriceCell =

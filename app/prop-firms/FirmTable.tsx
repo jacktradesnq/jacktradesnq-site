@@ -146,7 +146,7 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
     // A drawdown-kind cell carries its value in its tag (EOD Trail, Static), not in its text.
     ...firm.rules
       .filter((r) => r.cells[pi].text !== '–')
-      .map((r) => ({ label: r.label, value: r.cells[pi].text || r.cells[pi].tag?.label })),
+      .map((r) => (r.cells[pi].alone ? { label: r.cells[pi].text } : { label: r.label, value: r.cells[pi].text || r.cells[pi].tag?.label })),
   ];
   const pills = showFunded ? funded.pills : evalPills;
 

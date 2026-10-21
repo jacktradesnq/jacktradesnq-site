@@ -59,6 +59,13 @@ const SUMMARY: Record<string, string> = {
 // first payout », every 14 days. Direct: 20% consistency to request a payout, no cap, the max
 // loss locks at the starting balance « the moment you request your first payout ».
 const EVAL_CONSISTENCY: Record<string, string> = { Daily: '40%', Classic: 'None', Direct: '20% to request a payout' };
+// No consistency and no minimum days on Classic: said as what it lets you do, each of its two
+// steps can pass in one day (Angelo, 22/10/2026 : « consistency tu peux écrire one day pass ( si
+// on parle de evla ) », then « One-day pass per step » for the 2-step).
+const consistencyCell = (name: string): Cell =>
+  EVAL_CONSISTENCY[name] === 'None'
+    ? { text: 'One-day pass per step', alone: true }
+    : { text: EVAL_CONSISTENCY[name] ?? 'n/c', muted: !EVAL_CONSISTENCY[name] };
 const FUNDED: Record<string, Record<string, Funded>> = {
   'tradeify-fx': {
     Daily: {
@@ -72,9 +79,9 @@ const FUNDED: Record<string, Record<string, Funded>> = {
       ],
       rows: [],
     },
+    // No « Winning days: None », the 14-day pace says when you can ask (Angelo, 22/10/2026).
     Classic: {
       pills: [
-        { label: 'Winning days', value: 'None' },
         { label: 'Consistency', value: 'None' },
         { label: 'Payout request', value: 'Every 14 days' },
         { label: 'Minimum payout', value: '$100' },
@@ -137,7 +144,7 @@ function firmView(firm: CfdFirm): FirmView {
     },
     {
       label: 'Consistency',
-      cells: programs.map((p) => ({ text: EVAL_CONSISTENCY[p.name] ?? 'n/c', muted: !EVAL_CONSISTENCY[p.name] })),
+      cells: programs.map((p) => consistencyCell(p.name)),
       common: (c) => `Consistency ${c.text}`,
     },
   ]);
