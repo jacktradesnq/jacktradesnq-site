@@ -57,6 +57,7 @@ Tout en anglais SAUF footer légal FR (mentions légales + disclaimer AMF D.321-
 ## Workflow
 - Branche dédiée par feature (JAMAIS main)
 - 1 fix = 1 vérif visuelle avant commit
+- Changement visible du site : capture, puis son ok AVANT le merge (Angelo 12/10/2026 : « bah brother tu mas même pas montrer avant de merge »). Règle propre au site : elle ne vaut pas pour ClipForge (22/10 : « Clipforge, je m'en fous du visuel »).
 - Après merge : purge Cloudflare cache via dashboard
 - Angelo copy-colle les specs depuis le Claude principal vers ce CLI
 
