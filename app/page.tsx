@@ -285,6 +285,7 @@ export default function Home() {
         <nav className="nav" aria-label="Primary">
           <a href={SITE.nefarious.url}>Nefarious</a>
           <a href={SITE.propFirms.url}>Prop firms</a>
+          <a href={SITE.tradeCopier.url}>Trade copier</a>
           <div className={`nav-socials${socialsOpen ? ' is-open' : ''}`} ref={socialsRef}>
             <button
               type="button"
@@ -577,6 +578,9 @@ const CSS = `
 @media (max-width: 520px){
   .jtnq-home .nav a, .jtnq-home .nav-socials-trigger{ font-size: 12px; padding: 8px 8px; }
   .jtnq-home .socials-menu{ min-width: 216px; }
+}
+@media (max-width: 360px){
+  .jtnq-home .nav a, .jtnq-home .nav-socials-trigger{ font-size: 11px; padding: 8px 4px; }
 }
 
 .jtnq-home .hero{
