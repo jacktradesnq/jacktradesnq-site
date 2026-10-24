@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-23",
-  "builtFor": "2026-10-23",
+  "generatedAt": "2026-10-24",
+  "builtFor": "2026-10-24",
   "promos": [
     {
       "firmId": "e8-markets",
@@ -29,7 +29,7 @@
       "consistency": "None",
       "activationFee": null,
       "contracts": "4 minis / 40 micros",
-      "lastChecked": "2026-10-23"
+      "lastChecked": "2026-10-24"
     },
     {
       "firmId": "traders-launch",
@@ -58,7 +58,7 @@
       "consistency": "50%",
       "activationFee": null,
       "contracts": "2 minis or 20 micros",
-      "lastChecked": "2026-10-23"
+      "lastChecked": "2026-10-24"
     }
   ]
 }
