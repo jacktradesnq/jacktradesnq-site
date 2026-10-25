@@ -1,6 +1,5 @@
 import firmsData from '@/public/data/prop-firms.json';
 import promosData from '@/public/data/live-promos.json';
-import cfdData from '@/public/data/cfd-firms.json';
 import perpsData from '@/public/data/perps-firms.json';
 
 /**
@@ -21,14 +20,6 @@ export type GoLink = {
 };
 
 const fromFirms: GoLink[] = firmsData.firms.map((f) => ({
-  source: 'prop-firms' as const,
-  firmId: f.id,
-  firmName: f.name,
-  url: f.url,
-}));
-
-// CFD firms sit in their own block on /prop-firms, so their clicks count under the same source.
-const fromCfd: GoLink[] = cfdData.firms.map((f) => ({
   source: 'prop-firms' as const,
   firmId: f.id,
   firmName: f.name,
@@ -61,7 +52,7 @@ const fromTradeCopier: GoLink[] = [
 ];
 
 const byKey = new Map<string, GoLink>();
-for (const link of [...fromFirms, ...fromCfd, ...fromPerps, ...fromPromos, ...fromTradeCopier]) byKey.set(`${link.source}/${link.firmId}`, link);
+for (const link of [...fromFirms, ...fromPerps, ...fromPromos, ...fromTradeCopier]) byKey.set(`${link.source}/${link.firmId}`, link);
 
 export const GO_LINKS: GoLink[] = [...byKey.values()];
 

@@ -12,10 +12,10 @@ export const META = {
   backToHome: { label: 'Jacktradesnq', url: '/' },
   brand: 'Jacktradesnq',
   hero: {
-    eyebrow: 'FUTURES \u00b7 PERPS \u00b7 CFD',
+    eyebrow: 'FUTURES \u00b7 PERPS',
     title: 'Prop firms',
     phrase:
-      'Futures, perps and CFD firms I\u2019m partnered with. Pick one to see all of its plans side by side \u2014 account sizes, prices and risk rules. My code JTNQ or tracked link applied on every button.',
+      'Futures and perps firms I\u2019m partnered with. Pick one to see all of its plans side by side \u2014 account sizes, prices and risk rules. My code JTNQ or tracked link applied on every button.',
   },
   legal: {
     copyright: '\u00a9 2026 JackTradesNQ. All rights reserved.',

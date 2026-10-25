@@ -14,7 +14,7 @@ const SITE = {
     { name: 'Discord', url: 'https://discord.gg/wpddBCAAU2', handle: 'Join the server' },
   ],
   nefarious: { name: 'Nefarious', url: '/nefarious/', tagline: 'Official partner · free Discord community' },
-  propFirms: { name: 'Prop firms', url: '/prop-firms/', tagline: 'Futures, perps & CFD partners · code JTNQ' },
+  propFirms: { name: 'Prop firms', url: '/prop-firms/', tagline: 'Futures & perps partners · code JTNQ' },
   // Bio: Angelo's own sentences (dictated 13-14/10/2026), English corrected only.
   bio: {
     hello: "Hi, I'm Jack",

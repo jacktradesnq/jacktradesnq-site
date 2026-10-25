@@ -1,6 +1,6 @@
 'use client';
 
-// /prop-firms: pick a family (Futures · Perps · CFD), then a firm, and its whole table
+// /prop-firms: pick a family (Futures · Perps), then a firm, and its whole table
 // opens in a window over the page — every program and every size at once. Angelo, 11/10/2026: « un filtre
 // où tu tapes entre futures, perps et CFD […] chaque prop firm tu cliques dessus et ça
 // t'ouvre le tableau directement ».
@@ -17,7 +17,6 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { CSS, META, money } from './shared';
 import { FAMILIES, type Family, type FirmView } from './firm-view';
 import { FUTURES_FIRMS } from './futures';
-import { CFD_FIRMS } from './cfd';
 import { PERPS_PROMO, PERPS_PROMO_FIRM_ID, PROMO_ENDS_MS, perpsFirms, usePromoLive } from './perps';
 import { FirmLogo, FirmTable, PromoClock } from './FirmTable';
 import { FAMILY_CSS } from './family-css';
@@ -31,7 +30,6 @@ export default function PropFirms() {
     () => ({
       futures: [...FUTURES_FIRMS].sort(byName),
       perps: perpsFirms(promoLive).sort(byName),
-      cfd: [...CFD_FIRMS].sort(byName),
     }),
     [promoLive],
   );
@@ -49,7 +47,7 @@ export default function PropFirms() {
     };
   }, []);
 
-  // #futures / #perps / #cfd open the matching family, on load and on back/forward.
+  // #futures / #perps open the matching family, on load and on back/forward.
   useEffect(() => {
     const fromHash = () => {
       const h = window.location.hash.slice(1);

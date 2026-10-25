@@ -1,15 +1,14 @@
 // One shape for every firm on /prop-firms, whatever its family. Angelo, 11/10/2026:
 // « ils choisissent juste entre les trois types de prop firm, et après […] ils cliquent
 // dessus, ça leur montre le tableau avec tout d'un coup ». Each family (futures.ts,
-// perps.ts, cfd.ts) turns its own JSON into FirmView; FirmTable.tsx only draws it: one
+// perps.ts) turns its own JSON into FirmView; FirmTable.tsx only draws it: one
 // program at a time, its rules as pills, one column per account size, Eval / Funded.
 
-export type Family = 'futures' | 'perps' | 'cfd';
+export type Family = 'futures' | 'perps';
 
 export const FAMILIES: { id: Family; label: string }[] = [
   { id: 'futures', label: 'Futures' },
   { id: 'perps', label: 'Perps' },
-  { id: 'cfd', label: 'CFD' },
 ];
 
 export type Cell = {
@@ -108,7 +107,7 @@ export function splitCommon(
   return { common, rules };
 }
 
-// A limit as perps and CFD firms publish it: "None" is a rule (no daily loss), null means
+// A limit as perps firms publish it: "None" is a rule (no daily loss), null means
 // the firm does not publish it ("n/c").
 export const limitCell = (v: string | null): Cell =>
   v == null ? { text: 'n/c', muted: true } : v === 'None' ? { text: 'None', muted: true } : { text: v };
