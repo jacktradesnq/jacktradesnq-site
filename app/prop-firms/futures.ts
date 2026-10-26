@@ -428,6 +428,8 @@ function firmView(firm: Firm): FirmView {
       return Object.fromEntries(
         priced.map((pl) => {
           const price = pl.splitPrices![split];
+          // A plan on a public promo (originalPrice) already lists discounted split prices, like effectivePrice.
+          if (pl.originalPrice != null) return [pl.size, { now: price, was: null }];
           return [pl.size, { now: Math.round(price * (100 - pct)) / 100, was: pct ? price : null }];
         }),
       );

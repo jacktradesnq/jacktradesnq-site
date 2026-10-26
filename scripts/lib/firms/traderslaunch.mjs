@@ -41,6 +41,12 @@
  * L'onglet Early Access (des « drops » limites en quantite et en duree) devient
  * un programme « Early Access » des qu'un drop y est en vente ; sans drop, il
  * n'ajoute rien. Un drop illisible est signale au journal sans arreter la firme.
+ * Un drop vendu sur une seule plateforme (TL Drop #2, « Hyperprop only », 26/10/2026)
+ * n'a aucune carte sur la plateforme par defaut : l'onglet dit seulement « Show
+ * Hyperprop Accounts ». La lecture clique alors ce bouton dans un navigateur
+ * neuf, pour ne pas changer la plateforme des autres onglets. Ses cartes
+ * montrent les trois splits en meme temps (pas de selecteur), un prix barre
+ * (« List price ») et une perte journaliere, lus ici.
  */
 
 export const TRADERSLAUNCH_URL = 'https://traderslaunch.com/';
@@ -103,7 +109,8 @@ function drawdown(ls) {
   const m = raw.match(/^\$([\d,\s  ]+?)\s*(EOD|static)\s*(.*)$/i);
   if (!m) throw new Error(`drawdown illisible : « ${raw} »`);
   const kind = /^eod$/i.test(m[2]) ? 'EOD' : 'static';
-  const qualifier = m[3].trim();
+  // « EOD trailing Stops trailing at $25,000 » (drops) : le « trailing » colle au type.
+  const qualifier = m[3].trim().replace(/^trailing\s+(?=\S)/i, '');
   return { amount: money(m[1]), type: qualifier ? `${kind} - ${qualifier}` : kind };
 }
 
@@ -111,8 +118,9 @@ function drawdown(ls) {
  * Une carte : son texte rendu et son lien « Get Funded ».
  * @param {string} programme  l'onglet sous lequel la carte a ete lue (ou 'Legacy NYC')
  * @param {number} chosenSplit  le split selectionne dans l'onglet au moment de la lecture
+ * @param {boolean} drop  une carte de drop Early Access : pas de ligne « starting capital »
  */
-function parseCard(programme, chosenSplit, card) {
+function parseCard(programme, chosenSplit, card, drop = false) {
   const href = String(card?.href ?? '');
   const q = href.indexOf('?');
   const params = new URLSearchParams(q === -1 ? '' : href.slice(q + 1));
@@ -130,7 +138,9 @@ function parseCard(programme, chosenSplit, card) {
   const price = money(ls[feeAt - 1]);
   if (price == null) throw new Error(`${tag} : prix illisible avant « One-Time Fee » (« ${ls[feeAt - 1]} »)`);
 
-  for (const [quoi, vu] of [['son titre', sizeFromHeading(heading)], ['son capital affiche', capital]]) {
+  const checks = [['son titre', sizeFromHeading(heading)]];
+  if (!drop || capitalLine) checks.push(['son capital affiche', capital]);
+  for (const [quoi, vu] of checks) {
     if (vu == null) throw new Error(`${tag} : ${quoi} est illisible, le gabarit a change`);
     if (vu !== size) {
       throw new Error(
@@ -164,6 +174,12 @@ function parseCard(programme, chosenSplit, card) {
   const ev = ls.slice(evalAt + 1, fundedAt);
 
   const plan = { size, price };
+  // « List price » / « $99 » / « 20% Off » sous le prix (drops) : le prix barre de la page.
+  const listPrice = money(after(ls.slice(feeAt), 'List price'));
+  if (listPrice != null) {
+    if (listPrice < price) throw new Error(`${tag} : prix barre ${listPrice} sous le prix ${price}`);
+    if (listPrice > price) plan.originalPrice = listPrice;
+  }
   const target = money(after(ev, 'Profit Target'));
   if (target == null) throw new Error(`${tag} : profit target illisible`);
   plan.profitTarget = target;
@@ -187,11 +203,21 @@ function parseCard(programme, chosenSplit, card) {
   if (cons) plan.consistency = `${cons[1]}%`;
   else if (/^none$/i.test(consRule ?? '')) plan.consistency = 'None';
 
+  const note = [];
+  // « Daily Loss Limit » / « $600 » / « Lifted on days that start at or above $25,600 » (drops).
+  const dll = after(ev, 'Daily Loss Limit');
+  if (dll != null) {
+    const v = money(dll);
+    if (v == null) throw new Error(`${tag} : « Daily Loss Limit » illisible (« ${dll} »)`);
+    plan.dailyLoss = v;
+    const why = ev[ev.findIndex((l) => /^daily loss limit$/i.test(l)) + 2];
+    if (why && /^Lifted /.test(why)) note.push(`Daily loss limit ${why[0].toLowerCase()}${why.slice(1)}.`);
+  }
+
   const starts = ls.find((l) => /^Starts at /i.test(l));
-  const contracts = starts?.match(/^Starts at (.+?)(?:, up to [^.]*)?\.(?:\s|$)/i)?.[1];
+  const contracts = starts?.match(/^Starts at (.+?)(?:, up to [^.]*)?\.(?:\s|$)/i)?.[1] ?? after(ev, 'Starting Size');
   if (contracts) plan.contracts = contracts;
 
-  const note = [];
   // « Trading hours: 6:00pm – 4:00pm ET the following day » (Premium, Static),
   // « Trading hours: 9:30am – 4:00pm ET (Legacy NYC) » : chaque carte a les siennes.
   const hours = starts?.match(/(Trading hours: [^.]*?ET\b[^.]*?)\s*(?:\.|$)/i)?.[1]?.trim();
@@ -213,7 +239,18 @@ function parseCard(programme, chosenSplit, card) {
  * @param {boolean} drop  un drop Early Access : pas de split 80 % exige
  */
 function programFrom(name, splits, faq, drop = false) {
-  const all = Array.isArray(splits) ? splits : [];
+  let all = Array.isArray(splits) ? splits : [];
+  if (drop && all.length === 1 && all[0].split == null) {
+    // Un drop montre tous ses splits a la fois, sans selecteur : le lien de chaque carte dit le sien.
+    const by = new Map();
+    for (const c of all[0].cards ?? []) {
+      const q = String(c?.href ?? '').indexOf('?');
+      const sp = money(new URLSearchParams(q === -1 ? '' : String(c.href).slice(q + 1)).get('split'));
+      if (!by.has(sp)) by.set(sp, []);
+      by.get(sp).push(c);
+    }
+    all = [...by].map(([split, cards]) => ({ split, cards }));
+  }
   const read = all.filter((s) => s.cards?.length);
   if (!read.length) throw new Error(`${name} : aucune carte de prix dans son onglet (la mise en page a change)`);
   const empty = all.find((s) => !s.cards?.length);
@@ -231,14 +268,14 @@ function programFrom(name, splits, faq, drop = false) {
     main = read[0];
   }
 
-  const plans = main.cards.map((c) => parseCard(name, main.split, c));
+  const plans = main.cards.map((c) => parseCard(name, main.split, c, drop));
   const sizes = plans.map((p) => p.size);
   if (new Set(sizes).size !== sizes.length) throw new Error(`${name} : deux cartes pour la meme taille`);
 
   for (const s of read) {
     if (s === main) continue;
     for (const card of s.cards) {
-      const other = parseCard(name, s.split, card);
+      const other = parseCard(name, s.split, card, drop);
       const base = plans.find((p) => p.size === other.size);
       const tag = `${name} ${other.size / 1000}K`;
       if (!base) throw new Error(`${tag} : vendu au split ${s.split} % mais pas au ${main.split} %`);
@@ -260,7 +297,8 @@ function programFrom(name, splits, faq, drop = false) {
   // l'evaluation et du compte finance sans en citer, et la FAQ Static ecrit « There is
   // no separate daily loss limit ». Angelo, 21/10/2026 : « si y a pas écrit de daily
   // loss limit.. peut être que par ce que y en a pas ».
-  for (const p of plans) p.dailyLoss = null;
+  // Les drops publient la leur sur la carte (TL Drop #2 : $600) : celle-la reste.
+  for (const p of plans) if (p.dailyLoss === undefined) p.dailyLoss = null;
 
   return { name, type: 'eval', priceType: 'one-time', plans: plans.sort((a, b) => a.size - b.size) };
 }
@@ -287,7 +325,19 @@ export function programsFromSnapshot(snap, { log = () => {} } = {}) {
     if (v.account === EARLY_ACCESS) {
       if (!v.splits?.some((s) => s.cards?.length)) continue; // aucun drop en vente
       try {
-        programmes.push(programFrom(EARLY_ACCESS, v.splits, v.faq, true));
+        const ea = programFrom(EARLY_ACCESS, v.splits, v.faq, true);
+        // « TL Drop #2 25K, » -> « TL Drop #2 · Hyperprop only. Ends Mon, Nov 2, 6:53 AM ET. »
+        const card = v.splits.flatMap((s) => s.cards ?? [])[0];
+        const title = lines(card?.text)[0]?.replace(/\s*[\d.]+\s*K\b,?\s*$/i, '');
+        const ends = lines(v.text).find((l) => /^Ends /.test(l));
+        const intro = [
+          title ? `${title}${v.platform ? ` · ${v.platform} only` : ''}.` : null,
+          ends ? `${ends}.` : null,
+        ]
+          .filter(Boolean)
+          .join(' ');
+        if (intro) for (const p of ea.plans) p.note = `${intro} ${p.note}`;
+        programmes.push(ea);
       } catch (err) {
         // Un drop au gabarit inconnu ne doit pas geler Premium / Static / Legacy.
         log(`Early Access : drop en vente mais illisible, NON publie (${err.message})`);
@@ -309,7 +359,8 @@ export function earlyAccessStatus(snap) {
   const v = snap?.views?.find((x) => x.account === EARLY_ACCESS);
   if (!v) return null;
   const n = (v.splits ?? []).reduce((k, s) => k + (s.cards?.length ?? 0), 0);
-  if (n) return `Early Access : ${n} carte(s) en vente, publiees comme programme « ${EARLY_ACCESS} »`;
+  const sur = v.platform ? ` sur ${v.platform}` : '';
+  if (n) return `Early Access : ${n} carte(s) en vente${sur}, publiees comme programme « ${EARLY_ACCESS} »`;
   return 'Early Access : aucun drop en vente';
 }
 
@@ -449,6 +500,49 @@ export async function readTradersLaunchPage({ chromium, url = TRADERSLAUNCH_URL,
     await page.evaluate(inPage.openLegacy);
     await page.waitForTimeout(2000);
     const legacy = { splits: await readSplits(true) };
+
+    // Un drop vendu sur une seule plateforme : ses cartes n'existent que derriere
+    // « Show <plateforme> Accounts ». Navigateur neuf, les autres onglets restent lus
+    // sur la plateforme par defaut.
+    const ea = views.find((v) => v.account === EARLY_ACCESS);
+    const platform = ea && !ea.splits.some((s) => s.cards.length) ? ea.text?.match(/Show (\w+) Accounts/)?.[1] : null;
+    if (platform) {
+      const p2 = await (await browser.newContext({ userAgent: BROWSER_UA, viewport: { width: 1440, height: 1000 } })).newPage();
+      const r2 = await p2.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+      if (r2 && !r2.ok()) throw new Error(`${url} : HTTP ${r2.status()}`);
+      await p2.waitForTimeout(settleMs);
+      if (!(await p2.evaluate(inPage.clickAccount, EARLY_ACCESS))) throw new Error(`onglet « ${EARLY_ACCESS} » introuvable`);
+      await p2.waitForTimeout(1500);
+      const shown = await p2.evaluate((label) => {
+        const b = [...document.querySelectorAll('#pricing button')].find((x) => x.innerText.trim() === label);
+        if (!b) return false;
+        b.click();
+        return true;
+      }, `Show ${platform} Accounts`);
+      if (!shown) throw new Error(`bouton « Show ${platform} Accounts » introuvable`);
+      await p2.waitForTimeout(3000);
+      // Une taille par bouton « 25K » / « 50K » quand le drop en vend plusieurs.
+      const sizes = await p2.evaluate(() =>
+        [...document.querySelectorAll('#pricing button[aria-pressed]')]
+          .filter((b) => !!(b.offsetWidth || b.offsetHeight || b.getClientRects().length))
+          .map((b) => b.innerText.trim())
+          .filter((t) => /^\d+K$/.test(t)),
+      );
+      const seen = new Map();
+      for (const size of sizes.length ? sizes : [null]) {
+        if (size) {
+          await p2.evaluate((t) => {
+            const b = [...document.querySelectorAll('#pricing button[aria-pressed]')].find((x) => x.innerText.trim() === t);
+            if (b && b.getAttribute('aria-pressed') !== 'true') b.click();
+          }, size);
+          await p2.waitForTimeout(1500);
+        }
+        for (const c of await p2.evaluate(inPage.cards, false)) seen.set(c.href, c);
+      }
+      ea.splits = [{ split: null, cards: [...seen.values()] }];
+      ea.platform = platform;
+      ea.text = await p2.evaluate(inPage.text);
+    }
 
     return { url, readAt: new Date().toISOString(), views, legacy };
   } finally {

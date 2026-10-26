@@ -116,6 +116,29 @@
           ]
         },
         {
+          "name": "Early Access",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 79.2,
+              "originalPrice": 99,
+              "profitTarget": 1200,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": 600,
+              "consistency": "None",
+              "contracts": "1 mini or 10 micros",
+              "note": "TL Drop #2 · Hyperprop only. Ends Mon, Nov 2, 6:53 AM ET. Daily loss limit lifted on days that start at or above $25,600. Price shown for the 80% split.",
+              "splitPrices": {
+                "60": 63.2,
+                "90": 95.2
+              }
+            }
+          ]
+        },
+        {
           "name": "Legacy NYC",
           "type": "eval",
           "priceType": "one-time",

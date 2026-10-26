@@ -69,7 +69,10 @@ async function scrapeTradersLaunch() {
   for (const program of programs) {
     for (const plan of program.plans) {
       if (plan.ddType == null) continue;
-      const vocab = TRADERSLAUNCH_DD[plan.ddType];
+      // « EOD trailing — Stops trailing at $25,000 » (drops) : il se fige au solde de depart,
+      // comme « Locks at starting balance », seulement si ce montant est bien la taille du compte.
+      const stops = plan.ddType.match(/^EOD - Stops trailing at \$([\d,]+)$/);
+      const vocab = stops && Number(stops[1].replace(/,/g, '')) === plan.size ? 'EOD Trailing' : TRADERSLAUNCH_DD[plan.ddType];
       if (!vocab) throw new Error(`drawdown « ${plan.ddType} » hors du vocabulaire du comparateur`);
       plan.ddType = vocab;
     }

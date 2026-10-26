@@ -281,3 +281,65 @@ test('fetchTradersLaunchPrograms : une panne de lecture remonte telle quelle', a
     /HTTP 503/,
   );
 });
+
+/**
+ * La page relevee le 2026-10-26 : TL Drop #2 en vente sur Hyperprop seulement.
+ * Sur la plateforme par defaut, l'onglet Early Access n'a aucune carte, seulement
+ * « Show Hyperprop Accounts » ; la lecture clique ce bouton. Ses trois cartes
+ * (25K, 60 / 80 / 90 %) s'affichent ensemble, sans selecteur de split.
+ */
+const SNAP_DROP2 = JSON.parse(
+  fs.readFileSync(path.join(HERE, 'lib/firms/fixtures', 'traderslaunch-pricing-2026-10-26.json'), 'utf8'),
+);
+
+test('TL Drop #2 (Hyperprop only) : publie comme programme Early Access', () => {
+  assert.equal(
+    earlyAccessStatus(SNAP_DROP2),
+    'Early Access : 3 carte(s) en vente sur Hyperprop, publiees comme programme « Early Access »',
+  );
+  const progs = programsFromSnapshot(SNAP_DROP2);
+  assert.deepEqual(progs.map((p) => p.name), ['Premium', 'Static', 'Early Access', 'Legacy NYC']);
+  const [p] = progs.find((x) => x.name === 'Early Access').plans;
+  assert.deepEqual(
+    {
+      size: p.size,
+      price: p.price,
+      originalPrice: p.originalPrice,
+      splitPrices: p.splitPrices,
+      profitTarget: p.profitTarget,
+      maxDrawdown: p.maxDrawdown,
+      ddType: p.ddType,
+      dailyLoss: p.dailyLoss,
+      consistency: p.consistency,
+      contracts: p.contracts,
+    },
+    {
+      size: 25000,
+      price: 79.2,
+      originalPrice: 99,
+      splitPrices: { 60: 63.2, 90: 95.2 },
+      profitTarget: 1200,
+      maxDrawdown: 1000,
+      ddType: 'EOD - Stops trailing at $25,000',
+      dailyLoss: 600,
+      consistency: 'None',
+      contracts: '1 mini or 10 micros',
+    },
+  );
+  assert.equal(p.minDays, undefined);
+  assert.equal(
+    p.note,
+    'TL Drop #2 · Hyperprop only. Ends Mon, Nov 2, 6:53 AM ET. ' +
+      'Daily loss limit lifted on days that start at or above $25,600. Price shown for the 80% split.',
+  );
+});
+
+test('TL Drop #2 : les autres programmes gardent leur lecture (pas de perte journaliere, pas de prix barre)', () => {
+  const progs = programsFromSnapshot(SNAP_DROP2);
+  for (const pr of progs.filter((x) => x.name !== 'Early Access')) {
+    for (const p of pr.plans) {
+      assert.equal(p.dailyLoss, null, `${pr.name} ${p.size}`);
+      assert.equal(p.originalPrice, undefined, `${pr.name} ${p.size}`);
+    }
+  }
+});
