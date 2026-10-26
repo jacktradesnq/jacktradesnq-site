@@ -455,11 +455,6 @@ function firmView(firm: Firm): FirmView {
   const viaLink = discountViaLink(firm.id);
   const code = viaLink ? null : chipCode(firm, promo.code);
   const viaCode = allPlans.some((p) => effectivePrice(firm, p).viaCode);
-  const priceSub = viaCode
-    ? viaLink
-      ? `${firm.codeDiscountPct}% off via my link, no code to type`
-      : `${firm.codeDiscountPct}% off with code ${code}`
-    : promo.title || null;
   const ddTypes = [...new Set(allPlans.map((p) => p.ddType))];
   const legend = ddTypes.map((t) => DD_LEGEND[t]);
   if (allPlans.some((p) => p.dailyLossSoft)) legend.push('soft — position flattened, account survives');
@@ -484,18 +479,11 @@ function firmView(firm: Firm): FirmView {
     common,
     rules,
     priceTitle: code ? `Price with code ${code}` : viaLink && viaCode ? 'Price via my link' : 'Price',
-    priceSub,
-    // A program on the firm's own public promo (TL Drop #2: « List price $99 », « 20% Off », shown
-    // without any code) says its own discount, not « with code JTNQ ».
-    ...(programs.some((pr) => pr.plans.every((pl) => pl.originalPrice != null))
-      ? {
-          priceSubs: programs.map((pr) => {
-            const pl = pr.plans[0];
-            if (!pl?.originalPrice || !pr.plans.every((x) => x.originalPrice != null)) return priceSub;
-            return `${Math.round((1 - pl.price / pl.originalPrice) * 100)}% off`;
-          }),
-        }
-      : {}),
+    priceSub: viaCode
+      ? viaLink
+        ? `${firm.codeDiscountPct}% off via my link, no code to type`
+        : `${firm.codeDiscountPct}% off with code ${code}`
+      : promo.title || null,
     sizes: sizeRows,
     funded: fundedBy
       ? programs.map((pr) =>

@@ -150,7 +150,6 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
   const sizes = firm.sizes.filter((r) => r.cells[pi] != null);
   const priceOf = (r: (typeof sizes)[number]) => r.cells[pi] as Exclude<PriceCell, null>;
   const rowLabel = firm.priceLabels?.[pi] ?? firm.priceLabel;
-  const priceSub = firm.priceSubs ? firm.priceSubs[pi] : firm.priceSub;
   const lineLabels = [
     ...new Set(sizes.flatMap((r) => { const c = priceOf(r); return c.kind === 'price' ? c.lines.map((l) => l.label) : []; })),
   ];
@@ -281,9 +280,9 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
                     <th scope="row" className="ft-label">
                       {rowLabel ?? firm.priceTitle}
                       {rowLabel ? (
-                        <span className="ft-col-sub">{priceSub ?? firm.priceTitle}</span>
+                        <span className="ft-col-sub">{firm.priceSub ?? firm.priceTitle}</span>
                       ) : (
-                        priceSub && <span className="ft-col-sub">{priceSub}</span>
+                        firm.priceSub && <span className="ft-col-sub">{firm.priceSub}</span>
                       )}
                     </th>
                     {sizes.map((r) => {
