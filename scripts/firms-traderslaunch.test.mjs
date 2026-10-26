@@ -181,15 +181,15 @@ function withDrop(s) {
 
 test('Early Access : sans drop en vente, rien ne s ajoute', () => {
   assert.equal(earlyAccessStatus(SNAP), 'Early Access : aucun drop en vente');
-  assert.ok(!programs.some((p) => p.name === 'Early Access'));
+  assert.ok(!programs.some((p) => p.name === 'Drop'));
 });
 
 test('Early Access : un drop en vente devient un programme du site', () => {
   const s = withDrop(clone());
   assert.match(earlyAccessStatus(s), /2 carte\(s\) en vente, publiees/);
   const progs = programsFromSnapshot(s);
-  assert.deepEqual(progs.map((p) => p.name), ['Premium', 'Static', 'Early Access', 'Legacy NYC']);
-  const ea = progs.find((p) => p.name === 'Early Access');
+  assert.deepEqual(progs.map((p) => p.name), ['Premium', 'Static', 'Drop', 'Legacy NYC']);
+  const ea = progs.find((p) => p.name === 'Drop');
   assert.deepEqual(
     ea.plans.map(({ size, price, profitTarget, maxDrawdown }) => ({ size, price, profitTarget, maxDrawdown })),
     [
@@ -295,11 +295,11 @@ const SNAP_DROP2 = JSON.parse(
 test('TL Drop #2 (Hyperprop only) : publie comme programme Early Access', () => {
   assert.equal(
     earlyAccessStatus(SNAP_DROP2),
-    'Early Access : 3 carte(s) en vente sur Hyperprop, publiees comme programme « Early Access »',
+    'Early Access : 3 carte(s) en vente sur Hyperprop, publiees comme programme « Drop »',
   );
   const progs = programsFromSnapshot(SNAP_DROP2);
-  assert.deepEqual(progs.map((p) => p.name), ['Premium', 'Static', 'Early Access', 'Legacy NYC']);
-  const [p] = progs.find((x) => x.name === 'Early Access').plans;
+  assert.deepEqual(progs.map((p) => p.name), ['Premium', 'Static', 'Drop', 'Legacy NYC']);
+  const [p] = progs.find((x) => x.name === 'Drop').plans;
   assert.deepEqual(
     {
       size: p.size,
@@ -336,7 +336,7 @@ test('TL Drop #2 (Hyperprop only) : publie comme programme Early Access', () => 
 
 test('TL Drop #2 : les autres programmes gardent leur lecture (pas de perte journaliere, pas de prix barre)', () => {
   const progs = programsFromSnapshot(SNAP_DROP2);
-  for (const pr of progs.filter((x) => x.name !== 'Early Access')) {
+  for (const pr of progs.filter((x) => x.name !== 'Drop')) {
     for (const p of pr.plans) {
       assert.equal(p.dailyLoss, null, `${pr.name} ${p.size}`);
       assert.equal(p.originalPrice, undefined, `${pr.name} ${p.size}`);

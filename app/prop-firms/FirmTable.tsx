@@ -130,6 +130,19 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
   const [pi, setPi] = useState(0);
   const [mode, setMode] = useState<'eval' | 'funded'>('eval');
   const cols = firm.columns.length;
+  const tab = (c: FirmView['columns'][number], i: number) => (
+    <button
+      key={c.name}
+      type="button"
+      role="tab"
+      aria-selected={pi === i}
+      className={`ft-prog${pi === i ? ' active' : ''}`}
+      onClick={() => setPi(i)}
+    >
+      {c.name}
+    </button>
+  );
+  const drops = firm.columns.map((c, i) => [c, i] as const).filter(([c]) => c.drop);
   const funded = firm.funded?.[pi] ?? null;
   const hasFunded = !!firm.funded?.some(Boolean);
   const showFunded = mode === 'funded' && funded != null;
@@ -189,18 +202,7 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
           <div className="ft-filters">
             {cols > 1 && (
               <div className="ft-seg" role="tablist" aria-label={`${firm.name} programs`}>
-                {firm.columns.map((c, i) => (
-                  <button
-                    key={c.name}
-                    type="button"
-                    role="tab"
-                    aria-selected={pi === i}
-                    className={`ft-prog${pi === i ? ' active' : ''}`}
-                    onClick={() => setPi(i)}
-                  >
-                    {c.name}
-                  </button>
-                ))}
+                {firm.columns.map((c, i) => (c.drop ? null : tab(c, i)))}
               </div>
             )}
             {cols > 1 && hasFunded && <span className="ft-divider" aria-hidden="true" />}
@@ -218,6 +220,14 @@ export function FirmTable({ firm, id, banner }: { firm: FirmView; id: string; ba
                   </button>
                 ))}
               </div>
+            )}
+            {drops.length > 0 && (
+              <>
+                <span className="ft-divider" aria-hidden="true" />
+                <div className="ft-seg" role="tablist" aria-label={`${firm.name} drops`}>
+                  {drops.map(([c, i]) => tab(c, i))}
+                </div>
+              </>
             )}
           </div>
         </div>

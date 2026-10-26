@@ -459,7 +459,8 @@ function firmView(firm: Firm): FirmView {
           }
         : null,
     from: cheapestWithSplits(cheapest(sizeRows), extraPrices),
-    columns: programs.map((pr) => ({ name: pr.name })),
+    // Angelo, 26/10/2026 : « tu peux le mettre bcp + a droite genre a droite de funded ? car c des Drop ».
+    columns: programs.map((pr) => ({ name: pr.name, ...(pr.name === 'Drop' ? { drop: true } : {}) })),
     common,
     rules,
     priceTitle: code ? `Price with code ${code}` : viaLink && viaCode ? 'Price via my link' : 'Price',

@@ -60,7 +60,8 @@ export type FirmView = {
   stale: { label: string; title: string } | null;
   // Cheapest price paid with code JTNQ, any program, any size.
   from: { now: number; per: string | null } | null;
-  columns: { name: string }[];
+  // drop: a limited Traders Launch drop, its tab sits after Eval / Funded.
+  columns: { name: string; drop?: boolean }[];
   common: string[];
   rules: RuleRow[];
   priceTitle: string;

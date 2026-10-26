@@ -60,6 +60,12 @@ export const PUBLISHED_SPLIT = 80;
 /** L'onglet des drops : publie seulement quand un drop est en vente. */
 const EARLY_ACCESS = 'Early Access';
 
+/**
+ * Le nom du programme publie pour un drop. Angelo, 26/10/2026 : « c des Drop et c pas
+ * des early access c des Drop ».
+ */
+export const DROP_PROGRAM = 'Drop';
+
 const BROWSER_UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ' +
   '(KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
@@ -325,7 +331,7 @@ export function programsFromSnapshot(snap, { log = () => {} } = {}) {
     if (v.account === EARLY_ACCESS) {
       if (!v.splits?.some((s) => s.cards?.length)) continue; // aucun drop en vente
       try {
-        const ea = programFrom(EARLY_ACCESS, v.splits, v.faq, true);
+        const ea = programFrom(DROP_PROGRAM, v.splits, v.faq, true);
         // « TL Drop #2 25K, » -> « TL Drop #2 · Hyperprop only. Ends Mon, Nov 2, 6:53 AM ET. »
         const card = v.splits.flatMap((s) => s.cards ?? [])[0];
         const title = lines(card?.text)[0]?.replace(/\s*[\d.]+\s*K\b,?\s*$/i, '');
@@ -360,7 +366,7 @@ export function earlyAccessStatus(snap) {
   if (!v) return null;
   const n = (v.splits ?? []).reduce((k, s) => k + (s.cards?.length ?? 0), 0);
   const sur = v.platform ? ` sur ${v.platform}` : '';
-  if (n) return `Early Access : ${n} carte(s) en vente${sur}, publiees comme programme « ${EARLY_ACCESS} »`;
+  if (n) return `Early Access : ${n} carte(s) en vente${sur}, publiees comme programme « ${DROP_PROGRAM} »`;
   return 'Early Access : aucun drop en vente';
 }
 

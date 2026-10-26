@@ -84,7 +84,8 @@ const DATA = JSON.parse(readFileSync(new URL('../public/data/prop-firms.json', i
 test('every Traders Launch plan of the JSON is returned by the extractor', () => {
   const rules = tradersLaunchRules(TL_SNAP);
   const tl = DATA.firms.find((f) => f.id === 'traders-launch');
-  for (const program of tl.programs) {
+  // Un drop (programme « Drop ») ne vit que le temps de sa vente : le releve fige du 21/10 n'en a pas.
+  for (const program of tl.programs.filter((p) => p.name !== 'Drop')) {
     for (const plan of program.plans) {
       const m = rules.find((r) => r.programName === program.name && r.size === plan.size);
       assert.ok(m, `${program.name} ${plan.size}: not returned`);
