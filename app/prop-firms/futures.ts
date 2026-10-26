@@ -263,6 +263,20 @@ const TL_STATIC_PILLS: Pill[] = [
   { label: 'Daily earnings cap', value: 'Positions flattened at the cap on 60% and 80%, none on 90%' },
   ...TL_ACCOUNT_PILLS,
 ];
+// TL Drop #2 (Hyperprop only), its « Funded Terms » on traderslaunch.com read 26/10/2026:
+// « $2,000 daily earning cap once sim funded: positions are auto-flattened and trading stops
+// for the day » (60% / 80%; the 90% card: « unlimited daily earnings »), « The same drawdown and
+// daily loss limit apply », « No consistency rule and no minimum trading days », « Withdraw
+// everything above $25,600, $200 minimum, before your split, one payout a day ».
+// Only shown while the published drop is this one (DROP_TERMS_FOR).
+const TL_DROP2_PILLS: Pill[] = [
+  { label: 'Consistency', value: 'None' },
+  { label: 'No minimum trading days' },
+  { label: 'Withdraw', value: 'Everything above $25,600, $200 minimum before your split' },
+  { label: 'Daily earnings cap', value: '$2,000 on 60% and 80% (positions flattened), none on 90%' },
+  { label: 'Drawdown', value: 'Same as the evaluation, $600 daily loss limit too' },
+];
+const DROP_TERMS_FOR = 'TL Drop #2';
 const FUNDED: Record<string, Record<string, Funded>> = {
   'e8-markets': {
     'E8 Signature Futures': {
@@ -317,6 +331,7 @@ const FUNDED: Record<string, Record<string, Funded>> = {
       pills: TL_PILLS,
       rows: [{ label: 'Buffer before 1st payout', bySize: { 100000: '$1,000', 200000: '$1,000', 300000: '$2,000' } }],
     },
+    Drop: { pills: TL_DROP2_PILLS, rows: [] },
   },
 };
 
@@ -470,7 +485,14 @@ function firmView(firm: Firm): FirmView {
         : `${firm.codeDiscountPct}% off with code ${code}`
       : promo.title || null,
     sizes: sizeRows,
-    funded: fundedBy ? programs.map((pr) => fundedBy[pr.name] ?? null) : undefined,
+    funded: fundedBy
+      ? programs.map((pr) =>
+          // A later drop has its own terms: the written ones only cover the drop they were read on.
+          pr.name === 'Drop' && !pr.plans.every((pl) => pl.note?.startsWith(DROP_TERMS_FOR))
+            ? null
+            : fundedBy[pr.name] ?? null,
+        )
+      : undefined,
     ...(splits.length ? { priceLabel: `${firm.split} split`, extraPrices } : {}),
     legend,
     href: goHref('prop-firms', firm.id),
