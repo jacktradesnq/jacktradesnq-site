@@ -66,6 +66,8 @@ export type FirmView = {
   rules: RuleRow[];
   priceTitle: string;
   priceSub: string | null;
+  // The same, program by program, when one program differs (a drop on a public promo: no code).
+  priceSubs?: (string | null)[];
   sizes: { size: number; cells: PriceCell[] }[];
   // What changes once funded, per program (null: not documented for that program). The
   // table switches between the evaluation and these rules (Angelo, 12/10/2026, after
