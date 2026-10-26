@@ -1,6 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+// Written by ~/propfirm-tracker (site_counter.py) on every approved payout mail, then pushed to main.
+import challengeData from '../content/challenge.json';
+
+const challengeMonth = new Date(`${challengeData.month}-01T12:00:00Z`).toLocaleString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 
 const SITE = {
   brand: 'Jacktradesnq',
@@ -32,10 +36,10 @@ const SITE = {
     { file: '/payouts/lucid-2026-06-17-568.webp', date: 'June 17, 2026', amount: '$568' },
   ],
   // $10K a month challenge (series started 16/09/2026): payouts received this month, reset to 0 if missed.
-  // current = the figure Angelo shows on his videos; null until he gives it.
+  // current = sum of this month's "Payout Approved" amounts (Angelo 26/10/2026: "Tout seul", "Montant approuvé").
   challenge: {
-    month: 'October 2026',
-    current: 0 as number | null,
+    month: challengeMonth,
+    current: Math.round(challengeData.total) as number | null,
     goal: 10000,
     text: [
       "Right now, I'm doing a challenge where I document my way to making $10K a month with day trading.",
