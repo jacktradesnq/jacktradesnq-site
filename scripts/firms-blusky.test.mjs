@@ -29,7 +29,7 @@ test('les 15 comptes vendus le 2026-10-27, prix avec JTNQ et prix catalogue', ()
     ['Orbit', 100000, 209.3, 299],
     ['Orbit', 150000, 293.3, 419],
     ['Orbit', 200000, 293.3, 419],
-    ['Direct 2 Funded', 3500, 749, null],
+    ['Direct 2 Funded', 3500, 599.2, 749],
     ['Instant Funded', 50000, 299, 599],
   ]);
 });

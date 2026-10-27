@@ -27,12 +27,14 @@ export const BLUSKY_PROGRAMS = {
 
 // Ce que le code JTNQ retire, plan par plan : visuel « One code. Every BluSky plan »
 // envoye par leur CM a Angelo le 2026-10-27 (« Launch $10 off, Propel 30% off, Orbit
-// 30% off, Instant Funded $300 off — use code JTNQ »). Direct 2 Funded n'y est pas :
-// prix catalogue. Le prix publie est celui paye avec JTNQ, le prix catalogue est barre.
+// 30% off, Instant Funded $300 off — use code JTNQ »). Direct 2 Funded n'y est pas : JTNQ
+// teste sur leur verification de coupon le 2026-10-27 (« 20% off »), les 14 autres plans y
+// donnent les remises du visuel. Le prix publie est celui paye avec JTNQ, le prix catalogue est barre.
 export const JTNQ_OFF = {
   Launch: { usd: 10 },
   Propel: { pct: 30 },
   Orbit: { pct: 30 },
+  'Direct 2 Funded': { pct: 20 },
   'Instant Funded': { usd: 300 },
 };
 

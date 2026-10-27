@@ -381,7 +381,7 @@
       "split": "90%",
       "payout": "Daily",
       "promo": {
-        "label": "$10 off Launch, 30% off Propel and Orbit, $300 off Instant Funded",
+        "label": "$10 off Launch, 30% off Propel and Orbit, 20% off Direct 2 Funded, $300 off Instant Funded",
         "code": "JTNQ"
       },
       "url": "https://trader.blusky.pro/checkout?referral_id=09577e87582233340375",
@@ -557,8 +557,8 @@
           "plans": [
             {
               "size": 3500,
-              "price": 749,
-              "originalPrice": null,
+              "price": 599.2,
+              "originalPrice": 749,
               "profitTarget": null,
               "maxDrawdown": 2500,
               "ddType": "Static",
