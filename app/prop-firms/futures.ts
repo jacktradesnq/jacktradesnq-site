@@ -207,6 +207,12 @@ const FIELDS: Field[] = [
 
 const cellKey = (c: Cell) => JSON.stringify([c.text, c.tag?.label ?? '', !!c.soft]);
 
+// No profit target written on an instant account (BluSky Direct 2 Funded, Instant Funded):
+// Angelo, 22/10/2026, « pas de profit target ni de daily loss affiché sur un compte instant qui
+// n'en a pas » (CLAUDE.md du dépôt).
+const cellFor = (f: Field, pr: Program, plan: Plan): Cell | null =>
+  pr.type === 'instant' && f.label === 'Profit target' && plan.profitTarget == null ? null : f.cell(plan);
+
 // Funded rules per program, read on each firm's own help pages on 12/10/2026. Winning
 // days always written as a figure or "None" (Angelo, 12/10/2026: « tu mets le chiffre, si y
 // a pas tu mets none »).
@@ -467,7 +473,7 @@ function firmView(firm: Firm): FirmView {
     { label: 'Fee', cells: programs.map((pr) => ({ text: fee(pr) })), common: (c) => c.text },
     ...perProgram.map((f) => ({
       label: f.label,
-      cells: programs.map((pr) => f.cell(pr.plans[0])),
+      cells: programs.map((pr) => cellFor(f, pr, pr.plans[0]) ?? { text: '–', muted: true }),
       common: f.common,
     })),
   ]);
@@ -505,7 +511,10 @@ function firmView(firm: Firm): FirmView {
         was: price.was,
         per: pr.priceType === 'monthly' ? '/mo' : null,
         from: !!plan.priceAmbiguous,
-        lines: perSize.map((f) => ({ label: f.short, cell: f.cell(plan) })),
+        lines: perSize.flatMap((f) => {
+          const cell = cellFor(f, pr, plan);
+          return cell ? [{ label: f.short, cell }] : [];
+        }),
       };
     }),
   }));
