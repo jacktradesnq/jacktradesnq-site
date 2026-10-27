@@ -35,6 +35,7 @@ non ? imagine ils ont pas clique mon lien »).
 ## codes
 traders-launch = JTNQ
 e8-markets = JTNQ
+blusky = JTNQ
 
 ---
 

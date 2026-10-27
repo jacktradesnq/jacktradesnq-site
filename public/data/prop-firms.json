@@ -374,6 +374,221 @@
         }
       ],
       "rulesCheckedAt": "2026-10-12"
+    },
+    {
+      "id": "blusky",
+      "name": "BluSky",
+      "split": "90%",
+      "payout": "Daily",
+      "promo": {
+        "label": "$10 off Launch, 30% off Propel and Orbit, $300 off Instant Funded",
+        "code": "JTNQ"
+      },
+      "url": "https://trader.blusky.pro/checkout?referral_id=09577e87582233340375",
+      "lastChecked": "2026-10-27",
+      "stale": false,
+      "programs": [
+        {
+          "name": "Launch",
+          "type": "eval",
+          "priceType": "monthly",
+          "plans": [
+            {
+              "size": 50000,
+              "price": 49,
+              "originalPrice": 59,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "consistency": "55%",
+              "contracts": "5 minis or 50 micros",
+              "activationFee": 99
+            },
+            {
+              "size": 100000,
+              "price": 59,
+              "originalPrice": 69,
+              "profitTarget": 6000,
+              "maxDrawdown": 2500,
+              "ddType": "EOD Trailing",
+              "consistency": "55%",
+              "contracts": "10 minis or 100 micros",
+              "activationFee": 149
+            },
+            {
+              "size": 200000,
+              "price": 69,
+              "originalPrice": 79,
+              "profitTarget": 6000,
+              "maxDrawdown": 2000,
+              "ddType": "Static",
+              "consistency": "55%",
+              "contracts": "2 minis or 20 micros",
+              "activationFee": 179
+            }
+          ]
+        },
+        {
+          "name": "Propel",
+          "type": "eval",
+          "priceType": "monthly",
+          "plans": [
+            {
+              "size": 25000,
+              "price": 105,
+              "originalPrice": 150,
+              "profitTarget": 1500,
+              "maxDrawdown": 1200,
+              "ddType": "EOD Trailing",
+              "consistency": "34%",
+              "contracts": "2 minis or 25 micros"
+            },
+            {
+              "size": 50000,
+              "price": 112,
+              "originalPrice": 160,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "consistency": "34%",
+              "contracts": "5 minis or 50 micros"
+            },
+            {
+              "size": 100000,
+              "price": 154,
+              "originalPrice": 220,
+              "profitTarget": 6000,
+              "maxDrawdown": 2500,
+              "ddType": "EOD Trailing",
+              "consistency": "34%",
+              "contracts": "10 minis or 100 micros"
+            },
+            {
+              "size": 150000,
+              "price": 119,
+              "originalPrice": 170,
+              "profitTarget": 3000,
+              "maxDrawdown": 1000,
+              "ddType": "Static",
+              "consistency": "34%",
+              "contracts": "1 mini or 15 micros"
+            },
+            {
+              "size": 200000,
+              "price": 189,
+              "originalPrice": 270,
+              "profitTarget": 6000,
+              "maxDrawdown": 2000,
+              "ddType": "Static",
+              "consistency": "34%",
+              "contracts": "2 minis or 20 micros"
+            },
+            {
+              "size": 300000,
+              "price": 224,
+              "originalPrice": 320,
+              "profitTarget": 20000,
+              "maxDrawdown": 5000,
+              "ddType": "Static",
+              "consistency": "21%",
+              "contracts": "5 minis or 50 micros"
+            }
+          ]
+        },
+        {
+          "name": "Orbit",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 50000,
+              "price": 139.3,
+              "originalPrice": 199,
+              "profitTarget": 3000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "consistency": "None",
+              "minDays": 1,
+              "contracts": "5 minis or 50 micros",
+              "note": "30 days to pass from purchase, a reset does not extend it."
+            },
+            {
+              "size": 100000,
+              "price": 209.3,
+              "originalPrice": 299,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "consistency": "None",
+              "minDays": 1,
+              "contracts": "10 minis or 100 micros",
+              "note": "30 days to pass from purchase, a reset does not extend it."
+            },
+            {
+              "size": 150000,
+              "price": 293.3,
+              "originalPrice": 419,
+              "profitTarget": 9000,
+              "maxDrawdown": 4500,
+              "ddType": "EOD Trailing",
+              "consistency": "None",
+              "minDays": 1,
+              "contracts": "15 minis or 150 micros",
+              "note": "30 days to pass from purchase, a reset does not extend it."
+            },
+            {
+              "size": 200000,
+              "price": 293.3,
+              "originalPrice": 419,
+              "profitTarget": 8000,
+              "maxDrawdown": 3000,
+              "ddType": "Static",
+              "consistency": "None",
+              "minDays": 1,
+              "contracts": "3 minis or 30 micros",
+              "note": "30 days to pass from purchase, a reset does not extend it."
+            }
+          ]
+        },
+        {
+          "name": "Direct 2 Funded",
+          "type": "instant",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 3500,
+              "price": 749,
+              "originalPrice": null,
+              "profitTarget": null,
+              "maxDrawdown": 2500,
+              "ddType": "Static",
+              "dailyLoss": 2000,
+              "consistency": "21%",
+              "contracts": "5 minis or 50 micros",
+              "note": "Profit split 50% for 30 trading days, then 80%. No more than 3 losing days in any 10 trading days."
+            }
+          ]
+        },
+        {
+          "name": "Instant Funded",
+          "type": "instant",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 50000,
+              "price": 299,
+              "originalPrice": 599,
+              "profitTarget": null,
+              "maxDrawdown": 2000,
+              "ddType": "Intraday",
+              "dailyLoss": 1000,
+              "consistency": "21%",
+              "contracts": "5 minis or 50 micros",
+              "note": "Profit split 80%. The trailing drawdown stops at $51,000 once the balance passes $53,000."
+            }
+          ]
+        }
+      ]
     }
   ]
 }

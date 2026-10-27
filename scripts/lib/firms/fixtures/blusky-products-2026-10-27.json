@@ -1,0 +1,3039 @@
+[
+ {
+  "challenge_type": "Launch",
+  "products": [
+   {
+    "id": 14,
+    "name": "LAUNCH 50K",
+    "description": "Account Size: $50,000",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 37,
+      "account_size": "50K",
+      "price": "59",
+      "broker": "Volumetrica",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 38,
+      "account_size": "50K",
+      "price": "59",
+      "broker": "Tradovate",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 39,
+      "account_size": "50K",
+      "price": "59",
+      "broker": "Rithmic",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 58,
+      "account_size": "50K",
+      "price": "59",
+      "broker": "Tradesea",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 87,
+      "account_size": "50K",
+      "price": "59",
+      "broker": "Tickblaze",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 120,
+      "account_size": "50K",
+      "price": "59",
+      "broker": "BlackArrow",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     }
+    ],
+    "challenge": {
+     "id": 14,
+     "title": "LAUNCH 50K",
+     "description": "Account Size: $50,000",
+     "challenge_type": "Launch",
+     "swap_mode": "NORMAL",
+     "steps": 2,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "EOD",
+     "global_drawdown_threshold": "100.000000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Eval",
+       "description": "LAUNCH 50K - Eval",
+       "step": 1,
+       "live": false,
+       "target_profit": "0.060000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.040000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "55.00",
+       "minis_limit": 5,
+       "micros_limit": 50,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "3000",
+       "target_profit_balance": "53000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2000",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Buffer",
+       "description": "LAUNCH 50K - Buffer",
+       "step": 2,
+       "live": false,
+       "target_profit": "0.060000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.040000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "34.00",
+       "minis_limit": 5,
+       "micros_limit": 50,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "3000",
+       "target_profit_balance": "53000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2000",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Funded",
+       "description": "LAUNCH 50K - Funded",
+       "step": 3,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.966667",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "0.00",
+       "minis_limit": 5,
+       "micros_limit": 50,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2900",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": true,
+     "no_activation_fee": false,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   },
+   {
+    "id": 15,
+    "name": "LAUNCH 100K",
+    "description": "Account Size: $100,000",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 40,
+      "account_size": "100K",
+      "price": "69",
+      "broker": "Volumetrica",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 41,
+      "account_size": "100K",
+      "price": "69",
+      "broker": "Tradovate",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 42,
+      "account_size": "100K",
+      "price": "69",
+      "broker": "Rithmic",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 59,
+      "account_size": "100K",
+      "price": "69",
+      "broker": "Tradesea",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 88,
+      "account_size": "100K",
+      "price": "69",
+      "broker": "Tickblaze",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 121,
+      "account_size": "100K",
+      "price": "69",
+      "broker": "BlackArrow",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     }
+    ],
+    "challenge": {
+     "id": 15,
+     "title": "LAUNCH 100K",
+     "description": "Account Size: $100,000",
+     "challenge_type": "Launch",
+     "swap_mode": "NORMAL",
+     "steps": 2,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "EOD",
+     "global_drawdown_threshold": "100.000000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Eval",
+       "description": "LAUNCH 100K - Eval",
+       "step": 1,
+       "live": false,
+       "target_profit": "0.060000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.025000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "55.00",
+       "minis_limit": 10,
+       "micros_limit": 100,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "6000",
+       "target_profit_balance": "106000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2500",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Buffer",
+       "description": "LAUNCH 100K - Buffer",
+       "step": 2,
+       "live": false,
+       "target_profit": "0.035000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.025000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "34.00",
+       "minis_limit": 10,
+       "micros_limit": 100,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "3500",
+       "target_profit_balance": "103500",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2500",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Funded",
+       "description": "LAUNCH 100K - Funded",
+       "step": 3,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.971429",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "0.00",
+       "minis_limit": 10,
+       "micros_limit": 100,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "3400",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": true,
+     "no_activation_fee": false,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   },
+   {
+    "id": 16,
+    "name": "LAUNCH 200K",
+    "description": "Account Size: $200,000",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 43,
+      "account_size": "200K",
+      "price": "79",
+      "broker": "Volumetrica",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 44,
+      "account_size": "200K",
+      "price": "79",
+      "broker": "Tradovate",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 45,
+      "account_size": "200K",
+      "price": "79",
+      "broker": "Rithmic",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 60,
+      "account_size": "200K",
+      "price": "79",
+      "broker": "Tradesea",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 89,
+      "account_size": "200K",
+      "price": "79",
+      "broker": "Tickblaze",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 122,
+      "account_size": "200K",
+      "price": "79",
+      "broker": "BlackArrow",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     }
+    ],
+    "challenge": {
+     "id": 16,
+     "title": "LAUNCH 200K",
+     "description": "Account Size: $200,000",
+     "challenge_type": "Launch",
+     "swap_mode": "NORMAL",
+     "steps": 2,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "STATIC",
+     "global_drawdown_threshold": "100.000000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Eval",
+       "description": "LAUNCH 200K - Eval",
+       "step": 1,
+       "live": false,
+       "target_profit": "0.030000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.010000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "55.00",
+       "minis_limit": 2,
+       "micros_limit": 20,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "6000",
+       "target_profit_balance": "206000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2000",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Funded",
+       "description": "LAUNCH 200K - Funded",
+       "step": 3,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.971429",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "0.00",
+       "minis_limit": 2,
+       "micros_limit": 20,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2914",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Buffer",
+       "description": "LAUNCH 200K - Buffer",
+       "step": 2,
+       "live": false,
+       "target_profit": "0.015000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.010000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "34.00",
+       "minis_limit": 2,
+       "micros_limit": 20,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "3000",
+       "target_profit_balance": "203000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2000",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": true,
+     "no_activation_fee": false,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   }
+  ]
+ },
+ {
+  "challenge_type": "PROPEL",
+  "products": [
+   {
+    "id": 7,
+    "name": "PROPEL 25K",
+    "description": "Account Size: $25,000",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 19,
+      "account_size": "25K",
+      "price": "150",
+      "broker": "Volumetrica",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 20,
+      "account_size": "25K",
+      "price": "150",
+      "broker": "Tradovate",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 21,
+      "account_size": "25K",
+      "price": "150",
+      "broker": "Rithmic",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 52,
+      "account_size": "25K",
+      "price": "150",
+      "broker": "Tradesea",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 81,
+      "account_size": "25K",
+      "price": "150",
+      "broker": "Tickblaze",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 115,
+      "account_size": "25K",
+      "price": "150",
+      "broker": "BlackArrow",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     }
+    ],
+    "challenge": {
+     "id": 7,
+     "title": "PROPEL 25K",
+     "description": "Account Size: $25,000",
+     "challenge_type": "PROPEL",
+     "swap_mode": "NORMAL",
+     "steps": 2,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "EOD",
+     "global_drawdown_threshold": "100.000000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Buffer",
+       "description": "PROPEL 25K - Buffer",
+       "step": 2,
+       "live": false,
+       "target_profit": "0.060000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.048000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "34.00",
+       "minis_limit": 2,
+       "micros_limit": 25,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "1500",
+       "target_profit_balance": "26500",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "1200",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Eval",
+       "description": "PROPEL 25K - Eval",
+       "step": 1,
+       "live": false,
+       "target_profit": "0.060000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.048000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "34.00",
+       "minis_limit": 2,
+       "micros_limit": 25,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "1500",
+       "target_profit_balance": "26500",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "1200",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Funded",
+       "description": "PROPEL 25K - Funded",
+       "step": 3,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.933333",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "0.00",
+       "minis_limit": 2,
+       "micros_limit": 25,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "1400",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": false,
+     "no_activation_fee": true,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   },
+   {
+    "id": 8,
+    "name": "PROPEL 50K",
+    "description": "Account Size: $50,000",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 22,
+      "account_size": "50K",
+      "price": "160",
+      "broker": "Volumetrica",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 23,
+      "account_size": "50K",
+      "price": "160",
+      "broker": "Tradovate",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 24,
+      "account_size": "50K",
+      "price": "160",
+      "broker": "Rithmic",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 53,
+      "account_size": "50K",
+      "price": "160",
+      "broker": "Tradesea",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 82,
+      "account_size": "50K",
+      "price": "160",
+      "broker": "Tickblaze",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 127,
+      "account_size": "50K",
+      "price": "160",
+      "broker": "BlackArrow",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     }
+    ],
+    "challenge": {
+     "id": 8,
+     "title": "PROPEL 50K",
+     "description": "Account Size: $50,000",
+     "challenge_type": "PROPEL",
+     "swap_mode": "NORMAL",
+     "steps": 2,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "EOD",
+     "global_drawdown_threshold": "100.000000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Buffer",
+       "description": "PROPEL 50K - Buffer",
+       "step": 2,
+       "live": false,
+       "target_profit": "0.060000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.040000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "34.00",
+       "minis_limit": 5,
+       "micros_limit": 50,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "3000",
+       "target_profit_balance": "53000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2000",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Eval",
+       "description": "PROPEL 50K - Eval",
+       "step": 1,
+       "live": false,
+       "target_profit": "0.060000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.040000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "34.00",
+       "minis_limit": 5,
+       "micros_limit": 50,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "3000",
+       "target_profit_balance": "53000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2000",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Funded",
+       "description": "PROPEL 50K - Funded",
+       "step": 3,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.966667",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "0.00",
+       "minis_limit": 5,
+       "micros_limit": 50,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2900",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": false,
+     "no_activation_fee": true,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   },
+   {
+    "id": 10,
+    "name": "PROPEL 100K",
+    "description": "Account Size: $100,000",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 25,
+      "account_size": "100K",
+      "price": "220",
+      "broker": "Volumetrica",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 26,
+      "account_size": "100K",
+      "price": "220",
+      "broker": "Tradovate",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 27,
+      "account_size": "100K",
+      "price": "220",
+      "broker": "Rithmic",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 54,
+      "account_size": "100K",
+      "price": "220",
+      "broker": "Tradesea",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 83,
+      "account_size": "100K",
+      "price": "220",
+      "broker": "Tickblaze",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 116,
+      "account_size": "100K",
+      "price": "220",
+      "broker": "BlackArrow",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     }
+    ],
+    "challenge": {
+     "id": 10,
+     "title": "PROPEL 100K",
+     "description": "Account Size: $100,000",
+     "challenge_type": "PROPEL",
+     "swap_mode": "NORMAL",
+     "steps": 2,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "EOD",
+     "global_drawdown_threshold": "100.000000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Eval",
+       "description": "PROPEL 100K - Eval",
+       "step": 1,
+       "live": false,
+       "target_profit": "0.060000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.025000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "34.00",
+       "minis_limit": 10,
+       "micros_limit": 100,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "6000",
+       "target_profit_balance": "106000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2500",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Funded",
+       "description": "PROPEL 100K - Funded",
+       "step": 3,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.971429",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "0.00",
+       "minis_limit": 10,
+       "micros_limit": 100,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "3400",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Buffer",
+       "description": "PROPEL 100K - Buffer",
+       "step": 2,
+       "live": false,
+       "target_profit": "0.035000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.025000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "34.00",
+       "minis_limit": 10,
+       "micros_limit": 100,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "3500",
+       "target_profit_balance": "103500",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2500",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": false,
+     "no_activation_fee": true,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   },
+   {
+    "id": 11,
+    "name": "PROPEL 150K",
+    "description": "Account Size: $150,000",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 28,
+      "account_size": "150K",
+      "price": "170",
+      "broker": "Volumetrica",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 29,
+      "account_size": "150K",
+      "price": "170",
+      "broker": "Tradovate",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 30,
+      "account_size": "150K",
+      "price": "170",
+      "broker": "Rithmic",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 55,
+      "account_size": "150K",
+      "price": "170",
+      "broker": "Tradesea",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 84,
+      "account_size": "150K",
+      "price": "170",
+      "broker": "Tickblaze",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 117,
+      "account_size": "150K",
+      "price": "170",
+      "broker": "BlackArrow",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     }
+    ],
+    "challenge": {
+     "id": 11,
+     "title": "PROPEL 150K",
+     "description": "Account Size: $150,000",
+     "challenge_type": "PROPEL",
+     "swap_mode": "NORMAL",
+     "steps": 2,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "STATIC",
+     "global_drawdown_threshold": "1.000000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Eval",
+       "description": "PROPEL 150K - Eval",
+       "step": 1,
+       "live": false,
+       "target_profit": "0.020000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.006670",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "34.00",
+       "minis_limit": 1,
+       "micros_limit": 15,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "3000",
+       "target_profit_balance": "153000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "1000",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Funded",
+       "description": "PROPEL 150K - Funded",
+       "step": 3,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.950000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "0.00",
+       "minis_limit": 1,
+       "micros_limit": 15,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "1900",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Buffer",
+       "description": "PROPEL 150K - Buffer",
+       "step": 2,
+       "live": false,
+       "target_profit": "0.013330",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.006670",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "34.00",
+       "minis_limit": 1,
+       "micros_limit": 15,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "2000",
+       "target_profit_balance": "152000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "1000",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": true,
+     "no_activation_fee": true,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   },
+   {
+    "id": 12,
+    "name": "PROPEL 200K",
+    "description": "Account Size: $200,000",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 31,
+      "account_size": "200K",
+      "price": "270",
+      "broker": "Volumetrica",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 32,
+      "account_size": "200K",
+      "price": "270",
+      "broker": "Tradovate",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 33,
+      "account_size": "200K",
+      "price": "270",
+      "broker": "Rithmic",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 56,
+      "account_size": "200K",
+      "price": "270",
+      "broker": "Tradesea",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 85,
+      "account_size": "200K",
+      "price": "270",
+      "broker": "Tickblaze",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 118,
+      "account_size": "200K",
+      "price": "270",
+      "broker": "BlackArrow",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     }
+    ],
+    "challenge": {
+     "id": 12,
+     "title": "PROPEL 200K",
+     "description": "Account Size: $200,000",
+     "challenge_type": "PROPEL",
+     "swap_mode": "NORMAL",
+     "steps": 2,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "STATIC",
+     "global_drawdown_threshold": "1.000000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Funded",
+       "description": "PROPEL 200K - Funded",
+       "step": 3,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.971429",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "0.00",
+       "minis_limit": 2,
+       "micros_limit": 20,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2914",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Eval",
+       "description": "PROPEL 200K - Eval",
+       "step": 1,
+       "live": false,
+       "target_profit": "0.030000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.010000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "34.00",
+       "minis_limit": 2,
+       "micros_limit": 20,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "6000",
+       "target_profit_balance": "206000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2000",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Buffer",
+       "description": "PROPEL 200K - Buffer",
+       "step": 2,
+       "live": false,
+       "target_profit": "0.015000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.010000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "34.00",
+       "minis_limit": 2,
+       "micros_limit": 20,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "3000",
+       "target_profit_balance": "203000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2000",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": true,
+     "no_activation_fee": true,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   },
+   {
+    "id": 13,
+    "name": "PROPEL 300K",
+    "description": "Account Size: $300,000",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 34,
+      "account_size": "300K",
+      "price": "320",
+      "broker": "Volumetrica",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 35,
+      "account_size": "300K",
+      "price": "320",
+      "broker": "Tradovate",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 36,
+      "account_size": "300K",
+      "price": "320",
+      "broker": "Rithmic",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 57,
+      "account_size": "300K",
+      "price": "320",
+      "broker": "Tradesea",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 86,
+      "account_size": "300K",
+      "price": "320",
+      "broker": "Tickblaze",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     },
+     {
+      "id": 119,
+      "account_size": "300K",
+      "price": "320",
+      "broker": "BlackArrow",
+      "has_subscription": true,
+      "supported_addons": [],
+      "bundles": []
+     }
+    ],
+    "challenge": {
+     "id": 13,
+     "title": "PROPEL 300K",
+     "description": "Account Size: $300,000",
+     "challenge_type": "PROPEL",
+     "swap_mode": "NORMAL",
+     "steps": 2,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "STATIC",
+     "global_drawdown_threshold": "1.000000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Eval",
+       "description": "PROPEL 300K - Eval",
+       "step": 1,
+       "live": false,
+       "target_profit": "0.066670",
+       "daily_drawdown": "0.066670",
+       "check_daily_drawdown": true,
+       "maximum_drawdown": "0.016670",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "21.00",
+       "minis_limit": 5,
+       "micros_limit": 50,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "20001",
+       "target_profit_balance": "320001",
+       "daily_drawdown_amount": "20001",
+       "maximum_drawdown_amount": "5001",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Buffer",
+       "description": "PROPEL 300K - Buffer",
+       "step": 2,
+       "live": false,
+       "target_profit": "0.011670",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.008330",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "21.00",
+       "minis_limit": 5,
+       "micros_limit": 50,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "3501",
+       "target_profit_balance": "303501",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2499",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Funded",
+       "description": "PROPEL 300K - Funded",
+       "step": 3,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.971429",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "0.00",
+       "minis_limit": 5,
+       "micros_limit": 50,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "3400",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": true,
+     "no_activation_fee": true,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   }
+  ]
+ },
+ {
+  "challenge_type": "ORBIT",
+  "products": [
+   {
+    "id": 24,
+    "name": "Orbit2 50K",
+    "description": "Account Size: $50,000",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 95,
+      "account_size": "50K",
+      "price": "199",
+      "broker": "Volumetrica",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 1,
+        "name": "Orbit 50K Bundles",
+        "description": "Orbit 50K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "149.2500",
+        "total_price": "447.7500",
+        "per_unit_discount": "49.7500",
+        "total_discount": "149.2500",
+        "pre_discount_unit_price": "199.00",
+        "pre_discount_total_price": "597.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 96,
+      "account_size": "50K",
+      "price": "199",
+      "broker": "Tradovate",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 1,
+        "name": "Orbit 50K Bundles",
+        "description": "Orbit 50K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "149.2500",
+        "total_price": "447.7500",
+        "per_unit_discount": "49.7500",
+        "total_discount": "149.2500",
+        "pre_discount_unit_price": "199.00",
+        "pre_discount_total_price": "597.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 97,
+      "account_size": "50K",
+      "price": "199",
+      "broker": "Rithmic",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 1,
+        "name": "Orbit 50K Bundles",
+        "description": "Orbit 50K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "149.2500",
+        "total_price": "447.7500",
+        "per_unit_discount": "49.7500",
+        "total_discount": "149.2500",
+        "pre_discount_unit_price": "199.00",
+        "pre_discount_total_price": "597.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 98,
+      "account_size": "50K",
+      "price": "199",
+      "broker": "Tradesea",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 1,
+        "name": "Orbit 50K Bundles",
+        "description": "Orbit 50K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "149.2500",
+        "total_price": "447.7500",
+        "per_unit_discount": "49.7500",
+        "total_discount": "149.2500",
+        "pre_discount_unit_price": "199.00",
+        "pre_discount_total_price": "597.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 99,
+      "account_size": "50K",
+      "price": "199",
+      "broker": "Tickblaze",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 1,
+        "name": "Orbit 50K Bundles",
+        "description": "Orbit 50K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "149.2500",
+        "total_price": "447.7500",
+        "per_unit_discount": "49.7500",
+        "total_discount": "149.2500",
+        "pre_discount_unit_price": "199.00",
+        "pre_discount_total_price": "597.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 123,
+      "account_size": "50K",
+      "price": "199",
+      "broker": "BlackArrow",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 1,
+        "name": "Orbit 50K Bundles",
+        "description": "Orbit 50K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "149.2500",
+        "total_price": "447.7500",
+        "per_unit_discount": "49.7500",
+        "total_discount": "149.2500",
+        "pre_discount_unit_price": "199.00",
+        "pre_discount_total_price": "597.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     }
+    ],
+    "challenge": {
+     "id": 24,
+     "title": "ORBIT2 50K EOD",
+     "description": "Account Size: $50,000",
+     "challenge_type": "ORBIT",
+     "swap_mode": "NORMAL",
+     "steps": 1,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "EOD",
+     "global_drawdown_threshold": "100.000000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Eval",
+       "description": "Orbit2 50K - Eval",
+       "step": 1,
+       "live": false,
+       "target_profit": "0.060000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.040000",
+       "trading_period_days": 30,
+       "minimum_trading_days": 1,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "0.00",
+       "minis_limit": 5,
+       "micros_limit": 50,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "3000",
+       "target_profit_balance": "53000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2000",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Funded",
+       "description": "Orbit2 50K - Funded",
+       "step": 2,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.040000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "40.00",
+       "minis_limit": 2,
+       "micros_limit": 20,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "2000",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": true,
+     "no_activation_fee": true,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   },
+   {
+    "id": 25,
+    "name": "Orbit2 100K",
+    "description": "Account Size: $100,000",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 100,
+      "account_size": "100K",
+      "price": "299",
+      "broker": "Volumetrica",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 2,
+        "name": "Orbit 100K Bundles",
+        "description": "Orbit 100K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "224.2500",
+        "total_price": "672.7500",
+        "per_unit_discount": "74.7500",
+        "total_discount": "224.2500",
+        "pre_discount_unit_price": "299.00",
+        "pre_discount_total_price": "897.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 101,
+      "account_size": "100K",
+      "price": "299",
+      "broker": "Tradovate",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 2,
+        "name": "Orbit 100K Bundles",
+        "description": "Orbit 100K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "224.2500",
+        "total_price": "672.7500",
+        "per_unit_discount": "74.7500",
+        "total_discount": "224.2500",
+        "pre_discount_unit_price": "299.00",
+        "pre_discount_total_price": "897.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 102,
+      "account_size": "100K",
+      "price": "299",
+      "broker": "Rithmic",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 2,
+        "name": "Orbit 100K Bundles",
+        "description": "Orbit 100K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "224.2500",
+        "total_price": "672.7500",
+        "per_unit_discount": "74.7500",
+        "total_discount": "224.2500",
+        "pre_discount_unit_price": "299.00",
+        "pre_discount_total_price": "897.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 103,
+      "account_size": "100K",
+      "price": "299",
+      "broker": "Tradesea",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 2,
+        "name": "Orbit 100K Bundles",
+        "description": "Orbit 100K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "224.2500",
+        "total_price": "672.7500",
+        "per_unit_discount": "74.7500",
+        "total_discount": "224.2500",
+        "pre_discount_unit_price": "299.00",
+        "pre_discount_total_price": "897.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 104,
+      "account_size": "100K",
+      "price": "299",
+      "broker": "Tickblaze",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 2,
+        "name": "Orbit 100K Bundles",
+        "description": "Orbit 100K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "224.2500",
+        "total_price": "672.7500",
+        "per_unit_discount": "74.7500",
+        "total_discount": "224.2500",
+        "pre_discount_unit_price": "299.00",
+        "pre_discount_total_price": "897.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 124,
+      "account_size": "100K",
+      "price": "299",
+      "broker": "BlackArrow",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 2,
+        "name": "Orbit 100K Bundles",
+        "description": "Orbit 100K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "224.2500",
+        "total_price": "672.7500",
+        "per_unit_discount": "74.7500",
+        "total_discount": "224.2500",
+        "pre_discount_unit_price": "299.00",
+        "pre_discount_total_price": "897.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     }
+    ],
+    "challenge": {
+     "id": 25,
+     "title": "ORBIT2 100K EOD",
+     "description": "Account Size: $100,000",
+     "challenge_type": "ORBIT",
+     "swap_mode": "NORMAL",
+     "steps": 1,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "EOD",
+     "global_drawdown_threshold": "100.000000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Eval",
+       "description": "Orbit2 100K - Eval",
+       "step": 1,
+       "live": false,
+       "target_profit": "0.060000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.030000",
+       "trading_period_days": 30,
+       "minimum_trading_days": 1,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "0.00",
+       "minis_limit": 10,
+       "micros_limit": 100,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "6000",
+       "target_profit_balance": "106000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "3000",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Funded",
+       "description": "Orbit2 100K - Funded",
+       "step": 2,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.030000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "40.00",
+       "minis_limit": 3,
+       "micros_limit": 30,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "3000",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": true,
+     "no_activation_fee": true,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   },
+   {
+    "id": 26,
+    "name": "Orbit2 150K",
+    "description": "Account Size: $150,000",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 105,
+      "account_size": "150K",
+      "price": "419",
+      "broker": "Volumetrica",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 3,
+        "name": "Orbit 150K Bundles",
+        "description": "Orbit 150K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "314.2500",
+        "total_price": "942.7500",
+        "per_unit_discount": "104.7500",
+        "total_discount": "314.2500",
+        "pre_discount_unit_price": "419.00",
+        "pre_discount_total_price": "1257.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 106,
+      "account_size": "150K",
+      "price": "419",
+      "broker": "Tradovate",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 3,
+        "name": "Orbit 150K Bundles",
+        "description": "Orbit 150K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "314.2500",
+        "total_price": "942.7500",
+        "per_unit_discount": "104.7500",
+        "total_discount": "314.2500",
+        "pre_discount_unit_price": "419.00",
+        "pre_discount_total_price": "1257.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 107,
+      "account_size": "150K",
+      "price": "419",
+      "broker": "Rithmic",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 3,
+        "name": "Orbit 150K Bundles",
+        "description": "Orbit 150K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "314.2500",
+        "total_price": "942.7500",
+        "per_unit_discount": "104.7500",
+        "total_discount": "314.2500",
+        "pre_discount_unit_price": "419.00",
+        "pre_discount_total_price": "1257.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 108,
+      "account_size": "150K",
+      "price": "419",
+      "broker": "Tradesea",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 3,
+        "name": "Orbit 150K Bundles",
+        "description": "Orbit 150K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "314.2500",
+        "total_price": "942.7500",
+        "per_unit_discount": "104.7500",
+        "total_discount": "314.2500",
+        "pre_discount_unit_price": "419.00",
+        "pre_discount_total_price": "1257.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 109,
+      "account_size": "150K",
+      "price": "419",
+      "broker": "Tickblaze",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 3,
+        "name": "Orbit 150K Bundles",
+        "description": "Orbit 150K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "314.2500",
+        "total_price": "942.7500",
+        "per_unit_discount": "104.7500",
+        "total_discount": "314.2500",
+        "pre_discount_unit_price": "419.00",
+        "pre_discount_total_price": "1257.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 125,
+      "account_size": "150K",
+      "price": "419",
+      "broker": "BlackArrow",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 3,
+        "name": "Orbit 150K Bundles",
+        "description": "Orbit 150K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "314.2500",
+        "total_price": "942.7500",
+        "per_unit_discount": "104.7500",
+        "total_discount": "314.2500",
+        "pre_discount_unit_price": "419.00",
+        "pre_discount_total_price": "1257.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     }
+    ],
+    "challenge": {
+     "id": 26,
+     "title": "ORBIT2 150K EOD",
+     "description": "Account Size: $150,000",
+     "challenge_type": "ORBIT",
+     "swap_mode": "NORMAL",
+     "steps": 1,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "EOD",
+     "global_drawdown_threshold": "100.000000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Eval",
+       "description": "Orbit2 150K - Eval",
+       "step": 1,
+       "live": false,
+       "target_profit": "0.060000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.030000",
+       "trading_period_days": 30,
+       "minimum_trading_days": 1,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "0.00",
+       "minis_limit": 15,
+       "micros_limit": 150,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "9000",
+       "target_profit_balance": "159000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "4500",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Funded",
+       "description": "Orbit2 150K - Funded",
+       "step": 2,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.030000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "40.00",
+       "minis_limit": 5,
+       "micros_limit": 50,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "4500",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": true,
+     "no_activation_fee": true,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   },
+   {
+    "id": 27,
+    "name": "Orbit2 200K",
+    "description": "Account Size: $200,000",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 110,
+      "account_size": "200K",
+      "price": "419",
+      "broker": "Volumetrica",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 4,
+        "name": "Orbit 200K Bundles",
+        "description": "Orbit 200K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "314.2500",
+        "total_price": "942.7500",
+        "per_unit_discount": "104.7500",
+        "total_discount": "314.2500",
+        "pre_discount_unit_price": "419.00",
+        "pre_discount_total_price": "1257.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 111,
+      "account_size": "200K",
+      "price": "419",
+      "broker": "Tradovate",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 4,
+        "name": "Orbit 200K Bundles",
+        "description": "Orbit 200K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "314.2500",
+        "total_price": "942.7500",
+        "per_unit_discount": "104.7500",
+        "total_discount": "314.2500",
+        "pre_discount_unit_price": "419.00",
+        "pre_discount_total_price": "1257.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 112,
+      "account_size": "200K",
+      "price": "419",
+      "broker": "Rithmic",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 4,
+        "name": "Orbit 200K Bundles",
+        "description": "Orbit 200K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "314.2500",
+        "total_price": "942.7500",
+        "per_unit_discount": "104.7500",
+        "total_discount": "314.2500",
+        "pre_discount_unit_price": "419.00",
+        "pre_discount_total_price": "1257.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 113,
+      "account_size": "200K",
+      "price": "419",
+      "broker": "Tradesea",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 4,
+        "name": "Orbit 200K Bundles",
+        "description": "Orbit 200K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "314.2500",
+        "total_price": "942.7500",
+        "per_unit_discount": "104.7500",
+        "total_discount": "314.2500",
+        "pre_discount_unit_price": "419.00",
+        "pre_discount_total_price": "1257.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 114,
+      "account_size": "200K",
+      "price": "419",
+      "broker": "Tickblaze",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 4,
+        "name": "Orbit 200K Bundles",
+        "description": "Orbit 200K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "314.2500",
+        "total_price": "942.7500",
+        "per_unit_discount": "104.7500",
+        "total_discount": "314.2500",
+        "pre_discount_unit_price": "419.00",
+        "pre_discount_total_price": "1257.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 126,
+      "account_size": "200K",
+      "price": "419",
+      "broker": "BlackArrow",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 4,
+        "name": "Orbit 200K Bundles",
+        "description": "Orbit 200K Bundles",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "314.2500",
+        "total_price": "942.7500",
+        "per_unit_discount": "104.7500",
+        "total_discount": "314.2500",
+        "pre_discount_unit_price": "419.00",
+        "pre_discount_total_price": "1257.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     }
+    ],
+    "challenge": {
+     "id": 27,
+     "title": "ORBIT2 200K STATIC",
+     "description": "Account Size: $200,000",
+     "challenge_type": "ORBIT",
+     "swap_mode": "NORMAL",
+     "steps": 1,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "STATIC",
+     "global_drawdown_threshold": "100.000000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Eval",
+       "description": "Orbit2 200K - Eval",
+       "step": 1,
+       "live": false,
+       "target_profit": "0.040000",
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.015000",
+       "trading_period_days": 30,
+       "minimum_trading_days": 1,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "100.000000",
+       "consistency": "0.00",
+       "minis_limit": 3,
+       "micros_limit": 30,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": "8000",
+       "target_profit_balance": "208000",
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "3000",
+       "daily_soft_breach_limit": null
+      },
+      {
+       "title": "Funded",
+       "description": "Orbit2 200K - Funded",
+       "step": 2,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.000000",
+       "check_daily_drawdown": false,
+       "maximum_drawdown": "0.015000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "EOD",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "40.00",
+       "minis_limit": 3,
+       "micros_limit": 30,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": null,
+       "maximum_drawdown_amount": "3000",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": true,
+     "no_activation_fee": true,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   }
+  ]
+ },
+ {
+  "challenge_type": "Direct 2 Funded",
+  "products": [
+   {
+    "id": 18,
+    "name": "Direct2Funded 3K5",
+    "description": "Account Size: $3500",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 46,
+      "account_size": "3.5K",
+      "price": "749",
+      "broker": "Volumetrica",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 6,
+        "name": "Direct2Funded",
+        "description": "Direct2Funded",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "561.7500",
+        "total_price": "1685.2500",
+        "per_unit_discount": "187.2500",
+        "total_discount": "561.7500",
+        "pre_discount_unit_price": "749.00",
+        "pre_discount_total_price": "2247.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 47,
+      "account_size": "3.5K",
+      "price": "749",
+      "broker": "Tradovate",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 6,
+        "name": "Direct2Funded",
+        "description": "Direct2Funded",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "561.7500",
+        "total_price": "1685.2500",
+        "per_unit_discount": "187.2500",
+        "total_discount": "561.7500",
+        "pre_discount_unit_price": "749.00",
+        "pre_discount_total_price": "2247.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 48,
+      "account_size": "3.5K",
+      "price": "749",
+      "broker": "Rithmic",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 6,
+        "name": "Direct2Funded",
+        "description": "Direct2Funded",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "561.7500",
+        "total_price": "1685.2500",
+        "per_unit_discount": "187.2500",
+        "total_discount": "561.7500",
+        "pre_discount_unit_price": "749.00",
+        "pre_discount_total_price": "2247.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 61,
+      "account_size": "3.5K",
+      "price": "749",
+      "broker": "Tradesea",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 6,
+        "name": "Direct2Funded",
+        "description": "Direct2Funded",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "561.7500",
+        "total_price": "1685.2500",
+        "per_unit_discount": "187.2500",
+        "total_discount": "561.7500",
+        "pre_discount_unit_price": "749.00",
+        "pre_discount_total_price": "2247.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 90,
+      "account_size": "3.5K",
+      "price": "749",
+      "broker": "Tickblaze",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 6,
+        "name": "Direct2Funded",
+        "description": "Direct2Funded",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.2500",
+        "unit_price": "561.7500",
+        "total_price": "1685.2500",
+        "per_unit_discount": "187.2500",
+        "total_discount": "561.7500",
+        "pre_discount_unit_price": "749.00",
+        "pre_discount_total_price": "2247.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.2500",
+        "currency": "USD"
+       }
+      ]
+     }
+    ],
+    "challenge": {
+     "id": 18,
+     "title": "Direct2Funded 3K5",
+     "description": "Account Size: $3500",
+     "challenge_type": "Direct 2 Funded",
+     "swap_mode": "NORMAL",
+     "steps": 0,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "STATIC",
+     "global_drawdown_threshold": "1.000000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Funded",
+       "description": "Direct2Funded 3K5 - Funded",
+       "step": 1,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.571430",
+       "check_daily_drawdown": true,
+       "maximum_drawdown": "0.714290",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "STATIC",
+       "global_drawdown_threshold": "1.000000",
+       "consistency": "21.00",
+       "minis_limit": 5,
+       "micros_limit": 50,
+       "tradovateTrailingMaxDrawdownMode": "EOD",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": "2000",
+       "maximum_drawdown_amount": "2500",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": true,
+     "no_activation_fee": true,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   }
+  ]
+ },
+ {
+  "challenge_type": "Instant Funded",
+  "products": [
+   {
+    "id": 20,
+    "name": "Instant Funded 50K",
+    "description": "Account Size: $50,000",
+    "is_activation_product": false,
+    "variants": [
+     {
+      "id": 49,
+      "account_size": "50K",
+      "price": "599",
+      "broker": "Volumetrica",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 5,
+        "name": "Instant Funded 50K",
+        "description": "Instant Funded 50K Bundle",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.3400",
+        "unit_price": "395.3400",
+        "total_price": "1186.0200",
+        "per_unit_discount": "203.6600",
+        "total_discount": "610.9800",
+        "pre_discount_unit_price": "599.00",
+        "pre_discount_total_price": "1797.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.3400",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 50,
+      "account_size": "50K",
+      "price": "599",
+      "broker": "Tradovate",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 5,
+        "name": "Instant Funded 50K",
+        "description": "Instant Funded 50K Bundle",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.3400",
+        "unit_price": "395.3400",
+        "total_price": "1186.0200",
+        "per_unit_discount": "203.6600",
+        "total_discount": "610.9800",
+        "pre_discount_unit_price": "599.00",
+        "pre_discount_total_price": "1797.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.3400",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 51,
+      "account_size": "50K",
+      "price": "599",
+      "broker": "Rithmic",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 5,
+        "name": "Instant Funded 50K",
+        "description": "Instant Funded 50K Bundle",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.3400",
+        "unit_price": "395.3400",
+        "total_price": "1186.0200",
+        "per_unit_discount": "203.6600",
+        "total_discount": "610.9800",
+        "pre_discount_unit_price": "599.00",
+        "pre_discount_total_price": "1797.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.3400",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 62,
+      "account_size": "50K",
+      "price": "599",
+      "broker": "Tradesea",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 5,
+        "name": "Instant Funded 50K",
+        "description": "Instant Funded 50K Bundle",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.3400",
+        "unit_price": "395.3400",
+        "total_price": "1186.0200",
+        "per_unit_discount": "203.6600",
+        "total_discount": "610.9800",
+        "pre_discount_unit_price": "599.00",
+        "pre_discount_total_price": "1797.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.3400",
+        "currency": "USD"
+       }
+      ]
+     },
+     {
+      "id": 91,
+      "account_size": "50K",
+      "price": "599",
+      "broker": "Tickblaze",
+      "has_subscription": false,
+      "supported_addons": [],
+      "bundles": [
+       {
+        "id": 5,
+        "name": "Instant Funded 50K",
+        "description": "Instant Funded 50K Bundle",
+        "quantity": 3,
+        "discount_type": "percentage",
+        "discount_value": "0.3400",
+        "unit_price": "395.3400",
+        "total_price": "1186.0200",
+        "per_unit_discount": "203.6600",
+        "total_discount": "610.9800",
+        "pre_discount_unit_price": "599.00",
+        "pre_discount_total_price": "1797.00",
+        "has_slot_overrides": false,
+        "effective_discount_value": "0.3400",
+        "currency": "USD"
+       }
+      ]
+     }
+    ],
+    "challenge": {
+     "id": 20,
+     "title": "Instant Funded 50K",
+     "description": "Account Size: $50,000",
+     "challenge_type": "Instant Funded",
+     "swap_mode": "NORMAL",
+     "steps": 0,
+     "broker_type": "Volumetrica",
+     "global_drawdown_type": "TRAILING",
+     "global_drawdown_threshold": "1.020000",
+     "lock_trailing_drawdown": false,
+     "is_free_trial": false,
+     "phases": [
+      {
+       "title": "Funded",
+       "description": "Instant Funded 50K - Funded",
+       "step": 1,
+       "live": true,
+       "target_profit": null,
+       "daily_drawdown": "0.020000",
+       "check_daily_drawdown": true,
+       "maximum_drawdown": "0.040000",
+       "trading_period_days": null,
+       "minimum_trading_days": 0,
+       "global_drawdown_type": "TRAILING",
+       "global_drawdown_threshold": "1.020000",
+       "consistency": "21.00",
+       "minis_limit": 5,
+       "micros_limit": 50,
+       "tradovateTrailingMaxDrawdownMode": "RealTime",
+       "target_profit_amount": null,
+       "target_profit_balance": null,
+       "daily_drawdown_amount": "1000",
+       "maximum_drawdown_amount": "2000",
+       "daily_soft_breach_limit": null
+      }
+     ],
+     "archived": false,
+     "soft_breach": true,
+     "no_activation_fee": true,
+     "metadata": {
+      "challenge_display": {
+       "columns": [],
+       "display_rows": []
+      }
+     }
+    }
+   }
+  ]
+ },
+ {
+  "challenge_type": "No Type",
+  "products": [
+   {
+    "id": 99999,
+    "name": "Activation Product",
+    "description": "Activation Product",
+    "is_activation_product": true,
+    "variants": [
+     {
+      "id": 40,
+      "account_size": "100K",
+      "price": "149",
+      "broker": "Volumetrica",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 41,
+      "account_size": "100K",
+      "price": "149",
+      "broker": "Tradovate",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 42,
+      "account_size": "100K",
+      "price": "149",
+      "broker": "Rithmic",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 59,
+      "account_size": "100K",
+      "price": "149",
+      "broker": "Tradesea",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 88,
+      "account_size": "100K",
+      "price": "149",
+      "broker": "Tickblaze",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 121,
+      "account_size": "100K",
+      "price": "149",
+      "broker": "BlackArrow",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 43,
+      "account_size": "200K",
+      "price": "179",
+      "broker": "Volumetrica",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 44,
+      "account_size": "200K",
+      "price": "179",
+      "broker": "Tradovate",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 45,
+      "account_size": "200K",
+      "price": "179",
+      "broker": "Rithmic",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 60,
+      "account_size": "200K",
+      "price": "179",
+      "broker": "Tradesea",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 89,
+      "account_size": "200K",
+      "price": "179",
+      "broker": "Tickblaze",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 122,
+      "account_size": "200K",
+      "price": "179",
+      "broker": "BlackArrow",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 1,
+      "account_size": "2K",
+      "price": "99",
+      "broker": "Volumetrica",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 2,
+      "account_size": "2K",
+      "price": "99",
+      "broker": "Tradovate",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 3,
+      "account_size": "2K",
+      "price": "99",
+      "broker": "Rithmic",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 63,
+      "account_size": "2K",
+      "price": "99",
+      "broker": "Tradesea",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 78,
+      "account_size": "2K",
+      "price": "99",
+      "broker": "Tickblaze",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 4,
+      "account_size": "4K",
+      "price": "99",
+      "broker": "Volumetrica",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 5,
+      "account_size": "4K",
+      "price": "99",
+      "broker": "Tradovate",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 6,
+      "account_size": "4K",
+      "price": "99",
+      "broker": "Rithmic",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 64,
+      "account_size": "4K",
+      "price": "99",
+      "broker": "Tradesea",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 79,
+      "account_size": "4K",
+      "price": "99",
+      "broker": "Tickblaze",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 37,
+      "account_size": "50K",
+      "price": "99",
+      "broker": "Volumetrica",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 38,
+      "account_size": "50K",
+      "price": "99",
+      "broker": "Tradovate",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 39,
+      "account_size": "50K",
+      "price": "99",
+      "broker": "Rithmic",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 58,
+      "account_size": "50K",
+      "price": "99",
+      "broker": "Tradesea",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 87,
+      "account_size": "50K",
+      "price": "99",
+      "broker": "Tickblaze",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 120,
+      "account_size": "50K",
+      "price": "99",
+      "broker": "BlackArrow",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 7,
+      "account_size": "7K",
+      "price": "99",
+      "broker": "Volumetrica",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 8,
+      "account_size": "7K",
+      "price": "99",
+      "broker": "Tradovate",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 9,
+      "account_size": "7K",
+      "price": "99",
+      "broker": "Rithmic",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 65,
+      "account_size": "7K",
+      "price": "99",
+      "broker": "Tradesea",
+      "has_subscription": false,
+      "bundles": []
+     },
+     {
+      "id": 80,
+      "account_size": "7K",
+      "price": "99",
+      "broker": "Tickblaze",
+      "has_subscription": false,
+      "bundles": []
+     }
+    ]
+   }
+  ]
+ }
+]

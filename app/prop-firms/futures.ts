@@ -66,6 +66,7 @@ const DATA = rawData as unknown as PropData;
 const FIRM_LOGOS: Record<string, string> = {
   'traders-launch': '/logos/traders-launch.png',
   'e8-markets': '/logos/e8-markets.svg',
+  blusky: '/logos/blusky.svg',
 };
 
 const DD_LABEL: Record<DdType, string> = {
@@ -277,6 +278,43 @@ const TL_DROP2_PILLS: Pill[] = [
   { label: 'Drawdown', value: 'Same as the evaluation, $600 daily loss limit too' },
 ];
 const DROP_TERMS_FOR = 'TL Drop #2';
+// BluSky, help.blusky.pro read 27/10/2026. Launch and Propel (« Launch plans phases, rules
+// and costs », « Propel plans… », « Sim Funded Accounts Rules »): after the evaluation a Buffer
+// phase with its own target and 34% consistency (21% on Propel 300K), then Sim Funded;
+// « Minimum payout request: $500 », « at least $500 in new profit » between requests, « Sim
+// Funded payout caps operate on a rolling 7-day basis », « Stop trading for the day after
+// reaching $5,000 in daily profit » / « for the week after reaching $10,000 », « Before
+// exceeding $10,000 in total profit per account, you must open a Support Review Ticket ».
+// Daily payouts are in the firm line (Angelo, 22/10/2026: no « Winning days » then).
+const BLUSKY_SFA_PILLS: Pill[] = [
+  { label: 'Buffer phase', value: 'A second target after the evaluation, 34% consistency (21% on 300K)' },
+  { label: 'Minimum payout', value: '$500' },
+  { label: 'Between payouts', value: '$500 of new profit' },
+  { label: 'Profit stop', value: '$5,000 a day, $10,000 a week' },
+  { label: 'At $10,000 total profit', value: 'Review ticket before going further' },
+];
+const BLUSKY_CAP = 'Payout cap, rolling 7 days';
+// Orbit (« Orbit plans: two phases, faster payouts »): « A 40% consistency rule applies while Sim
+// Funded, and payouts become available every three trading days once your balance is above the
+// threshold », payout minimum $500, funded contracts per size. The checkout banner says the
+// same: « Payouts every 3 days in SFA ».
+const BLUSKY_ORBIT_PILLS: Pill[] = [
+  { label: 'Consistency', value: '40%' },
+  { label: 'Payout request', value: 'Every 3 trading days' },
+  { label: 'Minimum payout', value: '$500' },
+];
+// Direct 2 Funded and Instant Sim Funded (« Instant Funding: Direct to Funded and Instant Sim
+// Funded »): « Payouts are available every day, Monday to Friday, on any balance above $53,000,
+// up to $2,500 in any 7-day window »; Direct to Funded « payouts on balance above $3,500 »,
+// weekly cap $3,000.
+const bluskyInstant = (above: string, cap: string): Funded => ({
+  pills: [
+    { label: 'Payouts from', value: `Balance above ${above}` },
+    { label: 'Payout cap', value: `${cap} in any 7 days` },
+    { label: 'Minimum payout', value: '$500' },
+  ],
+  rows: [],
+});
 const FUNDED: Record<string, Record<string, Funded>> = {
   'e8-markets': {
     'E8 Signature Futures': {
@@ -333,6 +371,41 @@ const FUNDED: Record<string, Record<string, Funded>> = {
     },
     Drop: { pills: TL_DROP2_PILLS, rows: [] },
   },
+  blusky: {
+    Launch: {
+      pills: BLUSKY_SFA_PILLS,
+      rows: [
+        { label: 'Buffer target', bySize: { 50000: '$3,000', 100000: '$3,500', 200000: '$3,000' } },
+        { label: BLUSKY_CAP, bySize: { 50000: '$2,500', 100000: '$3,000', 200000: '$2,500' } },
+      ],
+    },
+    Propel: {
+      pills: BLUSKY_SFA_PILLS,
+      rows: [
+        {
+          label: 'Buffer target',
+          bySize: { 25000: '$1,500', 50000: '$3,000', 100000: '$3,500', 150000: '$2,000', 200000: '$3,000', 300000: '$3,500' },
+        },
+        {
+          label: BLUSKY_CAP,
+          bySize: { 25000: '$1,500', 50000: '$2,500', 100000: '$3,000', 150000: '$1,500', 200000: '$2,500', 300000: '$3,000' },
+        },
+      ],
+    },
+    Orbit: {
+      pills: BLUSKY_ORBIT_PILLS,
+      rows: [
+        { label: 'Payouts from', bySize: { 50000: '$52,000', 100000: '$103,000', 150000: '$154,500', 200000: '$203,000' } },
+        { label: BLUSKY_CAP, bySize: { 50000: '$2,000', 100000: '$2,500', 150000: '$3,000', 200000: '$2,500' } },
+        {
+          label: 'Funded contracts',
+          bySize: { 50000: '2 minis or 20 micros', 100000: '3 minis or 30 micros', 150000: '5 minis or 50 micros', 200000: '3 minis or 30 micros' },
+        },
+      ],
+    },
+    'Direct 2 Funded': bluskyInstant('$3,500', '$3,000'),
+    'Instant Funded': bluskyInstant('$53,000', '$2,500'),
+  },
 };
 
 // Firms whose own pages say there is no activation fee. Traders Launch, traderslaunch.com/faq
@@ -342,8 +415,11 @@ const NO_ACTIVATION_FEE = new Set(['traders-launch']);
 // Rules a firm publishes for every account, outside its price cards. Traders Launch FAQ
 // (traderslaunch.com, 21/10/2026): « The evaluation window is 60 days. If you haven't passed
 // by day 60 but you're above 50% of your profit target, you get a free 30-day extension ».
+// BluSky (help.blusky.pro « Multiple Accounts & Copy Trading », 27/10/2026): « Funded accounts can
+// only be 3 at any time (Sim Funded, Instant Sim Funded or Direct to Funded Accounts) ».
 const FIRM_RULES: Record<string, string[]> = {
   'traders-launch': ['60 days to pass, +30 free if above 50% of the target'],
+  blusky: ['Up to 3 funded accounts at a time'],
 };
 
 const SPLIT_NOTE = / ?Price shown for the 80% split\./;

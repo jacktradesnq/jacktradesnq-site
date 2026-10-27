@@ -25,6 +25,7 @@
 import fs from 'node:fs';
 
 import { guardCatalog, syncCatalog } from './lib/catalog-sync.mjs';
+import { fetchBluSkyPlans } from './lib/firms/blusky.mjs';
 import { fetchE8Plans } from './lib/firms/e8.mjs';
 import { fetchTradersLaunchPrograms } from './lib/firms/traderslaunch.mjs';
 
@@ -109,6 +110,16 @@ export async function scrapeE8Markets(read) {
       originalPrice,
     })),
   }; // promo stays manual — site banner label is vaguer than the curated JSON copy
+}
+
+/* ------------------------------------------------------------------ */
+/* BluSky — l'API publique de leur checkout (JSON, pas de navigateur)  */
+/* ------------------------------------------------------------------ */
+
+// Chemin `updates`, comme E8 : prix seulement, regles ecrites a la main.
+export async function scrapeBluSky(read = fetchBluSkyPlans) {
+  const plans = await read();
+  return { updates: plans }; // promo stays manual
 }
 
 /** Ce que la firme vend et que le JSON n'a pas : signale, jamais ajoute (choix d'Angelo). */
@@ -197,6 +208,7 @@ function applyPromos(firm, res, changes) {
 const SCRAPERS = {
   'traders-launch': scrapeTradersLaunch,
   'e8-markets': scrapeE8Markets,
+  blusky: scrapeBluSky,
 };
 
 async function main() {
