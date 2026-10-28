@@ -1,7 +1,35 @@
 {
-  "generatedAt": "2026-10-27",
-  "builtFor": "2026-10-27",
+  "generatedAt": "2026-10-28",
+  "builtFor": "2026-10-28",
   "promos": [
+    {
+      "firmId": "blusky",
+      "firmName": "BluSky",
+      "logo": "/logos/email/blusky.png",
+      "url": "https://trader.blusky.pro/checkout?referral_id=09577e87582233340375",
+      "code": "JTNQ",
+      "codeViaLink": false,
+      "program": "Propel",
+      "programType": "eval",
+      "priceType": "monthly",
+      "size": 50000,
+      "price": 112,
+      "originalPrice": 160,
+      "discountPct": 30,
+      "priceNote": null,
+      "note": null,
+      "endsAt": null,
+      "expiring": false,
+      "split": "90%",
+      "payout": "Daily",
+      "ddType": "EOD Trailing",
+      "profitTarget": 3000,
+      "maxDrawdown": 2000,
+      "consistency": "34%",
+      "activationFee": null,
+      "contracts": "5 minis or 50 micros",
+      "lastChecked": "2026-10-28"
+    },
     {
       "firmId": "e8-markets",
       "firmName": "E8 Markets",
@@ -29,7 +57,7 @@
       "consistency": "None",
       "activationFee": null,
       "contracts": "4 minis / 40 micros",
-      "lastChecked": "2026-10-27"
+      "lastChecked": "2026-10-28"
     },
     {
       "firmId": "traders-launch",
@@ -58,7 +86,7 @@
       "consistency": "50%",
       "activationFee": null,
       "contracts": "2 minis or 20 micros",
-      "lastChecked": "2026-10-27"
+      "lastChecked": "2026-10-28"
     }
   ]
 }
