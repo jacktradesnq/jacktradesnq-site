@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-29",
+  "generatedAt": "2026-10-30",
   "firms": [
     {
       "id": "traders-launch",
@@ -8,7 +8,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-10-29",
+      "lastChecked": "2026-10-30",
       "stale": false,
       "programs": [
         {
@@ -122,8 +122,8 @@
           "plans": [
             {
               "size": 25000,
-              "price": 79.2,
-              "originalPrice": 99,
+              "price": 99,
+              "originalPrice": 123.75,
               "profitTarget": 1200,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
@@ -132,8 +132,8 @@
               "contracts": "1 mini or 10 micros",
               "note": "TL Drop #2 · Hyperprop only. Ends Fri, Oct 30, 4:00 PM ET. Daily loss limit lifted on days that start at or above $26,000. Price shown for the 80% split.",
               "splitPrices": {
-                "60": 63.2,
-                "90": 95.2
+                "60": 79,
+                "90": 119
               }
             }
           ]
@@ -204,7 +204,7 @@
       },
       "code": "JTNQ",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-10-29",
+      "lastChecked": "2026-10-30",
       "stale": false,
       "programs": [
         {
@@ -385,7 +385,7 @@
         "code": "JTNQ"
       },
       "url": "https://trader.blusky.pro/checkout?referral_id=09577e87582233340375",
-      "lastChecked": "2026-10-29",
+      "lastChecked": "2026-10-30",
       "stale": false,
       "programs": [
         {
