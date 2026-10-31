@@ -3,10 +3,12 @@
 import { useEffect, useRef, useState } from 'react';
 // Written by ~/propfirm-tracker (site_counter.py) on every approved payout mail, then pushed to main.
 import challengeData from '../content/challenge.json';
+// Every certificate propfirm-tracker has published (never emptied), for "Total payout".
+import autoCertificates from '../content/certificates.json';
 
 // This month's payout certificates, also written by propfirm-tracker (Lucid "Your Payout Certificate is Ready!" mail).
 // Angelo 31/10/2026: added automatically, back to 0 every new month; the June-August ones stay.
-type Certificate = { file: string; date: string; firm: string; amount: number | null };
+type Certificate = { file: string; day?: string; date: string; firm: string; amount: number | null };
 const monthCertificates: Certificate[] = (challengeData as { certificates?: Certificate[] }).certificates ?? [];
 
 const challengeMonth = new Date(`${challengeData.month}-01T12:00:00Z`).toLocaleString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -32,14 +34,21 @@ const SITE = {
       'I started day trading four years ago. I trade the New York AM session with ICT.',
     ],
   },
-  // Lucid payout certificates, downloaded from his dashboard (Certificates) on 14/10/2026.
-  // All before the $10K challenge started (16/09/2026), so they sit with the bio, not the counter.
+  // Total payout (Angelo 31/10/2026: "on va garder ca par \" Total payout \" on aura l'intégralité de tout nos paoyuts ici; lucid et pas lucid met aussi traders launch").
+  // Lucid: downloaded from his dashboard (Certificates) on 14/10/2026. Traders Launch: iCloud Jack/Trading/traders-launch-payouts.
+  // Certificates that came after are added by propfirm-tracker in content/certificates.json.
   payouts: [
-    { file: '/payouts/lucid-2026-08-21-689.webp', date: 'August 21, 2026', amount: '$689' },
-    { file: '/payouts/lucid-2026-08-12-994.webp', date: 'August 12, 2026', amount: '$994' },
-    { file: '/payouts/lucid-2026-06-18-532.webp', date: 'June 18, 2026', amount: '$532' },
-    { file: '/payouts/lucid-2026-06-17-568.webp', date: 'June 17, 2026', amount: '$568' },
-  ],
+    { file: '/payouts/traders-launch-2026-09-01-160.webp', day: '2026-09-01', date: 'September 1, 2026', firm: 'Traders Launch', amount: 160 },
+    { file: '/payouts/traders-launch-2026-08-31-160.webp', day: '2026-08-31', date: 'August 31, 2026', firm: 'Traders Launch', amount: 160 },
+    { file: '/payouts/traders-launch-2026-08-28-176.webp', day: '2026-08-28', date: 'August 28, 2026', firm: 'Traders Launch', amount: 176 },
+    { file: '/payouts/traders-launch-2026-08-27-160.webp', day: '2026-08-27', date: 'August 27, 2026', firm: 'Traders Launch', amount: 160 },
+    { file: '/payouts/traders-launch-2026-08-26-160.webp', day: '2026-08-26', date: 'August 26, 2026', firm: 'Traders Launch', amount: 160 },
+    { file: '/payouts/traders-launch-2026-08-25-160.webp', day: '2026-08-25', date: 'August 25, 2026', firm: 'Traders Launch', amount: 160 },
+    { file: '/payouts/lucid-2026-08-21-689.webp', day: '2026-08-21', date: 'August 21, 2026', firm: 'Lucid Trading', amount: 689 },
+    { file: '/payouts/lucid-2026-08-12-994.webp', day: '2026-08-12', date: 'August 12, 2026', firm: 'Lucid Trading', amount: 994 },
+    { file: '/payouts/lucid-2026-06-18-532.webp', day: '2026-06-18', date: 'June 18, 2026', firm: 'Lucid Trading', amount: 532 },
+    { file: '/payouts/lucid-2026-06-17-568.webp', day: '2026-06-17', date: 'June 17, 2026', firm: 'Lucid Trading', amount: 568 },
+  ] as Certificate[],
   // $10K a month challenge (series started 16/09/2026): payouts received this month, reset to 0 if missed.
   // current = sum of this month's "Payout Approved" amounts (Angelo 26/10/2026: "Tout seul", "Montant approuvé").
   challenge: {
@@ -60,6 +69,15 @@ const SITE = {
       'Disclaimer — In accordance with article D.321-1 of the French Monétaire et Financier Code, the content published on this site is provided for informational purposes only and does not constitute investment advice.',
   },
 };
+
+const allCertificates: Certificate[] = [
+  ...(autoCertificates as Certificate[]),
+  ...SITE.payouts.filter((p) => !(autoCertificates as Certificate[]).some((a) => a.file === p.file)),
+].sort((a, b) => (b.day ?? '').localeCompare(a.day ?? ''));
+
+function certificateAlt(c: Certificate) {
+  return `${c.firm} payout certificate, ${c.date}${c.amount == null ? '' : `: $${Math.round(c.amount).toLocaleString('en-US')}`}`;
+}
 
 const ICONS: Record<string, string> = {
   tiktok:
@@ -365,11 +383,11 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="payouts" aria-label="Payout certificates">
-          <span className="eyebrow">Payouts · before the challenge (June – August 2026)</span>
+        <section className="payouts" aria-label="Total payout">
+          <span className="eyebrow">Total payout</span>
           <div className="payouts-grid">
-            {SITE.payouts.map((p) => (
-              <img key={p.file} src={p.file} width={900} height={645} loading="lazy" alt={`Lucid Trading payout certificate, ${p.date}: ${p.amount}`} />
+            {allCertificates.map((c) => (
+              <img key={c.file} src={c.file} width={900} height={645} loading="lazy" alt={certificateAlt(c)} />
             ))}
           </div>
         </section>
@@ -405,7 +423,7 @@ export default function Home() {
                   width={900}
                   height={645}
                   loading="lazy"
-                  alt={`${c.firm} payout certificate, ${c.date}${c.amount == null ? '' : `: $${Math.round(c.amount).toLocaleString('en-US')}`}`}
+                  alt={certificateAlt(c)}
                 />
               ))}
             </div>
