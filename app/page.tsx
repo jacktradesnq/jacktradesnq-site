@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import PayoutCarousel from './payout-carousel';
 // Written by ~/propfirm-tracker (site_counter.py) on every approved payout mail, then pushed to main.
 import challengeData from '../content/challenge.json';
 // Every certificate propfirm-tracker has published (never emptied), for "Total payout".
@@ -385,11 +386,7 @@ export default function Home() {
 
         <section className="payouts" aria-label="Total payout">
           <span className="eyebrow">Total payout</span>
-          <div className="payouts-grid">
-            {allCertificates.map((c) => (
-              <img key={c.file} src={c.file} width={900} height={645} loading="lazy" alt={certificateAlt(c)} />
-            ))}
-          </div>
+          <PayoutCarousel label="Total payout certificates" items={allCertificates.map((c) => ({ file: c.file, alt: certificateAlt(c) }))} />
         </section>
 
         <section className="challenge" aria-labelledby="challenge-title">
@@ -720,6 +717,19 @@ const CSS = `
   margin-top: 24px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 1.6vw, 24px);
 }
 @media (max-width: 980px){ .jtnq-home .payouts-grid{ grid-template-columns: 1fr 1fr; } }
+.jtnq-home .payouts-strip{
+  margin-top: 24px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; cursor: grab;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, oklch(0 0 0) 64px, oklch(0 0 0) calc(100% - 64px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, oklch(0 0 0) 64px, oklch(0 0 0) calc(100% - 64px), transparent 100%);
+}
+.jtnq-home .payouts-strip::-webkit-scrollbar{ display: none; }
+.jtnq-home .payouts-strip.dragging{ cursor: grabbing; user-select: none; }
+.jtnq-home .payouts-strip-row{ display: flex; gap: clamp(12px, 1.6vw, 24px); width: max-content; padding: 4px 0 24px; }
+.jtnq-home .payouts-strip-row img{
+  display: block; flex: none; width: clamp(240px, 24vw, 360px); height: auto; border-radius: 12px; border: 1px solid var(--c-line);
+  box-shadow: 0 1px 2px oklch(0.05 0.02 165 / .4), 0 16px 40px -16px oklch(0.05 0.02 165 / .6);
+  pointer-events: none;
+}
 .jtnq-home .payouts-grid img{
   display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--c-line);
   box-shadow: 0 1px 2px oklch(0.05 0.02 165 / .4), 0 16px 40px -16px oklch(0.05 0.02 165 / .6);
