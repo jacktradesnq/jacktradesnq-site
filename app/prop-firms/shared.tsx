@@ -13,7 +13,7 @@ export const META = {
   brand: 'Jacktradesnq',
   hero: {
     eyebrow: 'FUTURES \u00b7 PERPS',
-    title: 'Prop firms',
+    title: 'Trading Partnerships', // Angelo 31/10/2026 : « on fais Trading Partnerships »
     phrase:
       'Futures and perps firms I\u2019m partnered with. Pick one to see all of its plans side by side \u2014 account sizes, prices and risk rules. My code JTNQ or tracked link applied on every button.',
   },
