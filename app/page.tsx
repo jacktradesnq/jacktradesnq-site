@@ -46,7 +46,6 @@ const SITE = {
       "I chose $10K a month because five figures is a good milestone in my opinion.",
     ],
   },
-  tradeCopier: { name: 'Trade copier', url: '/trade-copier/', tagline: 'Tradecopia · my real days · code JTNQ' },
   legal: {
     copyright: '© 2026 JackTradesNQ. All rights reserved.',
     mentionsUrl: '/mentions-legales/',
@@ -289,7 +288,6 @@ export default function Home() {
         <nav className="nav" aria-label="Primary">
           <a href={SITE.nefarious.url}>Nefarious</a>
           <a href={SITE.propFirms.url}>Prop firms</a>
-          <a href={SITE.tradeCopier.url}>Trade copier</a>
           <div className={`nav-socials${socialsOpen ? ' is-open' : ''}`} ref={socialsRef}>
             <button
               type="button"
@@ -415,19 +413,6 @@ export default function Home() {
                 </svg>
               </div>
               <p className="tagline">{SITE.propFirms.tagline}</p>
-            </a>
-
-            <a className="hub-card" href={SITE.tradeCopier.url}>
-              <div className="row">
-                <h3 className="title">
-                  {SITE.tradeCopier.name}
-                  <span className="swash">.</span>
-                </h3>
-                <svg className="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M7 17L17 7M9 7h8v8" />
-                </svg>
-              </div>
-              <p className="tagline">{SITE.tradeCopier.tagline}</p>
             </a>
           </div>
         </section>
@@ -704,7 +689,7 @@ const CSS = `
   display: grid; grid-template-columns: 1fr; gap: clamp(40px, 5vw, 64px);
 }
 .jtnq-home .hub-grid{
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(28px, 4vw, 56px); align-items: stretch;
 }
 @media (max-width: 980px){
