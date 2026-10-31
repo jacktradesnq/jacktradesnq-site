@@ -23,6 +23,11 @@ export const FAMILY_CSS = `
   color: var(--c-text-mute); background: none; border: none; border-radius: 999px;
   padding: 12px 24px; cursor: pointer; transition: color .2s ease, background .2s ease;
 }
+.jtnq-cmp .fam-tab{ white-space: nowrap; }
+/* Three tabs since the trade copier joined (31/10/2026): tighter on small phones so they stay on one row. */
+@media (max-width: 400px){
+  .jtnq-cmp .fam-tab{ font-size: 11px; letter-spacing: .08em; padding: 12px 12px; }
+}
 .jtnq-cmp .fam-tab:hover{ color: var(--c-accent); }
 .jtnq-cmp .fam-tab.active{ color: var(--c-bg); background: var(--c-accent); }
 .jtnq-cmp .fam-panel{ width: 100%; }
