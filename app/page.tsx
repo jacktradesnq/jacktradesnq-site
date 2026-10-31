@@ -4,6 +4,11 @@ import { useEffect, useRef, useState } from 'react';
 // Written by ~/propfirm-tracker (site_counter.py) on every approved payout mail, then pushed to main.
 import challengeData from '../content/challenge.json';
 
+// This month's payout certificates, also written by propfirm-tracker (Lucid "Your Payout Certificate is Ready!" mail).
+// Angelo 31/10/2026: added automatically, back to 0 every new month; the June-August ones stay.
+type Certificate = { file: string; date: string; firm: string; amount: number | null };
+const monthCertificates: Certificate[] = (challengeData as { certificates?: Certificate[] }).certificates ?? [];
+
 const challengeMonth = new Date(`${challengeData.month}-01T12:00:00Z`).toLocaleString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 
 const SITE = {
@@ -388,6 +393,24 @@ export default function Home() {
             ))}
           </div>
         </section>
+
+        {monthCertificates.length > 0 && (
+          <section className="payouts payouts-month" aria-label={`Payout certificates, ${SITE.challenge.month}`}>
+            <span className="eyebrow">Payouts · {SITE.challenge.month}</span>
+            <div className="payouts-grid">
+              {monthCertificates.map((c) => (
+                <img
+                  key={c.file}
+                  src={c.file}
+                  width={900}
+                  height={645}
+                  loading="lazy"
+                  alt={`${c.firm} payout certificate, ${c.date}${c.amount == null ? '' : `: $${Math.round(c.amount).toLocaleString('en-US')}`}`}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
         <section id="hub" className="hub">
           <div className="hub-grid">
