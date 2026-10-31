@@ -1,6 +1,20 @@
 {
   "month": "2026-10",
-  "total": 0,
-  "payouts": [],
-  "certificates": []
+  "total": 533.5,
+  "payouts": [
+    {
+      "date": "2026-10-22",
+      "firm": "Lucid Trading",
+      "amount": 533.5
+    }
+  ],
+  "certificates": [
+    {
+      "file": "/payouts/2026-10/lucid-2026-10-21-b5c352fb.webp",
+      "day": "2026-10-21",
+      "date": "October 21, 2026",
+      "firm": "Lucid Trading",
+      "amount": 533.5
+    }
+  ]
 }
