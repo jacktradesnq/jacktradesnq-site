@@ -20,9 +20,15 @@ import { FUTURES_FIRMS } from './futures';
 import { PERPS_PROMO, PERPS_PROMO_FIRM_ID, PROMO_ENDS_MS, perpsFirms, usePromoLive } from './perps';
 import { FirmLogo, FirmTable, PromoClock } from './FirmTable';
 import { FAMILY_CSS } from './family-css';
+import { TRADE_COPIER_CSS, TRADE_COPIER_DISCLAIMER, TradeCopierPanel } from './TradeCopier';
+
+// A third tab next to Futures and Perps, Tradecopia (Angelo, 31/10/2026: « ouais 3eme bouton »).
+// Not a firm family: it opens its own panel instead of firm cards.
+type Tab = Family | 'trade-copier';
+const TABS: { id: Tab; label: string }[] = [...FAMILIES, { id: 'trade-copier', label: 'Trade copier' }];
 
 const byName = (a: FirmView, b: FirmView) => a.name.localeCompare(b.name, 'en');
-const isFamily = (s: string): s is Family => FAMILIES.some((f) => f.id === s);
+const isTab = (s: string): s is Tab => TABS.some((t) => t.id === s);
 
 export default function PropFirms() {
   const promoLive = usePromoLive();
@@ -34,7 +40,7 @@ export default function PropFirms() {
     [promoLive],
   );
 
-  const [family, setFamily] = useState<Family>('futures');
+  const [family, setFamily] = useState<Tab>('futures');
   const [openId, setOpenId] = useState<string | null>(null);
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -47,11 +53,11 @@ export default function PropFirms() {
     };
   }, []);
 
-  // #futures / #perps open the matching family, on load and on back/forward.
+  // #futures / #perps / #trade-copier open the matching tab, on load and on back/forward.
   useEffect(() => {
     const fromHash = () => {
       const h = window.location.hash.slice(1);
-      if (!isFamily(h)) return;
+      if (!isTab(h)) return;
       setFamily(h);
       setOpenId(null);
     };
@@ -60,7 +66,7 @@ export default function PropFirms() {
     return () => window.removeEventListener('hashchange', fromHash);
   }, []);
 
-  function pick(f: Family) {
+  function pick(f: Tab) {
     if (f === family) return;
     setFamily(f);
     setOpenId(null);
@@ -68,20 +74,21 @@ export default function PropFirms() {
   }
 
   function onTabKey(e: KeyboardEvent<HTMLButtonElement>) {
-    const i = FAMILIES.findIndex((f) => f.id === family);
+    const i = TABS.findIndex((f) => f.id === family);
     let next = -1;
-    if (e.key === 'ArrowRight') next = (i + 1) % FAMILIES.length;
-    else if (e.key === 'ArrowLeft') next = (i - 1 + FAMILIES.length) % FAMILIES.length;
+    if (e.key === 'ArrowRight') next = (i + 1) % TABS.length;
+    else if (e.key === 'ArrowLeft') next = (i - 1 + TABS.length) % TABS.length;
     else if (e.key === 'Home') next = 0;
-    else if (e.key === 'End') next = FAMILIES.length - 1;
+    else if (e.key === 'End') next = TABS.length - 1;
     if (next < 0) return;
     e.preventDefault();
-    const f = FAMILIES[next].id;
+    const f = TABS[next].id;
     pick(f);
     tabRefs.current[f]?.focus();
   }
 
-  const firms = firmsBy[family];
+  const isCopier = family === 'trade-copier';
+  const firms = isCopier ? [] : firmsBy[family];
   const open = firms.find((f) => f.id === openId) ?? null;
 
   // The native <dialog> gives Escape, focus trapping and the backdrop for free.
@@ -96,6 +103,7 @@ export default function PropFirms() {
     <div className="jtnq-cmp">
       <style>{CSS}</style>
       <style>{FAMILY_CSS}</style>
+      <style>{TRADE_COPIER_CSS}</style>
 
       <main>
         <section className="hero">
@@ -118,7 +126,7 @@ export default function PropFirms() {
 
         <section className="fam-section" aria-label="Partner prop firms">
           <div className="fam-tabs" role="tablist" aria-label="Prop firm type">
-            {FAMILIES.map((f) => (
+            {TABS.map((f) => (
               <button
                 key={f.id}
                 ref={(el) => {
@@ -140,6 +148,10 @@ export default function PropFirms() {
           </div>
 
           <div className="fam-panel" role="tabpanel" id={`panel-${family}`} aria-labelledby={`tab-${family}`}>
+            {isCopier ? (
+              <TradeCopierPanel />
+            ) : (
+            <>
             <p className="fam-caption">
               {firms.length} partner firm{firms.length > 1 ? 's' : ''}
               {firms.length > 1 ? ' · pick one to see all of its plans' : ''}
@@ -185,6 +197,8 @@ export default function PropFirms() {
                 );
               })}
             </div>
+            </>
+            )}
 
             <dialog
               ref={dialogRef}
@@ -238,7 +252,7 @@ export default function PropFirms() {
             <span>{META.legal.copyright}</span>
           </div>
         </div>
-        <p className="footer-disclaimer">{META.legal.disclaimer}</p>
+        <p className="footer-disclaimer">{isCopier ? TRADE_COPIER_DISCLAIMER : META.legal.disclaimer}</p>
       </footer>
     </div>
   );

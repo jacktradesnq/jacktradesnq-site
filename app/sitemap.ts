@@ -9,7 +9,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: `${BASE}/`, lastModified, changeFrequency: 'weekly', priority: 1.0 },
     { url: `${BASE}/prop-firms/`, lastModified, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${BASE}/trade-copier/`, lastModified, changeFrequency: 'weekly', priority: 0.6 },
     { url: `${BASE}/mentions-legales/`, lastModified, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${BASE}/politique-confidentialite/`, lastModified, changeFrequency: 'yearly', priority: 0.3 },
   ];

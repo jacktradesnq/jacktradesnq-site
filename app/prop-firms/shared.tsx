@@ -12,10 +12,10 @@ export const META = {
   backToHome: { label: 'Jacktradesnq', url: '/' },
   brand: 'Jacktradesnq',
   hero: {
-    eyebrow: 'FUTURES \u00b7 PERPS',
-    title: 'Prop firms',
+    eyebrow: 'FUTURES \u00b7 PERPS \u00b7 TRADE COPIER',
+    title: 'Trading Partnerships', // Angelo 31/10/2026 : « on fais Trading Partnerships »
     phrase:
-      'Futures and perps firms I\u2019m partnered with. Pick one to see all of its plans side by side \u2014 account sizes, prices and risk rules. My code JTNQ or tracked link applied on every button.',
+      'Futures and perps firms I\u2019m partnered with, and the trade copier I use. Pick a firm to see all of its plans side by side \u2014 account sizes, prices and risk rules. My code JTNQ or tracked link applied on every button.',
   },
   legal: {
     copyright: '\u00a9 2026 JackTradesNQ. All rights reserved.',
@@ -88,6 +88,11 @@ export const CSS = `
   color: var(--c-accent); display: inline-flex; align-items: center; gap: 12px; margin-bottom: clamp(24px, 3.5vw, 40px);
 }
 .jtnq-cmp .eyebrow::before, .jtnq-cmp .eyebrow::after{ content: ""; width: 28px; height: 1px; background: var(--c-accent); }
+/* « FUTURES · PERPS · TRADE COPIER » on one line on a phone: no side rules, tighter spacing. */
+@media (max-width: 480px){
+  .jtnq-cmp .eyebrow{ letter-spacing: .14em; white-space: nowrap; }
+  .jtnq-cmp .eyebrow::before, .jtnq-cmp .eyebrow::after{ display: none; }
+}
 .jtnq-cmp .wordmark{
   font-family: 'Zodiak', var(--f-serif); font-weight: 700;
   font-size: clamp(52px, 9vw, 132px); line-height: .92; letter-spacing: -0.028em; margin: 0; color: var(--c-text);
