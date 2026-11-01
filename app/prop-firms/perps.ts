@@ -1,15 +1,14 @@
 // Perps firms (public/data/perps-firms.json, read by hand, not auto-synced) turned into
 // FirmView (partner cards) and CompareRow (the comparator, one row per plan).
 //
-// The JTNQ promo has a hard end (endsAt). Three moments to get right:
-// - build: a build made after endsAt never shows the promo (BUILD_TS, inlined by
-//   next.config.js), so the daily rebuild drops it on its own;
-// - before hydration: the static HTML shows the state of the build, with a placeholder
-//   clock of the same width as the real one (PromoClock in FirmTable.tsx);
-// - in the browser: the page flips to normal prices once endsAt passes (usePromoLive).
+// The JTNQ promo has a hard end (endsAt), judged by the shared clock (promo-clock.ts): a
+// build made after endsAt never shows it, the static HTML shows the state of the build with a
+// placeholder clock of the same width as the real one (PromoClock in FirmTable.tsx), and the
+// page flips to normal prices once endsAt passes (usePromoLive).
 
-import { useEffect, useState } from 'react';
 import rawData from '@/public/data/perps-firms.json';
+import { runsAt } from '@/lib/promo-ends.mjs';
+import { BUILD_TS, usePromoClock } from './promo-clock';
 import { goHref } from '@/lib/go-links';
 import { firstNumber } from '@/lib/compare-order.mjs';
 import { sizeLabel } from './shared';
@@ -59,7 +58,6 @@ type PerpsFirm = {
 };
 
 const DATA = rawData as unknown as { generatedAt: string; firms: PerpsFirm[] };
-const BUILD_TS = Number(process.env.NEXT_PUBLIC_BUILD_TS ?? 0);
 
 // Several firms can run a JTNQ promo at once (MyFundedPerps, Breakout since 13/10/2026). Only a
 // promo with an end date needs the clock below; the page tracks the first such firm, or else the
@@ -68,24 +66,13 @@ const PROMO_FIRM = DATA.firms.find((f) => f.promo?.endsAt) ?? DATA.firms.find((f
 export const PERPS_PROMO = PROMO_FIRM?.promo ?? null;
 export const PERPS_PROMO_FIRM_ID = PROMO_FIRM?.id ?? null;
 export const PROMO_ENDS_MS = PERPS_PROMO?.endsAt ? Date.parse(PERPS_PROMO.endsAt) : null;
-const LIVE_AT_BUILD = PERPS_PROMO != null && (PROMO_ENDS_MS == null || BUILD_TS < PROMO_ENDS_MS);
+const PROMO_ENDS: readonly number[] = PROMO_ENDS_MS == null ? [] : [PROMO_ENDS_MS];
 
 // True while the promo runs. Starts from the build state (static HTML), re-checks the
 // clock once mounted, and flips to false at endsAt without re-rendering every second.
 export function usePromoLive(): boolean {
-  const [live, setLive] = useState(LIVE_AT_BUILD);
-  useEffect(() => {
-    if (!LIVE_AT_BUILD || PROMO_ENDS_MS == null) return;
-    const left = PROMO_ENDS_MS - Date.now();
-    if (left <= 0) {
-      setLive(false);
-      return;
-    }
-    // setTimeout caps at ~24.8 days; past that a reload will see the end anyway.
-    const id = window.setTimeout(() => setLive(false), Math.min(left, 2 ** 31 - 1));
-    return () => window.clearTimeout(id);
-  }, []);
-  return live;
+  const at = usePromoClock(PROMO_ENDS);
+  return PERPS_PROMO != null && runsAt(PROMO_ENDS_MS, at);
 }
 
 // The promo a firm shows right now: one without endsAt always; a timed one while the page's
@@ -95,7 +82,7 @@ function promoOf(firm: PerpsFirm, promoLive: boolean): PerpsFirm['promo'] {
   if (!p) return null;
   if (p.endsAt == null) return p;
   if (firm.id === PERPS_PROMO_FIRM_ID) return promoLive ? p : null;
-  return BUILD_TS < Date.parse(p.endsAt) ? p : null;
+  return runsAt(p.endsAt, BUILD_TS) ? p : null;
 }
 
 // Split and leverage per program, by firm, from the firm's checkout and docs; the payout rules

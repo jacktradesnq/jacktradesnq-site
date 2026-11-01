@@ -14,8 +14,9 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import { defaultOrder, filterRows, sortBy } from '@/lib/compare-order.mjs';
 import { FAMILIES, shownPrice, type CompareRow, type Family } from '../firm-view';
-import { FUTURES_ROWS } from '../futures';
+import { EXTRA_PROMO_ENDS, futuresRows } from '../futures';
 import { perpsRows, usePromoLive } from '../perps';
+import { usePromoClock } from '../promo-clock';
 import { sizeLabel } from '../shared';
 import { Arrow, CellView, FirmLogo, PriceView } from '../FirmTable';
 import { COLUMNS, type Column } from './columns';
@@ -102,9 +103,10 @@ function SortMark({ dir }: { dir: Dir | null }) {
 export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFirmChange: (id: string | null) => void }) {
   const uid = useId();
   const promoLive = usePromoLive();
+  const futuresAt = usePromoClock(EXTRA_PROMO_ENDS);
   const rowsBy = useMemo<Record<Family, CompareRow[]>>(
-    () => ({ futures: defaultOrder(FUTURES_ROWS), perps: defaultOrder(perpsRows(promoLive)) }),
-    [promoLive],
+    () => ({ futures: defaultOrder(futuresRows(futuresAt)), perps: defaultOrder(perpsRows(promoLive)) }),
+    [futuresAt, promoLive],
   );
   // #compare=<firm-id>: the firm's own table opens; an unknown id shows every firm.
   const firmFamily = (['futures', 'perps'] as const).find((f) => rowsBy[f].some((r) => r.firmId === firm)) ?? null;

@@ -2,12 +2,16 @@
 // - public/data/prop-firms.json: partner firms, scraped daily by scripts/scrape-prop-firms.mjs.
 // - public/data/compare-extra-firms.json: firms Angelo is not partnered with (Lucid Trading,
 //   Tradeify), same shape plus "affiliate": false and "code" = their public code. They show in
-//   the comparator only, with their own site and code (Angelo, 01/11/2026).
+//   the comparator only, with their own site and code (Angelo, 01/11/2026). Once their
+//   promo.ends passes, the comparator drops the code and the discounted prices (firmAt in
+//   lib/promo-ends.mjs, judged by the shared clock of promo-clock.ts); Tradeify's are read
+//   again every day by scripts/scrape-tradeify.mjs.
 
 import rawData from '@/public/data/prop-firms.json';
 import rawExtra from '@/public/data/compare-extra-firms.json';
 import { goHref } from '@/lib/go-links';
 import { firstNumber } from '@/lib/compare-order.mjs';
+import { firmAt, promoEnds } from '@/lib/promo-ends.mjs';
 import { money, sizeLabel } from './shared';
 import {
   cheapest, humanDate, pillValue, ptdd, textVal,
@@ -426,8 +430,9 @@ function rowsOf(firm: Firm, link: Link): CompareRow[] {
         steps,
         price: {
           kind: 'price',
+          // A list price equal to the price paid (no code on sale) is not struck through.
           list: price.was ?? price.now,
-          discounted: price.was != null ? price.now : null,
+          discounted: price.was != null && price.was > price.now ? price.now : null,
           alt: null,
           per: pr.priceType === 'monthly' ? '/month' : 'one-time',
           from: !!plan.priceAmbiguous,
@@ -536,8 +541,16 @@ const PARTNERS = DATA.firms.map((firm) => {
 });
 
 export const FUTURES_FIRMS: FirmView[] = PARTNERS.map((p) => p.view);
-// Partners and the extra firms, one row per plan. A firm in both files is a partner.
-export const FUTURES_ROWS: CompareRow[] = [
-  ...PARTNERS.flatMap((p) => p.rows),
-  ...EXTRA.firms.filter((f) => !DATA.firms.some((d) => d.id === f.id)).flatMap((f) => rowsOf(f, extraLink(f))),
-];
+
+// The extra firms' promo ends, for the clock (usePromoClock) to wake up at.
+export const EXTRA_PROMO_ENDS: readonly number[] = promoEnds(EXTRA.firms);
+const EXTRA_ONLY = EXTRA.firms.filter((f) => !DATA.firms.some((d) => d.id === f.id));
+
+// Partners and the extra firms, one row per plan, at time `at` (the promo clock). A firm in
+// both files is a partner.
+export function futuresRows(at: number): CompareRow[] {
+  return [
+    ...PARTNERS.flatMap((p) => p.rows),
+    ...EXTRA_ONLY.map((f) => firmAt(f, at)).flatMap((f) => rowsOf(f, extraLink(f))),
+  ];
+}

@@ -372,7 +372,7 @@
       "split": "90%",
       "payout": "Daily",
       "promo": {
-        "label": "30% off with code GEMS (Trick or Trade)",
+        "label": "30% off with code GEMS",
         "code": "GEMS",
         "ends": "2026-10-31T23:59:00-04:00"
       },
