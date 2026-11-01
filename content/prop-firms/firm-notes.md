@@ -18,11 +18,13 @@ s'affiche pas sur le site. Une ligne vide entre deux phrases = deux paragraphes.
 ### intro
 
 ### take
+I don't have any preferences for E8 as all of the plans suit different types of traders and I can see myself using all the types of plans depending on what I want. The good thing with them is that they have forex, futures and perps, basically whatever you need.
 
 ## e8-perps
 ### intro
 
 ### take
+I don't have any preferences for E8 as all of the plans suit different types of traders and I can see myself using all the types of plans depending on what I want. The good thing with them is that they have forex, futures and perps, basically whatever you need.
 
 ## blusky
 ### intro
