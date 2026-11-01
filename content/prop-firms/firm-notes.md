@@ -13,6 +13,7 @@ s'affiche pas sur le site. Une ligne vide entre deux phrases = deux paragraphes.
 ### intro
 
 ### take
+Traders Launch, the cheapest prop firm in the market that offers daily payouts up to 100K before being eligible for scaling. By far my favorite daily payout prop firm.
 
 ## e8-markets
 ### intro
@@ -40,6 +41,7 @@ I don't have any preferences for E8 as all of the plans suit different types of 
 ### intro
 
 ### take
+Breakout, EXTREMELY solid firm that I love to use for my huge swing trades. All the rules you LOVE and easy to scale as the choice of plans is huge. I like the Turbo plan. I like the 1:3 PT ratio.
 
 ## vest-markets
 ### intro
