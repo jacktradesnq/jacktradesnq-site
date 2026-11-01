@@ -36,6 +36,7 @@ I don't have any preferences for E8 as all of the plans suit different types of 
 ### intro
 
 ### take
+MyFundedPerps, I also use them for my swings, love the Elite plan, good PT/DD ratio.
 
 ## breakout
 ### intro
