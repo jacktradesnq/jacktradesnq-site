@@ -78,6 +78,8 @@ test('max / min payout: caps per payout as « Payouts 1-2: … », the $ everywh
 
 test('profit split: « 80% / 90% » is the 90% option', () => {
   assert.equal(text(splitWords('80% / 90%')), '80% (90% option)');
+  assert.equal(text(splitWords('80% / 100%')), '80% (100% option)');
+  assert.equal(text(splitWords('80% / 90% / 100%')), '80% (90%, 100% option)');
   assert.equal(text(splitWords('80% (90% option)')), '80% (90% option)');
   assert.equal(text(splitWords('50% for 30 trading days, then 80%')), '50% for 30 trading days, then 80%');
 });

@@ -18,6 +18,7 @@ import { cellVal, cheapest, pillValue, textVal, type CompareRow, type DailyLoss,
 // altPrice: a second version of the same account, shown in the same cell after a « / » (Angelo,
 // 12/10/2026 : « dans la même colonne et dans chaque truc t'as un / qui met les 2 prix »): MFP
 // Elite's cheaper 3% DLL version, Vest 1-Step's 90% split (the first price is the 80% split).
+// altPrices: the same, for an account sold in more than two versions (E8 One at 80%, 90%, 100%).
 // lines: rules that change with the size (Vest's max drawdown in dollars), a row under the price.
 type PerpsPlan = {
   size: number;
@@ -25,6 +26,7 @@ type PerpsPlan = {
   promoPrice: number | null;
   altPrice?: number;
   altPromoPrice?: number;
+  altPrices?: { price: number; promoPrice: number | null }[];
   lines?: { label: string; value: string }[];
   // more: other versions of the same account, one price row each under the main one (Vest 1-Step:
   // 3% DLL on the main row, then 4% DLL and No DLL; Angelo 21/10/2026: « les regrouper »).
@@ -33,6 +35,8 @@ type PerpsPlan = {
 };
 type PerpsProgram = {
   name: string;
+  // Key of DETAILS and FUNDED when the first word of the name is not enough (« E8 One · 4% Max »).
+  rulesKey?: string;
   steps: string;
   split: string;
   profitTarget: string | null;
@@ -87,7 +91,23 @@ function promoOf(firm: PerpsFirm, promoLive: boolean): PerpsFirm['promo'] {
 
 // Split and leverage per program, by firm, from the firm's checkout and docs; the payout rules
 // live in FUNDED below.
-const DETAILS: Record<string, Record<string, { split: string; leverage: string }>> = {
+const DETAILS: Record<string, Record<string, { split: string; leverage: string; leverageTitle?: string }>> = {
+  // E8 Perpetual, read 01/11/2026 on help.e8markets.com, « How much leverage do you offer? »
+  // (Perpetual futures table, the same for E8 One and E8 Pro) and the product overview (« Payout
+  // 80%, 90%, 100% » for E8 One, « 80%, 100% » for E8 Pro). Its own id, e8-perps: e8-markets is the
+  // futures firm, and one id in both families would open #compare=e8-markets on the wrong table.
+  'e8-perps': {
+    One: {
+      split: '80% / 90% / 100%',
+      leverage: 'Up to 25x',
+      leverageTitle: 'BTC, ETH, indices, metals, energy 15x · stocks 5x · other crypto 2x · forex 25x',
+    },
+    Pro: {
+      split: '80% / 100%',
+      leverage: 'Up to 25x',
+      leverageTitle: 'BTC, ETH, indices, metals, energy 15x · stocks 5x · other crypto 2x · forex 25x',
+    },
+  },
   // MyFundedPerps checkout and docs, 12/10/2026.
   myfundedperps: {
     Select: { split: '80% (90% option)', leverage: 'Standard' },
@@ -168,6 +188,34 @@ const BREAKOUT_FUNDED: Funded = {
   rows: [],
 };
 const FUNDED: Record<string, Record<string, Funded>> = {
+  // E8 Perpetual, read 01/11/2026 on e8markets.com/?market=perpetual (every size, drawdown and payout
+  // of the configurator) and help.e8markets.com: « What is Payout On Demand? » (E8 One: « you can
+  // request a payout at any time », « 40% Best Day rule », « net profit (payout) must be greater
+  // than 50% of your daily drawdown », « earliest first payout … 3 days »; E8 Pro: « daily payouts »,
+  // « the minimum is 1% »), the product overview (« No best day », « 2% Daily profit cap », static
+  // drawdown « Only moves when you request the first payout »).
+  // Price with code: e8markets.com/e8-markets-discount-code, « 50% off », « E8 Pro (Perpetual), E8 One
+  // (Perpetual) », « Apply for all purchases », no expiry; the configurator shows the same prices
+  // (« with code E8 on first order »). Printed as JTNQ (CLAUDE.md, Angelo 11/10/2026 and 26/10/2026).
+  'e8-perps': {
+    One: {
+      pills: [
+        { label: 'Consistency', value: '40% best day' },
+        { label: 'Payout request', value: 'Any time, first payout after 3 days at the earliest' },
+        { label: 'Minimum payout', value: 'Above 50% of the daily drawdown' },
+      ],
+      rows: [],
+    },
+    Pro: {
+      pills: [
+        { label: 'Consistency', value: 'None' },
+        { label: 'Payout request', value: 'Daily' },
+        { label: 'Minimum payout', value: '1%' },
+        { label: 'Daily profit cap', value: '2%' },
+      ],
+      rows: [],
+    },
+  },
   breakout: { Classic: BREAKOUT_FUNDED, Pro: BREAKOUT_FUNDED, Turbo: BREAKOUT_FUNDED },
   myfundedperps: {
     Select: MFP_STD,
@@ -193,10 +241,13 @@ const SUMMARY: Record<string, string> = {
   breakout: '80–90% split',
   // docs.vestmarkets.com/vest-capital/overview, 21/10/2026: « keep 80–95% of your profits ».
   'vest-markets': '80–95% split',
+  // help.e8markets.com product overview, 01/11/2026: E8 One « 80%, 90%, 100% », E8 Pro « 80%, 100% ».
+  'e8-perps': '80–100% split',
 };
 
 const STEPS = (s: string) => (/^instant/i.test(s) ? 'Instant' : /^2/.test(s) ? '2 Steps' : /^1/.test(s) ? '1 Step' : s);
 const figure = (text: string | null | undefined): Val | undefined => (text ? textVal(text, firstNumber(text)) : undefined);
+const withTitle = (val: Val | undefined, title: string | undefined): Val | undefined => (val && title ? { ...val, title } : val);
 
 // « 3% », « None », and the plans sold both ways: « None / 3% » (MFP Elite, shown « 3% or none »), « 3%, 4% or none » (Vest 1-Step).
 function dailyLossOf(text: string | null): DailyLoss {
@@ -209,8 +260,10 @@ function dailyLossOf(text: string | null): DailyLoss {
 
 function rowsOf(firm: PerpsFirm, promoLive: boolean): CompareRow[] {
   const promo = promoOf(firm, promoLive);
-  const d = (p: PerpsProgram) => DETAILS[firm.id]?.[p.name.split(' ')[0]];
-  const funded = (p: PerpsProgram) => FUNDED[firm.id]?.[p.name.split(' ')[0]];
+  const rulesKey = (p: PerpsProgram) => p.rulesKey ?? p.name.split(' ')[0];
+  const d = (p: PerpsProgram) => DETAILS[firm.id]?.[rulesKey(p)];
+  const funded = (p: PerpsProgram) => FUNDED[firm.id]?.[rulesKey(p)];
+  const version = (list: number, discounted: number | null | undefined) => ({ list, discounted: promo ? discounted ?? null : null });
   return firm.programs.flatMap((p) =>
     p.plans.map((plan, i): CompareRow => {
       const steps = STEPS(p.steps);
@@ -233,14 +286,17 @@ function rowsOf(firm: PerpsFirm, promoLive: boolean): CompareRow[] {
                 kind: 'price',
                 list: plan.price,
                 discounted: promo ? plan.promoPrice : null,
-                alt: plan.altPrice != null ? { list: plan.altPrice, discounted: promo ? plan.altPromoPrice ?? null : null } : null,
+                alts: [
+                  ...(plan.altPrice != null ? [version(plan.altPrice, plan.altPromoPrice)] : []),
+                  ...(plan.altPrices ?? []).map((a) => version(a.price, a.promoPrice)),
+                ],
                 per: null,
                 from: false,
               },
         cells: {
           size: { text: sizeLabel(plan.size), sort: plan.size },
           steps: { text: steps, sort: steps },
-          leverage: figure(d(p)?.leverage),
+          leverage: withTitle(figure(d(p)?.leverage), d(p)?.leverageTitle),
           // No target on instant funding is not said (Angelo, 22/10/2026).
           target: figure(p.profitTarget),
           dailyLoss: cellVal('dailyLoss', p.dailyLoss),

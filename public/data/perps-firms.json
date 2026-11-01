@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-21",
+  "generatedAt": "2026-11-01",
   "firms": [
     {
       "id": "myfundedperps",
@@ -700,6 +700,1444 @@
                   "value": "$2,000 (4%)"
                 }
               ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e8-perps",
+      "name": "E8 Markets",
+      "logo": "/logos/e8-markets.svg",
+      "url": "https://e8markets.com/d/B1770991",
+      "lastChecked": "2026-11-01",
+      "markets": [
+        "Crypto",
+        "Stocks",
+        "Indices",
+        "Commodities",
+        "Forex"
+      ],
+      "promo": {
+        "code": "JTNQ",
+        "discountPct": 50,
+        "endsAt": null,
+        "lastChecked": "2026-11-01"
+      },
+      "programs": [
+        {
+          "name": "E8 One · 4% Max",
+          "rulesKey": "One",
+          "steps": "1 step",
+          "split": "80% / 90% / 100%",
+          "profitTarget": "6%",
+          "maxDrawdown": "4%",
+          "ddType": "Dynamic",
+          "dailyLoss": "3%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 40,
+              "promoPrice": 20,
+              "altPrices": [
+                {
+                  "price": 44,
+                  "promoPrice": 22
+                },
+                {
+                  "price": 49,
+                  "promoPrice": 25
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$200"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 10000,
+              "price": 72,
+              "promoPrice": 36,
+              "altPrices": [
+                {
+                  "price": 81,
+                  "promoPrice": 41
+                },
+                {
+                  "price": 89,
+                  "promoPrice": 45
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$400"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 25000,
+              "price": 154,
+              "promoPrice": 77,
+              "altPrices": [
+                {
+                  "price": 172,
+                  "promoPrice": 86
+                },
+                {
+                  "price": 190,
+                  "promoPrice": 95
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 50000,
+              "price": 235,
+              "promoPrice": 118,
+              "altPrices": [
+                {
+                  "price": 263,
+                  "promoPrice": 132
+                },
+                {
+                  "price": 291,
+                  "promoPrice": 146
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$2,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 100000,
+              "price": 398,
+              "promoPrice": 199,
+              "altPrices": [
+                {
+                  "price": 445,
+                  "promoPrice": 223
+                },
+                {
+                  "price": 493,
+                  "promoPrice": 247
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$4,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 200000,
+              "price": 650,
+              "promoPrice": 325,
+              "altPrices": [
+                {
+                  "price": 728,
+                  "promoPrice": 364
+                },
+                {
+                  "price": 806,
+                  "promoPrice": 403
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$8,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 400000,
+              "price": 1301,
+              "promoPrice": 651,
+              "altPrices": [
+                {
+                  "price": 1457,
+                  "promoPrice": 729
+                },
+                {
+                  "price": 1613,
+                  "promoPrice": 807
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$16,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 500000,
+              "price": 1627,
+              "promoPrice": 814,
+              "altPrices": [
+                {
+                  "price": 1822,
+                  "promoPrice": 911
+                },
+                {
+                  "price": 2017,
+                  "promoPrice": 1009
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$20,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            }
+          ]
+        },
+        {
+          "name": "E8 One · 6% Max",
+          "rulesKey": "One",
+          "steps": "1 step",
+          "split": "80% / 90% / 100%",
+          "profitTarget": "9%",
+          "maxDrawdown": "6%",
+          "ddType": "Dynamic",
+          "dailyLoss": "4%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 48,
+              "promoPrice": 24,
+              "altPrices": [
+                {
+                  "price": 54,
+                  "promoPrice": 27
+                },
+                {
+                  "price": 60,
+                  "promoPrice": 30
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$300"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 10000,
+              "price": 88,
+              "promoPrice": 44,
+              "altPrices": [
+                {
+                  "price": 99,
+                  "promoPrice": 50
+                },
+                {
+                  "price": 110,
+                  "promoPrice": 55
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$600"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 25000,
+              "price": 188,
+              "promoPrice": 94,
+              "altPrices": [
+                {
+                  "price": 211,
+                  "promoPrice": 106
+                },
+                {
+                  "price": 234,
+                  "promoPrice": 117
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,500"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 50000,
+              "price": 288,
+              "promoPrice": 144,
+              "altPrices": [
+                {
+                  "price": 323,
+                  "promoPrice": 162
+                },
+                {
+                  "price": 358,
+                  "promoPrice": 179
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$3,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 100000,
+              "price": 488,
+              "promoPrice": 244,
+              "altPrices": [
+                {
+                  "price": 547,
+                  "promoPrice": 274
+                },
+                {
+                  "price": 606,
+                  "promoPrice": 303
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$6,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 200000,
+              "price": 798,
+              "promoPrice": 399,
+              "altPrices": [
+                {
+                  "price": 894,
+                  "promoPrice": 447
+                },
+                {
+                  "price": 990,
+                  "promoPrice": 495
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$12,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 400000,
+              "price": 1598,
+              "promoPrice": 799,
+              "altPrices": [
+                {
+                  "price": 1790,
+                  "promoPrice": 895
+                },
+                {
+                  "price": 1982,
+                  "promoPrice": 991
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$24,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 500000,
+              "price": 1998,
+              "promoPrice": 999,
+              "altPrices": [
+                {
+                  "price": 2238,
+                  "promoPrice": 1119
+                },
+                {
+                  "price": 2478,
+                  "promoPrice": 1239
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$30,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            }
+          ]
+        },
+        {
+          "name": "E8 One · 8% Max",
+          "rulesKey": "One",
+          "steps": "1 step",
+          "split": "80% / 90% / 100%",
+          "profitTarget": "12%",
+          "maxDrawdown": "8%",
+          "ddType": "Dynamic",
+          "dailyLoss": "5.3%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 58,
+              "promoPrice": 29,
+              "altPrices": [
+                {
+                  "price": 65,
+                  "promoPrice": 33
+                },
+                {
+                  "price": 72,
+                  "promoPrice": 36
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$400"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 10000,
+              "price": 106,
+              "promoPrice": 53,
+              "altPrices": [
+                {
+                  "price": 119,
+                  "promoPrice": 60
+                },
+                {
+                  "price": 131,
+                  "promoPrice": 66
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$800"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 25000,
+              "price": 226,
+              "promoPrice": 113,
+              "altPrices": [
+                {
+                  "price": 253,
+                  "promoPrice": 127
+                },
+                {
+                  "price": 280,
+                  "promoPrice": 140
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$2,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 50000,
+              "price": 346,
+              "promoPrice": 173,
+              "altPrices": [
+                {
+                  "price": 388,
+                  "promoPrice": 194
+                },
+                {
+                  "price": 429,
+                  "promoPrice": 215
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$4,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 100000,
+              "price": 586,
+              "promoPrice": 293,
+              "altPrices": [
+                {
+                  "price": 656,
+                  "promoPrice": 328
+                },
+                {
+                  "price": 727,
+                  "promoPrice": 364
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$8,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 200000,
+              "price": 958,
+              "promoPrice": 479,
+              "altPrices": [
+                {
+                  "price": 1073,
+                  "promoPrice": 537
+                },
+                {
+                  "price": 1188,
+                  "promoPrice": 594
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$16,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 400000,
+              "price": 1918,
+              "promoPrice": 959,
+              "altPrices": [
+                {
+                  "price": 2148,
+                  "promoPrice": 1074
+                },
+                {
+                  "price": 2378,
+                  "promoPrice": 1189
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$32,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 500000,
+              "price": 2398,
+              "promoPrice": 1199,
+              "altPrices": [
+                {
+                  "price": 2686,
+                  "promoPrice": 1343
+                },
+                {
+                  "price": 2974,
+                  "promoPrice": 1487
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$40,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            }
+          ]
+        },
+        {
+          "name": "E8 One · 10% Max",
+          "rulesKey": "One",
+          "steps": "1 step",
+          "split": "80% / 90% / 100%",
+          "profitTarget": "15%",
+          "maxDrawdown": "10%",
+          "ddType": "Dynamic",
+          "dailyLoss": "6.6%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 68,
+              "promoPrice": 34,
+              "altPrices": [
+                {
+                  "price": 76,
+                  "promoPrice": 38
+                },
+                {
+                  "price": 84,
+                  "promoPrice": 42
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$500"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 10000,
+              "price": 124,
+              "promoPrice": 62,
+              "altPrices": [
+                {
+                  "price": 138,
+                  "promoPrice": 69
+                },
+                {
+                  "price": 153,
+                  "promoPrice": 77
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 25000,
+              "price": 264,
+              "promoPrice": 132,
+              "altPrices": [
+                {
+                  "price": 295,
+                  "promoPrice": 148
+                },
+                {
+                  "price": 327,
+                  "promoPrice": 164
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$2,500"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 50000,
+              "price": 404,
+              "promoPrice": 202,
+              "altPrices": [
+                {
+                  "price": 452,
+                  "promoPrice": 226
+                },
+                {
+                  "price": 500,
+                  "promoPrice": 250
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$5,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 100000,
+              "price": 684,
+              "promoPrice": 342,
+              "altPrices": [
+                {
+                  "price": 766,
+                  "promoPrice": 383
+                },
+                {
+                  "price": 848,
+                  "promoPrice": 424
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$10,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 200000,
+              "price": 1118,
+              "promoPrice": 559,
+              "altPrices": [
+                {
+                  "price": 1252,
+                  "promoPrice": 626
+                },
+                {
+                  "price": 1386,
+                  "promoPrice": 693
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$20,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 400000,
+              "price": 2238,
+              "promoPrice": 1119,
+              "altPrices": [
+                {
+                  "price": 2506,
+                  "promoPrice": 1253
+                },
+                {
+                  "price": 2775,
+                  "promoPrice": 1388
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$40,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 500000,
+              "price": 2798,
+              "promoPrice": 1399,
+              "altPrices": [
+                {
+                  "price": 3133,
+                  "promoPrice": 1567
+                },
+                {
+                  "price": 3469,
+                  "promoPrice": 1735
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$50,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            }
+          ]
+        },
+        {
+          "name": "E8 One · 14% Max",
+          "rulesKey": "One",
+          "steps": "1 step",
+          "split": "80% / 90% / 100%",
+          "profitTarget": "21%",
+          "maxDrawdown": "14%",
+          "ddType": "Dynamic",
+          "dailyLoss": "9.2%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 87,
+              "promoPrice": 44,
+              "altPrices": [
+                {
+                  "price": 97,
+                  "promoPrice": 49
+                },
+                {
+                  "price": 108,
+                  "promoPrice": 54
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$700"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 10000,
+              "price": 159,
+              "promoPrice": 80,
+              "altPrices": [
+                {
+                  "price": 178,
+                  "promoPrice": 89
+                },
+                {
+                  "price": 197,
+                  "promoPrice": 99
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,400"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 25000,
+              "price": 339,
+              "promoPrice": 170,
+              "altPrices": [
+                {
+                  "price": 380,
+                  "promoPrice": 190
+                },
+                {
+                  "price": 420,
+                  "promoPrice": 210
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$3,500"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 50000,
+              "price": 519,
+              "promoPrice": 260,
+              "altPrices": [
+                {
+                  "price": 581,
+                  "promoPrice": 291
+                },
+                {
+                  "price": 643,
+                  "promoPrice": 322
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$7,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 100000,
+              "price": 879,
+              "promoPrice": 440,
+              "altPrices": [
+                {
+                  "price": 984,
+                  "promoPrice": 492
+                },
+                {
+                  "price": 1090,
+                  "promoPrice": 545
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$14,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 200000,
+              "price": 1437,
+              "promoPrice": 719,
+              "altPrices": [
+                {
+                  "price": 1609,
+                  "promoPrice": 805
+                },
+                {
+                  "price": 1782,
+                  "promoPrice": 891
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$28,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 400000,
+              "price": 2877,
+              "promoPrice": 1439,
+              "altPrices": [
+                {
+                  "price": 3222,
+                  "promoPrice": 1611
+                },
+                {
+                  "price": 3567,
+                  "promoPrice": 1784
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$56,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            },
+            {
+              "size": 500000,
+              "price": 3597,
+              "promoPrice": 1799,
+              "altPrices": [
+                {
+                  "price": 4028,
+                  "promoPrice": 2014
+                },
+                {
+                  "price": 4460,
+                  "promoPrice": 2230
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$70,000"
+                }
+              ],
+              "note": "Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule and no news trading on the funded account. First payout in as little as 3 days, above 50% of the daily drawdown. No payout caps. No activation fee. The drawdown moves up with closed profits and stops at the starting balance."
+            }
+          ]
+        },
+        {
+          "name": "E8 Pro · 6% Max",
+          "rulesKey": "Pro",
+          "steps": "1 step",
+          "split": "80% / 100%",
+          "profitTarget": "6%",
+          "maxDrawdown": "6%",
+          "ddType": "Static",
+          "dailyLoss": "2.5%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 28,
+              "promoPrice": 14,
+              "altPrices": [
+                {
+                  "price": 34,
+                  "promoPrice": 17
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$300"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 10000,
+              "price": 59,
+              "promoPrice": 30,
+              "altPrices": [
+                {
+                  "price": 70,
+                  "promoPrice": 35
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$600"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 25000,
+              "price": 138,
+              "promoPrice": 69,
+              "altPrices": [
+                {
+                  "price": 166,
+                  "promoPrice": 83
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,500"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 50000,
+              "price": 218,
+              "promoPrice": 109,
+              "altPrices": [
+                {
+                  "price": 262,
+                  "promoPrice": 131
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$3,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 100000,
+              "price": 468,
+              "promoPrice": 234,
+              "altPrices": [
+                {
+                  "price": 562,
+                  "promoPrice": 281
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$6,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 200000,
+              "price": 949,
+              "promoPrice": 475,
+              "altPrices": [
+                {
+                  "price": 1138,
+                  "promoPrice": 569
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$12,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 400000,
+              "price": 1999,
+              "promoPrice": 1000,
+              "altPrices": [
+                {
+                  "price": 2398,
+                  "promoPrice": 1199
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$24,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 500000,
+              "price": 2469,
+              "promoPrice": 1235,
+              "altPrices": [
+                {
+                  "price": 2962,
+                  "promoPrice": 1481
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$30,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            }
+          ]
+        },
+        {
+          "name": "E8 Pro · 8% Max",
+          "rulesKey": "Pro",
+          "steps": "1 step",
+          "split": "80% / 100%",
+          "profitTarget": "8%",
+          "maxDrawdown": "8%",
+          "ddType": "Static",
+          "dailyLoss": "2.5%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 32,
+              "promoPrice": 16,
+              "altPrices": [
+                {
+                  "price": 39,
+                  "promoPrice": 20
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$400"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 10000,
+              "price": 68,
+              "promoPrice": 34,
+              "altPrices": [
+                {
+                  "price": 82,
+                  "promoPrice": 41
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$800"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 25000,
+              "price": 148,
+              "promoPrice": 74,
+              "altPrices": [
+                {
+                  "price": 178,
+                  "promoPrice": 89
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$2,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 50000,
+              "price": 228,
+              "promoPrice": 114,
+              "altPrices": [
+                {
+                  "price": 274,
+                  "promoPrice": 137
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$4,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 100000,
+              "price": 488,
+              "promoPrice": 244,
+              "altPrices": [
+                {
+                  "price": 586,
+                  "promoPrice": 293
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$8,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 200000,
+              "price": 998,
+              "promoPrice": 499,
+              "altPrices": [
+                {
+                  "price": 1198,
+                  "promoPrice": 599
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$16,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 400000,
+              "price": 2098,
+              "promoPrice": 1049,
+              "altPrices": [
+                {
+                  "price": 2518,
+                  "promoPrice": 1259
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$32,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 500000,
+              "price": 2598,
+              "promoPrice": 1299,
+              "altPrices": [
+                {
+                  "price": 3118,
+                  "promoPrice": 1559
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$40,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            }
+          ]
+        },
+        {
+          "name": "E8 Pro · 10% Max",
+          "rulesKey": "Pro",
+          "steps": "1 step",
+          "split": "80% / 100%",
+          "profitTarget": "10%",
+          "maxDrawdown": "10%",
+          "ddType": "Static",
+          "dailyLoss": "2.5%",
+          "note": "",
+          "plans": [
+            {
+              "size": 5000,
+              "price": 48,
+              "promoPrice": 24,
+              "altPrices": [
+                {
+                  "price": 58,
+                  "promoPrice": 29
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$500"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 10000,
+              "price": 78,
+              "promoPrice": 39,
+              "altPrices": [
+                {
+                  "price": 94,
+                  "promoPrice": 47
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 25000,
+              "price": 159,
+              "promoPrice": 80,
+              "altPrices": [
+                {
+                  "price": 190,
+                  "promoPrice": 95
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$2,500"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 50000,
+              "price": 249,
+              "promoPrice": 125,
+              "altPrices": [
+                {
+                  "price": 298,
+                  "promoPrice": 149
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$5,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 100000,
+              "price": 539,
+              "promoPrice": 270,
+              "altPrices": [
+                {
+                  "price": 646,
+                  "promoPrice": 323
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$10,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 200000,
+              "price": 1098,
+              "promoPrice": 549,
+              "altPrices": [
+                {
+                  "price": 1318,
+                  "promoPrice": 659
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$20,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 400000,
+              "price": 2309,
+              "promoPrice": 1155,
+              "altPrices": [
+                {
+                  "price": 2770,
+                  "promoPrice": 1385
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$40,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
+            },
+            {
+              "size": 500000,
+              "price": 2858,
+              "promoPrice": 1429,
+              "altPrices": [
+                {
+                  "price": 3430,
+                  "promoPrice": 1715
+                }
+              ],
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$50,000"
+                }
+              ],
+              "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
             }
           ]
         }

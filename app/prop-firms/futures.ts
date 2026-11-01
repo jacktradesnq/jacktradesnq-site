@@ -432,7 +432,7 @@ function rowsOf(firm: Firm, link: Link): CompareRow[] {
           // A list price equal to the price paid (no code on sale) is not struck through.
           list: price.was ?? price.now,
           discounted: price.was != null && price.was > price.now ? price.now : null,
-          alt: null,
+          alts: [],
           per: pr.priceType === 'monthly' ? '/month' : 'one-time',
           from: !!plan.priceAmbiguous,
         },

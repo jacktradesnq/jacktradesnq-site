@@ -42,8 +42,9 @@ export type ComparePrice =
       kind: 'price';
       list: number;
       discounted: number | null;
-      // A second version of the same account after a « / » (MFP Elite 3% DLL, Vest 90% split).
-      alt: { list: number; discounted: number | null } | null;
+      // Other versions of the same account, each after a « / » (MFP Elite 3% DLL, Vest 90% split,
+      // E8 One 90% and 100% payout).
+      alts: { list: number; discounted: number | null }[];
       per: '/month' | 'one-time' | null;
       // Several prices live for the same product: the cheapest is shown, prefixed "from".
       from: boolean;
@@ -112,11 +113,11 @@ export const textVal = (text: string, sort: number | string | null = text): Val 
   text === 'None' ? { text, sort: null, muted: true } : { text, sort };
 
 // The price a row shows, with or without the discount.
-export function shownPrice(p: ComparePrice, discount: boolean): { now: number; was: number | null; alt: { now: number; was: number | null } | null } | null {
+export function shownPrice(p: ComparePrice, discount: boolean): { now: number; was: number | null; alts: { now: number; was: number | null }[] } | null {
   if (p.kind !== 'price') return null;
   const pick = (x: { list: number; discounted: number | null }) =>
     discount && x.discounted != null ? { now: x.discounted, was: x.list } : { now: x.list, was: null };
-  return { ...pick(p), alt: p.alt ? pick(p.alt) : null };
+  return { ...pick(p), alts: p.alts.map(pick) };
 }
 
 // "from $X" on a firm's card: the cheapest price with the discount, any plan.
@@ -126,7 +127,7 @@ export function cheapest(rows: CompareRow[]): FirmView['from'] {
     const p = shownPrice(r.price, true);
     if (!p || r.price.kind !== 'price') continue;
     const per = r.price.per === '/month' ? '/mo' : null;
-    for (const now of [p.now, p.alt?.now]) if (now != null && (best == null || now < best.now)) best = { now, per };
+    for (const now of [p.now, ...p.alts.map((a) => a.now)]) if (best == null || now < best.now) best = { now, per };
   }
   return best;
 }

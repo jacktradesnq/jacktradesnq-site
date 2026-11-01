@@ -5,7 +5,7 @@
 // replaced by the comparator on 01/11/2026 (Angelo: the firm window shows his words, its
 // code and « See all plans », which opens the comparator on that firm).
 
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { money } from './shared';
 import type { Cell, FirmView } from './firm-view';
 
@@ -43,7 +43,7 @@ export function CellView({ cell }: { cell: Cell }) {
 export type ShownPrice = {
   now: number;
   was: number | null;
-  alt: { now: number; was: number | null } | null;
+  alts: { now: number; was: number | null }[];
   per: string | null;
   from: boolean;
 };
@@ -60,18 +60,18 @@ export function PriceView({ price }: { price: ShownPrice }) {
           {money(price.was)}
         </s>
       )}
-      {price.alt && (
-        <>
+      {price.alts.map((alt, i) => (
+        <Fragment key={i}>
           <span className="price-sep" aria-hidden="true">/</span>
-          <span className="ft-now">{money(price.alt.now)}</span>
-          {price.alt.was != null && (
+          <span className="ft-now">{money(alt.now)}</span>
+          {alt.was != null && (
             <s className="price-was">
               <span className="sr-only">normal price </span>
-              {money(price.alt.was)}
+              {money(alt.was)}
             </s>
           )}
-        </>
-      )}
+        </Fragment>
+      ))}
     </span>
   );
 }
