@@ -709,7 +709,7 @@
       "id": "e8-perps",
       "name": "E8 Markets",
       "logo": "/logos/e8-markets.svg",
-      "url": "https://e8markets.com/d/B1770991",
+      "url": "https://e8markets.com/d/B1770991?market=perpetual",
       "lastChecked": "2026-11-01",
       "markets": [
         "Crypto",
