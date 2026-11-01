@@ -1,6 +1,5 @@
 // Perps firms (public/data/perps-firms.json, read by hand, not auto-synced) turned into
-// FirmView, in the layout of the MyFundedPerps comparison Angelo made on 11/10/2026
-// (jtnq-promo, out/myfundedperps/table.html).
+// FirmView (partner cards) and CompareRow (the comparator, one row per plan).
 //
 // The JTNQ promo has a hard end (endsAt). Three moments to get right:
 // - build: a build made after endsAt never shows the promo (BUILD_TS, inlined by
@@ -12,7 +11,9 @@
 import { useEffect, useState } from 'react';
 import rawData from '@/public/data/perps-firms.json';
 import { goHref } from '@/lib/go-links';
-import { cheapest, hasDailyLoss, limitCell, splitCommon, type Cell, type FirmView, type Funded, type PriceCell } from './firm-view';
+import { firstNumber } from '@/lib/compare-order.mjs';
+import { sizeLabel } from './shared';
+import { cheapest, humanDate, pillValue, ptdd, textVal, type CompareRow, type FirmView, type Funded, type Val } from './firm-view';
 
 // price null = announced but not on sale yet ("Coming soon").
 // altPrice: a second version of the same account, shown in the same cell after a « / » (Angelo,
@@ -135,47 +136,14 @@ const DETAILS: Record<string, Record<string, { split: string; leverage: string }
   },
 };
 
-// Rules MyFundedPerps applies to every program, from the same table.
-const COMMON: Record<string, string[]> = {
-  // No "1-step evaluation": MyFundedPerps sells no straight-to-funded account (Angelo,
-  // 12/10/2026: « si la prop firm n'a pas de straight to funded ne précise pas évaluation »).
-  myfundedperps: [
-    'Static drawdown',
-    'No consistency rule',
-    'No minimum trading days',
-    'No time limit',
-    'Up to $300K funded in total',
-  ],
-  // Breakout, read 13/10/2026. No "1-step evaluation" either: Breakout sells no straight-to-funded
-  // account (intercom.help/breakoutprop « What types of Breakout Evaluations can I purchase? »: three
-  // 1-Step variants, Classic, Pro, Turbo). Sources: breakoutprop.com/pricing/ (« 6% static »,
-  // « What is static drawdown? », « No min trading days », « No time limits », « You can hold up to
-  // $200K in total funded capital across all accounts combined »); breakoutprop.com FAQ (« There is
-  // no consistency rule on any Breakout account »).
-  breakout: [
-    'Static drawdown',
-    'No consistency rule',
-    'No minimum trading days',
-    'No time limit',
-    'Up to $200K funded in total',
-  ],
-  // Vest, docs.vestmarkets.com/vest-capital, read 21/10/2026: loss-limits « A fixed floor, set once
-  // when your account is created. It never moves »; overview « No time limits » and « Maximum 10 Live
-  // Funded Accounts per user, across both paths combined ». The docs say nothing about a consistency
-  // rule or minimum trading days, so neither is claimed here.
-  // Payouts, claiming-profit: « Claim as often as you like. There's no cap on frequency and no cap on
-  // the amount you can claim »; « 24 hours for every claim »; « the USDC is credited to your Primary
-  // Account ». Same for an evaluation or an Instant account (« This flow works identically »), and
-  // loss-limits: « Whatever applies during the Evaluation Phase carries through unchanged once you're
-  // Live ». So Vest has no Funded tab: it would repeat the evaluation (Angelo, 21/10/2026: « funded
-  // c presque pareil que eval partout »).
-  'vest-markets': [
-    'Static drawdown',
-    'No time limit',
-    'Up to 10 live funded accounts',
-    'Payouts any time, no cap',
-    'Paid in USDC within 24 hours',
-  ],
+// Payout pace of a firm with no funded rules written below. Vest, docs.vestmarkets.com/vest-capital,
+// read 21/10/2026, claiming-profit: « Claim as often as you like. There's no cap on frequency and no
+// cap on the amount you can claim »; « 24 hours for every claim ». Same for an evaluation or an
+// Instant account (« This flow works identically »), and loss-limits: « Whatever applies during the
+// Evaluation Phase carries through unchanged once you're Live ». So Vest has no funded rules of its
+// own (Angelo, 21/10/2026: « funded c presque pareil que eval partout »).
+const PAYOUTS: Record<string, string> = {
+  'vest-markets': 'Any time, no cap',
 };
 
 // No « Winning days: None » on a funded account whose payout pace is written (once a day, any
@@ -240,137 +208,73 @@ const SUMMARY: Record<string, string> = {
   'vest-markets': '80–95% split',
 };
 
-// How the limits are measured. Breakout, intercom 13/10/2026: max drawdown « 6% [5%, 3%] of your
-// initial account balance »; daily loss « 3% of your […] account balance at 00:30 UTC,
-// recalculated every day at that time ».
-// Vest, docs loss-limits 21/10/2026: the max drawdown is « Calculated as a percentage of your starting
-// capital »; the daily loss limit is « 3% or 4% of your reset balance », « The daily reset boundary is
-// 20:00 ET ».
-const LEGEND: Record<string, string[]> = {
-  breakout: ['Max drawdown is a percentage of your starting balance; the daily loss limit is a percentage of your balance at 00:30 UTC, reset every day'],
-  'vest-markets': [
-    'Max drawdown is a fixed floor, a percentage of your starting balance; the daily loss limit is a percentage of your balance at the 20:00 New York reset',
-    '1-Step: the first price is the 80% split, the second the 90% split',
-  ],
-};
+const STEPS = (s: string) => (/^instant/i.test(s) ? 'Instant' : /^2/.test(s) ? '2 Steps' : /^1/.test(s) ? '1 Step' : s);
+const figure = (text: string | null | undefined): Val | undefined => (text ? textVal(text, firstNumber(text)) : undefined);
 
-const text = (v: string | undefined): Cell => (v ? { text: v } : { text: 'n/c', muted: true });
-
-function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
-  const programs = firm.programs;
+function rowsOf(firm: PerpsFirm, promoLive: boolean): CompareRow[] {
   const promo = promoOf(firm, promoLive);
   const d = (p: PerpsProgram) => DETAILS[firm.id]?.[p.name.split(' ')[0]];
-
-  const { common, rules } = splitCommon([
-    // No target on instant funding is not said (Angelo, 22/10/2026 : « pk y aurait un target si c
-    // du straight to funded », then « Enlever aussi » for Vest Instant): no pill ("–").
-    {
-      label: 'Profit target',
-      cells: programs.map((p) => (p.profitTarget ? limitCell(p.profitTarget) : { text: '–', muted: true })),
-      common: (c) => (c.muted ? 'No profit target' : `${c.text} profit target`),
-    },
-    { label: 'Max drawdown', cells: programs.map((p) => limitCell(p.maxDrawdown)), common: (c) => `${c.text} max drawdown` },
-    ...(hasDailyLoss(programs.map((p) => p.dailyLoss))
-      ? [{
-          label: 'Daily loss limit',
-          // A program without one gets no pill (Angelo, 22/10/2026, Vest Instant).
-          cells: programs.map((p) => (p.dailyLoss === 'None' ? { text: '–', muted: true } : limitCell(p.dailyLoss))),
-          common: (c: Cell) => `${c.text} daily loss limit`,
-        }]
-      : []),
-    { label: 'Profit split', cells: programs.map((p) => text(d(p)?.split ?? p.split)), common: (c) => `${c.text} profit split` },
-    { label: 'Leverage', cells: programs.map((p) => text(d(p)?.leverage)), common: (c) => `${c.text} leverage` },
-    // A program missing from DETAILS still shows its rules as the JSON writes them.
-    {
-      label: 'Notes',
-      cells: programs.map((p) => (d(p) ? { text: '–', muted: true } : { text: p.note, note: true })),
-      common: () => '',
-      skip: programs.every((p) => d(p)),
-    },
-  ]);
-  const firmCommon = COMMON[firm.id] ?? [...new Set(programs.map((p) => p.steps))];
-
-  const sizes = [...new Set(programs.flatMap((p) => p.plans.map((pl) => pl.size)))].sort((a, b) => a - b);
-  const sizeRows = sizes.map((size) => ({
-    size,
-    cells: programs.map((p): PriceCell => {
-      const plan = p.plans.find((pl) => pl.size === size);
-      if (!plan) return null;
-      if (plan.price == null) return { kind: 'text', text: plan.note ?? 'Coming soon' };
-      const promoPrice = promo ? plan.promoPrice : null;
-      const altPromo = promo ? plan.altPromoPrice ?? null : null;
+  const funded = (p: PerpsProgram) => FUNDED[firm.id]?.[p.name.split(' ')[0]];
+  return firm.programs.flatMap((p) =>
+    p.plans.map((plan, i): CompareRow => {
+      const steps = STEPS(p.steps);
+      const dollars = plan.lines?.find((l) => l.label === 'Max drawdown')?.value;
       return {
-        kind: 'price',
-        now: promoPrice ?? plan.price,
-        was: promoPrice != null ? plan.price : null,
-        alt: plan.altPrice != null ? { now: altPromo ?? plan.altPrice, was: altPromo != null ? plan.altPrice : null } : null,
-        per: null,
-        from: false,
-        lines: (plan.lines ?? []).map((l) => ({ label: l.label, cell: { text: l.value } })),
+        key: `${firm.id}|${p.name}|${plan.size}|${i}`,
+        family: 'perps',
+        firmId: firm.id,
+        firmName: firm.name,
+        logo: firm.logo,
+        program: p.name,
+        size: plan.size,
+        steps,
+        // Prices with the code only where they were read on the firm's checkout (promoPrice), never
+        // computed from the rate (Breakout: the table keeps its normal prices).
+        price:
+          plan.price == null
+            ? { kind: 'text', text: plan.note ?? 'Coming soon' }
+            : {
+                kind: 'price',
+                list: plan.price,
+                discounted: promo ? plan.promoPrice : null,
+                alt: plan.altPrice != null ? { list: plan.altPrice, discounted: promo ? plan.altPromoPrice ?? null : null } : null,
+                per: null,
+                from: false,
+              },
+        cells: {
+          size: { text: sizeLabel(plan.size), sort: plan.size },
+          steps: { text: steps, sort: steps },
+          leverage: figure(d(p)?.leverage),
+          // No target on instant funding is not said (Angelo, 22/10/2026).
+          target: figure(p.profitTarget),
+          dailyLoss: figure(p.dailyLoss),
+          maxLoss: p.maxDrawdown ? { text: p.maxDrawdown, sort: firstNumber(p.maxDrawdown), sub: dollars } : undefined,
+          lossType: p.ddType ? { text: '', sort: p.ddType, tag: { label: p.ddType, title: '', accent: false } } : undefined,
+          ptdd: p.profitTarget ? ptdd(firstNumber(p.profitTarget), firstNumber(p.maxDrawdown)) : undefined,
+          split: figure(d(p)?.split ?? p.split),
+          payoutFreq: figure(pillValue(funded(p), 'Payout request') ?? PAYOUTS[firm.id]),
+          checked: { text: humanDate(firm.lastChecked), sort: firm.lastChecked },
+        },
+        lastChecked: firm.lastChecked,
+        note: plan.price != null ? plan.note : undefined,
+        href: goHref('prop-firms', firm.id),
+        affiliate: true,
+        code: { code: 'JTNQ', title: 'My affiliate code' },
       };
     }),
-  }));
+  );
+}
 
-  const moreLabels = [...new Set(programs.flatMap((p) => p.plans.flatMap((pl) => (pl.more ?? []).map((m) => m.label))))];
-  const extraPrices: NonNullable<FirmView['extraPrices']> = moreLabels.map((label) => ({
-    label,
-    byProgram: programs.map((p) => {
-      const rows = p.plans.flatMap((pl) => (pl.more ?? []).filter((m) => m.label === label).map((m) => [pl.size, m] as const));
-      if (!rows.length) return null;
-      return Object.fromEntries(
-        rows.map(([size, m]) => {
-          const now = promo ? m.promoPrice : null;
-          const altNow = promo ? m.altPromoPrice ?? null : null;
-          return [size, {
-            now: now ?? m.price,
-            was: now != null ? m.price : null,
-            alt: m.altPrice != null ? { now: altNow ?? m.altPrice, was: altNow != null ? m.altPrice : null } : null,
-          }];
-        }),
-      );
-    }),
-  }));
+export const perpsRows = (promoLive: boolean): CompareRow[] => DATA.firms.flatMap((f) => rowsOf(f, promoLive));
 
-  const hasPromoPrices = programs.some((p) => p.plans.some((pl) => pl.promoPrice != null));
-  const endsLabel = promo?.endsAt
-    ? new Date(promo.endsAt).toLocaleString('en-US', {
-        month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York',
-      })
-    : '';
-
-  return {
+export const perpsFirms = (promoLive: boolean): FirmView[] =>
+  DATA.firms.map((firm) => ({
     id: firm.id,
     name: firm.name,
     logo: firm.logo,
     summary: SUMMARY[firm.id] ?? '',
     code: { code: 'JTNQ', title: 'My affiliate code' },
     stale: null,
-    from: cheapest(sizeRows),
-    columns: programs.map((p) => ({ name: p.name })),
-    common: [...firmCommon, ...common.filter(Boolean)],
-    rules,
-    // Prices with the code are shown only where they were read on the firm's checkout (promoPrice);
-    // never computed from the rate. Vest: every price with code JTNQ read 21/10/2026 in the purchase
-    // configurator of next.vestmarkets.com/vest-capital/evaluation, code typed in « Enter Discount
-    // Code » (« 5% Discount »); each one is the price × 0.95 to the cent (43 out of 43). Exception,
-    // Vest 50K: its prices with the code are the price × 0.95, computed (Angelo, 22/10/2026: « non
-    // mais tant que c -5% c bon nan? »). Cross-check: the same 14 prices showed in that
-    // configurator, logged in, with JTNQ typed, on 22/10/2026 (1-Step 10% 3% DLL 80%: « $415 »
-    // then « $394.25 »). Without them the table keeps the normal prices and only names
-    // the rate (Breakout, Angelo 13/10/2026: « 5% off with code JTNQ »).
-    priceTitle: promo && hasPromoPrices ? `Price with code ${promo.code}` : 'Price',
-    priceSub: promo
-      ? `${promo.discountPct}% off${promo.firstPurchase ? ' your first purchase' : ''}${hasPromoPrices && !extraPrices.length ? '' : ` with code ${promo.code}`}${promo.thenPct ? `\n${promo.thenPct}% off every purchase after` : ''}${endsLabel ? ` until ${endsLabel} New York time` : ''}`
-      : null,
-    sizes: sizeRows,
-    ...(extraPrices.length ? { priceLabels: programs.map((p) => p.priceLabel ?? null), extraPrices } : {}),
-    funded: FUNDED[firm.id] ? programs.map((p) => FUNDED[firm.id][p.name.split(' ')[0]] ?? null) : undefined,
-    legend: [
-      ...(LEGEND[firm.id] ?? ['Every limit is a percentage of your starting balance, the way perps firms publish them']),
-      ...(rules.some((r) => r.cells.some((c) => c.text === 'n/c')) ? ['n/c — the firm does not publish that rule per program'] : []),
-    ],
+    from: cheapest(rowsOf(firm, promoLive)),
     href: goHref('prop-firms', firm.id),
-  };
-}
-
-export const perpsFirms = (promoLive: boolean): FirmView[] => DATA.firms.map((f) => firmView(f, promoLive));
+  }));

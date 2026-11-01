@@ -1,8 +1,10 @@
-// One shape for every firm on /prop-firms, whatever its family. Angelo, 11/10/2026:
-// « ils choisissent juste entre les trois types de prop firm, et après […] ils cliquent
-// dessus, ça leur montre le tableau avec tout d'un coup ». Each family (futures.ts,
-// perps.ts) turns its own JSON into FirmView; FirmTable.tsx only draws it: one
-// program at a time, its rules as pills, one column per account size, Eval / Funded.
+// The shapes /prop-firms draws, whatever the family. Each family (futures.ts, perps.ts) turns
+// its own JSON into:
+// - FirmView: a partner firm's card and its window (Angelo, 11/10/2026: « ils choisissent juste
+//   entre les trois types de prop firm, et après […] ils cliquent dessus »);
+// - CompareRow: one plan (firm × program × size) of the comparator, « Prop compare » (Angelo,
+//   01/11/2026). The firm window no longer holds a table of plans: « See all plans » opens the
+//   comparator on that firm.
 
 export type Family = 'futures' | 'perps';
 
@@ -15,40 +17,54 @@ export type Cell = {
   text: string;
   // Drawdown kind shown as a pill (EOD Trail, Static…), with its explanation on hover.
   tag?: { label: string; title: string; accent: boolean };
-  // Soft daily loss: position flattened, account survives.
-  soft?: boolean;
-  // "None", "Not published", "n/c": a rule, but not a figure.
+  // "None": a rule the firm says it does not have, not a figure.
   muted?: boolean;
-  // A sentence rather than a figure (plan notes): smaller, wraps.
-  note?: boolean;
-  // Said on its own, without the row's label (« One-day pass per step » for a consistency).
-  alone?: boolean;
 };
 
-export type PriceCell =
+// One cell of the comparator: what it says, and what a click on its column sorts by.
+export type Val = Cell & {
+  sort: number | string | null;
+  // A second line under the figure (the dollar max loss of a perps plan).
+  sub?: string;
+  // Where the value was read, on hover (« Payout caps 1 / 2 / 3 / 4 »).
+  title?: string;
+};
+
+// Prices without and with the discount (code JTNQ, the firm's public promo, a public code):
+// the comparator's « Apply discount » switch picks one.
+export type ComparePrice =
   | {
       kind: 'price';
-      now: number;
-      was: number | null;
-      alt?: { now: number; was: number | null } | null; // second price after « / » (MFP Elite 3% DLL)
-      per: string | null;
+      list: number;
+      discounted: number | null;
+      // A second version of the same account after a « / » (MFP Elite 3% DLL, Vest 90% split).
+      alt: { list: number; discounted: number | null } | null;
+      per: '/month' | 'one-time' | null;
       // Several prices live for the same product: the cheapest is shown, prefixed "from".
       from: boolean;
-      // Rules that change with the account size (futures dollar limits, contracts).
-      lines: { label: string; cell: Cell }[];
     }
-  | { kind: 'text'; text: string } // "Coming soon"
-  | null; // size not sold on that program
+  | { kind: 'text'; text: string }; // "Coming soon"
 
-export type RuleRow = { label: string; cells: Cell[] };
-
-// A rule shown as a pill above the table: a label, and its value when it has one.
-export type Pill = { label: string; value?: string };
-
-export type Funded = {
-  pills: Pill[];
-  // Funded rules that change with the account size, keyed by size.
-  rows: { label: string; bySize: Record<number, string> }[];
+export type CompareRow = {
+  key: string;
+  family: Family;
+  firmId: string;
+  firmName: string;
+  logo: string | null;
+  program: string;
+  size: number;
+  steps: string;
+  price: ComparePrice;
+  // Keyed by column id (compare/columns.ts); no key = nothing published, drawn « — ».
+  cells: Partial<Record<string, Val>>;
+  lastChecked: string;
+  // What the firm writes about the price or the plan (paid options, trading hours), shown folded.
+  note?: string;
+  href: string;
+  // false: a firm Angelo is not partnered with (compare-extra-firms.json), its own site and
+  // its public code, shown in the comparator only.
+  affiliate: boolean;
+  code: { code: string; title: string } | null;
 };
 
 export type FirmView = {
@@ -60,69 +76,53 @@ export type FirmView = {
   stale: { label: string; title: string } | null;
   // Cheapest price paid with code JTNQ, any program, any size.
   from: { now: number; per: string | null } | null;
-  // drop: a limited Traders Launch drop, its tab sits after Eval / Funded.
-  columns: { name: string; drop?: boolean }[];
-  common: string[];
-  rules: RuleRow[];
-  priceTitle: string;
-  priceSub: string | null;
-  sizes: { size: number; cells: PriceCell[] }[];
-  // What changes once funded, per program (null: not documented for that program). The
-  // table switches between the evaluation and these rules (Angelo, 12/10/2026, after
-  // Lucid's « Funded Rules »: « peut-être un filtre Eval/Funded »).
-  funded?: (Funded | null)[];
-  // A second price for the same account (Traders Launch sells each size at a 60% and an 80%
-  // split): the main price row is then named priceLabel, the others by their own label.
-  priceLabel?: string;
-  // The same, program by program (Vest: « 3% DLL » on the 1-Step tabs, nothing on 2-Step / Instant).
-  priceLabels?: (string | null)[];
-  extraPrices?: {
-    label: string;
-    byProgram: (Record<number, { now: number; was: number | null; alt?: { now: number; was: number | null } | null }> | null)[];
-  }[];
-  legend: string[];
   href: string;
 };
+
+// A rule shown as a pill: a label, and its value when it has one.
+export type Pill = { label: string; value?: string };
+
+// What changes once funded, per program, as read on the firm's own pages: pills, and the
+// rules that change with the account size. The comparator reads its payout columns here.
+export type Funded = {
+  pills: Pill[];
+  rows: { label: string; bySize: Record<number, string> }[];
+};
+
+export const pillValue = (f: Funded | null | undefined, label: string): string | undefined =>
+  f?.pills.find((p) => p.label === label)?.value;
 
 export const humanDate = (iso: string) =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {
     day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC',
   });
 
-const cellKey = (c: Cell) => JSON.stringify([c.text, c.tag?.label ?? '', !!c.soft]);
+export const textVal = (text: string, sort: number | string | null = text): Val =>
+  text === 'None' ? { text, sort: null, muted: true } : { text, sort };
 
-// A rule that reads the same on every program leaves the table for the "Same on every
-// plan" box, phrased as a sentence; the table keeps only what differs.
-export function splitCommon(
-  // keep: always a column, even when every program reads the same.
-  rows: { label: string; cells: Cell[]; common: (c: Cell) => string; skip?: boolean }[],
-): { common: string[]; rules: RuleRow[] } {
-  const common: string[] = [];
-  const rules: RuleRow[] = [];
-  for (const row of rows) {
-    if (row.skip) continue;
-    const same = row.cells.length > 1 && row.cells.every((c) => cellKey(c) === cellKey(row.cells[0]));
-    if (same || row.cells.length === 1) common.push(row.common(row.cells[0]));
-    else rules.push({ label: row.label, cells: row.cells });
-  }
-  return { common, rules };
+// PT:DD the way PropFirmMatch prints it: 1 : max loss / profit target (10% target, 6% loss: 1:0.6).
+export function ptdd(target: number | null, maxLoss: number | null): Val | undefined {
+  if (!target || !maxLoss) return undefined;
+  const r = Math.round((maxLoss / target) * 100) / 100;
+  return { text: `1:${r}`, sort: r };
 }
 
-// A limit as perps firms publish it: "None" is a rule (no daily loss), null means
-// the firm does not publish it ("n/c").
-export const limitCell = (v: string | null): Cell =>
-  v == null ? { text: 'n/c', muted: true } : v === 'None' ? { text: 'None', muted: true } : { text: v };
+// The price a row shows, with or without the discount.
+export function shownPrice(p: ComparePrice, discount: boolean): { now: number; was: number | null; alt: { now: number; was: number | null } | null } | null {
+  if (p.kind !== 'price') return null;
+  const pick = (x: { list: number; discounted: number | null }) =>
+    discount && x.discounted != null ? { now: x.discounted, was: x.list } : { now: x.list, was: null };
+  return { ...pick(p), alt: p.alt ? pick(p.alt) : null };
+}
 
-// No daily loss limit (or none published) on any program: the row is left out, the page
-// does not mention it. Angelo, 21/10/2026: « si y a pas de daily loss limit ne le mentionne pas ».
-export const hasDailyLoss = (values: (string | null)[]): boolean => values.some((v) => v != null && v !== 'None');
-
-export function cheapest(sizes: FirmView['sizes']): FirmView['from'] {
+// "from $X" on a firm's card: the cheapest price with the discount, any plan.
+export function cheapest(rows: CompareRow[]): FirmView['from'] {
   let best: FirmView['from'] = null;
-  for (const row of sizes)
-    for (const c of row.cells)
-      if (c?.kind === 'price')
-        for (const now of [c.now, c.alt?.now])
-          if (now != null && (best == null || now < best.now)) best = { now, per: c.per };
+  for (const r of rows) {
+    const p = shownPrice(r.price, true);
+    if (!p || r.price.kind !== 'price') continue;
+    const per = r.price.per === '/month' ? '/mo' : null;
+    for (const now of [p.now, p.alt?.now]) if (now != null && (best == null || now < best.now)) best = { now, per };
+  }
   return best;
 }

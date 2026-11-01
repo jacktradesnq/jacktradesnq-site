@@ -1,16 +1,17 @@
 'use client';
 
-// /prop-firms: pick a family (Futures · Perps), then a firm, and its whole table
-// opens in a window over the page — every program and every size at once. Angelo, 11/10/2026: « un filtre
-// où tu tapes entre futures, perps et CFD […] chaque prop firm tu cliques dessus et ça
-// t'ouvre le tableau directement ».
+// /prop-firms: pick a family (Futures · Perps), then a firm, and its window opens over the page.
+// Angelo, 11/10/2026: « un filtre où tu tapes entre futures, perps et CFD […] chaque prop firm
+// tu cliques dessus et ça t'ouvre le tableau directement ». Since 01/11/2026 the window holds
+// his words on the firm, its code and « See all plans », which opens the comparator (« Prop
+// compare ») on that firm; the plans themselves live in the comparator.
 //
-// His partnership contracts forbid comparing firms or putting one forward (11/10/2026:
-// « faut pas que je compare et que je mette en avant l'un ou l'autre, c'est contre mes
-// contrats »): cards in alphabetical order, all alike, never two firms in one table,
-// nothing opened by default.
+// His partnership contracts forbid putting one firm forward (11/10/2026: « faut pas que je
+// compare et que je mette en avant l'un ou l'autre, c'est contre mes contrats »): cards in
+// alphabetical order, all alike, nothing opened by default. The comparator he asked for on
+// 01/11/2026 ranks nothing either (compare/ComparePanel.tsx).
 //
-// The table opens over the page instead of folding out under the card (Angelo, 12/10/2026:
+// The window opens over the page instead of folding out under the card (Angelo, 12/10/2026:
 // « j'ai pas envie que ça soit un toggle mais un truc qui s'ouvre »).
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
@@ -18,14 +19,23 @@ import { CSS, META, money } from './shared';
 import { FAMILIES, type Family, type FirmView } from './firm-view';
 import { FUTURES_FIRMS } from './futures';
 import { PERPS_PROMO, PERPS_PROMO_FIRM_ID, PROMO_ENDS_MS, perpsFirms, usePromoLive } from './perps';
-import { FirmLogo, FirmTable, PromoClock } from './FirmTable';
+import { FirmLogo, PromoClock } from './FirmTable';
+import { FirmWindow } from './FirmWindow';
 import { FAMILY_CSS } from './family-css';
 import { TRADE_COPIER_CSS, TRADE_COPIER_DISCLAIMER, TradeCopierPanel } from './TradeCopier';
+import { ComparePanel } from './compare/ComparePanel';
 
 // A third tab next to Futures and Perps, Tradecopia (Angelo, 31/10/2026: « ouais 3eme bouton »).
-// Not a firm family: it opens its own panel instead of firm cards.
-type Tab = Family | 'trade-copier';
-const TABS: { id: Tab; label: string }[] = [...FAMILIES, { id: 'trade-copier', label: 'Trade copier' }];
+// A fourth, the comparator (Angelo, 01/11/2026: 4th button, « Prop compare pour qu'ils
+// comprennent on compare quoi »); #compare=<firm-id> opens it on one firm.
+// Neither is a firm family: each opens its own panel instead of firm cards.
+type Tab = Family | 'trade-copier' | 'compare';
+const TABS: { id: Tab; label: string }[] = [
+  ...FAMILIES,
+  { id: 'trade-copier', label: 'Trade copier' },
+  { id: 'compare', label: 'Prop compare' },
+];
+const COMPARE_FIRM = /^compare=([a-z0-9-]+)$/;
 
 const byName = (a: FirmView, b: FirmView) => a.name.localeCompare(b.name, 'en');
 const isTab = (s: string): s is Tab => TABS.some((t) => t.id === s);
@@ -42,6 +52,7 @@ export default function PropFirms() {
 
   const [family, setFamily] = useState<Tab>('futures');
   const [openId, setOpenId] = useState<string | null>(null);
+  const [compareFirm, setCompareFirm] = useState<string | null>(null);
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -53,12 +64,15 @@ export default function PropFirms() {
     };
   }, []);
 
-  // #futures / #perps / #trade-copier open the matching tab, on load and on back/forward.
+  // #futures / #perps / #trade-copier / #compare open the matching tab, on load and on
+  // back/forward; #compare=<firm-id> opens the comparator on that firm.
   useEffect(() => {
     const fromHash = () => {
       const h = window.location.hash.slice(1);
-      if (!isTab(h)) return;
-      setFamily(h);
+      const firm = COMPARE_FIRM.exec(h)?.[1] ?? null;
+      if (!isTab(h) && !firm) return;
+      setFamily(firm ? 'compare' : (h as Tab));
+      setCompareFirm(firm);
       setOpenId(null);
     };
     fromHash();
@@ -70,7 +84,21 @@ export default function PropFirms() {
     if (f === family) return;
     setFamily(f);
     setOpenId(null);
+    setCompareFirm(null);
     window.history.replaceState(null, '', `#${f}`);
+  }
+
+  function compareOn(firmId: string | null) {
+    setCompareFirm(firmId);
+    window.history.replaceState(null, '', firmId ? `#compare=${firmId}` : '#compare');
+  }
+
+  // « See all plans » in a firm's window: the comparator, on that firm.
+  function seeAllPlans(firmId: string) {
+    dialogRef.current?.close();
+    setFamily('compare');
+    compareOn(firmId);
+    document.querySelector('.fam-section')?.scrollIntoView({ block: 'start' });
   }
 
   function onTabKey(e: KeyboardEvent<HTMLButtonElement>) {
@@ -88,7 +116,8 @@ export default function PropFirms() {
   }
 
   const isCopier = family === 'trade-copier';
-  const firms = isCopier ? [] : firmsBy[family];
+  const isCompare = family === 'compare';
+  const firms = isCopier || isCompare ? [] : firmsBy[family];
   const open = firms.find((f) => f.id === openId) ?? null;
 
   // The native <dialog> gives Escape, focus trapping and the backdrop for free.
@@ -150,6 +179,8 @@ export default function PropFirms() {
           <div className="fam-panel" role="tabpanel" id={`panel-${family}`} aria-labelledby={`tab-${family}`}>
             {isCopier ? (
               <TradeCopierPanel />
+            ) : isCompare ? (
+              <ComparePanel firm={compareFirm} onFirmChange={compareOn} />
             ) : (
             <>
             <p className="fam-caption">
@@ -187,7 +218,7 @@ export default function PropFirms() {
                         </span>
                       )}
                       <span className="fc-open">
-                        See all plans
+                        Open
                         <svg className="fc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <path d="M7 17L17 7M9 7h8v8" />
                         </svg>
@@ -203,10 +234,10 @@ export default function PropFirms() {
             <dialog
               ref={dialogRef}
               className="firm-dialog"
-              aria-label={open ? `${open.name} plans` : undefined}
+              aria-label={open ? open.name : undefined}
               onClose={() => setOpenId(null)}
               onClick={(e) => {
-                // A click on the dimmed backdrop (the dialog box itself, outside the table) closes it.
+                // A click on the dimmed backdrop (the dialog box itself, outside the window) closes it.
                 if (e.target === e.currentTarget) e.currentTarget.close();
               }}
             >
@@ -216,21 +247,21 @@ export default function PropFirms() {
                 </svg>
               </button>
               {open && (
-              <FirmTable
-                key={open.id}
-                firm={open}
-                id={`firm-${open.id}`}
-                banner={
-                  open.id === PERPS_PROMO_FIRM_ID && promoLive && PERPS_PROMO && PROMO_ENDS_MS != null ? (
-                    <p className="perps-promo">
-                      <span className="perps-promo-text">
-                        {PERPS_PROMO.discountPct}% off with code {PERPS_PROMO.code} — ends in{' '}
-                        <PromoClock endsMs={PROMO_ENDS_MS} />
-                      </span>
-                    </p>
-                  ) : null
-                }
-              />
+                <FirmWindow
+                  key={open.id}
+                  firm={open}
+                  onSeeAll={() => seeAllPlans(open.id)}
+                  banner={
+                    open.id === PERPS_PROMO_FIRM_ID && promoLive && PERPS_PROMO && PROMO_ENDS_MS != null ? (
+                      <p className="perps-promo">
+                        <span className="perps-promo-text">
+                          {PERPS_PROMO.discountPct}% off with code {PERPS_PROMO.code} — ends in{' '}
+                          <PromoClock endsMs={PROMO_ENDS_MS} />
+                        </span>
+                      </p>
+                    ) : null
+                  }
+                />
               )}
             </dialog>
           </div>

@@ -22,7 +22,7 @@ export const META = {
     mentionsUrl: '/mentions-legales/',
     privacyUrl: '/politique-confidentialite/',
     disclaimer:
-      'Disclaimer \u2014 In accordance with article D.321-1 of the French Mon\u00e9taire et Financier Code, the content published on this site is provided for informational purposes only and does not constitute investment advice. This page is an advertisement: JackTradesNQ is an affiliate of the prop firms listed and earns a commission on sign-ups made with code JTNQ.',
+      'Disclaimer \u2014 In accordance with article D.321-1 of the French Mon\u00e9taire et Financier Code, the content published on this site is provided for informational purposes only and does not constitute investment advice. This page is an advertisement: the firms shown with code JTNQ are affiliates, and JackTradesNQ earns a commission on sign-ups made with code JTNQ. A firm shown without code JTNQ is not an affiliate.',
   },
 };
 
@@ -122,10 +122,6 @@ export const CSS = `
   border: 1px dashed var(--c-line); border-radius: 999px;
   padding: 3px 9px; white-space: nowrap; cursor: help;
 }
-.jtnq-cmp .soft-flag{
-  margin-left: 8px; font-size: 10px; font-weight: 400; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--c-text-mute); cursor: help;
-}
 .jtnq-cmp .none{ color: var(--c-text-mute); font-weight: 400; font-size: 13px; }
 .jtnq-cmp .tag{
   display: inline-block; font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
@@ -144,12 +140,6 @@ export const CSS = `
 .jtnq-cmp .row-cta svg{ width: 12px; height: 12px; }
 .jtnq-cmp .row-cta:hover{ background: var(--c-accent); color: var(--c-bg); transform: translateY(-1px); }
 
-.jtnq-cmp .legend{
-  display: flex; flex-direction: column; gap: 6px; margin: 16px 0 0;
-}
-.jtnq-cmp .legend p{
-  margin: 0; font-family: var(--f-mono); font-size: 11px; line-height: 1.5; color: var(--c-text-mute);
-}
 
 
 .jtnq-cmp .site-footer{

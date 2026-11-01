@@ -1,13 +1,18 @@
-// Futures firms (public/data/prop-firms.json, scraped daily by scripts/scrape-prop-firms.mjs)
-// turned into FirmView. Futures limits are dollar amounts that change with the account
-// size, so a rule that differs between two sizes of the same program is written in each
-// price cell; a rule fixed per program gets its own row; a rule fixed for the whole firm
-// goes to "Same on every plan".
+// Futures firms turned into FirmView (partner cards) and CompareRow (the comparator).
+// - public/data/prop-firms.json: partner firms, scraped daily by scripts/scrape-prop-firms.mjs.
+// - public/data/compare-extra-firms.json: firms Angelo is not partnered with (Lucid Trading,
+//   Tradeify), same shape plus "affiliate": false and "code" = their public code. They show in
+//   the comparator only, with their own site and code (Angelo, 01/11/2026).
 
 import rawData from '@/public/data/prop-firms.json';
+import rawExtra from '@/public/data/compare-extra-firms.json';
 import { goHref } from '@/lib/go-links';
-import { money } from './shared';
-import { cheapest, humanDate, splitCommon, type Cell, type FirmView, type Funded, type Pill, type PriceCell } from './firm-view';
+import { firstNumber } from '@/lib/compare-order.mjs';
+import { money, sizeLabel } from './shared';
+import {
+  cheapest, humanDate, pillValue, ptdd, textVal,
+  type CompareRow, type FirmView, type Funded, type Pill, type Val,
+} from './firm-view';
 import codesMd from '@/content/prop-firms/codes.md';
 import { parseCodes } from '@/lib/firm-codes.mjs';
 
@@ -29,6 +34,7 @@ type Plan = {
   // « Days to Pass: 3 minimum » where the firm's card prints it (Traders Launch).
   minDays?: number;
   contracts: string;
+  // 0: the firm says there is none.
   activationFee?: number | null;
   // One product live at several prices at once: the cheapest is shown, and said.
   priceAmbiguous?: boolean;
@@ -38,12 +44,22 @@ type Plan = {
   // The same account sold at other profit splits, list prices: {"60": 119, "90": 169}.
   splitPrices?: Record<string, number>;
 };
+// The optional program fields feed the comparator's columns (Angelo, 01/11/2026). Absent:
+// the column falls back on what the page already knows (firm split, funded rules below),
+// else stays empty. Never filled in by guess.
 type Program = {
   name: string;
   type: 'eval' | 'instant';
   priceType: 'one-time' | 'monthly';
   promoCode?: string;
   promoLabel?: string;
+  steps?: 1 | 2 | 'instant';
+  split?: string;
+  payoutFrequency?: string;
+  maxPayout?: string;
+  minPayout?: string;
+  evalConsistency?: string;
+  fundedConsistency?: string;
   plans: Plan[];
 };
 type Firm = {
@@ -57,11 +73,15 @@ type Firm = {
   url: string;
   lastChecked: string;
   stale: boolean;
+  // compare-extra-firms.json only: false, not a partner.
+  affiliate?: boolean;
   programs: Program[];
 };
 type PropData = { generatedAt: string; firms: Firm[] };
 
 const DATA = rawData as unknown as PropData;
+// Empty until filled ({ "generatedAt": "", "firms": [] }): nothing extra is shown.
+const EXTRA = rawExtra as unknown as PropData;
 
 const FIRM_LOGOS: Record<string, string> = {
   'traders-launch': '/logos/traders-launch.png',
@@ -81,12 +101,6 @@ const DD_TITLE: Record<DdType, string> = {
   Intraday: 'Trailing drawdown — the limit follows your equity in real time',
   // Traders Launch Static cards, read 21/10/2026: « static — Does not trail ».
   Static: 'Static drawdown — fixed loss limit, does not trail',
-};
-const DD_LEGEND: Record<DdType, string> = {
-  EOD: 'No trail — fixed loss limit, never moves',
-  'EOD Trailing': 'EOD Trail — limit follows your end-of-day balance',
-  Intraday: 'Intraday Trail — limit follows your equity in real time',
-  Static: 'Static — fixed loss limit, does not trail',
 };
 
 // A program-level promo wins, otherwise the firm-level promo.
@@ -116,102 +130,6 @@ function effectivePrice(firm: Firm, plan: Plan): { now: number; was: number | nu
   }
   return { now: plan.price, was: plan.originalPrice ?? null, viaCode: false };
 }
-
-type Field = {
-  label: string;
-  short: string;
-  cell: (p: Plan) => Cell;
-  common: (c: Cell) => string;
-  // Left out when no plan of the firm has it (no activation fee anywhere, no note).
-  optional?: (p: Plan) => boolean;
-};
-
-const FIELDS: Field[] = [
-  {
-    label: 'Profit target',
-    short: 'Target',
-    cell: (p) => (p.profitTarget != null ? { text: money(p.profitTarget) } : { text: 'None', muted: true }),
-    common: (c) => (c.muted ? 'No profit target' : `${c.text} profit target`),
-  },
-  {
-    label: 'Max loss limit',
-    short: 'Max loss',
-    cell: (p) => ({ text: money(p.maxDrawdown) }),
-    common: (c) => `${c.text} max loss limit`,
-  },
-  {
-    label: 'Loss limit type',
-    short: 'Type',
-    cell: (p) => ({
-      text: '',
-      tag: { label: DD_LABEL[p.ddType], title: DD_TITLE[p.ddType], accent: p.ddType !== 'EOD' && p.ddType !== 'Static' },
-    }),
-    common: (c) => `${c.tag?.label} loss limit`,
-  },
-  {
-    label: 'Daily loss',
-    short: 'Daily loss',
-    // A program without one gets no pill ("–"), the same rule as the row itself.
-    cell: (p) => (p.dailyLoss != null ? { text: money(p.dailyLoss), soft: !!p.dailyLossSoft } : { text: '–', muted: true }),
-    common: (c) => `${c.text} daily loss${c.soft ? ' (soft)' : ''}`,
-    // Shown only when one plan of the firm has a daily loss figure: no limit is not
-    // mentioned (Angelo, 21/10/2026 : « si y a pas de daily loss limit ne le mentionne pas »).
-    optional: (p) => p.dailyLoss != null,
-  },
-  {
-    label: 'Consistency',
-    short: 'Consistency',
-    cell: (p) =>
-      p.consistency == null
-        ? { text: 'Not published', muted: true }
-        : p.consistency === 'None'
-          ? { text: 'None', muted: true }
-          : { text: p.consistency },
-    common: (c) =>
-      c.text === 'None' ? 'No consistency rule' : c.muted ? 'Consistency not published' : `${c.text} consistency rule`,
-  },
-  {
-    label: 'Days to pass',
-    short: 'Min days',
-    // No figure, no pill: Traders Launch Static has none, its consistency says it (Angelo, 22/10/2026 : « le
-    // 40% consistency fait comprendre indicrement que c du 3 wining day minimum. donc oui pas besoin »).
-    cell: (p) => (p.minDays != null ? { text: `${p.minDays} minimum` } : { text: '–', muted: true }),
-    common: (c) => `Days to pass: ${c.text}`,
-    optional: (p) => p.minDays != null,
-  },
-  {
-    label: 'Contracts',
-    short: 'Contracts',
-    cell: (p) => ({ text: p.contracts }),
-    common: (c) => `Up to ${c.text}`,
-  },
-  {
-    label: 'Activation fee',
-    short: 'Activation',
-    cell: (p) => (p.activationFee != null ? { text: `+ ${money(p.activationFee)}` } : { text: 'None', muted: true }),
-    common: (c) => (c.muted ? 'No activation fee' : `${c.text} activation fee`),
-    optional: (p) => p.activationFee != null,
-  },
-  {
-    label: 'Notes',
-    short: 'Note',
-    cell: (p) => {
-      // The price rows now say which split they are for.
-      const note = p.note?.replace(SPLIT_NOTE, '').trim();
-      return note ? { text: note, note: true } : { text: '–', muted: true };
-    },
-    common: (c) => c.text,
-    optional: (p) => !!p.note?.replace(SPLIT_NOTE, '').trim(),
-  },
-];
-
-const cellKey = (c: Cell) => JSON.stringify([c.text, c.tag?.label ?? '', !!c.soft]);
-
-// No profit target written on an instant account (BluSky Direct 2 Funded, Instant Funded):
-// Angelo, 22/10/2026, « pas de profit target ni de daily loss affiché sur un compte instant qui
-// n'en a pas » (CLAUDE.md du dépôt).
-const cellFor = (f: Field, pr: Program, plan: Plan): Cell | null =>
-  pr.type === 'instant' && f.label === 'Profit target' && plan.profitTarget == null ? null : f.cell(plan);
 
 // Funded rules per program, read on each firm's own help pages on 12/10/2026. Winning
 // days always written as a figure or "None" (Angelo, 12/10/2026: « tu mets le chiffre, si y
@@ -418,18 +336,6 @@ const FUNDED: Record<string, Record<string, Funded>> = {
 // read 12/10/2026: « None. You pay the evaluation fee once. No activation fee when you pass ».
 const NO_ACTIVATION_FEE = new Set(['traders-launch']);
 
-// Rules a firm publishes for every account, outside its price cards. Traders Launch FAQ
-// (traderslaunch.com, 21/10/2026): « The evaluation window is 60 days. If you haven't passed
-// by day 60 but you're above 50% of your profit target, you get a free 30-day extension ».
-// BluSky (help.blusky.pro « Multiple Accounts & Copy Trading », 27/10/2026): « Funded accounts can
-// only be 3 at any time (Sim Funded, Instant Sim Funded or Direct to Funded Accounts) ».
-const FIRM_RULES: Record<string, string[]> = {
-  'traders-launch': ['60 days to pass, +30 free if above 50% of the target'],
-  blusky: ['Up to 3 funded accounts at a time'],
-};
-
-const SPLIT_NOTE = / ?Price shown for the 80% split\./;
-
 // The other profit splits a firm sells each account at (scraped into plan.splitPrices:
 // Traders Launch Premium 60%, Static 60% and 90%, Legacy NYC 55%), lowest first.
 function otherSplits(plans: Plan[]): string[] {
@@ -437,120 +343,181 @@ function otherSplits(plans: Plan[]): string[] {
   return [...keys].sort((a, b) => Number(a) - Number(b));
 }
 
-// "from $X" on the firm's card: the cheapest price on sale, other splits included (Traders
-// Launch Legacy NYC 55% is below every 80% price).
-function cheapestWithSplits(from: FirmView['from'], extra: NonNullable<FirmView['extraPrices']>): FirmView['from'] {
-  let best = from;
-  for (const x of extra)
-    for (const byProgram of x.byProgram)
-      for (const p of Object.values(byProgram ?? {}))
-        if (best == null || p.now < best.now) best = { now: p.now, per: null };
-  return best;
+function fundedFor(firm: Firm, pr: Program): Funded | null {
+  const by = FUNDED[firm.id];
+  if (!by) return null;
+  // A later drop has its own terms: the written ones only cover the drop they were read on.
+  if (pr.name === 'Drop' && !pr.plans.every((pl) => pl.note?.startsWith(DROP_TERMS_FOR))) return null;
+  return by[pr.name] ?? null;
 }
 
-function firmView(firm: Firm): FirmView {
+const STEPS: Record<string, string> = { '1': '1 Step', '2': '2 Steps', instant: 'Instant' };
+// Without "steps", what the JSON already says: an evaluation or an instant account.
+const stepsOf = (pr: Program) =>
+  pr.steps != null ? STEPS[String(pr.steps)] : pr.type === 'instant' ? 'Instant' : 'Evaluation';
+
+// BluSky's instant accounts write their own split in the plan note (« Profit split 50% for 30
+// trading days, then 80%. »), not the firm's 90%.
+const NOTE_SPLIT = /^Profit split ([^.]+)\./;
+
+function splitVal(firm: Firm, pr: Program, plan: Plan): Val {
+  const own = pr.split ?? NOTE_SPLIT.exec(plan.note ?? '')?.[1];
+  if (own) return { text: own, sort: firstNumber(own) };
+  // The price shown is the firm's main split; the others it sells the account at, in brackets.
+  const others = Object.keys(plan.splitPrices ?? {}).sort((a, b) => Number(a) - Number(b));
+  const text = others.length
+    ? `${firm.split} (${others.map((s) => `${s}%`).join(', ')} option${others.length > 1 ? 's' : ''})`
+    : firm.split;
+  return { text, sort: firstNumber(firm.split) };
+}
+
+const figure = (text: string | undefined): Val | undefined => (text ? textVal(text, firstNumber(text)) : undefined);
+
+function maxPayout(pr: Program, funded: Funded | null, size: number): Val | undefined {
+  if (pr.maxPayout) return figure(pr.maxPayout);
+  const row = funded?.rows.find((r) => /^Payout caps?\b/.test(r.label));
+  const v = row?.bySize[size];
+  if (row && v) return { text: v, sort: firstNumber(v), title: row.label };
+  return figure(pillValue(funded, 'Payout cap'));
+}
+
+function consistency(pr: Program, plan: Plan, funded: Funded | null): Val | undefined {
+  const ev = pr.evalConsistency ?? plan.consistency;
+  const fu = pr.fundedConsistency ?? pillValue(funded, 'Consistency');
+  if (ev == null && fu == null) return undefined;
+  return { text: `${ev ?? '—'} / ${fu ?? '—'}`, sort: firstNumber(ev) };
+}
+
+// "On-demand payouts" tells a trader nothing (Angelo, 12/10/2026: « enlève le on demand
+// payout, car point de vue trader ça veut rien dire »); a real pace (Daily) stays.
+const pace = (firm: Firm) => (firm.payout && !/on.?demand/i.test(firm.payout) ? firm.payout : undefined);
+
+function activation(firm: Firm, plan: Plan, firmHasFee: boolean): Val | undefined {
+  const fee = plan.activationFee;
+  if (fee != null && fee > 0) return { text: money(fee), sort: fee };
+  // « No activation fee » where the firm writes it, or where another plan of the firm has one.
+  if (fee === 0 || NO_ACTIVATION_FEE.has(firm.id) || firmHasFee) return { text: 'None', sort: 0, muted: true };
+  return undefined;
+}
+
+type Link = Pick<CompareRow, 'href' | 'affiliate' | 'code'>;
+
+function rowsOf(firm: Firm, link: Link): CompareRow[] {
+  const firmHasFee = firm.programs.some((pr) => pr.plans.some((p) => (p.activationFee ?? 0) > 0));
+  return firm.programs.flatMap((pr) => {
+    const funded = fundedFor(firm, pr);
+    return pr.plans.map((plan, i): CompareRow => {
+      const price = effectivePrice(firm, plan);
+      const steps = stepsOf(pr);
+      // No profit target written on an instant account that has none (Angelo, 22/10/2026).
+      const target =
+        plan.profitTarget != null
+          ? { text: money(plan.profitTarget), sort: plan.profitTarget }
+          : pr.type === 'instant'
+            ? undefined
+            : textVal('None');
+      return {
+        key: `${firm.id}|${pr.name}|${plan.size}|${i}`,
+        family: 'futures',
+        firmId: firm.id,
+        firmName: firm.name,
+        logo: FIRM_LOGOS[firm.id] ?? null,
+        program: pr.name,
+        size: plan.size,
+        steps,
+        price: {
+          kind: 'price',
+          list: price.was ?? price.now,
+          discounted: price.was != null ? price.now : null,
+          alt: null,
+          per: pr.priceType === 'monthly' ? '/month' : 'one-time',
+          from: !!plan.priceAmbiguous,
+        },
+        cells: {
+          size: { text: sizeLabel(plan.size), sort: plan.size },
+          steps: { text: steps, sort: steps },
+          activation: activation(firm, plan, firmHasFee),
+          contracts: { text: plan.contracts, sort: firstNumber(plan.contracts) },
+          target,
+          maxLoss: { text: money(plan.maxDrawdown), sort: plan.maxDrawdown },
+          lossType: {
+            text: '',
+            sort: DD_LABEL[plan.ddType],
+            tag: {
+              label: DD_LABEL[plan.ddType],
+              title: DD_TITLE[plan.ddType],
+              accent: plan.ddType !== 'EOD' && plan.ddType !== 'Static',
+            },
+          },
+          ptdd: ptdd(plan.profitTarget, plan.maxDrawdown),
+          split: splitVal(firm, pr, plan),
+          maxPayout: maxPayout(pr, funded, plan.size),
+          minPayout: figure(pr.minPayout ?? pillValue(funded, 'Minimum payout')),
+          consistency: consistency(pr, plan, funded),
+          payoutFreq: figure(pr.payoutFrequency ?? pillValue(funded, 'Payout request') ?? pace(firm)),
+          checked: { text: humanDate(firm.lastChecked), sort: firm.lastChecked },
+        },
+        lastChecked: firm.lastChecked,
+        note: plan.note,
+        ...link,
+      };
+    });
+  });
+}
+
+// A partner firm: its /go/ link, and code JTNQ unless codes.md says the link carries it.
+function partnerLink(firm: Firm): Link {
+  const promo = firm.programs.length ? promoFor(firm, firm.programs[0]) : { code: null, title: '' };
+  const code = discountViaLink(firm.id) ? null : chipCode(firm, promo.code);
+  return {
+    href: goHref('prop-firms', firm.id),
+    affiliate: true,
+    code: code ? { code, title: promo.title || 'My affiliate code' } : null,
+  };
+}
+
+// A firm Angelo is not partnered with: its official site, its public code as written.
+const extraLink = (firm: Firm): Link => ({
+  href: firm.url,
+  affiliate: false,
+  code: firm.code ? { code: firm.code, title: 'The firm’s public code' } : null,
+});
+
+function firmView(firm: Firm, rows: CompareRow[], link: Link): FirmView {
   const programs = firm.programs;
   const allPlans = programs.flatMap((p) => p.plans);
-  const fields = FIELDS.filter((f) => !f.optional || allPlans.some(f.optional));
-  // A field whose value moves with the size inside one program is written per size.
-  const perSize = fields.filter((f) =>
-    programs.some((pr) => new Set(pr.plans.map((pl) => cellKey(f.cell(pl)))).size > 1),
-  );
-  const perProgram = fields.filter((f) => !perSize.includes(f));
-
-  const kind = (pr: Program) => (pr.type === 'eval' ? 'Evaluation' : 'Instant funding');
-  const fee = (pr: Program) => (pr.priceType === 'monthly' ? 'Monthly fee' : 'One-time fee');
-  const fundedBy = FUNDED[firm.id];
-  const { common, rules } = splitCommon([
-    // "Evaluation" only says something next to straight-to-funded accounts (Angelo, 12/10/2026:
-    // « si la prop firm n'a pas de straight to funded ne précise pas évaluation »).
-    {
-      label: 'Program type',
-      cells: programs.map((pr) => ({ text: kind(pr) })),
-      common: (c) => c.text,
-      skip: programs.every((pr) => pr.type === 'eval'),
-    },
-    { label: 'Fee', cells: programs.map((pr) => ({ text: fee(pr) })), common: (c) => c.text },
-    ...perProgram.map((f) => ({
-      label: f.label,
-      cells: programs.map((pr) => cellFor(f, pr, pr.plans[0]) ?? { text: '–', muted: true }),
-      common: f.common,
-    })),
-  ]);
-  // "On-demand payouts" tells a trader nothing (Angelo, 12/10/2026: « enlève le on demand
-  // payout, car point de vue trader ça veut rien dire »); a real pace (Daily) stays.
-  const pace = /on.?demand/i.test(firm.payout) ? null : `${firm.payout} payouts`;
-  // With a 60% version the price rows name each split; the firm line says « Up to 80% »,
-  // the checkout's own words (« Up to 80% profit split »).
+  const p = pace(firm);
   // The header gives the best split on sale (Angelo, 21/10/2026: « si y a une option 90% pk
   // tu mettrais pas a 90% »).
   const splits = otherSplits(allPlans);
   const topSplit = Math.max(parseFloat(firm.split) || 0, ...splits.map(Number));
   const splitText = splits.length ? `Up to ${topSplit}%` : firm.split;
-  common.splice(2, 0, ...(splits.length ? [] : [`${firm.split} profit split`]), ...(pace ? [pace] : []));
-  common.push(...(FIRM_RULES[firm.id] ?? []));
-  // A fee kind shared by every plan goes up into the firm's summary line, not a column
-  // (Angelo, 12/10/2026: « mets-le ici et enlève la case […] si tous les plans n'ont pas
-  // de activation fee, pourquoi le préciser ? »).
-  const oneFee = common.find((t) => t === 'One-time fee' || t === 'Monthly fee');
-  if (oneFee) common.splice(common.indexOf(oneFee), 1);
-  // Said as "No activation fee" where the firm writes it (Angelo, 12/10/2026: « faut juste
+  // A fee kind shared by every plan goes into the firm's summary line (Angelo, 12/10/2026: « mets-le
+  // ici et enlève la case »), said « No activation fee » where the firm writes it (« faut juste
   // préciser "no activation fee" à la place de one-time fee »).
+  const kinds = new Set(programs.map((pr) => pr.priceType));
+  const oneFee = kinds.size === 1 ? (kinds.has('monthly') ? 'Monthly fee' : 'One-time fee') : null;
   const sharedFee = oneFee === 'One-time fee' && NO_ACTIVATION_FEE.has(firm.id) ? 'No activation fee' : oneFee;
 
-  const sizes = [...new Set(allPlans.map((p) => p.size))].sort((a, b) => a - b);
-  const sizeRows = sizes.map((size) => ({
-    size,
-    cells: programs.map((pr): PriceCell => {
-      const plan = pr.plans.find((p) => p.size === size);
-      if (!plan) return null;
-      const price = effectivePrice(firm, plan);
-      return {
-        kind: 'price',
-        now: price.now,
-        was: price.was,
-        per: pr.priceType === 'monthly' ? '/mo' : null,
-        from: !!plan.priceAmbiguous,
-        lines: perSize.flatMap((f) => {
-          const cell = cellFor(f, pr, plan);
-          return cell ? [{ label: f.short, cell }] : [];
-        }),
-      };
-    }),
-  }));
-
+  // "from $X" on the card: the cheapest price on sale, other splits included (Traders Launch
+  // Legacy NYC 55% is below every 80% price).
+  let from = cheapest(rows);
   const pct = firm.codeDiscountPct ?? 0;
-  const extraPrices: NonNullable<FirmView['extraPrices']> = splits.map((split) => ({
-    label: `${split}% split`,
-    byProgram: programs.map((pr) => {
-      const priced = pr.plans.filter((pl) => pl.splitPrices?.[split] != null);
-      if (!priced.length) return null;
-      return Object.fromEntries(
-        priced.map((pl) => {
-          const price = pl.splitPrices![split];
-          // A plan on a public promo (originalPrice) already lists discounted split prices, like effectivePrice.
-          if (pl.originalPrice != null) return [pl.size, { now: price, was: null }];
-          return [pl.size, { now: Math.round(price * (100 - pct)) / 100, was: pct ? price : null }];
-        }),
-      );
-    }),
-  }));
-
-  const promo = programs.length ? promoFor(firm, programs[0]) : { code: null, title: '' };
-  const viaLink = discountViaLink(firm.id);
-  const code = viaLink ? null : chipCode(firm, promo.code);
-  const viaCode = allPlans.some((p) => effectivePrice(firm, p).viaCode);
-  const ddTypes = [...new Set(allPlans.map((p) => p.ddType))];
-  const legend = ddTypes.map((t) => DD_LEGEND[t]);
-  if (allPlans.some((p) => p.dailyLossSoft)) legend.push('soft — position flattened, account survives');
-  if (allPlans.some((p) => p.priceAmbiguous)) legend.push('"from $X" — the plan is on sale at several prices; the lowest is shown');
+  for (const pl of allPlans)
+    for (const sp of Object.values(pl.splitPrices ?? {})) {
+      // A plan on a public promo (originalPrice) already lists discounted split prices.
+      const now = pl.originalPrice != null ? sp : Math.round(sp * (100 - pct)) / 100;
+      if (from == null || now < from.now) from = { now, per: null };
+    }
 
   return {
     id: firm.id,
     name: firm.name,
     logo: FIRM_LOGOS[firm.id] ?? null,
-    summary: `${splitText} split${pace ? ` · ${pace}` : ''}${sharedFee ? ` · ${sharedFee}` : ''}`,
-    code: code ? { code, title: promo.title || 'My affiliate code' } : null,
+    summary: `${splitText} split${p ? ` · ${p} payouts` : ''}${sharedFee ? ` · ${sharedFee}` : ''}`,
+    code: link.code,
+    // A firm whose scraper failed keeps its old prices while generatedAt says today: name
+    // the firms that are behind instead of advertising one sync date for everyone.
     stale:
       firm.lastChecked !== DATA.generatedAt
         ? {
@@ -558,34 +525,20 @@ function firmView(firm: Firm): FirmView {
             title: `Prices last verified on ${humanDate(firm.lastChecked)}, not at the last daily sync (${humanDate(DATA.generatedAt)}). Check the live checkout price.`,
           }
         : null,
-    from: cheapestWithSplits(cheapest(sizeRows), extraPrices),
-    // Angelo, 26/10/2026 : « tu peux le mettre bcp + a droite genre a droite de funded ? car c des Drop ».
-    columns: programs.map((pr) => ({ name: pr.name, ...(pr.name === 'Drop' ? { drop: true } : {}) })),
-    common,
-    rules,
-    priceTitle: code ? `Price with code ${code}` : viaLink && viaCode ? 'Price via my link' : 'Price',
-    priceSub: viaCode
-      ? viaLink
-        ? `${firm.codeDiscountPct}% off via my link, no code to type`
-        : `${firm.codeDiscountPct}% off with code ${code}`
-      : promo.title || null,
-    sizes: sizeRows,
-    funded: fundedBy
-      ? programs.map((pr) =>
-          // A later drop has its own terms: the written ones only cover the drop they were read on.
-          pr.name === 'Drop' && !pr.plans.every((pl) => pl.note?.startsWith(DROP_TERMS_FOR))
-            ? null
-            : fundedBy[pr.name] ?? null,
-        )
-      : undefined,
-    ...(splits.length ? { priceLabel: `${firm.split} split`, extraPrices } : {}),
-    legend,
-    href: goHref('prop-firms', firm.id),
+    from,
+    href: link.href,
   };
 }
 
-// A firm whose scraper failed keeps its old prices while generatedAt says today: name
-// the firms that are behind instead of advertising one sync date for everyone.
+const PARTNERS = DATA.firms.map((firm) => {
+  const link = partnerLink(firm);
+  const rows = rowsOf(firm, link);
+  return { view: firmView(firm, rows, link), rows };
+});
 
-
-export const FUTURES_FIRMS: FirmView[] = DATA.firms.map(firmView);
+export const FUTURES_FIRMS: FirmView[] = PARTNERS.map((p) => p.view);
+// Partners and the extra firms, one row per plan. A firm in both files is a partner.
+export const FUTURES_ROWS: CompareRow[] = [
+  ...PARTNERS.flatMap((p) => p.rows),
+  ...EXTRA.firms.filter((f) => !DATA.firms.some((d) => d.id === f.id)).flatMap((f) => rowsOf(f, extraLink(f))),
+];
