@@ -12,7 +12,7 @@ import { BUILD_TS, usePromoClock } from './promo-clock';
 import { goHref } from '@/lib/go-links';
 import { firstNumber } from '@/lib/compare-order.mjs';
 import { sizeLabel } from './shared';
-import { cheapest, humanDate, pillValue, ptdd, textVal, type CompareRow, type FirmView, type Funded, type Val } from './firm-view';
+import { cheapest, humanDate, pillValue, textVal, type CompareRow, type FirmView, type Funded, type Val } from './firm-view';
 
 // price null = announced but not on sale yet ("Coming soon").
 // altPrice: a second version of the same account, shown in the same cell after a « / » (Angelo,
@@ -237,7 +237,6 @@ function rowsOf(firm: PerpsFirm, promoLive: boolean): CompareRow[] {
           dailyLoss: figure(p.dailyLoss),
           maxLoss: p.maxDrawdown ? { text: p.maxDrawdown, sort: firstNumber(p.maxDrawdown), sub: dollars } : undefined,
           lossType: p.ddType ? { text: '', sort: p.ddType, tag: { label: p.ddType, title: '', accent: false } } : undefined,
-          ptdd: p.profitTarget ? ptdd(firstNumber(p.profitTarget), firstNumber(p.maxDrawdown)) : undefined,
           split: figure(d(p)?.split ?? p.split),
           payoutFreq: figure(pillValue(funded(p), 'Payout request') ?? PAYOUTS[firm.id]),
           checked: { text: humanDate(firm.lastChecked), sort: firm.lastChecked },

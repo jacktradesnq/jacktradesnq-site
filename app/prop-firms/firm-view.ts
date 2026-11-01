@@ -100,13 +100,6 @@ export const humanDate = (iso: string) =>
 export const textVal = (text: string, sort: number | string | null = text): Val =>
   text === 'None' ? { text, sort: null, muted: true } : { text, sort };
 
-// PT:DD the way PropFirmMatch prints it: 1 : max loss / profit target (10% target, 6% loss: 1:0.6).
-export function ptdd(target: number | null, maxLoss: number | null): Val | undefined {
-  if (!target || !maxLoss) return undefined;
-  const r = Math.round((maxLoss / target) * 100) / 100;
-  return { text: `1:${r}`, sort: r };
-}
-
 // The price a row shows, with or without the discount.
 export function shownPrice(p: ComparePrice, discount: boolean): { now: number; was: number | null; alt: { now: number; was: number | null } | null } | null {
   if (p.kind !== 'price') return null;

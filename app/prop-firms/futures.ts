@@ -14,7 +14,7 @@ import { firstNumber } from '@/lib/compare-order.mjs';
 import { firmAt, promoEnds } from '@/lib/promo-ends.mjs';
 import { money, sizeLabel } from './shared';
 import {
-  cheapest, humanDate, pillValue, ptdd, textVal,
+  cheapest, humanDate, pillValue, textVal,
   type CompareRow, type FirmView, type Funded, type Pill, type Val,
 } from './firm-view';
 import codesMd from '@/content/prop-firms/codes.md';
@@ -453,7 +453,6 @@ function rowsOf(firm: Firm, link: Link): CompareRow[] {
               accent: plan.ddType !== 'EOD' && plan.ddType !== 'Static',
             },
           },
-          ptdd: ptdd(plan.profitTarget, plan.maxDrawdown),
           split: splitVal(firm, pr, plan),
           maxPayout: maxPayout(pr, funded, plan.size),
           minPayout: figure(pr.minPayout ?? pillValue(funded, 'Minimum payout')),

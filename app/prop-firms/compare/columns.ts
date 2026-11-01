@@ -3,7 +3,7 @@
 // perps in two tables, each its own columns. The perps list was read on
 // propfirmmatch.com/perpetuals/prop-firm-challenges on 01/11/2026: Firm, Account size, Steps,
 // Pairs count, Leverage (BTC+ETH), Profit target, Daily loss, Max loss, Max loss type, PT:DD,
-// Profit split, Payout freq., Price. Plus, on every row, the date the firm was last checked.
+// Profit split, Payout freq., Price. PT:DD left out (Angelo, 01/11/2026: « flemme de le mettre retire »). Plus, on every row, the date the firm was last checked.
 //
 // Firm, Price and the link are drawn by ComparePanel itself; every other column reads
 // row.cells[id]. A column no plan has a value for is left out, the way /prop-firms drops a
@@ -34,7 +34,6 @@ export const COLUMNS: Record<Family, Column[]> = {
     { id: 'target', label: 'Profit target' },
     { id: 'maxLoss', label: 'Max loss' },
     { id: 'lossType', label: 'Max loss type' },
-    { id: 'ptdd', label: 'PT:DD' },
     { id: 'split', label: 'Profit split' },
     { id: 'maxPayout', label: 'Max payout' },
     { id: 'minPayout', label: 'Min payout' },
@@ -53,7 +52,6 @@ export const COLUMNS: Record<Family, Column[]> = {
     { id: 'dailyLoss', label: 'Daily loss' },
     { id: 'maxLoss', label: 'Max loss' },
     { id: 'lossType', label: 'Max loss type' },
-    { id: 'ptdd', label: 'PT:DD' },
     { id: 'split', label: 'Profit split' },
     { id: 'payoutFreq', label: 'Payout frequency' },
     PRICE,
