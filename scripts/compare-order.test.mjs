@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import { defaultOrder, filterRows, firstNumber, sortBy } from '../lib/compare-order.mjs';
 
 const rows = [
-  { key: 'v50', firmName: 'Vest Markets', firmId: 'vest', size: 50000, steps: '1 Step', price: 400 },
-  { key: 'b100', firmName: 'BluSky', firmId: 'blusky', size: 100000, steps: 'Evaluation', price: 59 },
-  { key: 'b50', firmName: 'BluSky', firmId: 'blusky', size: 50000, steps: 'Evaluation', price: 49 },
-  { key: 'b50i', firmName: 'BluSky', firmId: 'blusky', size: 50000, steps: 'Instant', price: null },
-  { key: 'e25', firmName: 'E8 Markets', firmId: 'e8', size: 25000, steps: 'Evaluation', price: 90 },
+  { key: 'v50', firmName: 'Vest Markets', firmId: 'vest', size: 50000, steps: '1 Step', price: 400, lossType: 'Static', dailyLoss: 'both' },
+  { key: 'b100', firmName: 'BluSky', firmId: 'blusky', size: 100000, steps: 'Evaluation', price: 59, lossType: 'EOD Trail', dailyLoss: null },
+  { key: 'b50', firmName: 'BluSky', firmId: 'blusky', size: 50000, steps: 'Evaluation', price: 49, lossType: 'Static', dailyLoss: null },
+  { key: 'b50i', firmName: 'BluSky', firmId: 'blusky', size: 50000, steps: 'Instant', price: null, lossType: 'Intraday Trail', dailyLoss: 'with' },
+  { key: 'e25', firmName: 'E8 Markets', firmId: 'e8', size: 25000, steps: 'Evaluation', price: 90, lossType: 'EOD Trail', dailyLoss: 'without' },
 ];
 const keys = (rs) => rs.map((r) => r.key);
 
@@ -24,12 +24,22 @@ test('sorting a column never leaves the empty cells on top', () => {
 
 test('filters: firm, size, steps, budget against the price shown', () => {
   const price = (r) => r.price;
-  assert.deepEqual(keys(filterRows(rows, { firmId: 'blusky' }, price)), ['b100', 'b50', 'b50i']);
+  assert.deepEqual(keys(filterRows(rows, { firmIds: ['blusky'] }, price)), ['b100', 'b50', 'b50i']);
+  assert.deepEqual(keys(filterRows(rows, { firmIds: ['blusky', 'e8'] }, price)), ['b100', 'b50', 'b50i', 'e25']);
+  assert.equal(filterRows(rows, { firmIds: [] }, price).length, rows.length);
   assert.deepEqual(keys(filterRows(rows, { size: 50000 }, price)), ['v50', 'b50', 'b50i']);
   assert.deepEqual(keys(filterRows(rows, { steps: 'Instant' }, price)), ['b50i']);
   // A plan with no price (coming soon) is not "under budget".
   assert.deepEqual(keys(filterRows(rows, { maxPrice: 90 }, price)), ['b100', 'b50', 'e25']);
-  assert.equal(filterRows(rows, { firmId: 'blusky', maxPrice: 10 }, price).length, 0);
+  assert.equal(filterRows(rows, { firmIds: ['blusky'], maxPrice: 10 }, price).length, 0);
+});
+
+test('filters: max loss type, daily loss limit (a plan sold both ways passes either, an unpublished one neither)', () => {
+  const price = (r) => r.price;
+  assert.deepEqual(keys(filterRows(rows, { lossType: 'EOD Trail' }, price)), ['b100', 'e25']);
+  assert.deepEqual(keys(filterRows(rows, { dailyLoss: 'with' }, price)), ['v50', 'b50i']);
+  assert.deepEqual(keys(filterRows(rows, { dailyLoss: 'without' }, price)), ['v50', 'e25']);
+  assert.deepEqual(keys(filterRows(rows, { dailyLoss: null, lossType: null, firmIds: null }, price)), keys(rows));
 });
 
 test('firstNumber reads the figure a word cell starts with', () => {

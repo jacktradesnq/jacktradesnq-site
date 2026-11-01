@@ -6,6 +6,8 @@
 //   01/11/2026). The firm window no longer holds a table of plans: « See all plans » opens the
 //   comparator on that firm.
 
+import { firstNumber } from '@/lib/compare-order.mjs';
+
 export type Family = 'futures' | 'perps';
 
 export const FAMILIES: { id: Family; label: string }[] = [
@@ -45,6 +47,9 @@ export type ComparePrice =
     }
   | { kind: 'text'; text: string }; // "Coming soon"
 
+// 'both': the same plan is sold with and without one (MFP Elite / Elite 3% DLL, Vest 1-Step 3%, 4% or none).
+export type DailyLoss = 'with' | 'without' | 'both' | null;
+
 export type CompareRow = {
   key: string;
   family: Family;
@@ -57,7 +62,10 @@ export type CompareRow = {
   price: ComparePrice;
   // Keyed by column id (compare/columns.ts); no key = nothing published, drawn « — ».
   cells: Partial<Record<string, Val>>;
-  lastChecked: string;
+  // For the Max loss type filter: the label the column shows (EOD Trail, Static…); null = not published.
+  lossType: string | null;
+  // For the Daily loss limit filter; null = not published (shown under « Any » only).
+  dailyLoss: DailyLoss;
   // What the firm writes about the price or the plan (paid options, trading hours), shown folded.
   note?: string;
   href: string;
@@ -118,4 +126,34 @@ export function cheapest(rows: CompareRow[]): FirmView['from'] {
     for (const now of [p.now, p.alt?.now]) if (now != null && (best == null || now < best.now)) best = { now, per };
   }
   return best;
+}
+
+// Payout frequency, one word per meaning, for futures and perps alike (Angelo, 01/11/2026: « je
+// préfère que les mêmes appellations soient le même mot », on « Daily » next to « Every day »):
+// « Daily » for once a day, « On demand » for any time. The data keeps each firm's own words; the
+// cell shows the shared word, the firm's whole sentence is read on hover, so a condition that
+// leaves the cell (« from day one », « with no open position », « no cap ») stays there. A long
+// sentence (Lucid, Tradeify) only has its start rewritten, when it means the same thing; two
+// different rules never share a word (« 5 days to payout », a wait before the first payout, is
+// not « 5 winning days » between payouts; Tradeify Lightning's « 5 Days » has no winning-day rule,
+// its help center says « No Minimum Trading Day Count », so it stays).
+const PAYOUT_WORDS: [RegExp, string][] = [
+  [/^(?:daily|every day|once (?:per|a) day)(?=$|[\s,;(])/i, 'Daily'],
+  [/^(?:any ?time|on[- ]?demand)(?=$|[\s,;(])/i, 'On demand'],
+  // A number of days above a minimum profit before each payout: Tradeify Growth « 5 Days (5
+  // winning days of $100 / … ) », Lucid Flex « 5 profitable days per cycle ($100 / … minimum per day) ».
+  [/^(\d+) Days \(\1 winning days of /i, '$1 winning days ('],
+  [/^(\d+) profitable days per cycle(?= \()/i, '$1 winning days'],
+];
+
+export function payoutFreqVal(raw: string | null | undefined): Val | undefined {
+  if (!raw) return undefined;
+  const rule = PAYOUT_WORDS.find(([re]) => re.test(raw));
+  let text = rule ? raw.replace(rule[0], rule[1]) : raw;
+  // « Daily, from day one » / « Any time, no cap »: the condition after the comma goes to the hover.
+  const cond = /^(Daily|On demand),/.exec(text);
+  if (cond) text = cond[1];
+  // The same word inside a sentence too (Lucid « On Demand Payouts »).
+  text = text.replace(/\bOn Demand Payouts\b/g, 'On demand payouts').replace(/\bOn Demand\b/g, 'On demand');
+  return { text, sort: firstNumber(text), title: text !== raw ? raw : undefined };
 }

@@ -14,7 +14,7 @@ import { firstNumber } from '@/lib/compare-order.mjs';
 import { firmAt, promoEnds } from '@/lib/promo-ends.mjs';
 import { money, sizeLabel } from './shared';
 import {
-  cheapest, humanDate, pillValue, textVal,
+  cheapest, humanDate, payoutFreqVal, pillValue, textVal,
   type CompareRow, type FirmView, type Funded, type Pill, type Val,
 } from './firm-view';
 import codesMd from '@/content/prop-firms/codes.md';
@@ -457,10 +457,12 @@ function rowsOf(firm: Firm, link: Link): CompareRow[] {
           maxPayout: maxPayout(pr, funded, plan.size),
           minPayout: figure(pr.minPayout ?? pillValue(funded, 'Minimum payout')),
           consistency: consistency(pr, plan, funded),
-          payoutFreq: figure(pr.payoutFrequency ?? pillValue(funded, 'Payout request') ?? pace(firm)),
-          checked: { text: humanDate(firm.lastChecked), sort: firm.lastChecked },
+          payoutFreq: payoutFreqVal(pr.payoutFrequency ?? pillValue(funded, 'Payout request') ?? pace(firm)),
         },
-        lastChecked: firm.lastChecked,
+        lossType: DD_LABEL[plan.ddType],
+        // The scraper writes null where the firm says there is none, and leaves the key out where
+        // no source says (scripts/lib/catalog-sync.mjs): not published.
+        dailyLoss: !('dailyLoss' in plan) ? null : plan.dailyLoss != null && plan.dailyLoss > 0 ? 'with' : 'without',
         note: plan.note,
         ...link,
       };

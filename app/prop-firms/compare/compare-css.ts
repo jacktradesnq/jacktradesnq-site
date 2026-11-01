@@ -61,6 +61,21 @@ export const COMPARE_CSS = `
 .jtnq-cmp .cmp-money input::placeholder{ color: var(--c-text-mute); }
 .jtnq-cmp .cmp-money input::-webkit-inner-spin-button, .jtnq-cmp .cmp-money input::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
 .jtnq-cmp .cmp-sort-m{ display: none; }
+/* Firm: several can be picked, so a list of boxes under a field drawn like the selects. */
+.jtnq-cmp .cmp-multi{ position: relative; }
+.jtnq-cmp .cmp-multi-sum{
+  list-style: none; position: relative; display: flex; align-items: center; height: 40px; padding: 0 40px 0 12px; min-width: 160px;
+  border: 1px solid var(--c-line); border-radius: 4px; background: var(--c-bg-deep); cursor: pointer;
+  font-family: var(--f-mono); font-size: 13px; color: var(--c-text); white-space: nowrap; transition: border-color .2s ease;
+}
+.jtnq-cmp .cmp-multi-sum::-webkit-details-marker{ display: none; }
+.jtnq-cmp .cmp-multi-sum::after{
+  content: ""; position: absolute; right: 16px; top: 50%; width: 6px; height: 6px; margin-top: -4px;
+  border-right: 1.5px solid var(--c-text-mute); border-bottom: 1.5px solid var(--c-text-mute);
+  transform: rotate(45deg); pointer-events: none;
+}
+.jtnq-cmp .cmp-multi[open] .cmp-multi-sum, .jtnq-cmp .cmp-multi-sum:focus-visible{ border-color: var(--c-accent); outline: none; }
+.jtnq-cmp .cmp-multi-list{ left: 0; right: auto; min-width: 100%; }
 
 .jtnq-cmp .cmp-switch{
   display: inline-flex; align-items: center; gap: 12px; height: 40px; padding: 0 4px;
@@ -221,6 +236,10 @@ export const COMPARE_CSS = `
   .jtnq-cmp .cmp-sort-m{ display: grid; }
   .jtnq-cmp .cmp-switch{ padding: 0; }
   .jtnq-cmp .cmp-custom-list{ position: static; margin-top: 8px; box-shadow: none; }
+  .jtnq-cmp .cmp-multi-sum{ min-width: 0; width: 100%; }
+  .jtnq-cmp .cmp-multi-list{ min-width: 0; }
+  /* The open list grows the row: the label stays by the field, not in the middle. */
+  .jtnq-cmp .cmp-field:has(.cmp-multi) .cmp-field-k{ align-self: start; padding-top: 12px; }
 
   .jtnq-cmp .cmp-scroll{ display: none; }
   .jtnq-cmp .cmp-cards{ display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }

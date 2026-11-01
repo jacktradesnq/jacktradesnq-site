@@ -12,7 +12,7 @@ import { BUILD_TS, usePromoClock } from './promo-clock';
 import { goHref } from '@/lib/go-links';
 import { firstNumber } from '@/lib/compare-order.mjs';
 import { sizeLabel } from './shared';
-import { cheapest, humanDate, pillValue, textVal, type CompareRow, type FirmView, type Funded, type Val } from './firm-view';
+import { cheapest, payoutFreqVal, pillValue, textVal, type CompareRow, type DailyLoss, type FirmView, type Funded, type Val } from './firm-view';
 
 // price null = announced but not on sale yet ("Coming soon").
 // altPrice: a second version of the same account, shown in the same cell after a « / » (Angelo,
@@ -198,6 +198,15 @@ const SUMMARY: Record<string, string> = {
 const STEPS = (s: string) => (/^instant/i.test(s) ? 'Instant' : /^2/.test(s) ? '2 Steps' : /^1/.test(s) ? '1 Step' : s);
 const figure = (text: string | null | undefined): Val | undefined => (text ? textVal(text, firstNumber(text)) : undefined);
 
+// « 3% », « None », and the plans sold both ways: « None / 3% » (MFP Elite), « 3%, 4% or none » (Vest 1-Step).
+function dailyLossOf(text: string | null): DailyLoss {
+  if (!text) return null;
+  const parts = text.split(/\s*(?:\/|,|\bor\b)\s*/).filter(Boolean);
+  const none = parts.some((x) => /^none$/i.test(x));
+  const some = parts.some((x) => !/^none$/i.test(x));
+  return none && some ? 'both' : none ? 'without' : 'with';
+}
+
 function rowsOf(firm: PerpsFirm, promoLive: boolean): CompareRow[] {
   const promo = promoOf(firm, promoLive);
   const d = (p: PerpsProgram) => DETAILS[firm.id]?.[p.name.split(' ')[0]];
@@ -238,10 +247,10 @@ function rowsOf(firm: PerpsFirm, promoLive: boolean): CompareRow[] {
           maxLoss: p.maxDrawdown ? { text: p.maxDrawdown, sort: firstNumber(p.maxDrawdown), sub: dollars } : undefined,
           lossType: p.ddType ? { text: '', sort: p.ddType, tag: { label: p.ddType, title: '', accent: false } } : undefined,
           split: figure(d(p)?.split ?? p.split),
-          payoutFreq: figure(pillValue(funded(p), 'Payout request') ?? PAYOUTS[firm.id]),
-          checked: { text: humanDate(firm.lastChecked), sort: firm.lastChecked },
+          payoutFreq: payoutFreqVal(pillValue(funded(p), 'Payout request') ?? PAYOUTS[firm.id]),
         },
-        lastChecked: firm.lastChecked,
+        lossType: p.ddType,
+        dailyLoss: dailyLossOf(p.dailyLoss),
         note: plan.price != null ? plan.note : undefined,
         href: goHref('prop-firms', firm.id),
         affiliate: true,

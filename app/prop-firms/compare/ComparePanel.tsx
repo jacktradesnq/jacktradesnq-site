@@ -5,13 +5,14 @@
 // - no ranking of any kind (partner contracts): A→Z by firm then size, no badge, no firm put
 //   forward, the same columns for all; the visitor may sort a column himself;
 // - PropFirmMatch's columns and filters (Size, Steps, Price, Apply discount, Customize),
-//   futures and perps in two tables;
-// - each row says when its firm was last checked;
+//   futures and perps in two tables; plus Firm (one or more), Max loss type and Daily loss limit
+//   in the same bar (Angelo, 01/11/2026);
+// - no « Last checked » column (Angelo, 01/11/2026: « pas besoin de ça »);
 // - only the site's own data; « — » when nothing is published, « None » when the firm says none;
 // - on a phone, one card per plan and the filters fold away.
 // Self-contained: it can move to a page of its own by rendering <ComparePanel> there.
 
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { defaultOrder, filterRows, sortBy } from '@/lib/compare-order.mjs';
 import { FAMILIES, shownPrice, type CompareRow, type Family } from '../firm-view';
 import { EXTRA_PROMO_ENDS, futuresRows } from '../futures';
@@ -30,6 +31,7 @@ export const COMPARE_NOTE =
 const LONG = 48;
 
 type Dir = 'asc' | 'desc';
+type DailyLossFilter = 'with' | 'without' | null;
 type Sort = { col: string; dir: Dir } | null;
 
 function PriceCell({ row, discount }: { row: CompareRow; discount: boolean }) {
@@ -113,41 +115,77 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   const firmId = firmFamily ? firm : null;
 
   const [family, setFamily] = useState<Family>(firmFamily ?? 'futures');
+  // The Firm filter: one or more firms, none = every firm. One firm picked is #compare=<firm-id>.
+  const [firms, setFirms] = useState<string[]>(firmId ? [firmId] : []);
   const [size, setSize] = useState<number | null>(null);
   const [steps, setSteps] = useState<string | null>(null);
   const [maxPrice, setMaxPrice] = useState('');
+  const [lossType, setLossType] = useState<string | null>(null);
+  const [dailyLoss, setDailyLoss] = useState<DailyLossFilter>(null);
   const [discount, setDiscount] = useState(true);
   const [hidden, setHidden] = useState<Record<Family, string[]>>({ futures: [], perps: [] });
   const [sort, setSort] = useState<Sort>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  // A firm picked from its window: its family's table, filters that could hide it cleared.
+  // The firm id this panel last put in the address itself (Firm filter), so its echo back
+  // through `firm` is not taken for a firm picked from its window.
+  const sent = useRef<string | null>(firmId);
+  // A firm picked from its window (« See all plans », #compare=<firm-id>): its family's table,
+  // filters that could hide it cleared. The address back to #compare (chip ×, a new tab) clears
+  // a single firm; several firms picked in the filter stay.
   useEffect(() => {
-    if (firmFamily) setFamily(firmFamily);
-    setSize(null);
-    setSteps(null);
+    const own = firmId === sent.current;
+    sent.current = firmId;
+    if (own) return;
+    if (firmId) {
+      setFirms([firmId]);
+      if (firmFamily) setFamily(firmFamily);
+      setSize(null);
+      setSteps(null);
+      setLossType(null);
+      setDailyLoss(null);
+    } else setFirms((prev) => (prev.length === 1 ? [] : prev));
   }, [firmId, firmFamily]);
+
+  function pickFirms(next: string[]) {
+    setFirms(next);
+    const id = next.length === 1 ? next[0] : null;
+    if (id !== firmId) {
+      sent.current = id;
+      onFirmChange(id);
+    }
+  }
 
   function pickFamily(f: Family) {
     if (f === family) return;
     setFamily(f);
     setSize(null);
     setSteps(null);
+    setLossType(null);
     setSort(null);
-    if (firmId && firmFamily !== f) onFirmChange(null);
+    if (firms.length) pickFirms([]);
   }
 
   const all = rowsBy[family];
-  const firmRows = firmId ? all.filter((r) => r.firmId === firmId) : all;
+  // Firms of this family, A→Z (the rows already are).
+  const firmList = [...new Map(all.map((r) => [r.firmId, r.firmName])).entries()].map(([id, name]) => ({ id, name }));
+  const firmRows = firms.length ? all.filter((r) => firms.includes(r.firmId)) : all;
   // A column no plan of this family has a value for is left out (columns.ts).
   const available = COLUMNS[family].filter((c) => c.fixed || all.some((r) => r.cells[c.id] != null));
   const cols = available.filter((c) => !hidden[family].includes(c.id));
   const sizes = [...new Set(firmRows.map((r) => r.size))].sort((a, b) => a - b);
   const stepsList = [...new Set(firmRows.map((r) => r.steps))].sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
+  // Max loss types as the column writes them, whatever the firms picked (a type no plan of
+  // this family has is not offered).
+  const lossTypes = [...new Set(all.map((r) => r.lossType).filter((t): t is string => !!t))].sort((a, b) => a.localeCompare(b, 'en'));
 
   const budget = maxPrice.trim() === '' ? null : Number(maxPrice);
   const priceOf = (r: CompareRow) => shownPrice(r.price, discount)?.now ?? null;
-  const filtered = filterRows(all, { firmId, size, steps, maxPrice: budget != null && Number.isFinite(budget) ? budget : null }, priceOf);
+  const filtered = filterRows(
+    all,
+    { firmIds: firms, size, steps, lossType, dailyLoss, maxPrice: budget != null && Number.isFinite(budget) ? budget : null },
+    priceOf,
+  );
   const keyOf = (col: string) => (r: CompareRow) =>
     col === 'price' ? priceOf(r) : col === 'firm' ? `${r.firmName} ${r.program}` : r.cells[col]?.sort ?? null;
   const shown = sort ? sortBy(filtered, keyOf(sort.col), sort.dir) : filtered;
@@ -163,10 +201,13 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
     setSize(null);
     setSteps(null);
     setMaxPrice('');
-    onFirmChange(null);
+    setLossType(null);
+    setDailyLoss(null);
+    pickFirms([]);
   }
 
-  const firmName = firmId ? all.find((r) => r.firmId === firmId)?.firmName : null;
+  const firmName = firms.length === 1 ? firmList.find((f) => f.id === firms[0])?.name ?? null : null;
+  const firmSummary = firms.length === 0 ? 'All firms' : firmName ?? `${firms.length} firms`;
   const familyLabel = FAMILIES.find((f) => f.id === family)?.label ?? family;
   const detailCols = cols.filter((c) => c.id !== 'firm' && c.id !== 'price' && c.id !== 'size');
 
@@ -206,7 +247,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
           <span className="cmp-firm-chip">
             <span className="cmp-firm-chip-k">Firm</span>
             {firmName}
-            <button type="button" className="cmp-firm-chip-x" aria-label="Show every firm" onClick={() => onFirmChange(null)}>
+            <button type="button" className="cmp-firm-chip-x" aria-label="Show every firm" onClick={() => pickFirms([])}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
                 <path d="M6 6l12 12M18 6L6 18" />
               </svg>
@@ -228,6 +269,31 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
       </div>
 
       <div className={`cmp-filters${filtersOpen ? ' open' : ''}`} id={`${uid}-filters`}>
+        <div className="cmp-field" role="group" aria-labelledby={`${uid}-firm-k`}>
+          <span className="cmp-field-k" id={`${uid}-firm-k`}>
+            Firm
+          </span>
+          <details className="cmp-multi">
+            <summary className="cmp-multi-sum">
+              <span>{firmSummary}</span>
+            </summary>
+            <fieldset className="cmp-custom-list cmp-multi-list">
+              <legend className="sr-only">Firms shown</legend>
+              {firmList.map((f) => (
+                <label key={f.id} className="cmp-check">
+                  <input
+                    type="checkbox"
+                    checked={firms.includes(f.id)}
+                    onChange={(e) =>
+                      pickFirms(e.target.checked ? firmList.map((x) => x.id).filter((id) => id === f.id || firms.includes(id)) : firms.filter((x) => x !== f.id))
+                    }
+                  />
+                  {f.name}
+                </label>
+              ))}
+            </fieldset>
+          </details>
+        </div>
         <label className="cmp-field">
           <span className="cmp-field-k">Size</span>
           <span className="cmp-select">
@@ -267,6 +333,29 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
             />
+          </span>
+        </label>
+        <label className="cmp-field">
+          <span className="cmp-field-k">Max loss type</span>
+          <span className="cmp-select">
+            <select value={lossType ?? ''} onChange={(e) => setLossType(e.target.value || null)}>
+              <option value="">All</option>
+              {lossTypes.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </span>
+        </label>
+        <label className="cmp-field">
+          <span className="cmp-field-k">Daily loss limit</span>
+          <span className="cmp-select">
+            <select value={dailyLoss ?? ''} onChange={(e) => setDailyLoss((e.target.value || null) as DailyLossFilter)}>
+              <option value="">Any</option>
+              <option value="with">With</option>
+              <option value="without">Without</option>
+            </select>
           </span>
         </label>
         <label className="cmp-field cmp-sort-m">

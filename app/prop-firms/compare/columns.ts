@@ -3,7 +3,8 @@
 // perps in two tables, each its own columns. The perps list was read on
 // propfirmmatch.com/perpetuals/prop-firm-challenges on 01/11/2026: Firm, Account size, Steps,
 // Pairs count, Leverage (BTC+ETH), Profit target, Daily loss, Max loss, Max loss type, PT:DD,
-// Profit split, Payout freq., Price. PT:DD left out (Angelo, 01/11/2026: « flemme de le mettre retire »). Plus, on every row, the date the firm was last checked.
+// Profit split, Payout freq., Price. PT:DD left out (Angelo, 01/11/2026: « flemme de le mettre retire »).
+// No « Last checked » column either (Angelo, 01/11/2026: « pas besoin de ça »).
 //
 // Firm, Price and the link are drawn by ComparePanel itself; every other column reads
 // row.cells[id]. A column no plan has a value for is left out, the way /prop-firms drops a
@@ -22,7 +23,6 @@ export type Column = {
 
 const FIRM: Column = { id: 'firm', label: 'Firm', fixed: true, align: 'left' };
 const PRICE: Column = { id: 'price', label: 'Price', fixed: true };
-const CHECKED: Column = { id: 'checked', label: 'Last checked' };
 
 export const COLUMNS: Record<Family, Column[]> = {
   futures: [
@@ -40,7 +40,6 @@ export const COLUMNS: Record<Family, Column[]> = {
     { id: 'consistency', label: 'Consistency (eval / funded)' },
     { id: 'payoutFreq', label: 'Payout frequency' },
     PRICE,
-    CHECKED,
   ],
   perps: [
     FIRM,
@@ -55,6 +54,5 @@ export const COLUMNS: Record<Family, Column[]> = {
     { id: 'split', label: 'Profit split' },
     { id: 'payoutFreq', label: 'Payout frequency' },
     PRICE,
-    CHECKED,
   ],
 };
