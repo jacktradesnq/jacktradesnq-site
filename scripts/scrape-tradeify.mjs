@@ -192,24 +192,40 @@ export function parseTradeify(html, now = Date.now()) {
   if (plans.length < EXPECTED || missing.length)
     throw new Error(`${plans.length}/${EXPECTED} prix trouvés${missing.length ? ` (manquent : ${missing.join(', ')})` : ''}`);
 
-  // Un seul code sur les 12 comptes, ou aucun : le JSON ne sait pas dire mieux (un code par
-  // firme), le reste se relit à la main. La remise peut varier d'un programme à l'autre (code NOV,
-  // novembre 2026 : Growth -40 %, Select et Lightning -30 %) : chaque prix porte déjà la sienne.
-  const codes = new Set(plans.map((p) => p.code ?? '—'));
-  if (codes.size > 1) throw new Error(`codes différents selon les comptes (${[...codes].join(' | ')}) : à relire à la main`);
-  const { code } = plans[0];
+  // Les firmes varient leurs promos d'un programme à l'autre (Angelo, 01/11/2026 : « c très commun
+  // chez les propfirm ») : même code à remises différentes (NOV : Growth -40 %, le reste -30 %), ou
+  // un code par programme. Seuls plusieurs codes dans un même programme se relisent à la main : une
+  // ligne du comparateur par compte, mais un seul code par programme dans le JSON.
+  const labelOf = (list, c) => {
+    const pcts = list.map((p) => p.pct);
+    const [low, high] = [Math.min(...pcts), Math.max(...pcts)];
+    return `${low === high ? high : `${low}-${high}`}% off with code ${c}`;
+  };
+  const offers = {};
+  for (const programName of Object.keys(TRADEIFY_PROGRAMS)) {
+    const own = plans.filter((p) => p.programName === programName);
+    const ownCodes = new Set(own.map((p) => p.code ?? '—'));
+    if (ownCodes.size > 1) throw new Error(`${programName} : plusieurs codes dans le même programme (${[...ownCodes].join(' | ')}) : à relire à la main`);
+    if (own[0].code) offers[programName] = { code: own[0].code, label: labelOf(own, own[0].code) };
+  }
+  const allCodes = new Set(plans.map((p) => p.code));
+  const code = allCodes.size === 1 ? plans[0].code : null;
   let promo = null;
   if (code) {
-    const pcts = plans.map((p) => p.pct);
-    const [low, high] = [Math.min(...pcts), Math.max(...pcts)];
     const { ends, note } = parseEnds(html, code, now);
     if (note) notices.push(note);
-    promo = { label: `${low === high ? high : `${low}-${high}`}% off with code ${code}`, code, ...(ends ? { ends } : {}) };
+    promo = { label: labelOf(plans, code), code, ...(ends ? { ends } : {}) };
+  } else {
+    // Plusieurs codes : leur date de fin ne vaut que pour celui qu'elle nomme.
+    for (const c of allCodes) {
+      const { ends } = c ? parseEnds(html, c, now) : { ends: null };
+      if (ends) promo = { label: labelOf(plans.filter((p) => p.code === c), c), code: c, ends };
+    }
   }
   const banner = html.match(/(\d+)% Off with code (?:&quot;|")(\w+)(?:&quot;|")/i);
   if (code && banner && banner[2].toUpperCase() !== code)
     notices.push(`le bandeau dit « ${banner[0]} », les cartes appliquent ${code}`);
-  return { promo, code, plans, notices };
+  return { promo, code, plans, notices, offers: allCodes.size > 1 ? offers : {} };
 }
 
 /**
@@ -227,6 +243,15 @@ export function applyTradeify(firm, read, today) {
     firm.code = read.code;
   }
   for (const program of firm.programs) {
+    const offer = read.offers?.[program.name] ?? null;
+    if ((program.promoCode ?? null) !== (offer?.code ?? null) || (program.promoLabel ?? null) !== (offer?.label ?? null)) {
+      changes.push(`${program.name} : code ${program.promoCode ?? null} -> ${offer?.code ?? null}`);
+      if (offer) Object.assign(program, { promoCode: offer.code, promoLabel: offer.label });
+      else {
+        delete program.promoCode;
+        delete program.promoLabel;
+      }
+    }
     for (const plan of program.plans) {
       const u = read.plans.find((p) => p.programName === program.name && p.size === plan.size);
       if (!u) continue; // un plan du JSON que la page ne vend plus : parseTradeify a déjà levé
@@ -282,7 +307,12 @@ export async function runTradeify(data, { read = fetchTradeify, now = Date.now()
   }
   for (const n of parsed.notices) log(`${FIRM_ID}: NOTICE — ${n}`);
   const changes = applyTradeify(firm, parsed, today);
-  const offer = parsed.promo ? `code ${parsed.promo.code}${parsed.promo.ends ? ` jusqu'au ${parsed.promo.ends}` : ''}` : 'aucun code affiché';
+  const perProgram = Object.entries(parsed.offers).map(([name, o]) => `${name} ${o.code}`).join(', ');
+  const offer = perProgram
+    ? `codes par programme : ${perProgram}`
+    : parsed.promo
+      ? `code ${parsed.promo.code}${parsed.promo.ends ? ` jusqu'au ${parsed.promo.ends}` : ''}`
+      : 'aucun code affiché';
   if (changes.length === 0) log(`${FIRM_ID}: OK — ${parsed.plans.length} prix relus, rien n'a changé (${offer})`);
   else {
     log(`${FIRM_ID}: OK — ${parsed.plans.length} prix relus (${offer}), ${changes.length} changement(s) :`);

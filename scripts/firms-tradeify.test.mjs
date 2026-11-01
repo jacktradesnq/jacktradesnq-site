@@ -113,15 +113,49 @@ test('même code, remise différente par programme : chaque prix porte la sienne
   assert.equal(firm.programs[0].plans[0].price, 59);
 });
 
-test('deux codes différents : données gardées, stale, échec', async () => {
+test('un code par programme : chaque programme garde le sien, pas de code de firme', async () => {
   const twoCodes = withCoupons("default_code: ['NOV', 30], growth: ['GROW', 40], select: ['NOV', 30], lightning: ['NOV', 30],");
-  await assertBroken(async () => twoCodes, /codes différents selon les comptes \(GROW \| NOV\)/);
+  const data = freshData();
+  const { ok } = await runTradeify(data, { read: async () => twoCodes, now: RECORDED, log: quiet });
+  assert.equal(ok, true);
+  const firm = data.firms.find((f) => f.id === 'tradeify');
+  const program = (name) => firm.programs.find((p) => p.name === name);
+  assert.equal(firm.code, null);
+  assert.equal(firm.stale, false);
+  assert.equal(program('Growth').promoCode, 'GROW');
+  assert.equal(program('Growth').promoLabel, '40% off with code GROW');
+  assert.equal(program('Growth').plans[0].price, 59);
+  assert.equal(program('Select').promoCode, 'NOV');
+  assert.equal(program('Select').plans[0].price, 76);
+
+  // Le mois suivant, un seul code : les codes par programme disparaissent.
+  await runTradeify(data, { read: async () => NOV_PAGE, now: RECORDED, log: quiet });
+  assert.equal(firm.code, 'NOV');
+  assert.equal(program('Growth').promoCode, undefined);
+  assert.equal(program('Growth').promoLabel, undefined);
+});
+
+test('un code sur certains programmes seulement : les autres au prix catalogue', () => {
+  const r = parseTradeify(withCoupons("default_code: ['none', 0], growth: ['GROW', 40], select: ['none', 0], lightning: ['none', 0],"), RECORDED);
+  assert.deepEqual(r.offers, { Growth: { code: 'GROW', label: '40% off with code GROW' } });
+  assert.equal(r.code, null);
+  const select = r.plans.find((p) => p.programName === 'Select' && p.size === 25000);
+  assert.equal(select.price, select.originalPrice);
 });
 
 test('date de fin déjà passée sur leur page (pas mise à jour) : le code reste, la date est ignorée', () => {
   const r = parseTradeify(PAGE, Date.parse('2026-11-02T12:00:00Z'));
   assert.deepEqual(r.promo, { label: '30% off with code GEMS', code: 'GEMS' });
   assert.match(r.notices.join('\n'), /déjà passée/);
+});
+
+test('plusieurs codes dans un même programme : données gardées, stale, échec', async () => {
+  const start = PAGE.indexOf('const GrowthData');
+  const end = PAGE.indexOf('</script>', start);
+  const growth = PAGE.slice(start, end).replace(/(name: '25K'[\s\S]*?couponCode: ')growth/g, '$1select');
+  const mixed = PAGE.slice(0, start) + growth + PAGE.slice(end);
+  const page = mixed.replace(/(const couponDetails = \{)[\s\S]*?(\};)/, "$1 default_code: ['NOV', 30], growth: ['GROW', 40], select: ['NOV', 30], lightning: ['NOV', 30], $2");
+  await assertBroken(async () => page, /Growth : plusieurs codes dans le même programme/);
 });
 
 async function assertBroken(read, reason) {

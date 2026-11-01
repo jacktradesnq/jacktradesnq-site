@@ -408,6 +408,8 @@ function rowsOf(firm: Firm, link: Link): CompareRow[] {
   const firmHasFee = firm.programs.some((pr) => pr.plans.some((p) => (p.activationFee ?? 0) > 0));
   return firm.programs.flatMap((pr) => {
     const funded = fundedFor(firm, pr);
+    // A firm not partnered with Angelo can run one public code per program.
+    const rowCode = !link.affiliate && pr.promoCode ? { code: pr.promoCode, title: pr.promoLabel ?? 'The firm’s public code' } : link.code;
     return pr.plans.map((plan, i): CompareRow => {
       const price = effectivePrice(firm, plan);
       const steps = stepsOf(pr);
@@ -464,6 +466,7 @@ function rowsOf(firm: Firm, link: Link): CompareRow[] {
         dailyLoss: !('dailyLoss' in plan) ? null : plan.dailyLoss != null && plan.dailyLoss > 0 ? 'with' : 'without',
         note: plan.note,
         ...link,
+        code: rowCode,
       };
     });
   });
