@@ -192,16 +192,19 @@ export function parseTradeify(html, now = Date.now()) {
   if (plans.length < EXPECTED || missing.length)
     throw new Error(`${plans.length}/${EXPECTED} prix trouvés${missing.length ? ` (manquent : ${missing.join(', ')})` : ''}`);
 
-  // Un seul code et une seule remise sur les 12 comptes, ou aucun : le JSON ne sait pas dire
-  // mieux (un code par firme), le reste se relit à la main.
-  const offers = new Set(plans.map((p) => `${p.code ?? '—'} ${p.pct}`));
-  if (offers.size > 1) throw new Error(`codes ou remises différents selon les comptes (${[...offers].join(' | ')}) : à relire à la main`);
-  const { code, pct } = plans[0];
+  // Un seul code sur les 12 comptes, ou aucun : le JSON ne sait pas dire mieux (un code par
+  // firme), le reste se relit à la main. La remise peut varier d'un programme à l'autre (code NOV,
+  // novembre 2026 : Growth -40 %, Select et Lightning -30 %) : chaque prix porte déjà la sienne.
+  const codes = new Set(plans.map((p) => p.code ?? '—'));
+  if (codes.size > 1) throw new Error(`codes différents selon les comptes (${[...codes].join(' | ')}) : à relire à la main`);
+  const { code } = plans[0];
   let promo = null;
   if (code) {
+    const pcts = plans.map((p) => p.pct);
+    const [low, high] = [Math.min(...pcts), Math.max(...pcts)];
     const { ends, note } = parseEnds(html, code, now);
     if (note) notices.push(note);
-    promo = { label: `${pct}% off with code ${code}`, code, ...(ends ? { ends } : {}) };
+    promo = { label: `${low === high ? high : `${low}-${high}`}% off with code ${code}`, code, ...(ends ? { ends } : {}) };
   }
   const banner = html.match(/(\d+)% Off with code (?:&quot;|")(\w+)(?:&quot;|")/i);
   if (code && banner && banner[2].toUpperCase() !== code)

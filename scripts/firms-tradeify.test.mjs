@@ -91,6 +91,33 @@ test('sans code affiché : promo null, code null, prix = prix catalogue', async 
   assert.match(lines.join('\n'), /aucun code affiché/);
 });
 
+// Le code de novembre 2026 tel que leur page l'écrit : une remise par programme.
+const withCoupons = (lines) => PAGE.replace(/(const couponDetails = \{)[\s\S]*?(\};)/, `$1 ${lines} $2`);
+const NOV_PAGE = withCoupons("default_code: ['NOV', 30], growth: ['NOV', 40], select: ['NOV', 30], lightning: ['NOV', 30], none: ['none', 0],");
+
+test('même code, remise différente par programme : chaque prix porte la sienne', async () => {
+  const r = parseTradeify(NOV_PAGE, RECORDED);
+  assert.equal(r.code, 'NOV');
+  assert.equal(r.promo.label, '30-40% off with code NOV');
+  const growth = r.plans.filter((p) => p.programName === 'Growth').map((p) => [p.size, p.price, p.originalPrice]);
+  assert.deepEqual(growth, [[25000, 59, 99], [50000, 87, 145], [100000, 153, 255], [150000, 221, 369]]);
+  const select25 = r.plans.find((p) => p.programName === 'Select' && p.size === 25000);
+  assert.deepEqual([select25.price, select25.originalPrice], [76, 109]);
+
+  const data = freshData();
+  const { ok } = await runTradeify(data, { read: async () => NOV_PAGE, now: RECORDED, log: quiet });
+  assert.equal(ok, true);
+  const firm = data.firms.find((f) => f.id === 'tradeify');
+  assert.equal(firm.code, 'NOV');
+  assert.equal(firm.stale, false);
+  assert.equal(firm.programs[0].plans[0].price, 59);
+});
+
+test('deux codes différents : données gardées, stale, échec', async () => {
+  const twoCodes = withCoupons("default_code: ['NOV', 30], growth: ['GROW', 40], select: ['NOV', 30], lightning: ['NOV', 30],");
+  await assertBroken(async () => twoCodes, /codes différents selon les comptes \(GROW \| NOV\)/);
+});
+
 test('date de fin déjà passée sur leur page (pas mise à jour) : le code reste, la date est ignorée', () => {
   const r = parseTradeify(PAGE, Date.parse('2026-11-02T12:00:00Z'));
   assert.deepEqual(r.promo, { label: '30% off with code GEMS', code: 'GEMS' });
