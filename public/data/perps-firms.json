@@ -718,6 +718,10 @@
         "Commodities",
         "Forex"
       ],
+      "pairs": {
+        "count": 256,
+        "title": "Crypto 158 · Stocks 83 · Metals 5 · Indices 4 · Energy 3 · FX 3"
+      },
       "promo": {
         "code": "JTNQ",
         "discountPct": 50,

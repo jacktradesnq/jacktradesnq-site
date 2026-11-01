@@ -54,6 +54,8 @@ type PerpsFirm = {
   url: string;
   lastChecked: string;
   markets: string[];
+  // Symbols the firm lists (E8: e8x.e8markets.com/trading-symbols, Perpetual Markets, 01/11/2026).
+  pairs?: { count: number; title: string };
   // endsAt null: no announced end, no countdown. firstPurchase: the rate applies to a first order.
   // thenPct: the rate on every later order (MFP, 12/10/2026: « 35% off your first purchase — 30%
   // off every purchase after »).
@@ -296,6 +298,7 @@ function rowsOf(firm: PerpsFirm, promoLive: boolean): CompareRow[] {
         cells: {
           size: { text: sizeLabel(plan.size), sort: plan.size },
           steps: { text: steps, sort: steps },
+          pairs: firm.pairs ? { text: String(firm.pairs.count), sort: firm.pairs.count, title: firm.pairs.title } : undefined,
           leverage: withTitle(figure(d(p)?.leverage), d(p)?.leverageTitle),
           // No target on instant funding is not said (Angelo, 22/10/2026).
           target: figure(p.profitTarget),
