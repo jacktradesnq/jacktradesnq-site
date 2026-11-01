@@ -31,6 +31,7 @@ I don't have any preferences for E8 as all of the plans suit different types of 
 ### intro
 
 ### take
+BluSky, pretty solid firm, love the rules, plans and profit split. IMO it really comes down to 2 plans, Propel and Orbit. One favors funded account rules, the other favors the eval stage.
 
 ## myfundedperps
 ### intro
