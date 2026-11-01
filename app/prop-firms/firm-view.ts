@@ -7,6 +7,9 @@
 //   comparator on that firm.
 
 import { firstNumber } from '@/lib/compare-order.mjs';
+import {
+  consistencyWords, contractsWords, dailyLossWords, moneyFirst, payoutFreqWords, payoutWords, splitWords,
+} from '@/lib/compare-words.mjs';
 
 export type Family = 'futures' | 'perps';
 
@@ -128,32 +131,39 @@ export function cheapest(rows: CompareRow[]): FirmView['from'] {
   return best;
 }
 
-// Payout frequency, one word per meaning, for futures and perps alike (Angelo, 01/11/2026: « je
-// préfère que les mêmes appellations soient le même mot », on « Daily » next to « Every day »):
-// « Daily » for once a day, « On demand » for any time. The data keeps each firm's own words; the
-// cell shows the shared word, the firm's whole sentence is read on hover, so a condition that
-// leaves the cell (« from day one », « with no open position », « no cap ») stays there. A long
-// sentence (Lucid, Tradeify) only has its start rewritten, when it means the same thing; two
-// different rules never share a word (« 5 days to payout », a wait before the first payout, is
-// not « 5 winning days » between payouts; Tradeify Lightning's « 5 Days » has no winning-day rule,
-// its help center says « No Minimum Trading Day Count », so it stays).
-const PAYOUT_WORDS: [RegExp, string][] = [
-  [/^(?:daily|every day|once (?:per|a) day)(?=$|[\s,;(])/i, 'Daily'],
-  [/^(?:any ?time|on[- ]?demand)(?=$|[\s,;(])/i, 'On demand'],
-  // A number of days above a minimum profit before each payout: Tradeify Growth « 5 Days (5
-  // winning days of $100 / … ) », Lucid Flex « 5 profitable days per cycle ($100 / … minimum per day) ».
-  [/^(\d+) Days \(\1 winning days of /i, '$1 winning days ('],
-  [/^(\d+) profitable days per cycle(?= \()/i, '$1 winning days'],
-];
+// The comparator's words, one place per column (Angelo, 01/11/2026: « je préfère que les mêmes
+// appellations soient le même mot », for the whole comparator): lib/compare-words.mjs says each
+// column's shared format, the data keeps each firm's own words, the firm's sentence stays on hover
+// where the cell drops part of it. Futures and perps both build their cells here.
+type Words = { text: string; title?: string };
+const WORDS = {
+  contracts: (raw: string) => contractsWords(raw),
+  split: (raw: string) => splitWords(raw),
+  dailyLoss: (raw: string) => dailyLossWords(raw),
+  consistency: (raw: string) => consistencyWords(raw),
+  payoutFreq: (raw: string) => payoutFreqWords(raw),
+  // A row is one account size: its own value of a sentence that lists every size.
+  maxPayout: (raw: string, size: number, label?: string) => payoutWords(raw, size, label),
+  minPayout: (raw: string, size: number, label?: string) => payoutWords(raw, size, label),
+} satisfies Record<string, (raw: string, size: number, label?: string) => Words>;
+export type WordsColumn = keyof typeof WORDS;
 
-export function payoutFreqVal(raw: string | null | undefined): Val | undefined {
+const SORT_BY_MONEY = new Set<WordsColumn>(['maxPayout', 'minPayout']);
+
+// A cell of `column` from the firm's words. `size`: the row's account size; `label`: where the
+// value was read (« Payout caps 1 / 2 / 3 / 4 »), on hover. « None » is muted, as in textVal.
+export function cellVal(
+  column: WordsColumn,
+  raw: string | null | undefined,
+  { size = 0, label, sort }: { size?: number; label?: string; sort?: number | string | null } = {},
+): Val | undefined {
   if (!raw) return undefined;
-  const rule = PAYOUT_WORDS.find(([re]) => re.test(raw));
-  let text = rule ? raw.replace(rule[0], rule[1]) : raw;
-  // « Daily, from day one » / « Any time, no cap »: the condition after the comma goes to the hover.
-  const cond = /^(Daily|On demand),/.exec(text);
-  if (cond) text = cond[1];
-  // The same word inside a sentence too (Lucid « On Demand Payouts »).
-  text = text.replace(/\bOn Demand Payouts\b/g, 'On demand payouts').replace(/\bOn Demand\b/g, 'On demand');
-  return { text, sort: firstNumber(text), title: text !== raw ? raw : undefined };
+  const w = WORDS[column](raw, size, label);
+  const val: Val = {
+    text: w.text,
+    sort: sort !== undefined ? sort : SORT_BY_MONEY.has(column) ? moneyFirst(w.text) : firstNumber(w.text),
+  };
+  if (w.title) val.title = w.title;
+  if (w.text === 'None') return { ...val, sort: null, muted: true };
+  return val;
 }

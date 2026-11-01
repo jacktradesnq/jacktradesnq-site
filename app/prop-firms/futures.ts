@@ -14,7 +14,7 @@ import { firstNumber } from '@/lib/compare-order.mjs';
 import { firmAt, promoEnds } from '@/lib/promo-ends.mjs';
 import { money, sizeLabel } from './shared';
 import {
-  cheapest, humanDate, payoutFreqVal, pillValue, textVal,
+  cellVal, cheapest, humanDate, pillValue, textVal,
   type CompareRow, type FirmView, type Funded, type Pill, type Val,
 } from './firm-view';
 import codesMd from '@/content/prop-firms/codes.md';
@@ -365,36 +365,34 @@ const NOTE_SPLIT = /^Profit split ([^.]+)\./;
 
 function splitVal(firm: Firm, pr: Program, plan: Plan): Val {
   const own = pr.split ?? NOTE_SPLIT.exec(plan.note ?? '')?.[1];
-  if (own) return { text: own, sort: firstNumber(own) };
+  if (own) return cellVal('split', own) as Val;
   // The price shown is the firm's main split; the others it sells the account at, in brackets.
   const others = Object.keys(plan.splitPrices ?? {}).sort((a, b) => Number(a) - Number(b));
   const text = others.length
     ? `${firm.split} (${others.map((s) => `${s}%`).join(', ')} option${others.length > 1 ? 's' : ''})`
     : firm.split;
-  return { text, sort: firstNumber(firm.split) };
+  return cellVal('split', text, { sort: firstNumber(firm.split) }) as Val;
 }
 
-const figure = (text: string | undefined): Val | undefined => (text ? textVal(text, firstNumber(text)) : undefined);
-
 function maxPayout(pr: Program, funded: Funded | null, size: number): Val | undefined {
-  if (pr.maxPayout) return figure(pr.maxPayout);
+  if (pr.maxPayout) return cellVal('maxPayout', pr.maxPayout, { size });
   const row = funded?.rows.find((r) => /^Payout caps?\b/.test(r.label));
   const v = row?.bySize[size];
-  if (row && v) return { text: v, sort: firstNumber(v), title: row.label };
-  return figure(pillValue(funded, 'Payout cap'));
+  if (row && v) return cellVal('maxPayout', v, { size, label: row.label });
+  return cellVal('maxPayout', pillValue(funded, 'Payout cap'), { size });
 }
 
 function consistency(pr: Program, plan: Plan, funded: Funded | null): Val | undefined {
   const ev = pr.evalConsistency ?? plan.consistency;
   const fu = pr.fundedConsistency ?? pillValue(funded, 'Consistency');
   if (ev == null && fu == null) return undefined;
-  return { text: `${ev ?? '—'} / ${fu ?? '—'}`, sort: firstNumber(ev) };
+  return cellVal('consistency', `${ev ?? '—'} / ${fu ?? '—'}`, { sort: firstNumber(ev) });
 }
 
 // The firm's payout pace, « On demand » included (Angelo, 01/11/2026: « garde on demand payout,
 // en fait ça se dit », which lifts his 12/10 « enlève le on demand payout »). Same word as the
-// comparator's column (payoutFreqVal).
-const pace = (firm: Firm) => payoutFreqVal(firm.payout)?.text;
+// comparator's column.
+const pace = (firm: Firm) => cellVal('payoutFreq', firm.payout)?.text;
 
 function activation(firm: Firm, plan: Plan, firmHasFee: boolean): Val | undefined {
   const fee = plan.activationFee;
@@ -442,7 +440,7 @@ function rowsOf(firm: Firm, link: Link): CompareRow[] {
           size: { text: sizeLabel(plan.size), sort: plan.size },
           steps: { text: steps, sort: steps },
           activation: activation(firm, plan, firmHasFee),
-          contracts: { text: plan.contracts, sort: firstNumber(plan.contracts) },
+          contracts: cellVal('contracts', plan.contracts),
           target,
           maxLoss: { text: money(plan.maxDrawdown), sort: plan.maxDrawdown },
           lossType: {
@@ -456,9 +454,9 @@ function rowsOf(firm: Firm, link: Link): CompareRow[] {
           },
           split: splitVal(firm, pr, plan),
           maxPayout: maxPayout(pr, funded, plan.size),
-          minPayout: figure(pr.minPayout ?? pillValue(funded, 'Minimum payout')),
+          minPayout: cellVal('minPayout', pr.minPayout ?? pillValue(funded, 'Minimum payout'), { size: plan.size }),
           consistency: consistency(pr, plan, funded),
-          payoutFreq: payoutFreqVal(pr.payoutFrequency ?? pillValue(funded, 'Payout request') ?? pace(firm)),
+          payoutFreq: cellVal('payoutFreq', pr.payoutFrequency ?? pillValue(funded, 'Payout request') ?? pace(firm)),
         },
         lossType: DD_LABEL[plan.ddType],
         // The scraper writes null where the firm says there is none, and leaves the key out where
