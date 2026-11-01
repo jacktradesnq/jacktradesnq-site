@@ -391,9 +391,10 @@ function consistency(pr: Program, plan: Plan, funded: Funded | null): Val | unde
   return { text: `${ev ?? '—'} / ${fu ?? '—'}`, sort: firstNumber(ev) };
 }
 
-// "On-demand payouts" tells a trader nothing (Angelo, 12/10/2026: « enlève le on demand
-// payout, car point de vue trader ça veut rien dire »); a real pace (Daily) stays.
-const pace = (firm: Firm) => (firm.payout && !/on.?demand/i.test(firm.payout) ? firm.payout : undefined);
+// The firm's payout pace, « On demand » included (Angelo, 01/11/2026: « garde on demand payout,
+// en fait ça se dit », which lifts his 12/10 « enlève le on demand payout »). Same word as the
+// comparator's column (payoutFreqVal).
+const pace = (firm: Firm) => payoutFreqVal(firm.payout)?.text;
 
 function activation(firm: Firm, plan: Plan, firmHasFee: boolean): Val | undefined {
   const fee = plan.activationFee;
