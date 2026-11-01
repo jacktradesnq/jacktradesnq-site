@@ -379,7 +379,7 @@
       "code": "GEMS",
       "url": "https://tradeify.co/#pricing",
       "lastChecked": "2026-11-01",
-      "stale": false,
+      "stale": true,
       "programs": [
         {
           "name": "Growth",
