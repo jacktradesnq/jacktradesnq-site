@@ -372,14 +372,14 @@
       "split": "90%",
       "payout": "Daily",
       "promo": {
-        "label": "30% off with code GEMS",
-        "code": "GEMS",
-        "ends": "2026-10-31T23:59:00-04:00"
+        "label": "30-40% off with code NOV",
+        "code": "NOV",
+        "ends": "2026-11-13T23:59:00-05:00"
       },
-      "code": "GEMS",
+      "code": "NOV",
       "url": "https://tradeify.co/#pricing",
       "lastChecked": "2026-11-01",
-      "stale": true,
+      "stale": false,
       "programs": [
         {
           "name": "Growth",
@@ -395,7 +395,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 69,
+              "price": 59,
               "originalPrice": 99,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
@@ -410,7 +410,7 @@
             },
             {
               "size": 50000,
-              "price": 102,
+              "price": 87,
               "originalPrice": 145,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -425,7 +425,7 @@
             },
             {
               "size": 100000,
-              "price": 179,
+              "price": 153,
               "originalPrice": 255,
               "profitTarget": 6000,
               "maxDrawdown": 3500,
@@ -440,7 +440,7 @@
             },
             {
               "size": 150000,
-              "price": 258,
+              "price": 221,
               "originalPrice": 369,
               "profitTarget": 9000,
               "maxDrawdown": 5000,
