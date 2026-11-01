@@ -120,19 +120,19 @@ export const COMPARE_CSS = `
 }
 .jtnq-cmp .cmp-table{ width: 100%; border-collapse: separate; border-spacing: 0; }
 .jtnq-cmp .cmp-table th, .jtnq-cmp .cmp-table td{
-  padding: 12px; border-bottom: 1px solid var(--c-line-soft); vertical-align: middle; text-align: center;
+  padding: 12px 8px; border-bottom: 1px solid var(--c-line-soft); vertical-align: middle; text-align: center;
 }
 .jtnq-cmp .cmp-table tbody tr:last-child > *{ border-bottom: none; }
 .jtnq-cmp .cmp-table tbody tr{ transition: background .15s ease; }
-.jtnq-cmp .cmp-table tbody tr:hover > *{ background: color-mix(in oklab, var(--c-bg-raise) 85%, var(--c-text) 4%); }
+.jtnq-cmp .cmp-table tbody tr:hover > *{ background: color-mix(in oklab, var(--c-bg-raise) 96%, var(--c-text) 4%); }
 .jtnq-cmp .cmp-table thead th{
   padding: 0; background: color-mix(in oklab, var(--c-bg-raise) 70%, var(--c-bg-deep) 30%);
-  border-bottom: 1px solid var(--c-line); white-space: nowrap;
+  border-bottom: 1px solid var(--c-line); vertical-align: bottom;
 }
 .jtnq-cmp .cmp-sort{
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px 12px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px; width: 100%; padding: 16px 8px 12px;
   border: none; background: none; cursor: pointer;
-  font-family: var(--f-mono); font-size: 10px; font-weight: 400; letter-spacing: .12em; text-transform: uppercase;
+  font-family: var(--f-mono); font-size: 10px; font-weight: 400; letter-spacing: .1em; text-transform: uppercase; line-height: 1.4;
   color: var(--c-text-soft); transition: color .2s ease;
 }
 .jtnq-cmp .cmp-sort:focus-visible{ outline-offset: -2px; }
@@ -144,7 +144,7 @@ export const COMPARE_CSS = `
 
 /* The firm stays in view while the columns scroll sideways. */
 .jtnq-cmp .cmp-firm-col{
-  position: sticky; left: 0; z-index: 2; min-width: 208px;
+  position: sticky; left: 0; z-index: 2; min-width: 200px; max-width: 232px;
   box-shadow: inset -1px 0 0 var(--c-line-soft);
 }
 .jtnq-cmp tbody .cmp-firm-col{ background: var(--c-bg-raise); }
@@ -156,20 +156,25 @@ export const COMPARE_CSS = `
 .jtnq-cmp .cmp-prog{
   font-family: var(--f-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--c-text-mute); line-height: 1.4;
 }
-.jtnq-cmp .cmp-firm-txt .promo-chip{ margin-top: 4px; font-size: 9px; padding: 2px 8px; cursor: inherit; }
+.jtnq-cmp .cmp-firm-meta{ display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-top: 4px; }
+.jtnq-cmp .cmp-firm-meta .promo-chip{ font-size: 9px; padding: 2px 8px; cursor: help; }
+.jtnq-cmp .cmp-firm-meta .cmp-note-d{ margin-top: 0; }
 
 .jtnq-cmp .cmp-td{ white-space: nowrap; }
-.jtnq-cmp .cmp-td .ft-fig, .jtnq-cmp .cmp-td .ft-word{ font-size: 14px; }
+.jtnq-cmp .cmp-td .ft-fig, .jtnq-cmp .cmp-td .ft-word{ font-size: 13px; }
 .jtnq-cmp .cmp-td .ft-word{ font-weight: 400; }
+/* Every short value reads in the data face, so a column never mixes two fonts (« None / 40% », « 21% / — »). */
+.jtnq-cmp .cmp-val .ft-word, .jtnq-cmp .cmp-val .none{ font-family: var(--f-mono); }
 /* Sentences (a split that changes after 30 days, a payout rule) wrap instead of widening the table. */
 .jtnq-cmp :is(.cmp-c-split, .cmp-c-minPayout, .cmp-c-maxPayout, .cmp-c-payoutFreq, .cmp-c-consistency, .cmp-c-contracts){
-  white-space: normal; min-width: 112px; max-width: 176px;
+  white-space: normal; min-width: 96px; max-width: 160px;
 }
 .jtnq-cmp .cmp-val{ display: inline-flex; flex-direction: column; align-items: center; gap: 4px; }
 .jtnq-cmp .cmp-long > *:first-child{
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; cursor: help;
 }
-.jtnq-cmp .cmp-td .cmp-long .ft-fig, .jtnq-cmp .cmp-td .cmp-long .ft-word{ font-size: 12px; line-height: 1.45; }
+/* A sentence reads in the body face, whatever it starts with. */
+.jtnq-cmp .cmp-long .ft-fig, .jtnq-cmp .cmp-long .ft-word{ font-family: var(--f-sans); font-size: 12px; font-weight: 400; line-height: 1.45; }
 .jtnq-cmp .cmp-note-d{ margin-top: 4px; font-size: 12px; color: var(--c-text-mute); }
 .jtnq-cmp .cmp-note-d summary{
   cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 4px;
@@ -187,7 +192,6 @@ export const COMPARE_CSS = `
 .jtnq-cmp .cmp-dash{ color: var(--c-text-deep); }
 .jtnq-cmp .cmp-td .ft-price{ flex-wrap: nowrap; gap: 4px 8px; }
 .jtnq-cmp .cmp-td .ft-now{ font-size: 15px; }
-.jtnq-cmp .cmp-c-price{ text-align: right !important; }
 .jtnq-cmp .cmp-go{ padding-right: 16px !important; }
 
 .jtnq-cmp .cmp-cards{ display: none; }

@@ -355,8 +355,12 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
                             <span className="cmp-firm-txt">
                               <span className="cmp-firm-name">{r.firmName}</span>
                               <span className="cmp-prog">{r.program}</span>
-                              <Code row={r} />
-                              <Note row={r} />
+                              {(r.code || r.note) && (
+                                <span className="cmp-firm-meta">
+                                  <Code row={r} />
+                                  <Note row={r} />
+                                </span>
+                              )}
                             </span>
                           </span>
                         </th>
