@@ -1,23 +1,24 @@
 // Perps firms (public/data/perps-firms.json, read by hand, not auto-synced) turned into
-// FirmView, in the layout of the MyFundedPerps comparison Angelo made on 11/10/2026
-// (jtnq-promo, out/myfundedperps/table.html).
+// FirmView (partner cards) and CompareRow (the comparator, one row per plan).
 //
-// The JTNQ promo has a hard end (endsAt). Three moments to get right:
-// - build: a build made after endsAt never shows the promo (BUILD_TS, inlined by
-//   next.config.js), so the daily rebuild drops it on its own;
-// - before hydration: the static HTML shows the state of the build, with a placeholder
-//   clock of the same width as the real one (PromoClock in FirmTable.tsx);
-// - in the browser: the page flips to normal prices once endsAt passes (usePromoLive).
+// The JTNQ promo has a hard end (endsAt), judged by the shared clock (promo-clock.ts): a
+// build made after endsAt never shows it, the static HTML shows the state of the build with a
+// placeholder clock of the same width as the real one (PromoClock in FirmTable.tsx), and the
+// page flips to normal prices once endsAt passes (usePromoLive).
 
-import { useEffect, useState } from 'react';
 import rawData from '@/public/data/perps-firms.json';
+import { runsAt } from '@/lib/promo-ends.mjs';
+import { BUILD_TS, usePromoClock } from './promo-clock';
 import { goHref } from '@/lib/go-links';
-import { cheapest, hasDailyLoss, limitCell, splitCommon, type Cell, type FirmView, type Funded, type PriceCell } from './firm-view';
+import { firstNumber } from '@/lib/compare-order.mjs';
+import { sizeLabel } from './shared';
+import { cellVal, cheapest, pillValue, textVal, type CompareRow, type DailyLoss, type FirmView, type Funded, type Val } from './firm-view';
 
 // price null = announced but not on sale yet ("Coming soon").
 // altPrice: a second version of the same account, shown in the same cell after a « / » (Angelo,
 // 12/10/2026 : « dans la même colonne et dans chaque truc t'as un / qui met les 2 prix »): MFP
 // Elite's cheaper 3% DLL version, Vest 1-Step's 90% split (the first price is the 80% split).
+// altPrices: the same, for an account sold in more than two versions (E8 One at 80%, 90%, 100%).
 // lines: rules that change with the size (Vest's max drawdown in dollars), a row under the price.
 type PerpsPlan = {
   size: number;
@@ -25,6 +26,7 @@ type PerpsPlan = {
   promoPrice: number | null;
   altPrice?: number;
   altPromoPrice?: number;
+  altPrices?: { price: number; promoPrice: number | null }[];
   lines?: { label: string; value: string }[];
   // more: other versions of the same account, one price row each under the main one (Vest 1-Step:
   // 3% DLL on the main row, then 4% DLL and No DLL; Angelo 21/10/2026: « les regrouper »).
@@ -33,6 +35,8 @@ type PerpsPlan = {
 };
 type PerpsProgram = {
   name: string;
+  // Key of DETAILS and FUNDED when the first word of the name is not enough (« E8 One · 4% Max »).
+  rulesKey?: string;
   steps: string;
   split: string;
   profitTarget: string | null;
@@ -50,6 +54,8 @@ type PerpsFirm = {
   url: string;
   lastChecked: string;
   markets: string[];
+  // Symbols the firm lists (E8: e8x.e8markets.com/trading-symbols, Perpetual Markets, 01/11/2026).
+  pairs?: { count: number; title: string };
   // endsAt null: no announced end, no countdown. firstPurchase: the rate applies to a first order.
   // thenPct: the rate on every later order (MFP, 12/10/2026: « 35% off your first purchase — 30%
   // off every purchase after »).
@@ -58,7 +64,6 @@ type PerpsFirm = {
 };
 
 const DATA = rawData as unknown as { generatedAt: string; firms: PerpsFirm[] };
-const BUILD_TS = Number(process.env.NEXT_PUBLIC_BUILD_TS ?? 0);
 
 // Several firms can run a JTNQ promo at once (MyFundedPerps, Breakout since 13/10/2026). Only a
 // promo with an end date needs the clock below; the page tracks the first such firm, or else the
@@ -67,24 +72,13 @@ const PROMO_FIRM = DATA.firms.find((f) => f.promo?.endsAt) ?? DATA.firms.find((f
 export const PERPS_PROMO = PROMO_FIRM?.promo ?? null;
 export const PERPS_PROMO_FIRM_ID = PROMO_FIRM?.id ?? null;
 export const PROMO_ENDS_MS = PERPS_PROMO?.endsAt ? Date.parse(PERPS_PROMO.endsAt) : null;
-const LIVE_AT_BUILD = PERPS_PROMO != null && (PROMO_ENDS_MS == null || BUILD_TS < PROMO_ENDS_MS);
+const PROMO_ENDS: readonly number[] = PROMO_ENDS_MS == null ? [] : [PROMO_ENDS_MS];
 
 // True while the promo runs. Starts from the build state (static HTML), re-checks the
 // clock once mounted, and flips to false at endsAt without re-rendering every second.
 export function usePromoLive(): boolean {
-  const [live, setLive] = useState(LIVE_AT_BUILD);
-  useEffect(() => {
-    if (!LIVE_AT_BUILD || PROMO_ENDS_MS == null) return;
-    const left = PROMO_ENDS_MS - Date.now();
-    if (left <= 0) {
-      setLive(false);
-      return;
-    }
-    // setTimeout caps at ~24.8 days; past that a reload will see the end anyway.
-    const id = window.setTimeout(() => setLive(false), Math.min(left, 2 ** 31 - 1));
-    return () => window.clearTimeout(id);
-  }, []);
-  return live;
+  const at = usePromoClock(PROMO_ENDS);
+  return PERPS_PROMO != null && runsAt(PROMO_ENDS_MS, at);
 }
 
 // The promo a firm shows right now: one without endsAt always; a timed one while the page's
@@ -94,12 +88,28 @@ function promoOf(firm: PerpsFirm, promoLive: boolean): PerpsFirm['promo'] {
   if (!p) return null;
   if (p.endsAt == null) return p;
   if (firm.id === PERPS_PROMO_FIRM_ID) return promoLive ? p : null;
-  return BUILD_TS < Date.parse(p.endsAt) ? p : null;
+  return runsAt(p.endsAt, BUILD_TS) ? p : null;
 }
 
 // Split and leverage per program, by firm, from the firm's checkout and docs; the payout rules
 // live in FUNDED below.
-const DETAILS: Record<string, Record<string, { split: string; leverage: string }>> = {
+const DETAILS: Record<string, Record<string, { split: string; leverage: string; leverageTitle?: string }>> = {
+  // E8 Perpetual, read 01/11/2026 on help.e8markets.com, « How much leverage do you offer? »
+  // (Perpetual futures table, the same for E8 One and E8 Pro) and the product overview (« Payout
+  // 80%, 90%, 100% » for E8 One, « 80%, 100% » for E8 Pro). Its own id, e8-perps: e8-markets is the
+  // futures firm, and one id in both families would open #compare=e8-markets on the wrong table.
+  'e8-perps': {
+    One: {
+      split: '80% / 90% / 100%',
+      leverage: 'Up to 25x',
+      leverageTitle: 'BTC, ETH, indices, metals, energy 15x · stocks 5x · other crypto 2x · forex 25x',
+    },
+    Pro: {
+      split: '80% / 100%',
+      leverage: 'Up to 25x',
+      leverageTitle: 'BTC, ETH, indices, metals, energy 15x · stocks 5x · other crypto 2x · forex 25x',
+    },
+  },
   // MyFundedPerps checkout and docs, 12/10/2026.
   myfundedperps: {
     Select: { split: '80% (90% option)', leverage: 'Standard' },
@@ -135,47 +145,14 @@ const DETAILS: Record<string, Record<string, { split: string; leverage: string }
   },
 };
 
-// Rules MyFundedPerps applies to every program, from the same table.
-const COMMON: Record<string, string[]> = {
-  // No "1-step evaluation": MyFundedPerps sells no straight-to-funded account (Angelo,
-  // 12/10/2026: « si la prop firm n'a pas de straight to funded ne précise pas évaluation »).
-  myfundedperps: [
-    'Static drawdown',
-    'No consistency rule',
-    'No minimum trading days',
-    'No time limit',
-    'Up to $300K funded in total',
-  ],
-  // Breakout, read 13/10/2026. No "1-step evaluation" either: Breakout sells no straight-to-funded
-  // account (intercom.help/breakoutprop « What types of Breakout Evaluations can I purchase? »: three
-  // 1-Step variants, Classic, Pro, Turbo). Sources: breakoutprop.com/pricing/ (« 6% static »,
-  // « What is static drawdown? », « No min trading days », « No time limits », « You can hold up to
-  // $200K in total funded capital across all accounts combined »); breakoutprop.com FAQ (« There is
-  // no consistency rule on any Breakout account »).
-  breakout: [
-    'Static drawdown',
-    'No consistency rule',
-    'No minimum trading days',
-    'No time limit',
-    'Up to $200K funded in total',
-  ],
-  // Vest, docs.vestmarkets.com/vest-capital, read 21/10/2026: loss-limits « A fixed floor, set once
-  // when your account is created. It never moves »; overview « No time limits » and « Maximum 10 Live
-  // Funded Accounts per user, across both paths combined ». The docs say nothing about a consistency
-  // rule or minimum trading days, so neither is claimed here.
-  // Payouts, claiming-profit: « Claim as often as you like. There's no cap on frequency and no cap on
-  // the amount you can claim »; « 24 hours for every claim »; « the USDC is credited to your Primary
-  // Account ». Same for an evaluation or an Instant account (« This flow works identically »), and
-  // loss-limits: « Whatever applies during the Evaluation Phase carries through unchanged once you're
-  // Live ». So Vest has no Funded tab: it would repeat the evaluation (Angelo, 21/10/2026: « funded
-  // c presque pareil que eval partout »).
-  'vest-markets': [
-    'Static drawdown',
-    'No time limit',
-    'Up to 10 live funded accounts',
-    'Payouts any time, no cap',
-    'Paid in USDC within 24 hours',
-  ],
+// Payout pace of a firm with no funded rules written below. Vest, docs.vestmarkets.com/vest-capital,
+// read 21/10/2026, claiming-profit: « Claim as often as you like. There's no cap on frequency and no
+// cap on the amount you can claim »; « 24 hours for every claim ». Same for an evaluation or an
+// Instant account (« This flow works identically »), and loss-limits: « Whatever applies during the
+// Evaluation Phase carries through unchanged once you're Live ». So Vest has no funded rules of its
+// own (Angelo, 21/10/2026: « funded c presque pareil que eval partout »).
+const PAYOUTS: Record<string, string> = {
+  'vest-markets': 'Any time, no cap',
 };
 
 // No « Winning days: None » on a funded account whose payout pace is written (once a day, any
@@ -213,6 +190,34 @@ const BREAKOUT_FUNDED: Funded = {
   rows: [],
 };
 const FUNDED: Record<string, Record<string, Funded>> = {
+  // E8 Perpetual, read 01/11/2026 on e8markets.com/?market=perpetual (every size, drawdown and payout
+  // of the configurator) and help.e8markets.com: « What is Payout On Demand? » (E8 One: « you can
+  // request a payout at any time », « 40% Best Day rule », « net profit (payout) must be greater
+  // than 50% of your daily drawdown », « earliest first payout … 3 days »; E8 Pro: « daily payouts »,
+  // « the minimum is 1% »), the product overview (« No best day », « 2% Daily profit cap », static
+  // drawdown « Only moves when you request the first payout »).
+  // Price with code: e8markets.com/e8-markets-discount-code, « 50% off », « E8 Pro (Perpetual), E8 One
+  // (Perpetual) », « Apply for all purchases », no expiry; the configurator shows the same prices
+  // (« with code E8 on first order »). Printed as JTNQ (CLAUDE.md, Angelo 11/10/2026 and 26/10/2026).
+  'e8-perps': {
+    One: {
+      pills: [
+        { label: 'Consistency', value: '40% best day' },
+        { label: 'Payout request', value: 'Any time, first payout after 3 days at the earliest' },
+        { label: 'Minimum payout', value: 'Above 50% of the daily drawdown' },
+      ],
+      rows: [],
+    },
+    Pro: {
+      pills: [
+        { label: 'Consistency', value: 'None' },
+        { label: 'Payout request', value: 'Daily' },
+        { label: 'Minimum payout', value: '1%' },
+        { label: 'Daily profit cap', value: '2%' },
+      ],
+      rows: [],
+    },
+  },
   breakout: { Classic: BREAKOUT_FUNDED, Pro: BREAKOUT_FUNDED, Turbo: BREAKOUT_FUNDED },
   myfundedperps: {
     Select: MFP_STD,
@@ -238,139 +243,92 @@ const SUMMARY: Record<string, string> = {
   breakout: '80–90% split',
   // docs.vestmarkets.com/vest-capital/overview, 21/10/2026: « keep 80–95% of your profits ».
   'vest-markets': '80–95% split',
+  // help.e8markets.com product overview, 01/11/2026: E8 One « 80%, 90%, 100% », E8 Pro « 80%, 100% ».
+  'e8-perps': '80–100% split',
 };
 
-// How the limits are measured. Breakout, intercom 13/10/2026: max drawdown « 6% [5%, 3%] of your
-// initial account balance »; daily loss « 3% of your […] account balance at 00:30 UTC,
-// recalculated every day at that time ».
-// Vest, docs loss-limits 21/10/2026: the max drawdown is « Calculated as a percentage of your starting
-// capital »; the daily loss limit is « 3% or 4% of your reset balance », « The daily reset boundary is
-// 20:00 ET ».
-const LEGEND: Record<string, string[]> = {
-  breakout: ['Max drawdown is a percentage of your starting balance; the daily loss limit is a percentage of your balance at 00:30 UTC, reset every day'],
-  'vest-markets': [
-    'Max drawdown is a fixed floor, a percentage of your starting balance; the daily loss limit is a percentage of your balance at the 20:00 New York reset',
-    '1-Step: the first price is the 80% split, the second the 90% split',
-  ],
-};
+const STEPS = (s: string) => (/^instant/i.test(s) ? 'Instant' : /^2/.test(s) ? '2 Steps' : /^1/.test(s) ? '1 Step' : s);
+const figure = (text: string | null | undefined): Val | undefined => (text ? textVal(text, firstNumber(text)) : undefined);
+const withTitle = (val: Val | undefined, title: string | undefined): Val | undefined => (val && title ? { ...val, title } : val);
 
-const text = (v: string | undefined): Cell => (v ? { text: v } : { text: 'n/c', muted: true });
+// « 3% », « None », and the plans sold both ways: « None / 3% » (MFP Elite, shown « 3% or none »), « 3%, 4% or none » (Vest 1-Step).
+function dailyLossOf(text: string | null): DailyLoss {
+  if (!text) return null;
+  const parts = text.split(/\s*(?:\/|,|\bor\b)\s*/).filter(Boolean);
+  const none = parts.some((x) => /^none$/i.test(x));
+  const some = parts.some((x) => !/^none$/i.test(x));
+  return none && some ? 'both' : none ? 'without' : 'with';
+}
 
-function firmView(firm: PerpsFirm, promoLive: boolean): FirmView {
-  const programs = firm.programs;
+function rowsOf(firm: PerpsFirm, promoLive: boolean): CompareRow[] {
   const promo = promoOf(firm, promoLive);
-  const d = (p: PerpsProgram) => DETAILS[firm.id]?.[p.name.split(' ')[0]];
-
-  const { common, rules } = splitCommon([
-    // No target on instant funding is not said (Angelo, 22/10/2026 : « pk y aurait un target si c
-    // du straight to funded », then « Enlever aussi » for Vest Instant): no pill ("–").
-    {
-      label: 'Profit target',
-      cells: programs.map((p) => (p.profitTarget ? limitCell(p.profitTarget) : { text: '–', muted: true })),
-      common: (c) => (c.muted ? 'No profit target' : `${c.text} profit target`),
-    },
-    { label: 'Max drawdown', cells: programs.map((p) => limitCell(p.maxDrawdown)), common: (c) => `${c.text} max drawdown` },
-    ...(hasDailyLoss(programs.map((p) => p.dailyLoss))
-      ? [{
-          label: 'Daily loss limit',
-          // A program without one gets no pill (Angelo, 22/10/2026, Vest Instant).
-          cells: programs.map((p) => (p.dailyLoss === 'None' ? { text: '–', muted: true } : limitCell(p.dailyLoss))),
-          common: (c: Cell) => `${c.text} daily loss limit`,
-        }]
-      : []),
-    { label: 'Profit split', cells: programs.map((p) => text(d(p)?.split ?? p.split)), common: (c) => `${c.text} profit split` },
-    { label: 'Leverage', cells: programs.map((p) => text(d(p)?.leverage)), common: (c) => `${c.text} leverage` },
-    // A program missing from DETAILS still shows its rules as the JSON writes them.
-    {
-      label: 'Notes',
-      cells: programs.map((p) => (d(p) ? { text: '–', muted: true } : { text: p.note, note: true })),
-      common: () => '',
-      skip: programs.every((p) => d(p)),
-    },
-  ]);
-  const firmCommon = COMMON[firm.id] ?? [...new Set(programs.map((p) => p.steps))];
-
-  const sizes = [...new Set(programs.flatMap((p) => p.plans.map((pl) => pl.size)))].sort((a, b) => a - b);
-  const sizeRows = sizes.map((size) => ({
-    size,
-    cells: programs.map((p): PriceCell => {
-      const plan = p.plans.find((pl) => pl.size === size);
-      if (!plan) return null;
-      if (plan.price == null) return { kind: 'text', text: plan.note ?? 'Coming soon' };
-      const promoPrice = promo ? plan.promoPrice : null;
-      const altPromo = promo ? plan.altPromoPrice ?? null : null;
+  const rulesKey = (p: PerpsProgram) => p.rulesKey ?? p.name.split(' ')[0];
+  const d = (p: PerpsProgram) => DETAILS[firm.id]?.[rulesKey(p)];
+  const funded = (p: PerpsProgram) => FUNDED[firm.id]?.[rulesKey(p)];
+  const version = (list: number, discounted: number | null | undefined) => ({ list, discounted: promo ? discounted ?? null : null });
+  return firm.programs.flatMap((p) =>
+    p.plans.map((plan, i): CompareRow => {
+      const steps = STEPS(p.steps);
+      const dollars = plan.lines?.find((l) => l.label === 'Max drawdown')?.value;
       return {
-        kind: 'price',
-        now: promoPrice ?? plan.price,
-        was: promoPrice != null ? plan.price : null,
-        alt: plan.altPrice != null ? { now: altPromo ?? plan.altPrice, was: altPromo != null ? plan.altPrice : null } : null,
-        per: null,
-        from: false,
-        lines: (plan.lines ?? []).map((l) => ({ label: l.label, cell: { text: l.value } })),
+        key: `${firm.id}|${p.name}|${plan.size}|${i}`,
+        family: 'perps',
+        firmId: firm.id,
+        firmName: firm.name,
+        logo: firm.logo,
+        program: p.name,
+        size: plan.size,
+        steps,
+        // Prices with the code from promoPrice. Breakout's are its prices minus 5%, written in the JSON
+        // (Angelo, 01/11/2026: « breakout premier eval c'est belle et bien du 5% »).
+        price:
+          plan.price == null
+            ? { kind: 'text', text: plan.note ?? 'Coming soon' }
+            : {
+                kind: 'price',
+                list: plan.price,
+                discounted: promo ? plan.promoPrice : null,
+                alts: [
+                  ...(plan.altPrice != null ? [version(plan.altPrice, plan.altPromoPrice)] : []),
+                  ...(plan.altPrices ?? []).map((a) => version(a.price, a.promoPrice)),
+                ],
+                per: null,
+                from: false,
+              },
+        cells: {
+          size: { text: sizeLabel(plan.size), sort: plan.size },
+          steps: { text: steps, sort: steps },
+          pairs: firm.pairs ? { text: String(firm.pairs.count), sort: firm.pairs.count, title: firm.pairs.title } : undefined,
+          leverage: withTitle(figure(d(p)?.leverage), d(p)?.leverageTitle),
+          // No target on instant funding is not said (Angelo, 22/10/2026).
+          target: figure(p.profitTarget),
+          dailyLoss: cellVal('dailyLoss', p.dailyLoss),
+          maxLoss: p.maxDrawdown ? { text: p.maxDrawdown, sort: firstNumber(p.maxDrawdown), sub: dollars } : undefined,
+          lossType: p.ddType ? { text: '', sort: p.ddType, tag: { label: p.ddType, title: '', accent: false } } : undefined,
+          split: cellVal('split', d(p)?.split ?? p.split),
+          payoutFreq: cellVal('payoutFreq', pillValue(funded(p), 'Payout request') ?? PAYOUTS[firm.id]),
+        },
+        lossType: p.ddType,
+        dailyLoss: dailyLossOf(p.dailyLoss),
+        note: plan.price != null ? plan.note : undefined,
+        href: goHref('prop-firms', firm.id),
+        affiliate: true,
+        code: { code: 'JTNQ', title: 'My affiliate code' },
       };
     }),
-  }));
+  );
+}
 
-  const moreLabels = [...new Set(programs.flatMap((p) => p.plans.flatMap((pl) => (pl.more ?? []).map((m) => m.label))))];
-  const extraPrices: NonNullable<FirmView['extraPrices']> = moreLabels.map((label) => ({
-    label,
-    byProgram: programs.map((p) => {
-      const rows = p.plans.flatMap((pl) => (pl.more ?? []).filter((m) => m.label === label).map((m) => [pl.size, m] as const));
-      if (!rows.length) return null;
-      return Object.fromEntries(
-        rows.map(([size, m]) => {
-          const now = promo ? m.promoPrice : null;
-          const altNow = promo ? m.altPromoPrice ?? null : null;
-          return [size, {
-            now: now ?? m.price,
-            was: now != null ? m.price : null,
-            alt: m.altPrice != null ? { now: altNow ?? m.altPrice, was: altNow != null ? m.altPrice : null } : null,
-          }];
-        }),
-      );
-    }),
-  }));
+export const perpsRows = (promoLive: boolean): CompareRow[] => DATA.firms.flatMap((f) => rowsOf(f, promoLive));
 
-  const hasPromoPrices = programs.some((p) => p.plans.some((pl) => pl.promoPrice != null));
-  const endsLabel = promo?.endsAt
-    ? new Date(promo.endsAt).toLocaleString('en-US', {
-        month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York',
-      })
-    : '';
-
-  return {
+export const perpsFirms = (promoLive: boolean): FirmView[] =>
+  DATA.firms.map((firm) => ({
     id: firm.id,
     name: firm.name,
     logo: firm.logo,
     summary: SUMMARY[firm.id] ?? '',
     code: { code: 'JTNQ', title: 'My affiliate code' },
     stale: null,
-    from: cheapest(sizeRows),
-    columns: programs.map((p) => ({ name: p.name })),
-    common: [...firmCommon, ...common.filter(Boolean)],
-    rules,
-    // Prices with the code are shown only where they were read on the firm's checkout (promoPrice);
-    // never computed from the rate. Vest: every price with code JTNQ read 21/10/2026 in the purchase
-    // configurator of next.vestmarkets.com/vest-capital/evaluation, code typed in « Enter Discount
-    // Code » (« 5% Discount »); each one is the price × 0.95 to the cent (43 out of 43). Exception,
-    // Vest 50K: its prices with the code are the price × 0.95, computed (Angelo, 22/10/2026: « non
-    // mais tant que c -5% c bon nan? »). Cross-check: the same 14 prices showed in that
-    // configurator, logged in, with JTNQ typed, on 22/10/2026 (1-Step 10% 3% DLL 80%: « $415 »
-    // then « $394.25 »). Without them the table keeps the normal prices and only names
-    // the rate (Breakout, Angelo 13/10/2026: « 5% off with code JTNQ »).
-    priceTitle: promo && hasPromoPrices ? `Price with code ${promo.code}` : 'Price',
-    priceSub: promo
-      ? `${promo.discountPct}% off${promo.firstPurchase ? ' your first purchase' : ''}${hasPromoPrices && !extraPrices.length ? '' : ` with code ${promo.code}`}${promo.thenPct ? `\n${promo.thenPct}% off every purchase after` : ''}${endsLabel ? ` until ${endsLabel} New York time` : ''}`
-      : null,
-    sizes: sizeRows,
-    ...(extraPrices.length ? { priceLabels: programs.map((p) => p.priceLabel ?? null), extraPrices } : {}),
-    funded: FUNDED[firm.id] ? programs.map((p) => FUNDED[firm.id][p.name.split(' ')[0]] ?? null) : undefined,
-    legend: [
-      ...(LEGEND[firm.id] ?? ['Every limit is a percentage of your starting balance, the way perps firms publish them']),
-      ...(rules.some((r) => r.cells.some((c) => c.text === 'n/c')) ? ['n/c — the firm does not publish that rule per program'] : []),
-    ],
+    from: cheapest(rowsOf(firm, promoLive)),
     href: goHref('prop-firms', firm.id),
-  };
-}
-
-export const perpsFirms = (promoLive: boolean): FirmView[] => DATA.firms.map((f) => firmView(f, promoLive));
+  }));

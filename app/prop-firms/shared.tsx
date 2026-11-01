@@ -14,15 +14,16 @@ export const META = {
   hero: {
     eyebrow: 'FUTURES \u00b7 PERPS \u00b7 TRADE COPIER',
     title: 'Trading Partnerships', // Angelo 31/10/2026 : « on fais Trading Partnerships »
+    // Angelo, 01/11/2026: plans moved to Prop compare, Lucid/Tradeify carry their own code.
     phrase:
-      'Futures and perps firms I\u2019m partnered with, and the trade copier I use. Pick a firm to see all of its plans side by side \u2014 account sizes, prices and risk rules. My code JTNQ or tracked link applied on every button.',
+      'Futures and perps firms I\u2019m partnered with, and the trade copier I use. Use Prop compare to see every plan side by side \u2014 account sizes, prices and risk rules. My code JTNQ or tracked link applied on every partner button.',
   },
   legal: {
     copyright: '\u00a9 2026 JackTradesNQ. All rights reserved.',
     mentionsUrl: '/mentions-legales/',
     privacyUrl: '/politique-confidentialite/',
     disclaimer:
-      'Disclaimer \u2014 In accordance with article D.321-1 of the French Mon\u00e9taire et Financier Code, the content published on this site is provided for informational purposes only and does not constitute investment advice. This page is an advertisement: JackTradesNQ is an affiliate of the prop firms listed and earns a commission on sign-ups made with code JTNQ.',
+      'Disclaimer \u2014 In accordance with article D.321-1 of the French Mon\u00e9taire et Financier Code, the content published on this site is provided for informational purposes only and does not constitute investment advice. This page is an advertisement: the firms shown with code JTNQ are affiliates, and JackTradesNQ earns a commission on sign-ups made with code JTNQ. A firm shown without code JTNQ is not an affiliate.',
   },
 };
 
@@ -122,10 +123,6 @@ export const CSS = `
   border: 1px dashed var(--c-line); border-radius: 999px;
   padding: 3px 9px; white-space: nowrap; cursor: help;
 }
-.jtnq-cmp .soft-flag{
-  margin-left: 8px; font-size: 10px; font-weight: 400; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--c-text-mute); cursor: help;
-}
 .jtnq-cmp .none{ color: var(--c-text-mute); font-weight: 400; font-size: 13px; }
 .jtnq-cmp .tag{
   display: inline-block; font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
@@ -144,12 +141,6 @@ export const CSS = `
 .jtnq-cmp .row-cta svg{ width: 12px; height: 12px; }
 .jtnq-cmp .row-cta:hover{ background: var(--c-accent); color: var(--c-bg); transform: translateY(-1px); }
 
-.jtnq-cmp .legend{
-  display: flex; flex-direction: column; gap: 6px; margin: 16px 0 0;
-}
-.jtnq-cmp .legend p{
-  margin: 0; font-family: var(--f-mono); font-size: 11px; line-height: 1.5; color: var(--c-text-mute);
-}
 
 
 .jtnq-cmp .site-footer{

@@ -36,10 +36,18 @@ jobs:
       - name: Build live promos feed
         run: node scripts/build-live-promos.mjs
 
+      # Tradeify (comparateur, compare-extra-firms.json) : code public et 12 prix relus chaque jour
+      # (Angelo, 01/11/2026 : « quand c'est expiré check tous les jours jusqu'à ce qu'il y ait le
+      # bon code »). Page illisible = firme stale (commitée avec le reste) puis job rouge plus bas.
+      - name: Scrape Tradeify (comparator)
+        id: tradeify
+        continue-on-error: true
+        run: node scripts/scrape-tradeify.mjs
+
       - name: Check for data changes
         id: diff
         run: |
-          if [ -n "$(git status --porcelain public/data/prop-firms.json public/data/live-promos.json)" ]; then
+          if [ -n "$(git status --porcelain public/data/prop-firms.json public/data/live-promos.json public/data/compare-extra-firms.json)" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -50,7 +58,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/data/prop-firms.json public/data/live-promos.json
+          git add public/data/prop-firms.json public/data/live-promos.json public/data/compare-extra-firms.json
           git commit -m "chore(data): daily prop-firms price sync"
           git push origin HEAD:main
 
@@ -74,7 +82,7 @@ jobs:
       - name: Discord alert — stale firms
         if: always()
         run: |
-          STALE=$(python3 -c "import json; d=json.load(open('public/data/prop-firms.json')); print(', '.join(f['name'] for f in d['firms'] if f.get('stale')))")
+          STALE=$(python3 -c "import json; fs=[f for p in ('public/data/prop-firms.json', 'public/data/compare-extra-firms.json') for f in json.load(open(p))['firms']]; print(', '.join(f['name'] for f in fs if f.get('stale')))")
           if [ -n "$STALE" ]; then
             curl -sS -H "Content-Type: application/json" -d "{\"content\": \"⚠️ **prop-firms sync** — firmes STALE (site illisible, anciennes données conservées) : $STALE\"}" "${{ secrets.DISCORD_WEBHOOK }}" > /dev/null
           fi
@@ -84,6 +92,12 @@ jobs:
         run: |
           SUMMARY=$(git show --stat --oneline HEAD | head -3 | tr '\n' ' ' | cut -c1-300)
           curl -sS -H "Content-Type: application/json" -d "{\"content\": \"✅ **prop-firms sync** — prix mis à jour et déployés : $SUMMARY\"}" "${{ secrets.DISCORD_WEBHOOK }}" > /dev/null
+
+      - name: Tradeify unreadable — fail the job
+        if: always() && steps.tradeify.outcome == 'failure'
+        run: |
+          echo "::error::scrape-tradeify : page Tradeify illisible ou moins de 12 prix (voir l'étape « Scrape Tradeify »). Données gardées, stale: true."
+          exit 1
 
       - name: Discord alert — workflow failed
         if: failure()

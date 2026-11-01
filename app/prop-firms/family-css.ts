@@ -1,5 +1,5 @@
-// Styles of the family picker, the firm cards and the per-firm table on /prop-firms
-// (page.tsx, FirmTable.tsx). Tokens come from shared.tsx (.jtnq-cmp).
+// Styles of the family picker, the firm cards, a firm's window and the price / rule pieces on
+// /prop-firms (page.tsx, FirmWindow.tsx, FirmTable.tsx). Tokens come from shared.tsx (.jtnq-cmp).
 
 export const FAMILY_CSS = `
 .jtnq-cmp .sr-only{
@@ -24,9 +24,10 @@ export const FAMILY_CSS = `
   padding: 12px 24px; cursor: pointer; transition: color .2s ease, background .2s ease;
 }
 .jtnq-cmp .fam-tab{ white-space: nowrap; }
-/* Three tabs since the trade copier joined (31/10/2026): tighter on small phones so they stay on one row. */
-@media (max-width: 400px){
-  .jtnq-cmp .fam-tab{ font-size: 11px; letter-spacing: .08em; padding: 12px 12px; }
+/* Four tabs since « Prop compare » joined (01/11/2026): two rows of two on a phone, every tab the same size. */
+@media (max-width: 560px){
+  .jtnq-cmp .fam-tabs{ display: grid; grid-template-columns: 1fr 1fr; border-radius: 24px; width: 100%; max-width: 400px; }
+  .jtnq-cmp .fam-tab{ font-size: 11px; letter-spacing: .1em; padding: 12px 8px; }
 }
 .jtnq-cmp .fam-tab:hover{ color: var(--c-accent); }
 .jtnq-cmp .fam-tab.active{ color: var(--c-bg); background: var(--c-accent); }
@@ -83,14 +84,13 @@ export const FAMILY_CSS = `
 .jtnq-cmp .fc-chev{ width: 14px; height: 14px; transition: transform .2s ease; }
 .jtnq-cmp .firm-card:hover .fc-chev{ transform: translate(2px, -2px); }
 
-/* ── the window a firm's table opens in ── */
+/* ── a firm's window ── */
 .jtnq-cmp .firm-dialog{
   position: fixed; inset: 0; margin: auto; padding: 48px 0 0; border: none; background: transparent; color: inherit;
-  width: min(1120px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px);
+  width: min(640px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px);
   overflow-y: auto; overscroll-behavior: contain;
 }
 .jtnq-cmp .firm-dialog::backdrop{ background: oklch(0.07 0.02 165 / .8); backdrop-filter: blur(6px); }
-.jtnq-cmp .firm-dialog .ft{ margin-top: 0; }
 .jtnq-cmp .fd-close{
   position: absolute; top: 0; right: 0; width: 40px; height: 40px; display: grid; place-items: center;
   border: 1px solid var(--c-line); border-radius: 999px; background: var(--c-bg-raise); color: var(--c-text);
@@ -100,33 +100,46 @@ export const FAMILY_CSS = `
 .jtnq-cmp .fd-close svg{ width: 18px; height: 18px; }
 html:has(.firm-dialog[open]){ overflow: hidden; }
 
-/* ── one firm's table ── */
-@keyframes ft-in{ from{ opacity: 0; transform: translateY(8px); } to{ opacity: 1; transform: none; } }
-.jtnq-cmp .ft{
-  width: 100%; margin-top: 32px; border: 1px solid var(--c-line); border-radius: 12px; background: var(--c-bg-raise);
-  overflow: hidden; animation: ft-in .28s ease both;
+@keyframes fw-in{ from{ opacity: 0; transform: translateY(8px); } to{ opacity: 1; transform: none; } }
+.jtnq-cmp .fw{
+  display: flex; flex-direction: column; gap: 24px; padding: 32px;
+  border: 1px solid var(--c-line); border-radius: 12px; background: var(--c-bg-raise);
+  animation: fw-in .28s ease both;
   box-shadow: 0 1px 2px oklch(0.05 0.02 165 / .35), 0 16px 40px -16px oklch(0.05 0.02 165 / .55);
 }
-@media (prefers-reduced-motion: reduce){ .jtnq-cmp .ft{ animation: none; } }
-.jtnq-cmp .ft-head{
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px;
-  padding: 24px; border-bottom: 1px solid var(--c-line-soft);
-}
-.jtnq-cmp .ft-id{ display: flex; align-items: center; gap: 16px; min-width: 0; }
-.jtnq-cmp .ft-title{
+@media (prefers-reduced-motion: reduce){ .jtnq-cmp .fw{ animation: none; } }
+.jtnq-cmp .fw-head{ display: flex; align-items: center; gap: 16px; min-width: 0; }
+.jtnq-cmp .fw-title{
   margin: 0; font-family: var(--f-serif); font-style: italic; font-weight: 400;
-  font-size: clamp(28px, 3.2vw, 40px); line-height: 1; letter-spacing: -0.02em; color: var(--c-text);
+  font-size: clamp(32px, 4vw, 44px); line-height: 1; letter-spacing: -0.02em; color: var(--c-text);
 }
-.jtnq-cmp .ft-sub{
-  margin: 8px 0 0; font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--c-text-mute); line-height: 1.5;
+.jtnq-cmp .fw-intro p{
+  margin: 0; font-family: var(--f-serif); font-style: italic; font-size: 20px; line-height: 1.4; color: var(--c-text-soft); text-wrap: pretty;
 }
-.jtnq-cmp .ft-actions{ display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
-.jtnq-cmp .ft-actions .row-cta{ padding: 12px 20px; font-size: 14px; }
+.jtnq-cmp .fw-intro p + p{ margin-top: 12px; }
+.jtnq-cmp .fw-take{ padding-top: 24px; border-top: 1px solid var(--c-line-soft); }
+.jtnq-cmp .fw-take-k{
+  margin: 0 0 12px; font-family: var(--f-mono); font-size: 11px; font-weight: 400; letter-spacing: .2em; text-transform: uppercase; color: var(--c-accent);
+}
+.jtnq-cmp .fw-take p{ margin: 0; font-size: 16px; line-height: 1.6; color: var(--c-text); text-wrap: pretty; }
+.jtnq-cmp .fw-take p + p{ margin-top: 12px; }
+.jtnq-cmp .fw-actions{
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  padding-top: 24px; border-top: 1px solid var(--c-line-soft);
+}
+.jtnq-cmp .fw-actions .promo-chip{ cursor: help; }
+.jtnq-cmp .fw-actions .row-cta{ margin-left: auto; padding: 12px 20px; font-size: 14px; }
+.jtnq-cmp .fw-all{
+  display: inline-flex; align-items: center; padding: 12px 20px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--c-line); background: none;
+  font-family: var(--f-sans); font-size: 14px; font-weight: 500; color: var(--c-text);
+  transition: border-color .2s ease, color .2s ease;
+}
+.jtnq-cmp .fw-all:hover{ border-color: var(--c-accent); color: var(--c-accent); }
 
 .jtnq-cmp .perps-promo{
   display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0;
-  padding: 12px 24px; border-bottom: 1px solid color-mix(in oklab, var(--c-accent) 35%, var(--c-line));
+  padding: 12px 16px; border: 1px solid color-mix(in oklab, var(--c-accent) 35%, var(--c-line)); border-radius: 12px;
   background: color-mix(in oklab, var(--c-bg-raise) 88%, var(--c-accent) 8%);
 }
 .jtnq-cmp .perps-promo-text{ font-size: 14px; color: var(--c-text); }
@@ -135,82 +148,20 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
   white-space: nowrap;
 }
 
-.jtnq-cmp .ft-col-sub{ white-space: pre-line; display: block; margin-top: 4px; font-family: var(--f-sans); font-size: 12px; font-style: italic; color: var(--c-text-mute); }
-
-.jtnq-cmp .ft-bar{
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 16px 24px; border-bottom: 1px solid var(--c-line-soft);
-}
-.jtnq-cmp .ft-filters{
-  display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 4px;
-  border: 1px solid var(--c-line); border-radius: 999px; background: var(--c-bg-deep);
-}
+/* ── segmented buttons (the comparator's Futures / Perps) ── */
 .jtnq-cmp .ft-seg{ display: inline-flex; flex-wrap: wrap; gap: 4px; }
-.jtnq-cmp .ft-divider{ width: 1px; align-self: stretch; margin: 4px 8px; background: var(--c-line); }
-/* Six programs or more (Vest Markets, 8) wrap the tabs on any screen: the bar turns into the phone
-   layout below, programs on top, Eval / Funded under a rule, instead of a pill split over 3 lines. */
-.jtnq-cmp .ft-filters:has(> .ft-seg > .ft-prog:nth-child(6)){ display: flex; flex-direction: column; align-items: stretch; border-radius: 20px; }
-.jtnq-cmp .ft-filters:has(> .ft-seg > .ft-prog:nth-child(6)) .ft-divider{ width: auto; height: 1px; margin: 4px 8px; }
-
 .jtnq-cmp .ft-prog{
   font-family: var(--f-sans); font-size: 13px; font-weight: 500; color: var(--c-text-mute);
   background: none; border: none; border-radius: 999px; padding: 8px 16px; cursor: pointer;
   transition: color .2s ease, background .2s ease;
 }
-
 .jtnq-cmp .ft-prog:hover{ color: var(--c-accent); }
 .jtnq-cmp .ft-prog.active{ color: var(--c-bg); background: var(--c-accent); }
-.jtnq-cmp .ft-pills{
-  list-style: none; margin: 0; padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 8px 24px;
-  border-bottom: 1px solid var(--c-line-soft);
-}
-.jtnq-cmp .ft-pill{ display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--c-text); }
-.jtnq-cmp .ft-pill .ft-check{ display: inline-block; margin: 0; width: 16px; height: 16px; }
-.jtnq-cmp .ft-pill-k{ color: var(--c-text-soft); }
-.jtnq-cmp .ft-pill-v{ font-weight: 500; color: var(--c-text); }
-.jtnq-cmp .ft-empty{ margin: 0; padding: 24px; font-size: 14px; color: var(--c-text-mute); }
-.jtnq-cmp .ft-sizes .ft-col--size{ font-family: var(--f-mono); font-style: normal; font-size: 15px; color: var(--c-accent); }
-.jtnq-cmp .ft-sizes .ft-label{ white-space: nowrap; }
-.jtnq-cmp .ft-sizes td, .jtnq-cmp .ft-sizes th{ padding-top: 12px; padding-bottom: 12px; }
-.jtnq-cmp .ft-check{ display: block; width: 18px; height: 18px; margin: 0 auto; color: var(--c-accent); }
 
-.jtnq-cmp .ft-scroll{ overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.jtnq-cmp .ft-table{
-  width: 100%; min-width: calc(200px + var(--cols) * 160px); border-collapse: separate; border-spacing: 0;
-}
-.jtnq-cmp .ft-table th, .jtnq-cmp .ft-table td{
-  padding: 16px; border-bottom: 1px solid var(--c-line-soft); vertical-align: middle;
-}
-.jtnq-cmp .ft-table tr:last-child > *{ border-bottom: none; }
-.jtnq-cmp .ft-table thead th{
-  background: color-mix(in oklab, var(--c-bg-raise) 70%, var(--c-bg-deep) 30%);
-  border-bottom: 1px solid var(--c-line);
-}
-.jtnq-cmp .ft-col{
-  text-align: center; font-family: var(--f-serif); font-style: italic; font-weight: 400;
-  font-size: 20px; letter-spacing: -0.01em; color: var(--c-text);
-}
-/* Rule names stay in view while the programs scroll sideways on a phone. */
-.jtnq-cmp .ft-label{
-  position: sticky; left: 0; z-index: 1; width: 200px; text-align: left;
-  background: var(--c-bg-raise); box-shadow: inset -1px 0 0 var(--c-line-soft);
-  font-family: var(--f-mono); font-size: 11px; font-weight: 400; letter-spacing: .14em; text-transform: uppercase;
-  color: var(--c-text-soft); line-height: 1.4;
-}
-.jtnq-cmp thead .ft-label{ background: color-mix(in oklab, var(--c-bg-raise) 70%, var(--c-bg-deep) 30%); }
-
-.jtnq-cmp .ft-cell{ text-align: center; }
-.jtnq-cmp .ft-cell .tag{ margin-left: 8px; }
-.jtnq-cmp .ft-cell .ft-fig + .tag{ margin-left: 8px; }
-.jtnq-cmp .ft-cell .tag:only-child{ margin-left: 0; }
+/* ── a figure, a word, a price ── */
 .jtnq-cmp .ft-fig{ font-family: var(--f-mono); font-size: 15px; font-weight: 500; color: var(--c-text); }
 .jtnq-cmp .ft-word{ font-family: var(--f-sans); font-size: 15px; font-weight: 500; color: var(--c-text); line-height: 1.4; }
-
-.jtnq-cmp .ft-sentence{
-  display: block; max-width: 34ch; margin: 0 auto; text-align: left;
-  font-family: var(--f-sans); font-size: 12px; font-style: italic; line-height: 1.5; color: var(--c-text-soft);
-}
-
+.jtnq-cmp .ft-fig + .tag{ margin-left: 8px; }
 .jtnq-cmp .ft-price .price-was{ white-space: nowrap; }
 .jtnq-cmp .ft-price{ display: inline-flex; align-items: baseline; justify-content: center; gap: 8px; flex-wrap: wrap; }
 .jtnq-cmp .ft-now{ font-family: var(--f-mono); font-size: 17px; font-weight: 500; color: var(--c-text); }
@@ -218,32 +169,11 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
 .jtnq-cmp .price-sep{ font-family: var(--f-mono); font-size: 15px; color: var(--c-text-mute); }
 .jtnq-cmp .price-from{ font-family: var(--f-mono); font-size: 11px; font-weight: 400; color: var(--c-text-mute); }
 .jtnq-cmp .per{ font-family: var(--f-mono); font-size: 11px; color: var(--c-text-mute); }
-.jtnq-cmp .ft-lines{ display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 8px; }
-.jtnq-cmp .ft-line{ font-family: var(--f-mono); font-size: 11px; color: var(--c-text-soft); line-height: 1.4; }
-.jtnq-cmp .ft-line .ft-fig{ font-size: 11px; font-weight: 400; color: var(--c-text-soft); }
-.jtnq-cmp .ft-line .none{ font-size: 11px; }
-.jtnq-cmp .ft-line-k{ color: var(--c-text-mute); text-transform: uppercase; letter-spacing: .08em; font-size: 10px; }
-.jtnq-cmp .ft-foot{ padding: 8px 24px 24px; border-top: 1px solid var(--c-line-soft); }
 
 @media (max-width: 720px){
-  .jtnq-cmp .ft-filters{ display: flex; flex-direction: column; align-items: stretch; border-radius: 20px; }
-  .jtnq-cmp .ft-divider{ width: auto; height: 1px; margin: 4px 8px; }
-  .jtnq-cmp .ft-bar, .jtnq-cmp .ft-pills{ padding-left: 16px; padding-right: 16px; }
-  .jtnq-cmp .ft-sizes .ft-label{ white-space: normal; min-width: 96px; max-width: 112px; }
-  .jtnq-cmp .ft-sizes .ft-col-sub{ font-size: 11px; }
-  .jtnq-cmp .fam-tab{ padding: 12px 16px; font-size: 11px; }
   .jtnq-cmp .firm-card{ padding: 16px; }
-  .jtnq-cmp .ft{ margin-top: 24px; }
-.jtnq-cmp .ft-head{ padding: 16px; }
-  .jtnq-cmp .perps-promo{ padding: 12px 16px; }
-  .jtnq-cmp .ft-actions{ width: 100%; }
-  .jtnq-cmp .ft-actions .row-cta{ margin-left: auto; }
-  .jtnq-cmp .ft-table{ min-width: calc(104px + var(--cols) * 152px); }
-
-  .jtnq-cmp .ft-table th, .jtnq-cmp .ft-table td{ padding: 12px 8px; }
-  .jtnq-cmp .ft-word{ font-size: 14px; }
-  .jtnq-cmp .ft-label{ width: 104px; font-size: 10px; letter-spacing: .1em; padding-left: 16px !important; }
-  .jtnq-cmp .ft-col{ font-size: 17px; }
-  .jtnq-cmp .ft-foot{ padding: 8px 16px 16px; }
+  .jtnq-cmp .fw{ padding: 24px 16px; gap: 16px; }
+  .jtnq-cmp .fw-take, .jtnq-cmp .fw-actions{ padding-top: 16px; }
+  .jtnq-cmp .fw-actions .row-cta{ margin-left: 0; }
 }
 `;
