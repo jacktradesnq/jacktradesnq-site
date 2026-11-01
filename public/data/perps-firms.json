@@ -192,27 +192,27 @@
             {
               "size": 5000,
               "price": 45,
-              "promoPrice": null
+              "promoPrice": 42.75
             },
             {
               "size": 10000,
               "price": 85,
-              "promoPrice": null
+              "promoPrice": 80.75
             },
             {
               "size": 25000,
               "price": 215,
-              "promoPrice": null
+              "promoPrice": 204.25
             },
             {
               "size": 50000,
               "price": 400,
-              "promoPrice": null
+              "promoPrice": 380.0
             },
             {
               "size": 100000,
               "price": 800,
-              "promoPrice": null
+              "promoPrice": 760.0
             }
           ]
         },
@@ -229,32 +229,32 @@
             {
               "size": 5000,
               "price": 33,
-              "promoPrice": null
+              "promoPrice": 31.35
             },
             {
               "size": 10000,
               "price": 65,
-              "promoPrice": null
+              "promoPrice": 61.75
             },
             {
               "size": 25000,
               "price": 150,
-              "promoPrice": null
+              "promoPrice": 142.5
             },
             {
               "size": 50000,
               "price": 280,
-              "promoPrice": null
+              "promoPrice": 266.0
             },
             {
               "size": 100000,
               "price": 545,
-              "promoPrice": null
+              "promoPrice": 517.75
             },
             {
               "size": 200000,
               "price": 1090,
-              "promoPrice": null
+              "promoPrice": 1035.5
             }
           ]
         },
@@ -271,32 +271,32 @@
             {
               "size": 5000,
               "price": 20,
-              "promoPrice": null
+              "promoPrice": 19.0
             },
             {
               "size": 10000,
               "price": 40,
-              "promoPrice": null
+              "promoPrice": 38.0
             },
             {
               "size": 25000,
               "price": 95,
-              "promoPrice": null
+              "promoPrice": 90.25
             },
             {
               "size": 50000,
               "price": 180,
-              "promoPrice": null
+              "promoPrice": 171.0
             },
             {
               "size": 100000,
               "price": 330,
-              "promoPrice": null
+              "promoPrice": 313.5
             },
             {
               "size": 200000,
               "price": 660,
-              "promoPrice": null
+              "promoPrice": 627.0
             }
           ]
         }

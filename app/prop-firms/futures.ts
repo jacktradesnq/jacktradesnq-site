@@ -351,10 +351,9 @@ function fundedFor(firm: Firm, pr: Program): Funded | null {
   return by[pr.name] ?? null;
 }
 
-const STEPS: Record<string, string> = { '1': '1 Step', '2': '2 Steps', instant: 'Instant' };
-// Without "steps", what the JSON already says: an evaluation or an instant account.
-const stepsOf = (pr: Program) =>
-  pr.steps != null ? STEPS[String(pr.steps)] : pr.type === 'instant' ? 'Instant' : 'Evaluation';
+// Futures say Evaluation or Instant for every firm, Lucid and Tradeify included (Angelo,
+// 01/11/2026: « lucid tradeify met evaluation »).
+const stepsOf = (pr: Program) => (pr.type === 'instant' || pr.steps === 'instant' ? 'Instant' : 'Evaluation');
 
 // BluSky's instant accounts write their own split in the plan note (« Profit split 50% for 30
 // trading days, then 80%. »), not the firm's 90%.

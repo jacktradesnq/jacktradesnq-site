@@ -228,8 +228,8 @@ function rowsOf(firm: PerpsFirm, promoLive: boolean): CompareRow[] {
         program: p.name,
         size: plan.size,
         steps,
-        // Prices with the code only where they were read on the firm's checkout (promoPrice), never
-        // computed from the rate (Breakout: the table keeps its normal prices).
+        // Prices with the code from promoPrice. Breakout's are its prices minus 5%, written in the JSON
+        // (Angelo, 01/11/2026: « breakout premier eval c'est belle et bien du 5% »).
         price:
           plan.price == null
             ? { kind: 'text', text: plan.note ?? 'Coming soon' }
