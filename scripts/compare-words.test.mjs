@@ -50,11 +50,13 @@ test('a sentence that cannot be cut safely stays whole', () => {
   assert.equal(valueForSize('$500', 50000), '$500');
 });
 
-test('max / min payout: the $ everywhere, the full sentence on hover, rolling 7 days said once', () => {
+test('max / min payout: caps per payout as « Payouts 1-2: … », the $ everywhere, the full sentence on hover, rolling 7 days said once', () => {
   assert.deepEqual(payoutWords('$1,000 / 1,000 / 1,250 / 1,250', 25000, 'Payout caps 1 / 2 / 3 / 4'), {
-    text: '$1,000 / $1,000 / $1,250 / $1,250',
+    text: 'Payouts 1-2: $1,000; Payouts 3-4: $1,250',
     title: 'Payout caps 1 / 2 / 3 / 4',
   });
+  assert.equal(payoutWords('$1,000 / 1,250 / 1,250 / 2,000', 25000, 'Payout caps 1 / 2 / 3 / 4').text,
+    'Payout 1: $1,000; Payouts 2-3: $1,250; Payout 4: $2,000');
   assert.deepEqual(payoutWords('$250 / $500 / $1,000 / $1,500 (25K / 50K / 100K / 150K)', 50000), {
     text: '$500',
     title: '$250 / $500 / $1,000 / $1,500 (25K / 50K / 100K / 150K)',
