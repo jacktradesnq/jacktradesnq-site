@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { defaultOrder, filterRows, firmMatches, firstNumber, sortBy } from '../lib/compare-order.mjs';
+import { defaultOrder, filterRows, firmMatches, firstNumber, sortBy, togglePick } from '../lib/compare-order.mjs';
 
 const rows = [
   { key: 'v50', firmName: 'Vest Markets', firmId: 'vest', size: 50000, steps: '1 Step', price: 400, lossType: 'Static', dailyLoss: 'both' },
@@ -61,4 +61,11 @@ test('the firm search ignores case, spaces and punctuation', () => {
 test('the firm search filters the plans with the other filters', () => {
   assert.deepEqual(keys(filterRows(rows, { firmQuery: 'BLU', size: 100000 }, (r) => r.price)), ['b100']);
   assert.deepEqual(keys(filterRows(rows, { firmQuery: 'nobody' }, (r) => r.price)), []);
+});
+
+test('any plans of any firm can be picked to compare, and unpicked', () => {
+  const [v50, b100, b50] = rows;
+  assert.deepEqual(keys(togglePick([b100], b50)), ['b100', 'b50']);
+  assert.deepEqual(keys(togglePick([b100, b50], v50)), ['b100', 'b50', 'v50']);
+  assert.deepEqual(keys(togglePick([b100, b50], b100)), ['b50']);
 });

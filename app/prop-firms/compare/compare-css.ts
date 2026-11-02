@@ -6,7 +6,8 @@ export const COMPARE_CSS = `
 .jtnq-cmp .cmp{
   /* Wider than the page column: 15 columns read better side by side. */
   width: min(1440px, calc(100vw - 2 * var(--pad-x)));
-  margin: 32px 0 0 50%; translate: -50% 0;
+  /* Centred by its margin, not by translate: a translate would pin the fixed bar to this box. */
+  margin: 32px 0 0 calc(50% - min(1440px, calc(100vw - 2 * var(--pad-x))) / 2);
   display: flex; flex-direction: column; gap: 16px;
 }
 
@@ -216,9 +217,29 @@ export const COMPARE_CSS = `
   font-size: 12px; line-height: 1.7; color: var(--c-text-mute); text-wrap: pretty;
 }
 
+/* ── picking plans to compare, in this same table ── */
+.jtnq-cmp .cmp-pick{
+  display: inline-flex; align-items: center; gap: 4px; cursor: pointer;
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute); transition: color .2s ease;
+}
+.jtnq-cmp .cmp-pick:hover, .jtnq-cmp .cmp-pick:has(input:checked){ color: var(--c-accent); }
+.jtnq-cmp .cmp-pick input{ width: 16px; height: 16px; margin: 0; accent-color: var(--c-accent); cursor: inherit; }
+.jtnq-cmp .cmp-tray{
+  /* In view wherever the page is scrolled, while the next plan is being looked for. */
+  position: fixed; left: 50%; bottom: 16px; translate: -50% 0; z-index: 5;
+  width: max-content; max-width: calc(100vw - 32px);
+  display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 16px;
+  border: 1px solid var(--c-accent); border-radius: 12px; background: var(--c-bg-raise);
+  box-shadow: 0 1px 2px oklch(0.05 0.02 165 / .35), 0 16px 40px -16px oklch(0.05 0.02 165 / .6);
+}
+.jtnq-cmp .cmp-tray > button{ flex-shrink: 0; }
+.jtnq-cmp .cmp-tray-txt{ min-width: 0; font-size: 14px; font-weight: 500; color: var(--c-text); }
+/* While comparing the table shows the picked plans whatever the filters: those are put away. */
+.jtnq-cmp .cmp-filters.comparing .cmp-field:not(.cmp-sort-m){ display: none; }
+
 /* ── phone: one card per plan, filters folded ── */
 @media (max-width: 760px){
-  .jtnq-cmp .cmp{ width: 100%; margin-left: 0; translate: none; margin-top: 24px; }
+  .jtnq-cmp .cmp{ width: 100%; margin-left: 0; margin-top: 24px; }
   .jtnq-cmp .cmp-filters-toggle{
     display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; cursor: pointer;
     border: 1px solid var(--c-line); border-radius: 999px; background: none;
@@ -268,7 +289,7 @@ export const COMPARE_CSS = `
   .jtnq-cmp .cmp-card-row:has(.cmp-long) dd{ text-align: left; }
   .jtnq-cmp .cmp-card-row .cmp-long{ align-items: flex-start; }
   .jtnq-cmp .cmp-card .cmp-note-d p{ max-width: none; }
-  .jtnq-cmp .cmp-card-foot{ display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .jtnq-cmp .cmp-card-foot{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
   .jtnq-cmp .cmp-card-foot .row-cta{ margin-left: auto; }
 }
 `;

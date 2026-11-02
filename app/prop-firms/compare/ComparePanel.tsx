@@ -9,11 +9,14 @@
 //   in the same bar (Angelo, 01/11/2026);
 // - no « Last checked » column (Angelo, 01/11/2026: « pas besoin de ça »);
 // - only the site's own data; « — » when nothing is published, « None » when the firm says none;
-// - on a phone, one card per plan and the filters fold away.
+// - on a phone, one card per plan and the filters fold away;
+// - pick plans and compare them in this same table (Angelo, 02/11/2026: « tu prends 2 plan
+//   différent que ce sois le même propfirm ou 2 propfirm différent ou même + et tu compares
+//   comme ca, on rajoute rien [...] juste pouvoir selectionner ca »).
 // Self-contained: it can move to a page of its own by rendering <ComparePanel> there.
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { defaultOrder, filterRows, firmMatches, sortBy } from '@/lib/compare-order.mjs';
+import { defaultOrder, filterRows, firmMatches, sortBy, togglePick } from '@/lib/compare-order.mjs';
 import { FirmSearch } from '../FirmSearch';
 import { FAMILIES, shownPrice, type CompareRow, type Family } from '../firm-view';
 import { EXTRA_PROMO_ENDS, futuresRows } from '../futures';
@@ -94,6 +97,20 @@ function Code({ row }: { row: CompareRow }) {
   ) : null;
 }
 
+function Pick({ row, picked, onToggle }: { row: CompareRow; picked: CompareRow[]; onToggle: (row: CompareRow) => void }) {
+  return (
+    <label className="cmp-pick">
+      <input
+        type="checkbox"
+        checked={picked.some((p) => p.key === row.key)}
+        aria-label={`Compare ${row.firmName}, ${row.program} ${sizeLabel(row.size)}`}
+        onChange={() => onToggle(row)}
+      />
+      Compare
+    </label>
+  );
+}
+
 function SortMark({ dir }: { dir: Dir | null }) {
   return (
     <svg className={`cmp-sort-mark${dir ? ' on' : ''}`} viewBox="0 0 12 16" aria-hidden="true">
@@ -128,6 +145,10 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   const [hidden, setHidden] = useState<Record<Family, string[]>>({ futures: [], perps: [] });
   const [sort, setSort] = useState<Sort>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  // The plans ticked; ticks stay while the filters change, so plans of any size or firm can be
+  // picked. « Compare » shows only them, in this same table.
+  const [pickedKeys, setPickedKeys] = useState<string[]>([]);
+  const [compareOn, setCompareOn] = useState(false);
 
   // The firm id this panel last put in the address itself (Firm filter), so its echo back
   // through `firm` is not taken for a firm picked from its window.
@@ -166,6 +187,8 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
     setSteps(null);
     setLossType(null);
     setSort(null);
+    setPickedKeys([]);
+    setCompareOn(false);
     if (firms.length) pickFirms([]);
   }
 
@@ -178,6 +201,13 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   }
 
   const all = rowsBy[family];
+  const picked = all.filter((r) => pickedKeys.includes(r.key));
+  const comparing = compareOn && picked.length >= 2;
+
+  function togglePlan(row: CompareRow) {
+    setPickedKeys(togglePick(picked, row).map((r) => r.key));
+  }
+
   // Firms of this family, A→Z (the rows already are).
   const firmList = [...new Map(all.map((r) => [r.firmId, r.firmName])).entries()].map(([id, name]) => ({ id, name }));
   const firmRows = firms.length ? all.filter((r) => firms.includes(r.firmId)) : all;
@@ -199,7 +229,8 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   );
   const keyOf = (col: string) => (r: CompareRow) =>
     col === 'price' ? priceOf(r) : col === 'firm' ? `${r.firmName} ${r.program}` : r.cells[col]?.sort ?? null;
-  const shown = sort ? sortBy(filtered, keyOf(sort.col), sort.dir) : filtered;
+  const base = comparing ? picked : filtered;
+  const shown = sort ? sortBy(base, keyOf(sort.col), sort.dir) : base;
 
   // A click on a header sorts A→Z / low→high, a second click the other way, a third goes
   // back to the default order.
@@ -258,8 +289,8 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
             </button>
           ))}
         </div>
-        <FirmSearch value={query} onChange={search} />
-        {firmName && (
+        {!comparing && <FirmSearch value={query} onChange={search} />}
+        {!comparing && firmName && (
           <span className="cmp-firm-chip">
             <span className="cmp-firm-chip-k">Firm</span>
             {firmName}
@@ -284,7 +315,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
         </button>
       </div>
 
-      <div className={`cmp-filters${filtersOpen ? ' open' : ''}`} id={`${uid}-filters`}>
+      <div className={`cmp-filters${filtersOpen ? ' open' : ''}${comparing ? ' comparing' : ''}`} id={`${uid}-filters`}>
         <div className="cmp-field" role="group" aria-labelledby={`${uid}-firm-k`}>
           <span className="cmp-field-k" id={`${uid}-firm-k`}>
             Firm
@@ -462,12 +493,11 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
                             <span className="cmp-firm-txt">
                               <span className="cmp-firm-name">{r.firmName}</span>
                               <span className="cmp-prog">{r.program}</span>
-                              {(r.code || r.note) && (
-                                <span className="cmp-firm-meta">
-                                  <Code row={r} />
-                                  <Note row={r} />
-                                </span>
-                              )}
+                              <span className="cmp-firm-meta">
+                                <Code row={r} />
+                                <Note row={r} />
+                                <Pick row={r} picked={picked} onToggle={togglePlan} />
+                              </span>
                             </span>
                           </span>
                         </th>
@@ -512,6 +542,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
                 </dl>
                 <Note row={r} />
                 <div className="cmp-card-foot">
+                  <Pick row={r} picked={picked} onToggle={togglePlan} />
                   <Code row={r} />
                   <Go row={r} />
                 </div>
@@ -519,6 +550,32 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
             ))}
           </ul>
         </>
+      )}
+
+      {picked.length > 0 && (
+        <div className="cmp-tray" role="status">
+          <span className="cmp-tray-txt">
+            {picked.length} plan{picked.length === 1 ? '' : 's'} selected
+          </span>
+          {picked.length >= 2 && (
+            <button type="button" className="fw-all" onClick={() => setCompareOn(!comparing)}>
+              {comparing ? 'Show all plans' : 'Compare'}
+            </button>
+          )}
+          <button
+            type="button"
+            className="cmp-firm-chip-x"
+            aria-label="Clear the selected plans"
+            onClick={() => {
+              setPickedKeys([]);
+              setCompareOn(false);
+            }}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        </div>
       )}
 
       <p className="cmp-note">{COMPARE_NOTE}</p>
