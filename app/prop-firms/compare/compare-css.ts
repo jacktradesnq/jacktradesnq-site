@@ -234,8 +234,9 @@ export const COMPARE_CSS = `
 }
 .jtnq-cmp .cmp-tray > button{ flex-shrink: 0; }
 .jtnq-cmp .cmp-tray-txt{ min-width: 0; font-size: 14px; font-weight: 500; color: var(--c-text); }
-/* While comparing the table shows the picked plans whatever the filters: those are put away. */
-.jtnq-cmp .cmp-filters.comparing .cmp-field:not(.cmp-sort-m){ display: none; }
+/* A line between the picked plans and the rest of the list. */
+.jtnq-cmp .cmp-table tbody tr.cmp-picked-last > *{ border-bottom: 1px solid var(--c-accent); }
+.jtnq-cmp .cmp-count{ scroll-margin-top: 16px; }
 
 /* ── phone: one card per plan, filters folded ── */
 @media (max-width: 760px){
@@ -290,6 +291,7 @@ export const COMPARE_CSS = `
   .jtnq-cmp .cmp-card-row .cmp-long{ align-items: flex-start; }
   .jtnq-cmp .cmp-card .cmp-note-d p{ max-width: none; }
   .jtnq-cmp .cmp-card-foot{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+  .jtnq-cmp .cmp-card.cmp-picked-last{ margin-bottom: 12px; border-color: var(--c-accent); }
   .jtnq-cmp .cmp-card-foot .row-cta{ margin-left: auto; }
 }
 `;

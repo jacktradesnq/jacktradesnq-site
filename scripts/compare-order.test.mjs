@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { defaultOrder, filterRows, firmMatches, firstNumber, sortBy, togglePick } from '../lib/compare-order.mjs';
+import { defaultOrder, filterRows, firmMatches, firstNumber, pickedFirst, sortBy, togglePick } from '../lib/compare-order.mjs';
 
 const rows = [
   { key: 'v50', firmName: 'Vest Markets', firmId: 'vest', size: 50000, steps: '1 Step', price: 400, lossType: 'Static', dailyLoss: 'both' },
@@ -68,4 +68,11 @@ test('any plans of any firm can be picked to compare, and unpicked', () => {
   assert.deepEqual(keys(togglePick([b100], b50)), ['b100', 'b50']);
   assert.deepEqual(keys(togglePick([b100, b50], v50)), ['b100', 'b50', 'v50']);
   assert.deepEqual(keys(togglePick([b100, b50], b100)), ['b50']);
+});
+
+test('picked plans come first, even one the filters hide, and never twice', () => {
+  const [v50, b100, b50] = rows;
+  assert.deepEqual(keys(pickedFirst([v50], [b100, b50])), ['v50', 'b100', 'b50']);
+  assert.deepEqual(keys(pickedFirst([b50], [b100, b50])), ['b50', 'b100']);
+  assert.deepEqual(keys(pickedFirst([], [b100, b50])), ['b100', 'b50']);
 });
