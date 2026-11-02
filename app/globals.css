@@ -80,7 +80,6 @@
   --accent-soft:   var(--c-yellow-soft);
 
   /* ── TYPO ── */
-  --font-display: 'Fraunces', 'Georgia', serif;
   --font-body:    'Satoshi', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
   --fs-xs:   0.8125rem;
@@ -164,7 +163,7 @@ a { color: inherit; text-decoration: none; }
 
 /* ── HEADING ── */
 .heading {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: clamp(3rem, 10vw, var(--fs-3xl));
   line-height: 0.95;
@@ -242,7 +241,6 @@ a { color: inherit; text-decoration: none; }
   font-size: var(--fs-xs);
   color: var(--fg-quiet);
   font-weight: 400;
-  letter-spacing: 0.02em;
 }
 .card-arrow {
   font-family: var(--font-body);
@@ -291,8 +289,7 @@ a { color: inherit; text-decoration: none; }
 }
 .card-featured .card-icon { width: 28px; height: 28px; }
 .card-featured .card-label {
-  font-family: var(--font-display);
-  font-style: italic;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: var(--fs-lg);
   letter-spacing: -0.02em;
@@ -307,8 +304,6 @@ a { color: inherit; text-decoration: none; }
   font-family: var(--font-body);
   font-size: var(--fs-xs);
   font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--fg-quiet);
   text-align: center;
   margin-bottom: var(--s-3);
@@ -325,8 +320,7 @@ a { color: inherit; text-decoration: none; }
   background: var(--c-ink);
 }
 .card-partner .card-label {
-  font-family: var(--font-display);
-  font-style: italic;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: var(--fs-md);
   letter-spacing: -0.01em;
@@ -351,7 +345,6 @@ a { color: inherit; text-decoration: none; }
   gap: var(--s-3);
   font-size: var(--fs-xs);
   color: var(--fg-quiet);
-  letter-spacing: 0.04em;
   text-align: center;
 }
 .footer-row a {
@@ -417,8 +410,7 @@ body:has(.page-legal) { background: oklch(0.15 0.028 165); }
   box-shadow: var(--shadow-sm);
 }
 .page-legal h2 {
-  font-family: var(--font-display);
-  font-style: italic;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: var(--fs-xl);
   color: var(--fg);
@@ -430,8 +422,6 @@ body:has(.page-legal) { background: oklch(0.15 0.028 165); }
   font-size: var(--fs-xs);
   font-weight: 700;
   color: var(--accent-deep);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
   margin: var(--s-8) 0 var(--s-2);
 }
 .page-legal p, .page-legal li {
@@ -443,9 +433,7 @@ body:has(.page-legal) { background: oklch(0.15 0.028 165); }
 .page-legal hr { border: none; border-top: 1px solid var(--border); margin: var(--s-8) 0; }
 .page-legal .lang-tag {
   display: inline-block;
-  font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.1em;
-  color: var(--accent-deep); text-transform: uppercase;
-  margin-bottom: var(--s-2);
+  font-size: var(--fs-xs); font-weight: 700;  color: var(--accent-deep);  margin-bottom: var(--s-2);
 }
 
 /* ── REDUCED MOTION ── */

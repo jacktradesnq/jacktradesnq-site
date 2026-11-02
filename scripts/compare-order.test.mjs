@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { defaultOrder, filterRows, firstNumber, sortBy } from '../lib/compare-order.mjs';
+import { defaultOrder, filterRows, firmMatches, firstNumber, sortBy } from '../lib/compare-order.mjs';
 
 const rows = [
   { key: 'v50', firmName: 'Vest Markets', firmId: 'vest', size: 50000, steps: '1 Step', price: 400, lossType: 'Static', dailyLoss: 'both' },
@@ -48,4 +48,17 @@ test('firstNumber reads the figure a word cell starts with', () => {
   assert.equal(firstNumber('40% / None'), 40);
   assert.equal(firstNumber('None'), null);
   assert.equal(firstNumber(undefined), null);
+});
+
+test('the firm search ignores case, spaces and punctuation', () => {
+  assert.equal(firmMatches('BluSky', 'blu sky'), true);
+  assert.equal(firmMatches('E8 Markets', 'e8m'), true);
+  assert.equal(firmMatches('Traders Launch', 'launch'), true);
+  assert.equal(firmMatches('BluSky', ''), true);
+  assert.equal(firmMatches('BluSky', 'vest'), false);
+});
+
+test('the firm search filters the plans with the other filters', () => {
+  assert.deepEqual(keys(filterRows(rows, { firmQuery: 'BLU', size: 100000 }, (r) => r.price)), ['b100']);
+  assert.deepEqual(keys(filterRows(rows, { firmQuery: 'nobody' }, (r) => r.price)), []);
 });

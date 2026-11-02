@@ -149,27 +149,19 @@ export default function Nefarious() {
 }
 
 const CSS = `
-@font-face{
-  font-family:'JetBrains Mono';
-  font-style:normal;
-  font-weight:400 500;
-  font-display:swap;
-  src:url('/fonts/JetBrainsMono.woff2') format('woff2');
-}
 .jtnq-nef{
   --c-bg: oklch(0.13 0.028 165);
   --c-bg-raise: oklch(0.17 0.032 165);
   --c-bg-deep: oklch(0.11 0.025 165);
   --c-text: oklch(0.95 0.025 95);
   --c-text-soft: oklch(0.78 0.025 120);
-  --c-text-mute: oklch(0.55 0.025 140);
-  --c-text-deep: oklch(0.38 0.02 150);
+  --c-text-mute: oklch(0.78 0.025 120);
+  --c-text-deep: oklch(0.78 0.025 120);
   --c-accent: oklch(0.78 0.14 75);
   --c-line: oklch(0.27 0.032 165);
   --c-line-soft: oklch(0.22 0.028 165);
   --f-serif: 'Fraunces', 'Times New Roman', serif;
   --f-sans: 'Satoshi', system-ui, sans-serif;
-  --f-mono: 'JetBrains Mono', ui-monospace, monospace;
   --maxw: 1200px;
   --pad-x: clamp(24px, 5vw, 64px);
   font-family: var(--f-sans);
@@ -211,19 +203,19 @@ const CSS = `
   pointer-events: none; z-index: -1;
 }
 .jtnq-nef .eyebrow{
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .26em; text-transform: uppercase;
+  font-family: var(--f-sans); font-size: 14px;
   color: var(--c-accent); display: inline-flex; align-items: center; gap: 12px;
   margin-bottom: clamp(28px, 4vw, 44px);
 }
 .jtnq-nef .eyebrow::before, .jtnq-nef .eyebrow::after{ content: ""; width: 28px; height: 1px; background: var(--c-accent); }
 .jtnq-nef .wordmark{
-  font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-family: 'Zodiak', var(--f-serif); font-weight: 700;
   font-size: clamp(72px, 13vw, 200px); line-height: .88; letter-spacing: -0.035em; margin: 0; color: var(--c-text);
 }
 .jtnq-nef .wordmark .dot{ color: var(--c-accent); }
 .jtnq-nef .phrase{
   margin: clamp(28px, 4vw, 44px) auto 0; max-width: 36ch;
-  font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-family: var(--f-sans); font-weight: 400;
   font-size: clamp(20px, 2.3vw, 28px); line-height: 1.35; letter-spacing: -0.01em; color: var(--c-text-soft);
   text-wrap: balance;
 }
@@ -233,8 +225,8 @@ const CSS = `
   border-top: 1px solid var(--c-line-soft); border-bottom: 1px solid var(--c-line-soft);
   display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
   gap: clamp(14px, 2vw, 24px) clamp(18px, 3vw, 36px); text-align: center;
-  font-family: var(--f-mono); font-size: clamp(11px, 1.05vw, 13px); letter-spacing: .24em;
-  text-transform: uppercase; color: var(--c-text);
+  font-family: var(--f-sans); font-size: 14px;
+ color: var(--c-text);
 }
 .jtnq-nef .what .item{ display: inline-block; }
 .jtnq-nef .what .sep{ color: var(--c-accent); opacity: .9; font-size: 14px; line-height: 0; transform: translateY(-1px); display: inline-block; }
@@ -248,11 +240,11 @@ const CSS = `
   margin-bottom: clamp(32px, 4vw, 48px); padding-bottom: 18px; border-bottom: 1px solid var(--c-line-soft);
 }
 .jtnq-nef .section-head h2{
-  font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-family: var(--f-sans); font-weight: 400;
   font-size: clamp(26px, 3.2vw, 40px); line-height: 1; letter-spacing: -0.02em; margin: 0; color: var(--c-text);
 }
 .jtnq-nef .section-head .count{
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--c-text-mute);
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute);
 }
 .jtnq-nef .testi-grid{ column-count: 2; column-gap: clamp(20px, 2.4vw, 28px); }
 @media (max-width: 760px){ .jtnq-nef .testi-grid{ column-count: 1; } }
@@ -264,15 +256,15 @@ const CSS = `
 }
 .jtnq-nef .testi:hover{ border-color: var(--c-accent); }
 .jtnq-nef .testi .quote{
-  font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-family: var(--f-sans); font-weight: 400;
   font-size: clamp(18px, 1.55vw, 21px); line-height: 1.42; letter-spacing: -0.005em; color: var(--c-text);
   margin: 0; text-wrap: pretty;
 }
-.jtnq-nef .testi .quote::before{ content: "\\201C"; font-family: var(--f-serif); font-style: italic; color: var(--c-accent); margin-right: 2px; }
-.jtnq-nef .testi .quote::after{ content: "\\201D"; font-family: var(--f-serif); font-style: italic; color: var(--c-accent); margin-left: 1px; }
+.jtnq-nef .testi .quote::before{ content: "\\201C"; font-family: var(--f-sans); color: var(--c-accent); margin-right: 2px; }
+.jtnq-nef .testi .quote::after{ content: "\\201D"; font-family: var(--f-sans); color: var(--c-accent); margin-left: 1px; }
 .jtnq-nef .testi .author{
   margin-top: clamp(18px, 2vw, 22px); display: inline-flex; align-items: center; gap: 10px;
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--c-text-mute);
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute);
 }
 .jtnq-nef .testi .author .dot{ width: 6px; height: 6px; border-radius: 50%; background: var(--c-accent); flex-shrink: 0; }
 .jtnq-nef .testi.is-short .quote{ font-size: clamp(22px, 2.1vw, 28px); line-height: 1.25; }
@@ -287,7 +279,7 @@ const CSS = `
   pointer-events: none; z-index: -1;
 }
 .jtnq-nef .closer .lead{
-  font-family: var(--f-serif); font-style: italic; font-size: clamp(22px, 2.6vw, 32px);
+  font-family: var(--f-sans); font-size: clamp(22px, 2.6vw, 32px);
   line-height: 1.3; letter-spacing: -0.015em; color: var(--c-text); max-width: 24ch;
   margin: 0 auto clamp(32px, 4vw, 48px); text-wrap: balance;
 }
@@ -300,8 +292,8 @@ const CSS = `
 .jtnq-nef .cta:hover{ transform: translateY(-2px); gap: 18px; background: oklch(0.83 0.14 78); }
 .jtnq-nef .cta svg{ width: 16px; height: 16px; }
 .jtnq-nef .note{
-  margin-top: clamp(22px, 2.6vw, 30px); font-family: var(--f-mono); font-size: 11px;
-  letter-spacing: .26em; text-transform: uppercase; color: var(--c-text-mute);
+  margin-top: clamp(22px, 2.6vw, 30px); font-family: var(--f-sans); font-size: 14px;
+ color: var(--c-text-mute);
 }
 .jtnq-nef .note .gold{ color: var(--c-accent); margin: 0 8px; }
 
@@ -312,10 +304,10 @@ const CSS = `
   max-width: var(--maxw); margin: 0 auto; display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: start;
 }
 @media (max-width: 720px){ .jtnq-nef .footer-inner{ grid-template-columns: 1fr; } }
-.jtnq-nef .footer-brand{ font-family: var(--f-serif); font-style: italic; font-size: 22px; color: var(--c-text); }
+.jtnq-nef .footer-brand{ font-family: var(--f-sans); font-size: 22px; color: var(--c-text); }
 .jtnq-nef .footer-brand .dot{ color: var(--c-accent); }
 .jtnq-nef .footer-meta{
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  font-family: var(--f-sans); font-size: 14px;
   color: var(--c-text-mute); text-align: right; line-height: 1.9;
 }
 @media (max-width: 720px){ .jtnq-nef .footer-meta{ text-align: left; } }

@@ -21,6 +21,8 @@ import { FUTURES_FIRMS } from './futures';
 import { PERPS_PROMO, PERPS_PROMO_FIRM_ID, PROMO_ENDS_MS, perpsFirms, usePromoLive } from './perps';
 import { FirmLogo, PromoClock } from './FirmTable';
 import { FirmWindow } from './FirmWindow';
+import { FirmSearch } from './FirmSearch';
+import { firmMatches } from '@/lib/compare-order.mjs';
 import { FAMILY_CSS } from './family-css';
 import { TRADE_COPIER_CSS, TRADE_COPIER_DISCLAIMER, TradeCopierPanel } from './TradeCopier';
 import { ComparePanel } from './compare/ComparePanel';
@@ -53,6 +55,7 @@ export default function PropFirms() {
   const [family, setFamily] = useState<Tab>('futures');
   const [openId, setOpenId] = useState<string | null>(null);
   const [compareFirm, setCompareFirm] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -74,6 +77,7 @@ export default function PropFirms() {
       setFamily(firm ? 'compare' : (h as Tab));
       setCompareFirm(firm);
       setOpenId(null);
+      setQuery('');
     };
     fromHash();
     window.addEventListener('hashchange', fromHash);
@@ -85,7 +89,20 @@ export default function PropFirms() {
     setFamily(f);
     setOpenId(null);
     setCompareFirm(null);
+    setQuery('');
     window.history.replaceState(null, '', `#${f}`);
+  }
+
+  // A firm that is only in the other family: its tab opens, the search stays.
+  function search(next: string) {
+    setQuery(next);
+    if (family !== 'futures' && family !== 'perps') return;
+    const other = family === 'futures' ? 'perps' : 'futures';
+    const has = (f: Family) => firmsBy[f].some((firm) => firmMatches(firm.name, next));
+    if (!has(family) && has(other)) {
+      setFamily(other);
+      window.history.replaceState(null, '', `#${other}`);
+    }
   }
 
   function compareOn(firmId: string | null) {
@@ -118,6 +135,7 @@ export default function PropFirms() {
   const isCopier = family === 'trade-copier';
   const isCompare = family === 'compare';
   const firms = isCopier || isCompare ? [] : firmsBy[family];
+  const shownFirms = firms.filter((f) => firmMatches(f.name, query));
   const open = firms.find((f) => f.id === openId) ?? null;
 
   // The native <dialog> gives Escape, focus trapping and the backdrop for free.
@@ -183,13 +201,20 @@ export default function PropFirms() {
               <ComparePanel firm={compareFirm} onFirmChange={compareOn} />
             ) : (
             <>
-            <p className="fam-caption">
-              {firms.length} partner firm{firms.length > 1 ? 's' : ''}
-              {firms.length > 1 ? ' · pick one to see all of its plans' : ''}
+            <FirmSearch value={query} onChange={search} />
+            <p className="fam-caption" aria-live="polite">
+              {shownFirms.length === 0 ? (
+                'No partner firm found'
+              ) : (
+                <>
+                  {shownFirms.length} partner firm{shownFirms.length > 1 ? 's' : ''}
+                  {shownFirms.length > 1 ? ' · pick one to see all of its plans' : ''}
+                </>
+              )}
             </p>
 
             <div className="firm-cards">
-              {firms.map((firm) => {
+              {shownFirms.map((firm) => {
                 return (
                   <button
                     key={firm.id}

@@ -20,7 +20,7 @@ export const COMPARE_CSS = `
   font-size: 14px; font-weight: 500; color: var(--c-text);
 }
 .jtnq-cmp .cmp-firm-chip-k{
-  font-family: var(--f-mono); font-size: 10px; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--c-text-mute);
+  font-family: var(--f-sans); font-size: 14px; font-weight: 400; color: var(--c-text-mute);
 }
 .jtnq-cmp .cmp-firm-chip-x{
   width: 32px; height: 32px; display: grid; place-items: center; border: none; border-radius: 999px;
@@ -37,7 +37,7 @@ export const COMPARE_CSS = `
 }
 .jtnq-cmp .cmp-field{ display: flex; flex-direction: column; gap: 8px; }
 .jtnq-cmp .cmp-field-k{
-  font-family: var(--f-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--c-text-mute);
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute);
 }
 .jtnq-cmp .cmp-select, .jtnq-cmp .cmp-money{
   position: relative; display: inline-flex; align-items: center;
@@ -47,7 +47,7 @@ export const COMPARE_CSS = `
 .jtnq-cmp .cmp-select:focus-within, .jtnq-cmp .cmp-money:focus-within{ border-color: var(--c-accent); }
 .jtnq-cmp .cmp-select select, .jtnq-cmp .cmp-money input{
   appearance: none; -webkit-appearance: none; border: none; background: transparent; outline: none;
-  font-family: var(--f-mono); font-size: 13px; color: var(--c-text); height: 100%;
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text); height: 100%;
 }
 .jtnq-cmp .cmp-select select{ padding: 0 40px 0 12px; min-width: 128px; cursor: pointer; }
 .jtnq-cmp .cmp-select select option{ background: var(--c-bg-deep); color: var(--c-text); }
@@ -56,7 +56,7 @@ export const COMPARE_CSS = `
   border-right: 1.5px solid var(--c-text-mute); border-bottom: 1.5px solid var(--c-text-mute);
   transform: rotate(45deg); pointer-events: none;
 }
-.jtnq-cmp .cmp-money{ padding-left: 12px; font-family: var(--f-mono); font-size: 13px; color: var(--c-text-mute); }
+.jtnq-cmp .cmp-money{ padding-left: 12px; font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute); }
 .jtnq-cmp .cmp-money input{ width: 96px; padding: 0 12px 0 4px; -moz-appearance: textfield; }
 .jtnq-cmp .cmp-money input::placeholder{ color: var(--c-text-mute); }
 .jtnq-cmp .cmp-money input::-webkit-inner-spin-button, .jtnq-cmp .cmp-money input::-webkit-outer-spin-button{ -webkit-appearance: none; margin: 0; }
@@ -66,7 +66,7 @@ export const COMPARE_CSS = `
 .jtnq-cmp .cmp-multi-sum{
   list-style: none; position: relative; display: flex; align-items: center; height: 40px; padding: 0 40px 0 12px; min-width: 160px;
   border: 1px solid var(--c-line); border-radius: 4px; background: var(--c-bg-deep); cursor: pointer;
-  font-family: var(--f-mono); font-size: 13px; color: var(--c-text); white-space: nowrap; transition: border-color .2s ease;
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text); white-space: nowrap; transition: border-color .2s ease;
 }
 .jtnq-cmp .cmp-multi-sum::-webkit-details-marker{ display: none; }
 .jtnq-cmp .cmp-multi-sum::after{
@@ -118,13 +118,13 @@ export const COMPARE_CSS = `
 
 .jtnq-cmp .cmp-count{
   margin: 0; text-align: center;
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--c-text-mute);
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute);
 }
 .jtnq-cmp .cmp-empty{
   display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 48px 24px;
   border: 1px dashed var(--c-line); border-radius: 12px; text-align: center;
 }
-.jtnq-cmp .cmp-empty p{ margin: 0; font-family: var(--f-serif); font-style: italic; font-size: 20px; color: var(--c-text-soft); }
+.jtnq-cmp .cmp-empty p{ margin: 0; font-family: var(--f-sans); font-size: 20px; color: var(--c-text-soft); }
 .jtnq-cmp .cmp-empty .ft-prog{ border: 1px solid var(--c-line); }
 
 /* ── the table ── */
@@ -147,7 +147,7 @@ export const COMPARE_CSS = `
 .jtnq-cmp .cmp-sort{
   display: inline-flex; align-items: center; justify-content: center; gap: 4px; width: 100%; padding: 16px 8px 12px;
   border: none; background: none; cursor: pointer;
-  font-family: var(--f-mono); font-size: 10px; font-weight: 400; letter-spacing: .1em; text-transform: uppercase; line-height: 1.4;
+  font-family: var(--f-sans); font-size: 14px; font-weight: 400; line-height: 1.4;
   color: var(--c-text-soft); transition: color .2s ease;
 }
 .jtnq-cmp .cmp-sort:focus-visible{ outline-offset: -2px; }
@@ -169,17 +169,17 @@ export const COMPARE_CSS = `
 .jtnq-cmp .cmp-firm-txt{ display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
 .jtnq-cmp .cmp-firm-name{ font-family: var(--f-sans); font-size: 15px; font-weight: 500; color: var(--c-text); line-height: 1.2; }
 .jtnq-cmp .cmp-prog{
-  font-family: var(--f-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--c-text-mute); line-height: 1.4;
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute); line-height: 1.4;
 }
 .jtnq-cmp .cmp-firm-meta{ display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-top: 4px; }
-.jtnq-cmp .cmp-firm-meta .promo-chip{ font-size: 9px; padding: 2px 8px; cursor: help; }
+.jtnq-cmp .cmp-firm-meta .promo-chip{ padding: 2px 8px; cursor: help; }
 .jtnq-cmp .cmp-firm-meta .cmp-note-d{ margin-top: 0; }
 
 .jtnq-cmp .cmp-td{ white-space: nowrap; }
 .jtnq-cmp .cmp-td .ft-fig, .jtnq-cmp .cmp-td .ft-word{ font-size: 13px; }
 .jtnq-cmp .cmp-td .ft-word{ font-weight: 400; }
 /* Every short value reads in the data face, so a column never mixes two fonts (« None / 40% », « 21% / — »). */
-.jtnq-cmp .cmp-val .ft-word, .jtnq-cmp .cmp-val .none{ font-family: var(--f-mono); }
+.jtnq-cmp .cmp-val .ft-word, .jtnq-cmp .cmp-val .none{ font-family: var(--f-sans); }
 /* Sentences (a split that changes after 30 days, a payout rule) wrap instead of widening the table. */
 .jtnq-cmp :is(.cmp-c-split, .cmp-c-minPayout, .cmp-c-maxPayout, .cmp-c-payoutFreq, .cmp-c-consistency, .cmp-c-contracts){
   white-space: normal; min-width: 96px; max-width: 160px;
@@ -193,7 +193,7 @@ export const COMPARE_CSS = `
 .jtnq-cmp .cmp-note-d{ margin-top: 4px; font-size: 12px; color: var(--c-text-mute); }
 .jtnq-cmp .cmp-note-d summary{
   cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 4px;
-  font-family: var(--f-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--c-text-mute);
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute);
 }
 .jtnq-cmp .cmp-note-d summary::-webkit-details-marker{ display: none; }
 .jtnq-cmp .cmp-note-d summary::after{ content: "+"; }
@@ -201,9 +201,9 @@ export const COMPARE_CSS = `
 .jtnq-cmp .cmp-note-d summary:hover{ color: var(--c-accent); }
 .jtnq-cmp .cmp-note-d p{
   margin: 8px 0 0; max-width: 32ch; white-space: normal; text-align: left;
-  font-family: var(--f-sans); font-size: 12px; font-style: italic; line-height: 1.5; color: var(--c-text-soft);
+  font-family: var(--f-sans); font-size: 12px; line-height: 1.5; color: var(--c-text-soft);
 }
-.jtnq-cmp .cmp-sub{ font-family: var(--f-mono); font-size: 11px; color: var(--c-text-mute); }
+.jtnq-cmp .cmp-sub{ font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute); }
 .jtnq-cmp .cmp-dash{ color: var(--c-text-deep); }
 .jtnq-cmp .cmp-td .ft-price{ flex-wrap: nowrap; gap: 4px 8px; }
 .jtnq-cmp .cmp-td .ft-now{ font-size: 15px; }
@@ -248,7 +248,7 @@ export const COMPARE_CSS = `
     border: 1px solid var(--c-line); border-radius: 12px; background: var(--c-bg-raise);
   }
   .jtnq-cmp .cmp-card-head{ display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; }
-  .jtnq-cmp .cmp-card-size{ font-family: var(--f-mono); font-size: 15px; font-weight: 500; color: var(--c-text); }
+  .jtnq-cmp .cmp-card-size{ font-family: var(--f-sans); font-size: 15px; font-weight: 500; color: var(--c-text); }
   .jtnq-cmp .cmp-card-price .ft-price{ justify-content: flex-start; }
   .jtnq-cmp .cmp-card-price .ft-now{ font-size: 20px; }
   .jtnq-cmp .cmp-card-dl{ margin: 0; display: grid; border-top: 1px solid var(--c-line-soft); }
@@ -257,7 +257,7 @@ export const COMPARE_CSS = `
     padding: 8px 0; border-bottom: 1px solid var(--c-line-soft);
   }
   .jtnq-cmp .cmp-card-row dt{
-    font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--c-text-mute); line-height: 1.4;
+    font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute); line-height: 1.4;
   }
   .jtnq-cmp .cmp-card-row dd{ margin: 0; text-align: right; }
   .jtnq-cmp .cmp-card-row .cmp-val{ align-items: flex-end; }

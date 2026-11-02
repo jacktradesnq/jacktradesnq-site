@@ -55,11 +55,9 @@ const CSS = `
   text-align: center;
 }
 .jtnq-go .eyebrow {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.68rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: oklch(0.62 0.02 150);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: oklch(0.78 0.025 120);
 }
 .jtnq-go .line { font-size: 1.05rem; }
 .jtnq-go .line strong { font-weight: 600; color: oklch(0.8 0.14 80); }

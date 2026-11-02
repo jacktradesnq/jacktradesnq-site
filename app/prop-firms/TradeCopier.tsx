@@ -84,7 +84,7 @@ export const TRADE_COPIER_CSS = `
 .jtnq-cmp .tcp{ width: 100%; margin-top: 32px; text-align: center; }
 .jtnq-cmp .tcp-phrase{
   margin: 0 auto; max-width: 40ch;
-  font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-family: var(--f-sans); font-weight: 400;
   font-size: clamp(18px, 2.1vw, 24px); line-height: 1.35; letter-spacing: -0.01em; color: var(--c-text-soft); text-wrap: balance;
 }
 .jtnq-cmp .tcp-code-row{
@@ -98,14 +98,14 @@ export const TRADE_COPIER_CSS = `
   background: color-mix(in oklab, var(--c-accent) 6%, var(--c-bg));
 }
 .jtnq-cmp .tcp-code-k{
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--c-text-mute);
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute);
 }
 .jtnq-cmp .tcp-code-v{
-  font-family: var(--f-mono); font-weight: 500; font-size: 20px; letter-spacing: .12em; color: var(--c-accent);
+  font-family: var(--f-sans); font-weight: 500; font-size: 20px; color: var(--c-accent);
 }
 .jtnq-cmp .tcp-code-note{
   margin: 16px 0 0; text-align: center;
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--c-text-mute);
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute);
 }
 .jtnq-cmp a.tcp-cta{
   display: inline-flex; align-items: center; gap: 8px;
@@ -123,11 +123,11 @@ export const TRADE_COPIER_CSS = `
   padding-top: 24px; border-top: 1px solid var(--c-line); margin-bottom: clamp(24px, 3vw, 32px);
 }
 .jtnq-cmp .tcp-days-title{
-  margin: 0; font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  margin: 0; font-family: var(--f-sans); font-weight: 400;
   font-size: clamp(28px, 3vw, 40px); letter-spacing: -0.02em; color: var(--c-text);
 }
 .jtnq-cmp .tcp-days-caption{
-  margin: 0; font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+  margin: 0; font-family: var(--f-sans); font-size: 14px;
   color: var(--c-text-mute); max-width: 48ch;
 }
 .jtnq-cmp .tcp-cards{

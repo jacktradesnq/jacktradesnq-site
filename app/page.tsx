@@ -486,27 +486,19 @@ export default function Home() {
 }
 
 const CSS = `
-@font-face{
-  font-family:'JetBrains Mono';
-  font-style:normal;
-  font-weight:400 500;
-  font-display:swap;
-  src:url('/fonts/JetBrainsMono.woff2') format('woff2');
-}
 .jtnq-home{
   --c-bg: oklch(0.17 0.03 165);
   --c-bg-raise: oklch(0.205 0.035 165);
   --c-bg-deep: oklch(0.13 0.028 165);
   --c-text: oklch(0.95 0.025 95);
   --c-text-soft: oklch(0.78 0.025 120);
-  --c-text-mute: oklch(0.55 0.025 140);
-  --c-text-deep: oklch(0.38 0.02 150);
+  --c-text-mute: oklch(0.78 0.025 120);
+  --c-text-deep: oklch(0.78 0.025 120);
   --c-accent: oklch(0.80 0.135 82);
   --c-line: oklch(0.29 0.035 165);
   --c-line-soft: oklch(0.24 0.03 165);
   --f-serif: 'Fraunces', 'Times New Roman', serif;
   --f-sans: 'Satoshi', system-ui, sans-serif;
-  --f-mono: 'JetBrains Mono', ui-monospace, monospace;
   --maxw: 1280px;
   --pad-x: clamp(24px, 5vw, 64px);
   font-family: var(--f-sans);
@@ -534,7 +526,7 @@ const CSS = `
   border-bottom-color: var(--c-line-soft);
 }
 .jtnq-home .brand{
-  font-family: var(--f-serif); font-style: italic; font-weight: 500;
+  font-family: var(--f-sans); font-weight: 500;
   font-size: 28px; line-height: 1; letter-spacing: -0.015em;
   color: var(--c-text); display: inline-flex; align-items: baseline;
   transition: color .2s ease;
@@ -591,7 +583,7 @@ const CSS = `
 .jtnq-home .socials-menu a svg{ width: 16px; height: 16px; fill: currentColor; color: var(--c-text-mute); transition: color .16s ease; }
 .jtnq-home .socials-menu .sm-name{ font-size: 13px; }
 .jtnq-home .socials-menu .sm-handle{
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em;
+  font-family: var(--f-sans); font-size: 14px;
   color: var(--c-text-deep); transition: color .16s ease;
 }
 .jtnq-home .socials-menu a:hover{ background: color-mix(in oklab, var(--c-accent) 10%, transparent); color: var(--c-text); }
@@ -646,7 +638,7 @@ const CSS = `
   position: relative; z-index: 2; display: grid;
   grid-template-columns: 1fr auto 1fr; align-items: end; gap: 24px;
   padding: 0 var(--pad-x) 36px; color: var(--c-text-mute);
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+  font-family: var(--f-sans); font-size: 14px;
 }
 .jtnq-home .hero-foot .scroll{
   grid-column: 2; display: inline-flex; flex-direction: column; align-items: center; gap: 10px;
@@ -681,11 +673,11 @@ const CSS = `
 @media (max-width: 860px){ .jtnq-home .about, .jtnq-home .challenge{ grid-template-columns: 1fr; gap: 24px; } }
 .jtnq-home .eyebrow{
   display: inline-flex; align-items: center; gap: 12px;
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--c-accent);
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-accent);
 }
 .jtnq-home .eyebrow::before{ content: ""; width: 28px; height: 1px; background: var(--c-accent); }
 .jtnq-home .about-title{
-  font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-family: var(--f-sans); font-weight: 400;
   font-size: clamp(44px, 5.6vw, 88px); line-height: .95; letter-spacing: -0.03em;
   margin: 24px 0 0; color: var(--c-text);
 }
@@ -720,7 +712,7 @@ const CSS = `
   box-shadow: 0 1px 2px oklch(0.05 0.02 165 / .4), 0 16px 40px -16px oklch(0.05 0.02 165 / .6);
 }
 .jtnq-home .challenge-count{
-  margin: 24px 0 0; font-family: var(--f-mono); font-weight: 500;
+  margin: 24px 0 0; font-family: var(--f-sans); font-weight: 500;
   font-size: clamp(40px, 5vw, 72px); letter-spacing: -0.02em; line-height: 1; color: var(--c-text);
 }
 .jtnq-home .challenge-count .cur{ color: var(--c-accent); }
@@ -731,7 +723,7 @@ const CSS = `
 .jtnq-home .challenge-bar span{ display: block; height: 100%; background: var(--c-accent); border-radius: 999px; }
 .jtnq-home .challenge-label{
   display: block; margin-top: 12px;
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--c-text-mute);
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute);
 }
 
 .jtnq-home .hub{
@@ -758,7 +750,7 @@ const CSS = `
 .jtnq-home .hub-card:hover::after{ width: 100%; }
 .jtnq-home .hub-card .row{ display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
 .jtnq-home .hub-card .title{
-  font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-family: var(--f-sans); font-weight: 400;
   font-size: clamp(34px, 3.4vw, 52px); line-height: .98; letter-spacing: -0.025em;
   margin: 0; color: var(--c-text); transition: color .25s ease; text-wrap: balance;
 }
@@ -769,8 +761,8 @@ const CSS = `
   transition: transform .35s cubic-bezier(.2,.7,.3,1), color .25s ease;
 }
 .jtnq-home .hub-card .tagline{
-  margin: clamp(18px, 2.4vw, 28px) 0 0; font-family: var(--f-mono); font-size: 11px;
-  letter-spacing: .18em; text-transform: uppercase; color: var(--c-text-mute); max-width: 36ch;
+  margin: clamp(18px, 2.4vw, 28px) 0 0; font-family: var(--f-sans); font-size: 14px;
+ color: var(--c-text-mute); max-width: 36ch;
 }
 .jtnq-home .hub-card:hover .title{ color: var(--c-accent); }
 .jtnq-home .hub-card:hover .arrow{ color: var(--c-accent); transform: translate(6px,-6px); }
@@ -784,10 +776,10 @@ const CSS = `
   grid-template-columns: 1fr auto; gap: 32px; align-items: start;
 }
 @media (max-width: 720px){ .jtnq-home .footer-inner{ grid-template-columns: 1fr; } }
-.jtnq-home .footer-brand{ font-family: var(--f-serif); font-style: italic; font-size: 22px; color: var(--c-text); }
+.jtnq-home .footer-brand{ font-family: var(--f-sans); font-size: 22px; color: var(--c-text); }
 .jtnq-home .footer-brand .dot{ color: var(--c-accent); }
 .jtnq-home .footer-meta{
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  font-family: var(--f-sans); font-size: 14px;
   color: var(--c-text-mute); text-align: right; line-height: 1.9;
 }
 @media (max-width: 720px){ .jtnq-home .footer-meta{ text-align: left; } }

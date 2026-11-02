@@ -18,11 +18,8 @@ export default function NotFound() {
     >
       <p
         style={{
-          fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-          fontSize: '11px',
-          letterSpacing: '0.28em',
-          textTransform: 'uppercase',
-          color: 'oklch(0.64 0.03 140)',
+          fontSize: '14px',
+          color: 'oklch(0.78 0.025 120)',
           margin: '0 0 20px',
         }}
       >
@@ -30,8 +27,7 @@ export default function NotFound() {
       </p>
       <h1
         style={{
-          fontFamily: "'Fraunces', Georgia, serif",
-          fontStyle: 'italic',
+          fontFamily: "'Zodiak', 'Fraunces', Georgia, serif",
           fontWeight: 700,
           fontSize: 'clamp(36px, 7vw, 72px)',
           lineHeight: 1.05,
@@ -55,9 +51,7 @@ export default function NotFound() {
       <Link
         href="/"
         style={{
-          fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-          fontSize: '13px',
-          letterSpacing: '0.04em',
+          fontSize: '14px',
           color: 'oklch(0.80 0.135 82)',
           border: '1px solid oklch(0.80 0.135 82)',
           borderRadius: '999px',

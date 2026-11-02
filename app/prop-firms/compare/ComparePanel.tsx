@@ -13,7 +13,8 @@
 // Self-contained: it can move to a page of its own by rendering <ComparePanel> there.
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { defaultOrder, filterRows, sortBy } from '@/lib/compare-order.mjs';
+import { defaultOrder, filterRows, firmMatches, sortBy } from '@/lib/compare-order.mjs';
+import { FirmSearch } from '../FirmSearch';
 import { FAMILIES, shownPrice, type CompareRow, type Family } from '../firm-view';
 import { EXTRA_PROMO_ENDS, futuresRows } from '../futures';
 import { perpsRows, usePromoLive } from '../perps';
@@ -117,6 +118,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   const [family, setFamily] = useState<Family>(firmFamily ?? 'futures');
   // The Firm filter: one or more firms, none = every firm. One firm picked is #compare=<firm-id>.
   const [firms, setFirms] = useState<string[]>(firmId ? [firmId] : []);
+  const [query, setQuery] = useState('');
   const [size, setSize] = useState<number | null>(null);
   const [steps, setSteps] = useState<string | null>(null);
   const [maxPrice, setMaxPrice] = useState('');
@@ -140,6 +142,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
     if (firmId) {
       setFirms([firmId]);
       if (firmFamily) setFamily(firmFamily);
+      setQuery('');
       setSize(null);
       setSteps(null);
       setLossType(null);
@@ -166,6 +169,14 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
     if (firms.length) pickFirms([]);
   }
 
+  // A firm that is only in the other table: that table opens, the search stays.
+  function search(next: string) {
+    setQuery(next);
+    const other: Family = family === 'futures' ? 'perps' : 'futures';
+    const has = (f: Family) => rowsBy[f].some((r) => firmMatches(r.firmName, next));
+    if (!has(family) && has(other)) pickFamily(other);
+  }
+
   const all = rowsBy[family];
   // Firms of this family, A→Z (the rows already are).
   const firmList = [...new Map(all.map((r) => [r.firmId, r.firmName])).entries()].map(([id, name]) => ({ id, name }));
@@ -183,7 +194,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   const priceOf = (r: CompareRow) => shownPrice(r.price, discount)?.now ?? null;
   const filtered = filterRows(
     all,
-    { firmIds: firms, size, steps, lossType, dailyLoss, maxPrice: budget != null && Number.isFinite(budget) ? budget : null },
+    { firmIds: firms, firmQuery: query, size, steps, lossType, dailyLoss, maxPrice: budget != null && Number.isFinite(budget) ? budget : null },
     priceOf,
   );
   const keyOf = (col: string) => (r: CompareRow) =>
@@ -198,6 +209,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   const dirOf = (col: string): Dir | null => (sort?.col === col ? sort.dir : null);
 
   function clearFilters() {
+    setQuery('');
     setSize(null);
     setSteps(null);
     setMaxPrice('');
@@ -237,12 +249,16 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
               type="button"
               aria-pressed={family === f.id}
               className={`ft-prog${family === f.id ? ' active' : ''}`}
-              onClick={() => pickFamily(f.id)}
+              onClick={() => {
+                if (f.id !== family) setQuery('');
+                pickFamily(f.id);
+              }}
             >
               {f.label}
             </button>
           ))}
         </div>
+        <FirmSearch value={query} onChange={search} />
         {firmName && (
           <span className="cmp-firm-chip">
             <span className="cmp-firm-chip-k">Firm</span>

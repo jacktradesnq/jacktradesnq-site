@@ -19,7 +19,7 @@ export const FAMILY_CSS = `
   border: 1px solid var(--c-line); border-radius: 999px; background: var(--c-bg-raise);
 }
 .jtnq-cmp .fam-tab{
-  font-family: var(--f-mono); font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+  font-family: var(--f-sans); font-size: 14px;
   color: var(--c-text-mute); background: none; border: none; border-radius: 999px;
   padding: 12px 24px; cursor: pointer; transition: color .2s ease, background .2s ease;
 }
@@ -27,15 +27,30 @@ export const FAMILY_CSS = `
 /* Four tabs since « Prop compare » joined (01/11/2026): two rows of two on a phone, every tab the same size. */
 @media (max-width: 560px){
   .jtnq-cmp .fam-tabs{ display: grid; grid-template-columns: 1fr 1fr; border-radius: 24px; width: 100%; max-width: 400px; }
-  .jtnq-cmp .fam-tab{ font-size: 11px; letter-spacing: .1em; padding: 12px 8px; }
+  .jtnq-cmp .fam-tab{ padding: 12px 8px; }
 }
 .jtnq-cmp .fam-tab:hover{ color: var(--c-accent); }
 .jtnq-cmp .fam-tab.active{ color: var(--c-bg); background: var(--c-accent); }
 .jtnq-cmp .fam-panel{ width: 100%; }
 .jtnq-cmp .fam-caption{
   margin: 24px 0 16px; text-align: center;
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--c-text-mute);
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute);
 }
+
+/* The firm search: same look as the comparator's fields. 16px in the box so a phone does not zoom. */
+.jtnq-cmp .firm-search{
+  display: flex; align-items: center; gap: 8px; width: min(100%, 320px); height: 40px; padding: 0 12px;
+  border: 1px solid var(--c-line); border-radius: 4px; background: var(--c-bg-deep); color: var(--c-text-soft);
+  transition: border-color .2s ease;
+}
+.jtnq-cmp .firm-search:focus-within{ border-color: var(--c-accent); }
+.jtnq-cmp .firm-search svg{ width: 16px; height: 16px; flex-shrink: 0; }
+.jtnq-cmp .firm-search input{
+  flex: 1; min-width: 0; height: 100%; border: none; outline: none; background: none; padding: 0;
+  font-family: var(--f-sans); font-size: 16px; color: var(--c-text); color-scheme: dark;
+}
+.jtnq-cmp .firm-search input::placeholder{ color: var(--c-text-soft); opacity: 1; }
+.jtnq-cmp .fam-panel > .firm-search{ margin: 24px auto 0; }
 
 /* Every card alike: same width, same height, same style — no firm put forward. */
 .jtnq-cmp .firm-cards{
@@ -53,17 +68,17 @@ export const FAMILY_CSS = `
 .jtnq-cmp .firm-mark{ border-radius: 8px; object-fit: contain; flex-shrink: 0; }
 .jtnq-cmp .firm-mark--letter{
   display: inline-grid; place-items: center;
-  font-family: var(--f-serif); font-style: italic; font-size: 20px; color: var(--c-accent);
+  font-family: var(--f-sans); font-size: 20px; color: var(--c-accent);
   border: 1px solid color-mix(in oklab, var(--c-accent) 45%, var(--c-line));
   background: var(--c-bg-deep);
 }
 .jtnq-cmp .fc-body{ display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .jtnq-cmp .fc-name{
-  font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-family: var(--f-sans); font-weight: 400;
   font-size: 24px; line-height: 1.1; letter-spacing: -0.01em; color: var(--c-text);
 }
 .jtnq-cmp .fc-meta{
-  font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--c-text-mute);
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute);
   line-height: 1.5;
 }
 .jtnq-cmp .fc-chips{ display: flex; flex-wrap: wrap; gap: 8px; }
@@ -74,9 +89,9 @@ export const FAMILY_CSS = `
 }
 .jtnq-cmp .fc-from{ display: flex; flex-direction: column; gap: 4px; }
 .jtnq-cmp .fc-from-k{
-  font-family: var(--f-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--c-text-mute);
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute);
 }
-.jtnq-cmp .fc-from-v{ font-family: var(--f-mono); font-size: 20px; font-weight: 500; color: var(--c-text); }
+.jtnq-cmp .fc-from-v{ font-family: var(--f-sans); font-size: 20px; font-weight: 500; color: var(--c-text); }
 .jtnq-cmp .fc-open{
   display: inline-flex; align-items: center; gap: 8px;
   font-family: var(--f-sans); font-size: 13px; font-weight: 500; color: var(--c-accent);
@@ -110,16 +125,16 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
 @media (prefers-reduced-motion: reduce){ .jtnq-cmp .fw{ animation: none; } }
 .jtnq-cmp .fw-head{ display: flex; align-items: center; gap: 16px; min-width: 0; }
 .jtnq-cmp .fw-title{
-  margin: 0; font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  margin: 0; font-family: var(--f-sans); font-weight: 400;
   font-size: clamp(32px, 4vw, 44px); line-height: 1; letter-spacing: -0.02em; color: var(--c-text);
 }
 .jtnq-cmp .fw-intro p{
-  margin: 0; font-family: var(--f-serif); font-style: italic; font-size: 20px; line-height: 1.4; color: var(--c-text-soft); text-wrap: pretty;
+  margin: 0; font-family: var(--f-sans); font-size: 20px; line-height: 1.4; color: var(--c-text-soft); text-wrap: pretty;
 }
 .jtnq-cmp .fw-intro p + p{ margin-top: 12px; }
 .jtnq-cmp .fw-take{ padding-top: 24px; border-top: 1px solid var(--c-line-soft); }
 .jtnq-cmp .fw-take-k{
-  margin: 0 0 12px; font-family: var(--f-mono); font-size: 11px; font-weight: 400; letter-spacing: .2em; text-transform: uppercase; color: var(--c-accent);
+  margin: 0 0 12px; font-family: var(--f-sans); font-size: 14px; font-weight: 400; color: var(--c-accent);
 }
 .jtnq-cmp .fw-take p{ margin: 0; font-size: 16px; line-height: 1.6; color: var(--c-text); text-wrap: pretty; }
 .jtnq-cmp .fw-take p + p{ margin-top: 12px; }
@@ -144,7 +159,7 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
 }
 .jtnq-cmp .perps-promo-text{ font-size: 14px; color: var(--c-text); }
 .jtnq-cmp .perps-clock{
-  font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 500; color: var(--c-accent);
+  font-family: var(--f-sans); font-variant-numeric: tabular-nums; font-weight: 500; color: var(--c-accent);
   white-space: nowrap;
 }
 
@@ -159,16 +174,16 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
 .jtnq-cmp .ft-prog.active{ color: var(--c-bg); background: var(--c-accent); }
 
 /* ── a figure, a word, a price ── */
-.jtnq-cmp .ft-fig{ font-family: var(--f-mono); font-size: 15px; font-weight: 500; color: var(--c-text); }
+.jtnq-cmp .ft-fig{ font-family: var(--f-sans); font-size: 15px; font-weight: 500; color: var(--c-text); }
 .jtnq-cmp .ft-word{ font-family: var(--f-sans); font-size: 15px; font-weight: 500; color: var(--c-text); line-height: 1.4; }
 .jtnq-cmp .ft-fig + .tag{ margin-left: 8px; }
 .jtnq-cmp .ft-price .price-was{ white-space: nowrap; }
 .jtnq-cmp .ft-price{ display: inline-flex; align-items: baseline; justify-content: center; gap: 8px; flex-wrap: wrap; }
-.jtnq-cmp .ft-now{ font-family: var(--f-mono); font-size: 17px; font-weight: 500; color: var(--c-text); }
-.jtnq-cmp .price-was{ font-family: var(--f-mono); font-size: 12px; font-weight: 400; color: var(--c-text-mute); }
-.jtnq-cmp .price-sep{ font-family: var(--f-mono); font-size: 15px; color: var(--c-text-mute); }
-.jtnq-cmp .price-from{ font-family: var(--f-mono); font-size: 11px; font-weight: 400; color: var(--c-text-mute); }
-.jtnq-cmp .per{ font-family: var(--f-mono); font-size: 11px; color: var(--c-text-mute); }
+.jtnq-cmp .ft-now{ font-family: var(--f-sans); font-size: 17px; font-weight: 500; color: var(--c-text); }
+.jtnq-cmp .price-was{ font-family: var(--f-sans); font-size: 14px; font-weight: 400; color: var(--c-text-mute); }
+.jtnq-cmp .price-sep{ font-family: var(--f-sans); font-size: 15px; color: var(--c-text-mute); }
+.jtnq-cmp .price-from{ font-family: var(--f-sans); font-size: 14px; font-weight: 400; color: var(--c-text-mute); }
+.jtnq-cmp .per{ font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute); }
 
 @media (max-width: 720px){
   .jtnq-cmp .firm-card{ padding: 16px; }

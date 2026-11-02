@@ -29,11 +29,6 @@ export const META = {
 
 export const CSS = `
 @font-face{
-  font-family:'JetBrains Mono';
-  font-style:normal; font-weight:400 500; font-display:swap;
-  src:url('/fonts/JetBrainsMono.woff2') format('woff2');
-}
-@font-face{
   font-family:'Zodiak';
   font-style:normal; font-weight:700; font-display:swap;
   src:url('/fonts/Zodiak-Bold.woff2') format('woff2');
@@ -44,14 +39,13 @@ export const CSS = `
   --c-bg-deep: oklch(0.11 0.025 165);
   --c-text: oklch(0.95 0.025 95);
   --c-text-soft: oklch(0.78 0.025 120);
-  --c-text-mute: oklch(0.55 0.025 140);
-  --c-text-deep: oklch(0.38 0.02 150);
+  --c-text-mute: oklch(0.78 0.025 120);
+  --c-text-deep: oklch(0.78 0.025 120);
   --c-accent: oklch(0.78 0.14 75);
   --c-line: oklch(0.27 0.032 165);
   --c-line-soft: oklch(0.22 0.028 165);
   --f-serif: 'Fraunces', 'Times New Roman', serif;
   --f-sans: 'Satoshi', system-ui, sans-serif;
-  --f-mono: 'JetBrains Mono', ui-monospace, monospace;
   --maxw: 1120px;
   --pad-x: clamp(24px, 5vw, 64px);
   font-family: var(--f-sans);
@@ -85,13 +79,13 @@ export const CSS = `
   pointer-events: none; z-index: -1;
 }
 .jtnq-cmp .eyebrow{
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .26em; text-transform: uppercase;
+  font-family: var(--f-sans); font-size: 14px;
   color: var(--c-accent); display: inline-flex; align-items: center; gap: 12px; margin-bottom: clamp(24px, 3.5vw, 40px);
 }
 .jtnq-cmp .eyebrow::before, .jtnq-cmp .eyebrow::after{ content: ""; width: 28px; height: 1px; background: var(--c-accent); }
 /* « FUTURES · PERPS · TRADE COPIER » on one line on a phone: no side rules, tighter spacing. */
 @media (max-width: 480px){
-  .jtnq-cmp .eyebrow{ letter-spacing: .14em; white-space: nowrap; }
+  .jtnq-cmp .eyebrow{ white-space: nowrap; }
   .jtnq-cmp .eyebrow::before, .jtnq-cmp .eyebrow::after{ display: none; }
 }
 .jtnq-cmp .wordmark{
@@ -101,7 +95,7 @@ export const CSS = `
 .jtnq-cmp .wordmark .dot{ color: var(--c-accent); }
 .jtnq-cmp .phrase{
   margin: clamp(24px, 3.5vw, 40px) auto 0; max-width: 46ch;
-  font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-family: var(--f-sans); font-weight: 400;
   font-size: clamp(18px, 2.1vw, 25px); line-height: 1.35; letter-spacing: -0.01em; color: var(--c-text-soft); text-wrap: balance;
 }
 
@@ -110,22 +104,22 @@ export const CSS = `
 }
 
 .jtnq-cmp .promo-chip{
-  display: inline-block; font-family: var(--f-mono); font-size: 10px; font-weight: 400;
-  letter-spacing: .1em; text-transform: uppercase; color: var(--c-accent);
+  display: inline-block; font-family: var(--f-sans); font-size: 14px; font-weight: 400;
+ color: var(--c-accent);
   border: 1px solid color-mix(in oklab, var(--c-accent) 45%, var(--c-line)); border-radius: 999px;
   padding: 3px 9px; white-space: nowrap; cursor: help;
 }
 /* Firm whose prices did not come from the last daily sync: muted, not accent —
    it is a caveat, not an offer. */
 .jtnq-cmp .stale-chip{
-  display: inline-block; font-family: var(--f-mono); font-size: 10px; font-weight: 400;
-  letter-spacing: .1em; text-transform: uppercase; color: var(--c-text-mute);
+  display: inline-block; font-family: var(--f-sans); font-size: 14px; font-weight: 400;
+ color: var(--c-text-mute);
   border: 1px dashed var(--c-line); border-radius: 999px;
   padding: 3px 9px; white-space: nowrap; cursor: help;
 }
 .jtnq-cmp .none{ color: var(--c-text-mute); font-weight: 400; font-size: 13px; }
 .jtnq-cmp .tag{
-  display: inline-block; font-family: var(--f-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  display: inline-block; font-family: var(--f-sans); font-size: 14px;
   padding: 5px 11px; border-radius: 999px; border: 1px solid var(--c-line); color: var(--c-text-soft); white-space: nowrap;
   font-weight: 400;
 }
@@ -150,10 +144,10 @@ export const CSS = `
   max-width: var(--maxw); margin: 0 auto; display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: start;
 }
 @media (max-width: 720px){ .jtnq-cmp .footer-inner{ grid-template-columns: 1fr; } }
-.jtnq-cmp .footer-brand{ font-family: var(--f-serif); font-style: italic; font-size: 22px; color: var(--c-text); }
+.jtnq-cmp .footer-brand{ font-family: var(--f-sans); font-size: 22px; color: var(--c-text); }
 .jtnq-cmp .footer-brand .dot{ color: var(--c-accent); }
 .jtnq-cmp .footer-meta{
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  font-family: var(--f-sans); font-size: 14px;
   color: var(--c-text-mute); text-align: right; line-height: 1.9;
 }
 @media (max-width: 720px){ .jtnq-cmp .footer-meta{ text-align: left; } }

@@ -12,19 +12,18 @@
 ## Direction esthétique déclarée (ne PAS dévier)
 **dark editorial site-objet** (home + page partenaire, refonte 2026-05-25).
 - Fond noir chaud brun (`oklch(0.12-0.16`), accent **gold unique** (`oklch(0.78-0.80 0.14 ~80`)
-- Wordmark Fraunces italique monumental + canvas candlesticks infini en fond (mask radial au centre)
+- Wordmark Zodiak monumental + canvas candlesticks infini en fond (mask radial au centre)
 - Ton : éditorial, magazine, premium ; pas de funnel marketing agressif
-- Point mémorable : wordmark italique géant + point doré (leitmotiv de marque) + bougies live
+- Point mémorable : wordmark géant + point doré (leitmotiv de marque) + bougies live
 - Anti-objectif explicite : ne PAS faire un link-in-bio déguisé ni un funnel de vente type Whop
 - La refonte dark couvre home + `/nefarious/` (+ `/prop-firms/`), CSS scopé sous `.jtnq-home` / `.jtnq-nef` ; globals.css ne garde que la base (polices, tokens, pages légales).
 - (Ancienne direction warm-editorial prairie Kazuo Oga = abandonnée 2026-05-25, conservée nulle part.)
 
 ## Typographie (OBLIGATOIRE)
-- Titres / wordmark : **Fraunces** (serif italique) — self-hosted public/fonts/
-- Body / UI : **Satoshi** (sans-serif clean) — self-hosted
-- Labels / eyebrows / data : **JetBrains Mono** (uppercase, letter-spacing ~.2em) — self-hosted public/fonts/JetBrainsMono.woff2
+- Tout le texte du site : **Satoshi**, sans italique, sans majuscules forcées ni lettres espacées, petits textes à 14 px et clairs (Angelo, 02/11/2026 : « le texte est weird », puis sur l'essai : « oui ca em fait », « ce type de tedxt sah on le fait partout sur min site »). Il garde les couleurs (« On pourrait garder la couleur »).
+- Grand titre de page : **Zodiak** (droit, gras), seule exception.
 - Fonts self-hosted dans public/fonts/ (fix COEP — JAMAIS de CDN Google Fonts / Fontshare)
-- Inter reste banni (cf anti-slop) ; le mono est JetBrains Mono, pas un fallback système.
+- Inter reste banni (cf anti-slop).
 
 ## Couleurs (OKLCH uniquement, pas de hex dans les composants)
 3 couches : primitive (valeurs OKLCH brutes) → semantic (bg, fg, card, primary, muted, border, ring) → component overrides.
