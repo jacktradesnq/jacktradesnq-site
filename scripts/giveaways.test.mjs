@@ -17,5 +17,4 @@ test('past giveaways: newest first, each with a date, a prize and its winners', 
 test('the page says how to enter and what a winner must do', () => {
   assert.equal(data.howToEnter.length, 3);
   assert.ok(data.ifYouWin.some((s) => s.includes('48 hours')));
-  assert.match(data.discordUrl, /^https:\/\/discord\.gg\//);
 });

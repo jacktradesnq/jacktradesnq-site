@@ -17,6 +17,7 @@ const ADVICE_NOTICE =
 export const META = {
   backToHome: { label: 'Jacktradesnq', url: '/' },
   brand: 'Jacktradesnq',
+  discordUrl: 'https://discord.gg/wpddBCAAU2',
   hero: {
     eyebrow: 'FUTURES \u00b7 PERPS \u00b7 TRADE COPIER',
     title: 'Trading Partnerships', // Angelo 31/10/2026 : « on fais Trading Partnerships »

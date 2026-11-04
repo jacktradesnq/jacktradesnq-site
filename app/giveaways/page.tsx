@@ -59,7 +59,7 @@ export default function Giveaways() {
               ))}
             </ol>
             <p className="gw-cta">
-              <a className="row-cta" href={data.discordUrl} target="_blank" rel="noopener">
+              <a className="row-cta" href={META.discordUrl} target="_blank" rel="noopener">
                 Join the server
                 <Arrow />
               </a>

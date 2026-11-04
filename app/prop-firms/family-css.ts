@@ -143,6 +143,9 @@ html:has(.firm-dialog[open]){ overflow: hidden; }
   padding-top: 24px; border-top: 1px solid var(--c-line-soft);
 }
 .jtnq-cmp .fw-actions .promo-chip{ cursor: help; }
+.jtnq-cmp .fw-role{ margin: 16px 0 0; font-size: 14px; line-height: 1.5; color: var(--c-text-soft); }
+.jtnq-cmp .fw-role a{ color: var(--c-accent); }
+.jtnq-cmp .fw-role a:hover{ text-decoration: underline; }
 .jtnq-cmp .fw-actions .row-cta{ margin-left: auto; padding: 12px 20px; font-size: 14px; }
 .jtnq-cmp .fw-all{
   display: inline-flex; align-items: center; padding: 12px 20px; border-radius: 999px; cursor: pointer;

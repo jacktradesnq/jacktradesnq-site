@@ -9,6 +9,7 @@ import notesMd from '@/content/prop-firms/firm-notes.md';
 import { parseFirmNotes } from '@/lib/firm-notes.mjs';
 import type { FirmView } from './firm-view';
 import { Arrow, FirmLogo } from './FirmTable';
+import { META } from './shared';
 
 const NOTES = parseFirmNotes(notesMd);
 
@@ -60,6 +61,17 @@ export function FirmWindow({ firm, banner, onSeeAll }: { firm: FirmView; banner?
           See all plans
         </button>
       </div>
+
+      {/* The Code JTNQ role on his Discord (Angelo, 04/11/2026: « ok ca m'interesse le role oui »). */}
+      {firm.code && (
+        <p className="fw-role">
+          Used code {firm.code.code}? Open a ticket on{' '}
+          <a href={META.discordUrl} target="_blank" rel="noopener">
+            my Discord
+          </a>{' '}
+          with your receipt and get the Code JTNQ role.
+        </p>
+      )}
     </div>
   );
 }
