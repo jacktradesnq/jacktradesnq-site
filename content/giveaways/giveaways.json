@@ -1,5 +1,5 @@
 {
-  "_source": "How to enter: bot message in #giveaway-announcement, 22/10/2026 (his wording). If you win: his messages of 26/10/2026 in the same channel, English corrected only. Past: #giveaways, GIVEAWAY ENDED and Congratulations messages; BluSky = X draw of 31/10/2026.",
+  "_source": "How to enter: bot message in #giveaway-announcement, 22/10/2026 (his wording). If you win: his messages of 26/10/2026 in the same channel, English corrected only. Past: #giveaways, read every day by scripts/sync-giveaways.mjs after syncedThrough; a giveaway run on X only is added by hand (BluSky, X draw of 31/10/2026).",
   "phrase": "I host my giveaways mainly on my Discord.",
   "discordUrl": "https://discord.gg/wpddBCAAU2",
   "howToEnter": [
@@ -14,10 +14,31 @@
     "If somebody tells you that person is jacktradesnq in DM, do NOT believe him. I will not DM you first."
   ],
   "past": [
-    { "date": "2026-10-31", "prize": "2x Traders Launch 100K, 80% profit split", "winners": 2 },
-    { "date": "2026-10-31", "prize": "3x BluSky 50K Launch Plans", "winners": 3 },
-    { "date": "2026-10-29", "prize": "Diamond Case, MyFundedPerps", "winners": 1 },
-    { "date": "2026-10-22", "prize": "3x $10K Select Account, MyFundedPerps", "winners": 3 },
-    { "date": "2026-10-12", "prize": "$25K Traders Launch Static Account, 80% profit split", "winners": 1 }
-  ]
+    {
+      "date": "2026-10-31",
+      "prize": "2x Traders Launch 100K, 80% profit split",
+      "winners": 2
+    },
+    {
+      "date": "2026-10-31",
+      "prize": "3x BluSky 50K Launch Plans",
+      "winners": 3
+    },
+    {
+      "date": "2026-10-29",
+      "prize": "Diamond Case, MyFundedPerps",
+      "winners": 1
+    },
+    {
+      "date": "2026-10-22",
+      "prize": "3x $10K Select Account, MyFundedPerps",
+      "winners": 3
+    },
+    {
+      "date": "2026-10-12",
+      "prize": "$25K Traders Launch Static Account, 80% profit split",
+      "winners": 1
+    }
+  ],
+  "syncedThrough": "2026-10-31T23:59:59.000Z"
 }

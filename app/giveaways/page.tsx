@@ -2,8 +2,8 @@
 
 // /giveaways: how to enter, what a winner must do, the past giveaways (Angelo, 04/11/2026, idea seen
 // on fredvshapes.com/giveaways, written his way). Words and history come from his Discord
-// (content/giveaways/giveaways.json); the giveaways themselves stay on Discord. The list is updated
-// by hand: nothing reads Discord at build time.
+// (content/giveaways/giveaways.json); the giveaways themselves stay on Discord. The list is kept up
+// to date every day by scripts/sync-giveaways.mjs (.github/workflows/update-prop-firms.yml).
 
 import data from '@/content/giveaways/giveaways.json';
 import { Arrow } from '../prop-firms/FirmTable';

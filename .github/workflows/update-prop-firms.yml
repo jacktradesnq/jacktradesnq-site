@@ -44,10 +44,18 @@ jobs:
         continue-on-error: true
         run: node scripts/scrape-tradeify.mjs
 
+      # Les giveaways terminés sur Discord (Angelo, 04/11/2026). Discord illisible = job rouge plus bas.
+      - name: Sync giveaways from Discord
+        id: giveaways
+        continue-on-error: true
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+        run: node scripts/sync-giveaways.mjs
+
       - name: Check for data changes
         id: diff
         run: |
-          if [ -n "$(git status --porcelain public/data/prop-firms.json public/data/live-promos.json public/data/compare-extra-firms.json)" ]; then
+          if [ -n "$(git status --porcelain public/data/prop-firms.json public/data/live-promos.json public/data/compare-extra-firms.json content/giveaways/giveaways.json)" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -58,7 +66,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/data/prop-firms.json public/data/live-promos.json public/data/compare-extra-firms.json
+          git add public/data/prop-firms.json public/data/live-promos.json public/data/compare-extra-firms.json content/giveaways/giveaways.json
           git commit -m "chore(data): daily prop-firms price sync"
           git push origin HEAD:main
 
@@ -97,6 +105,12 @@ jobs:
         if: always() && steps.tradeify.outcome == 'failure'
         run: |
           echo "::error::scrape-tradeify : page Tradeify illisible ou moins de 12 prix (voir l'étape « Scrape Tradeify »). Données gardées, stale: true."
+          exit 1
+
+      - name: Giveaways unreadable — fail the job
+        if: always() && steps.giveaways.outcome == 'failure'
+        run: |
+          echo "::error::sync-giveaways : Discord illisible (voir l'étape « Sync giveaways from Discord »). Liste gardée telle quelle."
           exit 1
 
       - name: Discord alert — workflow failed
