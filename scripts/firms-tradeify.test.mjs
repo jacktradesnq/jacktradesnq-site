@@ -55,7 +55,8 @@ test('la même page en guillemets doubles (leur page depuis novembre) donne le m
 });
 
 test('le Select 300K : relu quand ils le vendent, firme stale quand il disparaît de leur page', async () => {
-  const visible = PAGE.replace('is300visible = false', 'is300visible = true');
+  // Caché, il était aussi sans code chez eux ; en vente, il porte le code du programme (page du 04/11).
+  const visible = PAGE.replace('is300visible = false', 'is300visible = true').replace(/(name: '300K',[\s\S]*?couponCode: ')[^']*'/g, "$1select'");
   assert.notEqual(visible, PAGE);
   const r = parseTradeify(visible, RECORDED);
   const p = r.plans.find((x) => x.programName === 'Select' && x.size === 300000);
