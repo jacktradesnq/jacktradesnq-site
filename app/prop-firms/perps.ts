@@ -6,6 +6,8 @@
 // placeholder clock of the same width as the real one (PromoClock in FirmTable.tsx), and the
 // page flips to normal prices once endsAt passes (usePromoLive).
 
+import { dailyLossChoices } from '@/lib/daily-loss-choices.mjs';
+import { discountWords } from '@/lib/discount-words.mjs';
 import rawData from '@/public/data/perps-firms.json';
 import { runsAt } from '@/lib/promo-ends.mjs';
 import { BUILD_TS, usePromoClock } from './promo-clock';
@@ -311,6 +313,17 @@ function rowsOf(firm: PerpsFirm, promoLive: boolean): CompareRow[] {
         lossType: p.ddType,
         dailyLoss: dailyLossOf(p.dailyLoss),
         note: plan.price != null ? plan.note : undefined,
+        options: dailyLossChoices(p, plan)?.map((c) => ({
+          label: c.label,
+          price: {
+            kind: 'price',
+            list: c.price,
+            discounted: promo ? c.promoPrice : null,
+            alts: c.altPrice != null ? [version(c.altPrice, c.altPromoPrice)] : [],
+            per: null,
+            from: false,
+          },
+        })),
         href: goHref('prop-firms', firm.id),
         affiliate: true,
         code: { code: 'JTNQ', title: 'My affiliate code' },
@@ -328,6 +341,8 @@ export const perpsFirms = (promoLive: boolean): FirmView[] =>
     logo: firm.logo,
     summary: SUMMARY[firm.id] ?? '',
     code: { code: 'JTNQ', title: 'My affiliate code' },
+    // The firm's published rate; MFP: 35% on a first order, then 30%, so « Up to 35% off ».
+    offer: discountWords([promoOf(firm, promoLive)?.discountPct, promoOf(firm, promoLive)?.thenPct]),
     stale: null,
     from: cheapest(rowsOf(firm, promoLive)),
     href: goHref('prop-firms', firm.id),

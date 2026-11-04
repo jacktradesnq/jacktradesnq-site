@@ -27,6 +27,7 @@ const SITE = {
   ],
   nefarious: { name: 'Nefarious', url: '/nefarious/', tagline: 'Official partner · free Discord community' },
   propFirms: { name: 'Trading Partnerships', url: '/prop-firms/', tagline: 'Futures & perps partners · trade copier · code JTNQ' },
+  giveaways: { name: 'Giveaways', url: '/giveaways/', tagline: 'How to enter · past giveaways' },
   // Bio: Angelo's own sentences (dictated 13-14/10/2026), English corrected only.
   bio: {
     hello: "Hi, I'm Jack",
@@ -312,6 +313,7 @@ export default function Home() {
         <nav className="nav" aria-label="Primary">
           <a href={SITE.nefarious.url}>Nefarious</a>
           <a href={SITE.propFirms.url}>{SITE.propFirms.name}</a>
+          <a href={SITE.giveaways.url}>{SITE.giveaways.name}</a>
           <div className={`nav-socials${socialsOpen ? ' is-open' : ''}`} ref={socialsRef}>
             <button
               type="button"
@@ -451,6 +453,19 @@ export default function Home() {
                 </svg>
               </div>
               <p className="tagline">{SITE.propFirms.tagline}</p>
+            </a>
+
+            <a className="hub-card" href={SITE.giveaways.url}>
+              <div className="row">
+                <h3 className="title">
+                  {SITE.giveaways.name}
+                  <span className="swash">.</span>
+                </h3>
+                <svg className="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 17L17 7M9 7h8v8" />
+                </svg>
+              </div>
+              <p className="tagline">{SITE.giveaways.tagline}</p>
             </a>
           </div>
         </section>

@@ -20,7 +20,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { defaultOrder, filterRows, firmMatches, pickedFirst, sortBy, togglePick } from '@/lib/compare-order.mjs';
 import { FirmSearch } from '../FirmSearch';
-import { FAMILIES, shownPrice, type CompareRow, type Family } from '../firm-view';
+import { FAMILIES, shownPrice, type ComparePrice, type CompareRow, type Family } from '../firm-view';
 import { EXTRA_PROMO_ENDS, futuresRows } from '../futures';
 import { perpsRows, usePromoLive } from '../perps';
 import { usePromoClock } from '../promo-clock';
@@ -40,13 +40,32 @@ type Dir = 'asc' | 'desc';
 type DailyLossFilter = 'with' | 'without' | null;
 type Sort = { col: string; dir: Dir } | null;
 
-function PriceCell({ row, discount }: { row: CompareRow; discount: boolean }) {
-  const p = shownPrice(row.price, discount);
-  if (row.price.kind === 'text' || !p) return <span className="none">{row.price.kind === 'text' ? row.price.text : '—'}</span>;
-  return <PriceView price={{ ...p, per: row.price.per, from: row.price.from }} />;
+function PriceCell({ price, discount }: { price: ComparePrice; discount: boolean }) {
+  const p = shownPrice(price, discount);
+  if (price.kind === 'text' || !p) return <span className="none">{price.kind === 'text' ? price.text : '—'}</span>;
+  return <PriceView price={{ ...p, per: price.per, from: price.from }} />;
 }
 
-function ValCell({ row, col }: { row: CompareRow; col: string }) {
+// Options: the row's Daily loss buttons, when the plan is sold with several limits.
+type Options = { chosen: (row: CompareRow) => number; choose: (row: CompareRow, i: number) => void };
+
+function ValCell({ row, col, options }: { row: CompareRow; col: string; options: Options }) {
+  if (col === 'dailyLoss' && row.options)
+    return (
+      <span className="cmp-opts" role="group" aria-label={`Daily loss limit, ${row.firmName} ${row.program} ${sizeLabel(row.size)}`}>
+        {row.options.map((o, i) => (
+          <button
+            key={o.label}
+            type="button"
+            className="cmp-opt"
+            aria-pressed={i === options.chosen(row)}
+            onClick={() => options.choose(row, i)}
+          >
+            {o.label}
+          </button>
+        ))}
+      </span>
+    );
   const v = row.cells[col];
   if (!v)
     return (
@@ -151,6 +170,13 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   // can be added one after the other.
   const [pickedKeys, setPickedKeys] = useState<string[]>([]);
   const countRef = useRef<HTMLParagraphElement>(null);
+  // The Daily loss button picked on each plan sold with several limits; none = its first version.
+  const [optionOf, setOptionOf] = useState<Record<string, number>>({});
+  const options: Options = {
+    chosen: (r) => optionOf[r.key] ?? 0,
+    choose: (r, i) => setOptionOf((prev) => ({ ...prev, [r.key]: i })),
+  };
+  const priceNow = (r: CompareRow) => r.options?.[options.chosen(r)]?.price ?? r.price;
 
   // The firm id this panel last put in the address itself (Firm filter), so its echo back
   // through `firm` is not taken for a firm picked from its window.
@@ -228,7 +254,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   const lossTypes = [...new Set(all.map((r) => r.lossType).filter((t): t is string => !!t))].sort((a, b) => a.localeCompare(b, 'en'));
 
   const budget = maxPrice.trim() === '' ? null : Number(maxPrice);
-  const priceOf = (r: CompareRow) => shownPrice(r.price, discount)?.now ?? null;
+  const priceOf = (r: CompareRow) => shownPrice(priceNow(r), discount)?.now ?? null;
   const filtered = filterRows(
     all,
     { firmIds: firms, firmQuery: query, size, steps, lossType, dailyLoss, maxPrice: budget != null && Number.isFinite(budget) ? budget : null },
@@ -511,7 +537,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
                         </th>
                       ) : (
                         <td key={c.id} className={`cmp-td cmp-c-${c.id}`}>
-                          {c.id === 'price' ? <PriceCell row={r} discount={discount} /> : <ValCell row={r} col={c.id} />}
+                          {c.id === 'price' ? <PriceCell price={priceNow(r)} discount={discount} /> : <ValCell row={r} col={c.id} options={options} />}
                         </td>
                       ),
                     )}
@@ -536,14 +562,14 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
                   <span className="cmp-card-size">{sizeLabel(r.size)}</span>
                 </div>
                 <div className="cmp-card-price">
-                  <PriceCell row={r} discount={discount} />
+                  <PriceCell price={priceNow(r)} discount={discount} />
                 </div>
                 <dl className="cmp-card-dl">
                   {detailCols.map((c) => (
                     <div key={c.id} className="cmp-card-row">
                       <dt>{c.label}</dt>
                       <dd>
-                        <ValCell row={r} col={c.id} />
+                        <ValCell row={r} col={c.id} options={options} />
                       </dd>
                     </div>
                   ))}

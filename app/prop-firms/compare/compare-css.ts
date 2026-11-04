@@ -294,4 +294,12 @@ export const COMPARE_CSS = `
   .jtnq-cmp .cmp-card.cmp-picked-last{ margin-bottom: 12px; border-color: var(--c-accent); }
   .jtnq-cmp .cmp-card-foot .row-cta{ margin-left: auto; }
 }
+.jtnq-cmp .cmp-opts{ display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.jtnq-cmp .cmp-opt{
+  font-family: var(--f-sans); font-size: 14px; color: var(--c-text-soft); background: transparent;
+  border: 1px solid var(--c-line); border-radius: 999px; padding: 3px 9px; cursor: pointer; white-space: nowrap;
+  transition: color .2s ease, border-color .2s ease;
+}
+.jtnq-cmp .cmp-opt:hover{ color: var(--c-accent); }
+.jtnq-cmp .cmp-opt[aria-pressed="true"]{ color: var(--c-accent); border-color: var(--c-accent); }
 `;

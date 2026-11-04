@@ -1,0 +1,23 @@
+{
+  "_source": "How to enter: bot message in #giveaway-announcement, 22/10/2026 (his wording). If you win: his messages of 26/10/2026 in the same channel, English corrected only. Past: #giveaways, GIVEAWAY ENDED and Congratulations messages; BluSky = X draw of 31/10/2026.",
+  "phrase": "I host my giveaways mainly on my Discord.",
+  "discordUrl": "https://discord.gg/wpddBCAAU2",
+  "howToEnter": [
+    "Go to #giveaway-requirements, complete the requirements and post your proof screenshots there.",
+    "Once your screenshots are posted, the bot gives you the Giveaway Ready role automatically.",
+    "With that role, go to #giveaways and click the 🎉 button on the current giveaway."
+  ],
+  "ifYouWin": [
+    "After each giveaway you have 48 hours to open a ticket, ping me and tell me you won the giveaway.",
+    "If you do not redeem the reward before the 48 hours, I will be forced to reroll you and choose another winner.",
+    "The ticket channel is in the Entry Gate category.",
+    "If somebody tells you that person is jacktradesnq in DM, do NOT believe him. I will not DM you first."
+  ],
+  "past": [
+    { "date": "2026-10-31", "prize": "2x Traders Launch 100K, 80% profit split", "winners": 2 },
+    { "date": "2026-10-31", "prize": "3x BluSky 50K Launch Plans", "winners": 3 },
+    { "date": "2026-10-29", "prize": "Diamond Case, MyFundedPerps", "winners": 1 },
+    { "date": "2026-10-22", "prize": "3x $10K Select Account, MyFundedPerps", "winners": 3 },
+    { "date": "2026-10-12", "prize": "$25K Traders Launch Static Account, 80% profit split", "winners": 1 }
+  ]
+}

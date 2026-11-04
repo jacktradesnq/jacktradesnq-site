@@ -1,12 +1,18 @@
 'use client';
 
-// Shared chrome for /prop-firms: the design tokens + component CSS, the page copy
-// and the number formatters.
+// Shared chrome for /prop-firms and /giveaways: the design tokens + component CSS, the page copy,
+// the back link, the footer and the number formatters.
+
+import { useEffect } from 'react';
 
 export const money = (n: number) =>
   '$' + n.toLocaleString('en-US', Number.isInteger(n) ? undefined : { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 // Under $1K (Vest's $500 Instant account) the size reads in dollars, not "$0.5K".
 export const sizeLabel = (n: number) => (n < 1000 ? '$' + n : '$' + n / 1000 + 'K');
+
+// The legal line of every page; /prop-firms adds what it says about its affiliates.
+const ADVICE_NOTICE =
+  'Disclaimer \u2014 In accordance with article D.321-1 of the French Mon\u00e9taire et Financier Code, the content published on this site is provided for informational purposes only and does not constitute investment advice.';
 
 export const META = {
   backToHome: { label: 'Jacktradesnq', url: '/' },
@@ -22,10 +28,55 @@ export const META = {
     copyright: '\u00a9 2026 JackTradesNQ. All rights reserved.',
     mentionsUrl: '/mentions-legales/',
     privacyUrl: '/politique-confidentialite/',
-    disclaimer:
-      'Disclaimer \u2014 In accordance with article D.321-1 of the French Mon\u00e9taire et Financier Code, the content published on this site is provided for informational purposes only and does not constitute investment advice. This page is an advertisement: the firms shown with code JTNQ are affiliates, and JackTradesNQ earns a commission on sign-ups made with code JTNQ. A firm shown without code JTNQ is not an affiliate.',
+    adviceNotice: ADVICE_NOTICE,
+    disclaimer: `${ADVICE_NOTICE} This page is an advertisement: the firms shown with code JTNQ are affiliates, and JackTradesNQ earns a commission on sign-ups made with code JTNQ. A firm shown without code JTNQ is not an affiliate.`,
   },
 };
+
+// The page's colour behind the overscroll, while the page is open.
+export function useBodyBackground() {
+  useEffect(() => {
+    const prev = document.body.style.background;
+    document.body.style.background = 'oklch(0.13 0.028 165)';
+    return () => {
+      document.body.style.background = prev;
+    };
+  }, []);
+}
+
+export function BackBar() {
+  return (
+    <div className="back-bar">
+      <a className="back" href={META.backToHome.url}>
+        <svg className="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        <span>{META.backToHome.label}</span>
+      </a>
+    </div>
+  );
+}
+
+export function SiteFooter({ disclaimer }: { disclaimer: string }) {
+  return (
+    <footer className="site-footer">
+      <div className="footer-inner">
+        <div className="footer-brand">
+          {META.brand}
+          <span className="dot">.</span>
+        </div>
+        <div className="footer-meta">
+          <a href={META.legal.mentionsUrl}>Legal</a>
+          <span className="sep">·</span>
+          <a href={META.legal.privacyUrl}>Privacy policy</a>
+          <br />
+          <span>{META.legal.copyright}</span>
+        </div>
+      </div>
+      <p className="footer-disclaimer">{disclaimer}</p>
+    </footer>
+  );
+}
 
 export const CSS = `
 @font-face{

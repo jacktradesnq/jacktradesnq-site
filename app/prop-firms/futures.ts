@@ -15,7 +15,7 @@ import { firmAt, promoEnds } from '@/lib/promo-ends.mjs';
 import { money, sizeLabel } from './shared';
 import {
   cellVal, cheapest, humanDate, pillValue, textVal,
-  type CompareRow, type FirmView, type Funded, type Pill, type Val,
+  type CompareRow, type FirmView, type Funded, type Pill, type Val, offerOf,
 } from './firm-view';
 import codesMd from '@/content/prop-firms/codes.md';
 import { parseCodes } from '@/lib/firm-codes.mjs';
@@ -523,6 +523,7 @@ function firmView(firm: Firm, rows: CompareRow[], link: Link): FirmView {
     logo: FIRM_LOGOS[firm.id] ?? null,
     summary: `${splitText} split${p ? ` · ${p} payouts` : ''}${sharedFee ? ` · ${sharedFee}` : ''}`,
     code: link.code,
+    offer: offerOf(rows),
     // A firm whose scraper failed keeps its old prices while generatedAt says today: name
     // the firms that are behind instead of advertising one sync date for everyone.
     stale:

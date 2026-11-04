@@ -15,7 +15,7 @@
 // « j'ai pas envie que ça soit un toggle mais un truc qui s'ouvre »).
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
-import { CSS, META, money } from './shared';
+import { BackBar, CSS, META, SiteFooter, money, useBodyBackground } from './shared';
 import { FAMILIES, type Family, type FirmView } from './firm-view';
 import { FUTURES_FIRMS } from './futures';
 import { PERPS_PROMO, PERPS_PROMO_FIRM_ID, PROMO_ENDS_MS, perpsFirms, usePromoLive } from './perps';
@@ -59,13 +59,7 @@ export default function PropFirms() {
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const dialogRef = useRef<HTMLDialogElement>(null);
 
-  useEffect(() => {
-    const prev = document.body.style.background;
-    document.body.style.background = 'oklch(0.13 0.028 165)';
-    return () => {
-      document.body.style.background = prev;
-    };
-  }, []);
+  useBodyBackground();
 
   // #futures / #perps / #trade-copier / #compare open the matching tab, on load and on
   // back/forward; #compare=<firm-id> opens the comparator on that firm.
@@ -154,14 +148,7 @@ export default function PropFirms() {
 
       <main>
         <section className="hero">
-          <div className="back-bar">
-            <a className="back" href={META.backToHome.url}>
-              <svg className="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-              <span>{META.backToHome.label}</span>
-            </a>
-          </div>
+          <BackBar />
 
           <div className="eyebrow">{META.hero.eyebrow}</div>
           <h1 className="wordmark">
@@ -228,7 +215,11 @@ export default function PropFirms() {
                       <span className="fc-name">{firm.name}</span>
                       <span className="fc-meta">{firm.summary}</span>
                       <span className="fc-chips">
-                        {firm.code && <span className="promo-chip">code {firm.code.code}</span>}
+                        {firm.code && (
+                          <span className="promo-chip">
+                            {firm.offer ? `${firm.offer} with code ${firm.code.code}` : `code ${firm.code.code}`}
+                          </span>
+                        )}
                         {firm.stale && <span className="stale-chip">{firm.stale.label}</span>}
                       </span>
                     </span>
@@ -294,22 +285,7 @@ export default function PropFirms() {
 
       </main>
 
-      <footer className="site-footer">
-        <div className="footer-inner">
-          <div className="footer-brand">
-            {META.brand}
-            <span className="dot">.</span>
-          </div>
-          <div className="footer-meta">
-            <a href={META.legal.mentionsUrl}>Legal</a>
-            <span className="sep">·</span>
-            <a href={META.legal.privacyUrl}>Privacy policy</a>
-            <br />
-            <span>{META.legal.copyright}</span>
-          </div>
-        </div>
-        <p className="footer-disclaimer">{isCopier ? TRADE_COPIER_DISCLAIMER : META.legal.disclaimer}</p>
-      </footer>
+      <SiteFooter disclaimer={isCopier ? TRADE_COPIER_DISCLAIMER : META.legal.disclaimer} />
     </div>
   );
 }

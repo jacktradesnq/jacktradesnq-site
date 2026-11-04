@@ -7,6 +7,7 @@
 //   comparator on that firm.
 
 import { firstNumber } from '@/lib/compare-order.mjs';
+import { discountWords } from '@/lib/discount-words.mjs';
 import {
   consistencyWords, contractsWords, dailyLossWords, moneyFirst, payoutFreqWords, payoutWords, splitWords,
 } from '@/lib/compare-words.mjs';
@@ -72,6 +73,9 @@ export type CompareRow = {
   dailyLoss: DailyLoss;
   // What the firm writes about the price or the plan (paid options, trading hours), shown folded.
   note?: string;
+  // The versions of the plan sold with different daily loss limits, one button each in the Daily
+  // loss cell; the button picked gives the price shown. No key: the plan is sold one way.
+  options?: { label: string; price: ComparePrice }[];
   href: string;
   // false: a firm Angelo is not partnered with (compare-extra-firms.json), its own site and
   // its public code, shown in the comparator only.
@@ -85,6 +89,8 @@ export type FirmView = {
   logo: string | null;
   summary: string;
   code: { code: string; title: string } | null;
+  // « 20% off », « Up to 35% off »: printed with the code on the firm's card.
+  offer: string | null;
   stale: { label: string; title: string } | null;
   // Cheapest price paid with code JTNQ, any program, any size.
   from: { now: number; per: string | null } | null;
@@ -130,6 +136,15 @@ export function cheapest(rows: CompareRow[]): FirmView['from'] {
     for (const now of [p.now, ...p.alts.map((a) => a.now)]) if (best == null || now < best.now) best = { now, per };
   }
   return best;
+}
+
+// The discount a firm's plans give, for its card: list price against discounted price.
+export function offerOf(rows: CompareRow[]): string | null {
+  return discountWords(
+    rows.flatMap((r) =>
+      r.price.kind === 'price' && r.price.discounted != null ? [((r.price.list - r.price.discounted) / r.price.list) * 100] : [],
+    ),
+  );
 }
 
 // The comparator's words, one place per column (Angelo, 01/11/2026: « je préfère que les mêmes
