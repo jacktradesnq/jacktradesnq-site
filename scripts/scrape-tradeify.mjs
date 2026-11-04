@@ -66,7 +66,7 @@ export function parseCouponDetails(html) {
   if (!block) throw new Error('couponDetails introuvable dans la page');
   const body = block.slice(0, block.indexOf('};') + 1);
   const out = {};
-  for (const m of body.matchAll(/(\w+)\s*:\s*\[\s*'([^']*)'\s*,\s*([\d.]+)\s*\]/g)) out[m[1].toLowerCase()] = [m[2].toUpperCase(), Number(m[3])];
+  for (const m of body.matchAll(/(\w+)\s*:\s*\[\s*['"]([^'"]*)['"]\s*,\s*([\d.]+)\s*\]/g)) out[m[1].toLowerCase()] = [m[2].toUpperCase(), Number(m[3])];
   if (!out.default_code) throw new Error('couponDetails sans default_code');
   return out;
 }
@@ -84,7 +84,7 @@ function visible(html, chunk) {
 
 /** Les comptes en vente d'une plateforme : [{ size, price, couponCode, showFraction }]. */
 function accountsOf(html, brokerText) {
-  const marks = [...brokerText.matchAll(/name:\s*'(\d+(?:\.\d+)?)K'/g)];
+  const marks = [...brokerText.matchAll(/name:\s*['"](\d+(?:\.\d+)?)K['"]/g)];
   return marks.flatMap((m, i) => {
     const chunk = brokerText.slice(m.index, marks[i + 1]?.index);
     const price = chunk.match(/\bprice:\s*([\d.]+)/);
@@ -93,7 +93,7 @@ function accountsOf(html, brokerText) {
     return [{
       size: Math.round(Number(m[1]) * 1000),
       price: price ? Number(price[1]) : NaN,
-      couponCode: chunk.match(/couponCode:\s*'([^']*)'/)?.[1] ?? null,
+      couponCode: chunk.match(/couponCode:\s*['"]([^'"]*)['"]/)?.[1] ?? null,
       showFraction: /showFraction:\s*true/.test(head),
     }];
   });
@@ -133,7 +133,7 @@ function newYorkOffset(utcGuessMs) {
 export function parseEnds(html, code, now) {
   const block = scriptBlock(html, 'couponInfo');
   if (!block) return { ends: null, note: 'pas de couponInfo, pas de date de fin' };
-  const field = (k) => block.match(new RegExp(`${k}\\s*:\\s*'([^']*)'`))?.[1] ?? null;
+  const field = (k) => block.match(new RegExp(`${k}\\s*:\\s*['"]([^'"]*)['"]`))?.[1] ?? null;
   const shownCode = field('monthlyCode')?.toUpperCase();
   if (shownCode !== code) return { ends: null, note: `date de fin écrite pour ${shownCode ?? '?'}, pas pour ${code} : ignorée` };
   const day = Number(field('lastDay'));

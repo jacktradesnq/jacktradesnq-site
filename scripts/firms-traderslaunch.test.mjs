@@ -106,6 +106,23 @@ test('programsFromSnapshot : les prix des autres splits (60 %, 90 % Static, 55 %
   assert.deepEqual(Object.keys(plan('Static', 25000).splitPrices), ['60', '90']);
 });
 
+test('programsFromSnapshot : cartes du 04/11/2026, « Session Profit Limit », « No minimum », limite fixe', () => {
+  const s = clone();
+  const c = at(view(s, 'Premium'), 80).cards[0];
+  c.text = c.text
+    .replace('3 minimum', 'No minimum')
+    .replace(/Best Day\n[^\n]*/, 'Session Profit Limit\n40% of profit target')
+    .replace(/Starts at (\d+ minis? or \d+ micros?)[^.]*\./, 'Starts at $1; that is your fixed limit.');
+  assert.match(c.text, /Session Profit Limit/);
+  assert.match(c.text, /fixed limit/);
+  const p = programsFromSnapshot(s).find((x) => x.name === 'Premium').plans[0];
+  assert.equal(p.minDays, 0);
+  assert.equal(p.consistency, '40%');
+  assert.equal(p.ddType, 'EOD - Locks at starting balance');
+  assert.match(p.contracts, /^\d+ minis? or \d+ micros?$/);
+  assert.match(p.note, /^Session profit limit: 40% of profit target\. /);
+});
+
 test('programsFromSnapshot : « Days to Pass » lu la ou la carte le publie', () => {
   for (const name of ['Premium', 'Legacy NYC']) for (const p of programme(name).plans) assert.equal(p.minDays, 3);
   for (const p of programme('Static').plans) assert.ok(!('minDays' in p));

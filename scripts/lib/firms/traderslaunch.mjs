@@ -97,7 +97,7 @@ function after(ls, label) {
 }
 
 /** Les libelles de la zone EVALUATION, pour savoir ou s'arrete une valeur. */
-const EVAL_LABELS = ['Profit Target', 'Max Drawdown', 'Best Day', 'Days to Pass', 'Consistency Rule'];
+const EVAL_LABELS = ['Profit Target', 'Max Drawdown', 'Best Day', 'Session Profit Limit', 'Days to Pass', 'Consistency Rule'];
 
 /**
  * « $1 000 EODLocks at starting balance », « $1 000 EOD » + « Locks at starting
@@ -198,18 +198,23 @@ function parseCard(programme, chosenSplit, card, drop = false) {
   // « Best Day — Under 40% of profit » (Premium, Legacy) ou « Consistency Rule — 50% » (Static).
   const days = after(ev, 'Days to Pass');
   if (days != null) {
+    // « 3 minimum », ou « No minimum » (cartes relues le 04/11/2026).
     const d = days.match(/^(\d+)\s+minimum$/i);
-    if (!d) throw new Error(`${tag} : « Days to Pass » illisible (« ${days} »)`);
-    plan.minDays = Number(d[1]);
+    if (!d && !/^no minimum$/i.test(days)) throw new Error(`${tag} : « Days to Pass » illisible (« ${days} »)`);
+    plan.minDays = d ? Number(d[1]) : 0;
   }
 
   const bestDay = after(ev, 'Best Day');
   const consRule = after(ev, 'Consistency Rule');
-  const cons = (bestDay ?? consRule ?? '').match(/(\d+)\s*%/);
+  // « Session Profit Limit — 40% of profit target » (Premium, Legacy, cartes du 04/11/2026) a
+  // remplacé « Best Day » : le chiffre va dans la colonne, la phrase de la firme dans la note.
+  const session = after(ev, 'Session Profit Limit');
+  const cons = (bestDay ?? consRule ?? session ?? '').match(/(\d+)\s*%/);
   if (cons) plan.consistency = `${cons[1]}%`;
   else if (/^none$/i.test(consRule ?? '')) plan.consistency = 'None';
 
   const note = [];
+  if (session) note.push(`Session profit limit: ${session}.`);
   // « Daily Loss Limit » / « $600 » / « Lifted on days that start at or above $25,600 » (drops).
   const dll = after(ev, 'Daily Loss Limit');
   if (dll != null) {
@@ -221,7 +226,7 @@ function parseCard(programme, chosenSplit, card, drop = false) {
   }
 
   const starts = ls.find((l) => /^Starts at /i.test(l));
-  const contracts = starts?.match(/^Starts at (.+?)(?:, up to [^.]*)?\.(?:\s|$)/i)?.[1] ?? after(ev, 'Starting Size');
+  const contracts = starts?.match(/^Starts at (.+?)(?:, up to [^.]*|; that is your fixed limit)?\.(?:\s|$)/i)?.[1] ?? after(ev, 'Starting Size');
   if (contracts) plan.contracts = contracts;
 
   // « Trading hours: 6:00pm – 4:00pm ET the following day » (Premium, Static),

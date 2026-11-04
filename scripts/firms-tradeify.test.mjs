@@ -42,6 +42,12 @@ test('page du 01/11 : code GEMS -30 %, fin le 31/10 23:59 heure de New York, les
   assert.deepEqual(r.notices, []); // le 300K Select est caché chez eux (is300visible = false)
 });
 
+test('la même page en guillemets doubles (leur page depuis novembre) donne le même résultat', () => {
+  const doubled = PAGE.replace(/(const (?:couponDetails|GrowthData|SelectData|LightningData)\s*=[\s\S]*?<\/script>)/g, (b) => b.replace(/'([^'\n]*)'/g, '"$1"'));
+  assert.notEqual(doubled, PAGE);
+  assert.deepEqual(parseTradeify(doubled, RECORDED), parseTradeify(PAGE, RECORDED));
+});
+
 test('leur arrondi : ,5 vers le haut', () => {
   assert.equal(formatPriceValue((145 * 70) / 100, false), 102);
   assert.equal(formatPriceValue((345 * 70) / 100, false), 242);
