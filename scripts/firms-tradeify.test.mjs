@@ -27,7 +27,13 @@ const GEMS_TABLE = [
 
 const table = (plans) => plans.map((p) => [p.programName, p.size, p.price, p.originalPrice]);
 const firmTable = (firm) => firm.programs.flatMap((pr) => pr.plans.map((pl) => [pr.name, pl.size, pl.price, pl.originalPrice]));
-const freshData = () => structuredClone(DATA);
+// La page enregistrée le 01/11 cachait le Select 300K (is300visible = false) : le JSON sans lui.
+const without300K = (data) => {
+  const select = data.firms.find((f) => f.id === 'tradeify').programs.find((p) => p.name === 'Select');
+  select.plans = select.plans.filter((p) => p.size !== 300000);
+  return data;
+};
+const freshData = () => without300K(structuredClone(DATA));
 const quiet = () => {};
 
 // La même page, sans aucun code : leurs couponDetails à 0 % (getDiscountValue : pas de remise,
@@ -46,6 +52,20 @@ test('la même page en guillemets doubles (leur page depuis novembre) donne le m
   const doubled = PAGE.replace(/(const (?:couponDetails|GrowthData|SelectData|LightningData)\s*=[\s\S]*?<\/script>)/g, (b) => b.replace(/'([^'\n]*)'/g, '"$1"'));
   assert.notEqual(doubled, PAGE);
   assert.deepEqual(parseTradeify(doubled, RECORDED), parseTradeify(PAGE, RECORDED));
+});
+
+test('le Select 300K : relu quand ils le vendent, firme stale quand il disparaît de leur page', async () => {
+  const visible = PAGE.replace('is300visible = false', 'is300visible = true');
+  assert.notEqual(visible, PAGE);
+  const r = parseTradeify(visible, RECORDED);
+  const p = r.plans.find((x) => x.programName === 'Select' && x.size === 300000);
+  assert.ok(p);
+  assert.deepEqual(r.notices, []);
+  const withIt = structuredClone(DATA);
+  assert.equal((await runTradeify(withIt, { read: async () => visible, now: RECORDED, log: quiet })).ok, true);
+  const hidden = structuredClone(DATA);
+  assert.equal((await runTradeify(hidden, { read: async () => PAGE, now: RECORDED, log: quiet })).ok, false);
+  assert.equal(hidden.firms.find((f) => f.id === 'tradeify').stale, true);
 });
 
 test('leur arrondi : ,5 vers le haut', () => {

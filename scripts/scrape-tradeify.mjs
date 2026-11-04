@@ -42,6 +42,8 @@ const UA =
 export const TRADEIFY_PROGRAMS = { Growth: 'GrowthData', Select: 'SelectData', Lightning: 'LightningData' };
 export const TRADEIFY_SIZES = [25000, 50000, 100000, 150000];
 const EXPECTED = Object.keys(TRADEIFY_PROGRAMS).length * TRADEIFY_SIZES.length; // 12
+/** Une taille qu'ils affichent ou cachent (is300visible) : relue quand elle est en vente (04/11/2026). */
+const TRADEIFY_EXTRA_SIZES = { Select: [300000] };
 
 const MONTHS = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
 
@@ -164,7 +166,7 @@ export function parseTradeify(html, now = Date.now()) {
   const notices = [];
   for (const programName of Object.keys(TRADEIFY_PROGRAMS)) {
     for (const a of programAccounts(html, programName)) {
-      if (!TRADEIFY_SIZES.includes(a.size)) {
+      if (!TRADEIFY_SIZES.includes(a.size) && !TRADEIFY_EXTRA_SIZES[programName]?.includes(a.size)) {
         notices.push(`vendu chez eux, pas dans notre JSON (pas ajouté) : ${programName} $${a.size / 1000}K (${a.price})`);
         continue;
       }
