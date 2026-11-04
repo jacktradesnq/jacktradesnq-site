@@ -147,7 +147,7 @@ Deploy : push sur `main` -> GitHub Actions -> Cloudflare Pages auto.
 - Idées reprises de fredvshapes.com, jamais sa forme (Angelo, 04/11/2026 : « j'avoue page giveaways, pourquoi pas », « le but c pas de copier coller tout entièrement ») :
   - Carte d'une firme : la remise dans la pastille, « 20% off with code JTNQ », « Up to 35% off… » quand elle varie selon les plans ; même format pour toutes (lib/discount-words.mjs). Futures = calculée sur les prix des plans, perps = le taux publié.
   - Comparateur : un bouton par limite de daily loss sur les plans vendus en plusieurs versions (MFP Elite, Vest 1-Step), le prix suit (lib/daily-loss-choices.mjs). Rien d'autre n'a de boutons.
-  - /giveaways : ses mots repris de Discord, historique dans content/giveaways/giveaways.json mis à jour à la main ; aucun pseudo de gagnant affiché sans son accord.
+  - /giveaways : ses mots repris de Discord, historique dans content/giveaways/giveaways.json mis à jour à la main ; aucun pseudo de gagnant (Angelo, 04/11/2026 : « pas le pseudo gagnant, on s'en fout »).
 - `output: 'export'` : pas de server-side runtime, pas d'API routes dynamiques.
 - Section études (/studies, ex-/backtested-data, /print, PDF, data JSON, scripts de backtest) retirée le 12/10/2026 à la demande d'Angelo (« pas sur que ca sois un projet a mon image », puis « je veux bien » pour « Je les retire ») ; les anciennes URLs redirigent vers la home (public/_redirects). Tout reste dans l'historique git.
 - Fonts : ne plus importer via CDN Fontshare (bloque COEP). Self-hosted uniquement dans `public/fonts/`.
