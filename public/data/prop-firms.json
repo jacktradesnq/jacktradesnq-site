@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-04",
+  "generatedAt": "2026-11-05",
   "firms": [
     {
       "id": "traders-launch",
@@ -8,9 +8,61 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-11-04",
+      "lastChecked": "2026-11-05",
       "stale": false,
       "programs": [
+        {
+          "name": "Selected",
+          "type": "eval",
+          "priceType": "one-time",
+          "plans": [
+            {
+              "size": 100000,
+              "price": 159,
+              "profitTarget": 2000,
+              "maxDrawdown": 1000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "consistency": "40%",
+              "minDays": 0,
+              "contracts": "2 minis or 20 micros",
+              "note": "Session profit limit: 40% of profit target. Trading hours: 6:00pm – 4:00pm ET the following day. Price shown for the 80% split.",
+              "splitPrices": {
+                "60": 99
+              }
+            },
+            {
+              "size": 200000,
+              "price": 299,
+              "profitTarget": 4000,
+              "maxDrawdown": 2000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "consistency": "40%",
+              "minDays": 0,
+              "contracts": "4 minis or 40 micros",
+              "note": "Session profit limit: 40% of profit target. Trading hours: 6:00pm – 4:00pm ET the following day. Price shown for the 80% split.",
+              "splitPrices": {
+                "60": 199
+              }
+            },
+            {
+              "size": 300000,
+              "price": 599,
+              "profitTarget": 6000,
+              "maxDrawdown": 3000,
+              "ddType": "EOD Trailing",
+              "dailyLoss": null,
+              "consistency": "40%",
+              "minDays": 0,
+              "contracts": "6 minis or 60 micros",
+              "note": "Session profit limit: 40% of profit target. Trading hours: 6:00pm – 4:00pm ET the following day. Price shown for the 80% split.",
+              "splitPrices": {
+                "60": 399
+              }
+            }
+          ]
+        },
         {
           "name": "Premium",
           "type": "eval",
@@ -181,7 +233,7 @@
       },
       "code": "JTNQ",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-11-04",
+      "lastChecked": "2026-11-05",
       "stale": false,
       "programs": [
         {
@@ -362,7 +414,7 @@
         "code": "JTNQ"
       },
       "url": "https://trader.blusky.pro/checkout?referral_id=09577e87582233340375",
-      "lastChecked": "2026-11-04",
+      "lastChecked": "2026-11-05",
       "stale": false,
       "programs": [
         {
