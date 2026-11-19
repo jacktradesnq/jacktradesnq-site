@@ -30,7 +30,8 @@ export const META = {
     mentionsUrl: '/mentions-legales/',
     privacyUrl: '/politique-confidentialite/',
     adviceNotice: ADVICE_NOTICE,
-    disclaimer: `${ADVICE_NOTICE} This page is an advertisement: the firms shown with code JTNQ are affiliates, and JackTradesNQ earns a commission on sign-ups made with code JTNQ. A firm shown without code JTNQ is not an affiliate.`,
+    // « or JackTNQ »: Tradeify's code since 19/11/2026 (content/prop-firms/codes.md).
+    disclaimer: `${ADVICE_NOTICE} This page is an advertisement: the firms shown with code JTNQ or JackTNQ are affiliates, and JackTradesNQ earns a commission on sign-ups made with code JTNQ or JackTNQ. A firm shown without code JTNQ or JackTNQ is not an affiliate.`,
   },
 };
 

@@ -19,6 +19,12 @@
  * 12 prix (price / originalPrice de Growth, Select, Lightning × 25K/50K/100K/150K), lastChecked.
  * Les règles des plans restent écrites à la main. Lucid Trading n'est pas relu (403 Cloudflare).
  *
+ * Firme affiliée ("affiliate": true, Tradeify depuis le 19/11/2026, Angelo : « c officielle j'ai
+ * le code JackTNQ sur tradeify. donc mtn go changer dans mon site ») : son code imprimé (firm.code,
+ * JackTNQ) n'est jamais réécrit. Le code public lu sur leur page sert seulement à trouver les prix
+ * remisés et la date de fin ; les libellés écrits dans le JSON portent le code imprimé, jamais le
+ * public (content/prop-firms/codes.md : « Jamais le leur »).
+ *
  * Trois sorties, distinctes dans les logs :
  *   « OK — rien n'a changé »            code 0
  *   « OK — N changement(s) »            code 0
@@ -231,9 +237,25 @@ export function parseTradeify(html, now = Date.now()) {
 }
 
 /**
- * Applique une relecture à la firme (copie modifiée en place). Renvoie la liste des changements.
+ * Une relecture vue par une firme affiliée : le code public de leur page remplacé par le code
+ * imprimé, dans le code et dans les libellés (« 30-45% off with code JackTNQ »).
  */
-export function applyTradeify(firm, read, today) {
+export function asPrinted(read, code) {
+  const swap = (o) => (o ? { ...o, code, label: o.label.replace(/with code \S+$/, `with code ${code}`) } : o);
+  return {
+    ...read,
+    promo: swap(read.promo),
+    code,
+    offers: Object.fromEntries(Object.entries(read.offers ?? {}).map(([name, o]) => [name, swap(o)])),
+  };
+}
+
+/**
+ * Applique une relecture à la firme (copie modifiée en place). Renvoie la liste des changements.
+ * Firme affiliée : son code imprimé reste, la relecture est d'abord passée par asPrinted.
+ */
+export function applyTradeify(firm, parsed, today) {
+  const read = firm.affiliate ? asPrinted(parsed, firm.code) : parsed;
   const changes = [];
   const before = JSON.stringify(firm.promo ?? null);
   if (before !== JSON.stringify(read.promo)) {
@@ -296,6 +318,8 @@ export async function runTradeify(data, { read = fetchTradeify, now = Date.now()
   const today = new Date(now).toISOString().slice(0, 10);
   let parsed;
   try {
+    // Une firme affiliée sans code imprimé laisserait passer le code public : on s'arrête.
+    if (firm.affiliate && !firm.code) throw new Error('firme affiliée sans code imprimé ("code") dans le JSON');
     parsed = parseTradeify(await read(), now);
     // Les 12 comptes du JSON doivent tous avoir été relus.
     for (const program of firm.programs)
@@ -310,11 +334,12 @@ export async function runTradeify(data, { read = fetchTradeify, now = Date.now()
   for (const n of parsed.notices) log(`${FIRM_ID}: NOTICE — ${n}`);
   const changes = applyTradeify(firm, parsed, today);
   const perProgram = Object.entries(parsed.offers).map(([name, o]) => `${name} ${o.code}`).join(', ');
-  const offer = perProgram
-    ? `codes par programme : ${perProgram}`
-    : parsed.promo
-      ? `code ${parsed.promo.code}${parsed.promo.ends ? ` jusqu'au ${parsed.promo.ends}` : ''}`
-      : 'aucun code affiché';
+  const offer =
+    (perProgram
+      ? `codes par programme : ${perProgram}`
+      : parsed.promo
+        ? `code ${parsed.promo.code}${parsed.promo.ends ? ` jusqu'au ${parsed.promo.ends}` : ''}`
+        : 'aucun code affiché') + (firm.affiliate ? ` ; code imprimé ${firm.code}` : '');
   if (changes.length === 0) log(`${FIRM_ID}: OK — ${parsed.plans.length} prix relus, rien n'a changé (${offer})`);
   else {
     log(`${FIRM_ID}: OK — ${parsed.plans.length} prix relus (${offer}), ${changes.length} changement(s) :`);

@@ -368,15 +368,15 @@
     {
       "id": "tradeify",
       "name": "Tradeify",
-      "affiliate": false,
+      "affiliate": true,
       "split": "90%",
       "payout": "Daily",
       "promo": {
-        "label": "30-40% off with code NOV",
-        "code": "NOV",
+        "label": "30-40% off with code JackTNQ",
+        "code": "JackTNQ",
         "ends": "2026-11-13T23:59:00-05:00"
       },
-      "code": "NOV",
+      "code": "JackTNQ",
       "url": "https://tradeify.co/#pricing",
       "lastChecked": "2026-11-05",
       "stale": false,

@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 import { formatPriceValue, parseTradeify, runTradeify } from './scrape-tradeify.mjs';
+import { parseCodes } from '../lib/firm-codes.mjs';
+import { firmAt } from '../lib/promo-ends.mjs';
 
 // tradeify.co enregistrée le 2026-11-01 à 00:45 UTC (curl, User-Agent navigateur), code GEMS -30 %.
 const PAGE = fs.readFileSync(new URL('./__fixtures__/tradeify-2026-11-01.html', import.meta.url), 'utf8');
@@ -34,6 +36,12 @@ const without300K = (data) => {
   return data;
 };
 const freshData = () => without300K(structuredClone(DATA));
+// La même firme non affiliée (Tradeify avant le 19/11/2026) : son code public est écrit tel quel.
+const publicData = () => {
+  const data = freshData();
+  data.firms.find((f) => f.id === 'tradeify').affiliate = false;
+  return data;
+};
 const quiet = () => {};
 
 // La même page, sans aucun code : leurs couponDetails à 0 % (getDiscountValue : pas de remise,
@@ -76,7 +84,7 @@ test('leur arrondi : ,5 vers le haut', () => {
 });
 
 test('relecture appliquée au JSON : 12 prix, code, lastChecked, pas stale', async () => {
-  const data = freshData();
+  const data = publicData();
   const { ok } = await runTradeify(data, { read: async () => PAGE, now: RECORDED, log: quiet });
   assert.equal(ok, true);
   const firm = data.firms.find((f) => f.id === 'tradeify');
@@ -107,7 +115,7 @@ test('sans code affiché : promo null, code null, prix = prix catalogue', async 
   assert.ok(r.plans.every((p) => p.price === p.originalPrice));
   assert.deepEqual(r.plans.map((p) => p.originalPrice), GEMS_TABLE.map((row) => row[3]));
 
-  const data = freshData();
+  const data = publicData();
   const lines = [];
   const { ok } = await runTradeify(data, { read: async () => NO_CODE, now: RECORDED, log: (l) => lines.push(l) });
   assert.equal(ok, true);
@@ -131,7 +139,7 @@ test('même code, remise différente par programme : chaque prix porte la sienne
   const select25 = r.plans.find((p) => p.programName === 'Select' && p.size === 25000);
   assert.deepEqual([select25.price, select25.originalPrice], [76, 109]);
 
-  const data = freshData();
+  const data = publicData();
   const { ok } = await runTradeify(data, { read: async () => NOV_PAGE, now: RECORDED, log: quiet });
   assert.equal(ok, true);
   const firm = data.firms.find((f) => f.id === 'tradeify');
@@ -142,7 +150,7 @@ test('même code, remise différente par programme : chaque prix porte la sienne
 
 test('un code par programme : chaque programme garde le sien, pas de code de firme', async () => {
   const twoCodes = withCoupons("default_code: ['NOV', 30], growth: ['GROW', 40], select: ['NOV', 30], lightning: ['NOV', 30],");
-  const data = freshData();
+  const data = publicData();
   const { ok } = await runTradeify(data, { read: async () => twoCodes, now: RECORDED, log: quiet });
   assert.equal(ok, true);
   const firm = data.firms.find((f) => f.id === 'tradeify');
@@ -160,6 +168,81 @@ test('un code par programme : chaque programme garde le sien, pas de code de fir
   assert.equal(firm.code, 'NOV');
   assert.equal(program('Growth').promoCode, undefined);
   assert.equal(program('Growth').promoLabel, undefined);
+});
+
+// Tradeify affiliée depuis le 19/11/2026, code JackTNQ (Angelo : « c officielle j'ai le code
+// JackTNQ sur tradeify. donc mtn go changer dans mon site »).
+const PUBLIC_CODES = /\b(GEMS|NOV|GROW)\b/;
+
+test('codes.md et le JSON impriment le même code pour Tradeify : JackTNQ, lien vers leur site', () => {
+  const codes = parseCodes(fs.readFileSync(new URL('../content/prop-firms/codes.md', import.meta.url), 'utf8'));
+  const firm = DATA.firms.find((f) => f.id === 'tradeify');
+  assert.equal(codes.tradeify, 'JackTNQ');
+  assert.equal(firm.code, codes.tradeify);
+  assert.equal(firm.affiliate, true);
+  assert.equal(firm.url, 'https://tradeify.co/#pricing');
+  assert.doesNotMatch(JSON.stringify(firm), PUBLIC_CODES);
+  // Lucid reste non affiliée, son code public tel quel.
+  const lucid = DATA.firms.find((f) => f.id === 'lucid-trading');
+  assert.equal(lucid.affiliate, false);
+  assert.equal(codes['lucid-trading'], undefined);
+});
+
+test('firme affiliée : prix et date de fin relus, le code imprimé reste JackTNQ', async () => {
+  const data = freshData();
+  const lines = [];
+  const { ok } = await runTradeify(data, { read: async () => PAGE, now: RECORDED, log: (l) => lines.push(l) });
+  assert.equal(ok, true);
+  const firm = data.firms.find((f) => f.id === 'tradeify');
+  assert.deepEqual(firmTable(firm), GEMS_TABLE);
+  assert.equal(firm.code, 'JackTNQ');
+  assert.deepEqual(firm.promo, { label: '30% off with code JackTNQ', code: 'JackTNQ', ends: '2026-10-31T23:59:00-04:00' });
+  assert.doesNotMatch(JSON.stringify(firm), PUBLIC_CODES);
+  assert.match(lines.join('\n'), /code imprimé JackTNQ/);
+});
+
+test('firme affiliée : jamais de code public dans le JSON, un code ou un code par programme', async () => {
+  const data = freshData();
+  const firm = data.firms.find((f) => f.id === 'tradeify');
+  const program = (name) => firm.programs.find((p) => p.name === name);
+
+  await runTradeify(data, { read: async () => NOV_PAGE, now: RECORDED, log: quiet });
+  assert.equal(firm.code, 'JackTNQ');
+  assert.equal(firm.promo.label, '30-40% off with code JackTNQ');
+  assert.equal(firm.programs[0].plans[0].price, 59);
+  assert.doesNotMatch(JSON.stringify(firm), PUBLIC_CODES);
+
+  const twoCodes = withCoupons("default_code: ['NOV', 30], growth: ['GROW', 40], select: ['NOV', 30], lightning: ['NOV', 30],");
+  await runTradeify(data, { read: async () => twoCodes, now: RECORDED, log: quiet });
+  assert.equal(firm.code, 'JackTNQ');
+  assert.equal(program('Growth').promoCode, 'JackTNQ');
+  assert.equal(program('Growth').promoLabel, '40% off with code JackTNQ');
+  assert.equal(program('Growth').plans[0].price, 59);
+  assert.equal(program('Select').plans[0].price, 76);
+  assert.doesNotMatch(JSON.stringify(firm), PUBLIC_CODES);
+});
+
+test('firme affiliée, page sans code : prix catalogue, promo null, le code imprimé reste', async () => {
+  const data = freshData();
+  const { ok } = await runTradeify(data, { read: async () => NO_CODE, now: RECORDED, log: quiet });
+  assert.equal(ok, true);
+  const firm = data.firms.find((f) => f.id === 'tradeify');
+  assert.equal(firm.promo, null);
+  assert.equal(firm.code, 'JackTNQ');
+  assert.ok(firm.programs.every((pr) => pr.plans.every((pl) => pl.price === pl.originalPrice)));
+});
+
+test('firme affiliée, date de fin passée : firmAt retire le code et les prix remisés comme avant', async () => {
+  const data = freshData();
+  await runTradeify(data, { read: async () => PAGE, now: RECORDED, log: quiet });
+  const firm = data.firms.find((f) => f.id === 'tradeify');
+  const ends = Date.parse(firm.promo.ends);
+  assert.equal(firmAt(firm, ends - 1).code, 'JackTNQ');
+  const after = firmAt(firm, ends);
+  assert.equal(after.code, null);
+  assert.equal(after.promo, null);
+  assert.ok(after.programs.every((pr) => pr.plans.every((pl) => pl.originalPrice === null)));
+  assert.deepEqual(after.programs.flatMap((pr) => pr.plans.map((pl) => pl.price)), GEMS_TABLE.map((row) => row[3]));
 });
 
 test('un code sur certains programmes seulement : les autres au prix catalogue', () => {
@@ -215,4 +298,17 @@ test('site injoignable (HTTP 403) : données gardées, stale, échec', async () 
   await assertBroken(async () => {
     throw new Error('HTTP 403 sur https://tradeify.co/');
   }, /HTTP 403/);
+});
+
+test('firme affiliée sans code imprimé : rien écrit (le code public ne passe pas), stale, échec', async () => {
+  const data = freshData();
+  const firm = data.firms.find((f) => f.id === 'tradeify');
+  delete firm.code;
+  const lines = [];
+  const res = await runTradeify(data, { read: async () => PAGE, now: RECORDED, log: (l) => lines.push(l) });
+  assert.deepEqual(res, { ok: false, changes: [] });
+  assert.equal(firm.stale, true);
+  assert.equal(firm.code, undefined);
+  assert.doesNotMatch(JSON.stringify(firm), PUBLIC_CODES);
+  assert.match(lines.join('\n'), /firme affiliée sans code imprimé/);
 });

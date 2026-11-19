@@ -1,8 +1,9 @@
 # Quel code on imprime, firme par firme
 
-Une ligne par firme. Deux valeurs possibles :
+Une ligne par firme. Trois valeurs possibles :
 
     e8-markets = JTNQ      -> la page dit "code JTNQ"
+    tradeify = JackTNQ     -> la firme t'a donne un autre code : la page dit "code JackTNQ"
     une-firme = link       -> aucun code a taper, le lien porte la remise
 
 ## Pourquoi c'est JTNQ partout
@@ -30,12 +31,24 @@ Quelqu'un qui revient sur leur site sans le lien doit donc voir le code
 (Angelo, 21/10/2026 : « si ils veulent ils peuvent egalement utiliser mon code
 non ? imagine ils ont pas clique mon lien »).
 
+## Tradeify
+
+Le code est JackTNQ (cette casse), pas JTNQ : Despina (Tradeify Affiliate Team)
+l'a mis a jour le 19/11/2026 (« Sure, this has been updated! », visuel « USE
+CODE: JACKTNQ ») (Angelo, 19/11/2026 : « c officielle j'ai le code JackTNQ sur
+tradeify. donc mtn go changer dans mon site »). Tradeify n'est que dans le
+comparateur : public/data/compare-extra-firms.json porte le meme code
+("code": "JackTNQ", scripts/firms-tradeify.test.mjs verifie que les deux disent
+pareil), le bouton mene a leur site (aucun lien de tracking donne). Le feed des
+promos ne lit que prop-firms.json, il ne voit pas Tradeify.
+
 ---
 
 ## codes
 traders-launch = JTNQ
 e8-markets = JTNQ
 blusky = JTNQ
+tradeify = JackTNQ
 
 ---
 

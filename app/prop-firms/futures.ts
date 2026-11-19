@@ -1,11 +1,12 @@
 // Futures firms turned into FirmView (partner cards) and CompareRow (the comparator).
 // - public/data/prop-firms.json: partner firms, scraped daily by scripts/scrape-prop-firms.mjs.
-// - public/data/compare-extra-firms.json: firms Angelo is not partnered with (Lucid Trading,
-//   Tradeify), same shape plus "affiliate": false and "code" = their public code. They show in
-//   the comparator only, with their own site and code (Angelo, 01/11/2026). Once their
-//   promo.ends passes, the comparator drops the code and the discounted prices (firmAt in
-//   lib/promo-ends.mjs, judged by the shared clock of promo-clock.ts); Tradeify's are read
-//   again every day by scripts/scrape-tradeify.mjs.
+// - public/data/compare-extra-firms.json: firms shown in the comparator only, with their own
+//   site (Angelo, 01/11/2026). Same shape plus "affiliate" and "code": Lucid Trading, not a
+//   partner ("affiliate": false), "code" = its public code; Tradeify, a partner since
+//   19/11/2026 ("affiliate": true), "code" = JackTNQ, the code Angelo was given there. Once
+//   their promo.ends passes, the comparator drops the code and the discounted prices (firmAt in
+//   lib/promo-ends.mjs, judged by the shared clock of promo-clock.ts); Tradeify's prices and
+//   end date are read again every day by scripts/scrape-tradeify.mjs.
 
 import rawData from '@/public/data/prop-firms.json';
 import rawExtra from '@/public/data/compare-extra-firms.json';
@@ -77,7 +78,8 @@ type Firm = {
   url: string;
   lastChecked: string;
   stale: boolean;
-  // compare-extra-firms.json only: false, not a partner.
+  // compare-extra-firms.json only: false, not a partner; true, a partner shown in the
+  // comparator only (Tradeify, code JackTNQ).
   affiliate?: boolean;
   programs: Program[];
 };
@@ -483,12 +485,16 @@ function partnerLink(firm: Firm): Link {
   };
 }
 
-// A firm Angelo is not partnered with: its official site, its public code as written.
-const extraLink = (firm: Firm): Link => ({
-  href: firm.url,
-  affiliate: false,
-  code: firm.code ? { code: firm.code, title: 'The firm’s public code' } : null,
-});
+// A firm of compare-extra-firms.json: its official site. Not a partner: its public code as
+// written. A partner there ("affiliate": true, Tradeify since 19/11/2026, Angelo: « c officielle
+// j'ai le code JackTNQ sur tradeify. donc mtn go changer dans mon site »): the code it prints
+// (firm.code, the same as codes.md), never the firm's public code; no /go/ link given, so its site.
+function extraLink(firm: Firm): Link {
+  if (!firm.affiliate)
+    return { href: firm.url, affiliate: false, code: firm.code ? { code: firm.code, title: 'The firm’s public code' } : null };
+  const promo = firm.programs.length ? promoFor(firm, firm.programs[0]) : { title: '' };
+  return { href: firm.url, affiliate: true, code: firm.code ? { code: firm.code, title: promo.title || 'My affiliate code' } : null };
+}
 
 function firmView(firm: Firm, rows: CompareRow[], link: Link): FirmView {
   const programs = firm.programs;

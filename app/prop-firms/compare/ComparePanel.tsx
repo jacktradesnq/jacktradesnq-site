@@ -30,9 +30,10 @@ import { COLUMNS, type Column } from './columns';
 import { COMPARE_CSS } from './compare-css';
 
 // The comparator's own disclaimer, under the table (Angelo, 01/11/2026: firms showing code JTNQ
-// are affiliates; a firm without code JTNQ is not).
+// are affiliates; a firm without code JTNQ is not). « or JackTNQ »: Tradeify's code since
+// 19/11/2026 (content/prop-firms/codes.md).
 export const COMPARE_NOTE =
-  'Firms shown with code JTNQ are affiliates: JackTradesNQ earns a commission on sign-ups made with code JTNQ. A firm shown without code JTNQ is not an affiliate.';
+  'Firms shown with code JTNQ or JackTNQ are affiliates: JackTradesNQ earns a commission on sign-ups made with code JTNQ or JackTNQ. A firm shown without code JTNQ or JackTNQ is not an affiliate.';
 
 const LONG = 48;
 
