@@ -6,18 +6,25 @@
  * « quand c'est expiré check tous les jours jusqu'à ce qu'il y ait le bon code ».
  *
  * tradeify.co répond 200 à un simple fetch avec un User-Agent navigateur. Les cartes de prix
- * sont dessinées par leur JS à partir de trois objets écrits dans le HTML :
- *   const GrowthData / SelectData / LightningData = [{ broker: [{ broker_name, account_size:
- *     [{ name: '25K', price: 99, couponCode: 'growth', showFraction: false, ... }] }] }]
+ * sont dessinées par leur JS à partir d'objets écrits dans le HTML :
+ *   const GrowthData / SelectData / LightningData / InterMiamiData = [{ name, isVisible, broker:
+ *     [{ broker_name, account_size: [{ name: '25K', price: 99, couponCode: 'growth', showFraction:
+ *     false, ... }] }] }]
  *   const couponDetails = { default_code: ['GEMS', 30], growth: ['GEMS', 30], ... }
  *   const couponInfo = { lastDay: '31', month: 'OCTOBER', time: '11:59PM EST', monthlyCode: 'GEMS' }
  * Prix affiché = formatPriceValue(price × (100 − remise) / 100), barré = price ; remise 0 = ni
  * code ni prix barré (leur getDiscountValue). Une plateforme (Tradovate, WealthCharts, Tradesea)
- * dont les prix diffèrent arrête la relecture plutôt que d'en choisir une.
+ * dont les prix diffèrent arrête la relecture plutôt que d'en choisir une. Les lignes en
+ * commentaire (« // broker_name: "WealthCharts" » dans InterMiamiData, le 19/11/2026) ne sont pas
+ * en vente : ignorées.
  *
  * Met à jour, pour Tradeify seulement : promo (libellé, code, date de fin si affichée), code, les
- * 12 prix (price / originalPrice de Growth, Select, Lightning × 25K/50K/100K/150K), lastChecked.
- * Les règles des plans restent écrites à la main. Lucid Trading n'est pas relu (403 Cloudflare).
+ * prix (price / originalPrice) et lastChecked. 12 prix de base, toujours exigés : Growth, Select,
+ * Lightning × 25K/50K/100K/150K. En plus, relus quand ils sont en vente : Select 300K (is300visible)
+ * et Inter Miami 10K/25K/50K (programme « Limited Edition », isMiamivisible, ajouté le 19/11/2026 :
+ * le site reprend tout ce que la firme publie, CLAUDE.md 21/10/2026). Chaque compte du JSON doit
+ * être relu : avec le JSON actuel, 16 prix. Les règles des plans restent écrites à la main.
+ * Lucid Trading n'est pas relu (403 Cloudflare).
  *
  * Firme affiliée ("affiliate": true, Tradeify depuis le 19/11/2026, Angelo : « c officielle j'ai
  * le code JackTNQ sur tradeify. donc mtn go changer dans mon site ») : son code imprimé (firm.code,
@@ -28,8 +35,9 @@
  * Trois sorties, distinctes dans les logs :
  *   « OK — rien n'a changé »            code 0
  *   « OK — N changement(s) »            code 0
- *   « ÉCHEC — … stale: true »           code 1 : page illisible ou moins de 12 prix ; les données
- *                                        ne bougent pas, seule la firme passe stale: true.
+ *   « ÉCHEC — … stale: true »           code 1 : page illisible, moins de 12 prix de base, ou un
+ *                                        compte du JSON absent de leur page ; les données ne
+ *                                        bougent pas, seule la firme passe stale: true.
  *
  *   node scripts/scrape-tradeify.mjs           relit et écrit
  *   node scripts/scrape-tradeify.mjs --dry     relit, n'écrit rien
@@ -45,11 +53,23 @@ const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 
 /** Programme du JSON -> objet de données de leur page. */
-export const TRADEIFY_PROGRAMS = { Growth: 'GrowthData', Select: 'SelectData', Lightning: 'LightningData' };
+export const TRADEIFY_PROGRAMS = {
+  Growth: 'GrowthData',
+  Select: 'SelectData',
+  Lightning: 'LightningData',
+  'Inter Miami': 'InterMiamiData',
+};
 export const TRADEIFY_SIZES = [25000, 50000, 100000, 150000];
-const EXPECTED = Object.keys(TRADEIFY_PROGRAMS).length * TRADEIFY_SIZES.length; // 12
-/** Une taille qu'ils affichent ou cachent (is300visible) : relue quand elle est en vente (04/11/2026). */
-const TRADEIFY_EXTRA_SIZES = { Select: [300000] };
+/** Les programmes dont les 4 tailles de base sont toujours exigées : 12 prix, le seuil « page illisible ». */
+const CORE_PROGRAMS = ['Growth', 'Select', 'Lightning'];
+const EXPECTED = CORE_PROGRAMS.length * TRADEIFY_SIZES.length; // 12
+/**
+ * Ce qu'ils affichent ou cachent : relu quand c'est en vente. Select 300K (is300visible, 04/11/2026) ;
+ * Inter Miami (isMiamivisible, « Limited Edition », 19/11/2026), un programme entier, ses propres
+ * tailles. Encore dans le JSON mais plus sur leur page : runTradeify échoue, firme stale.
+ */
+const TRADEIFY_EXTRA_SIZES = { Select: [300000], 'Inter Miami': [10000, 25000, 50000] };
+const OPTIONAL_PROGRAMS = ['Inter Miami'];
 
 const MONTHS = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
 
@@ -59,6 +79,9 @@ export function formatPriceValue(value, showFraction) {
   if (showFraction) return Number(num.toFixed(2));
   return num - Math.floor(num) >= 0.5 ? Math.ceil(num) : Math.floor(num);
 }
+
+/** La page sans ses lignes de JS en commentaire (« // { broker_name: … »), les adresses gardées. */
+const withoutLineComments = (html) => html.replace(/^[ \t]*\/\/.*$/gm, '');
 
 /** Le texte d'un `const <name> = …` jusqu'à la fin de son <script>. */
 function scriptBlock(html, name) {
@@ -107,13 +130,21 @@ function accountsOf(html, brokerText) {
   });
 }
 
-/** Prix catalogue par taille d'un programme, identiques sur toutes les plateformes. */
+/**
+ * Prix catalogue par taille d'un programme, identiques sur toutes les plateformes. Un programme
+ * caché chez eux (isVisible: isMiamivisible = false) n'a aucun compte en vente ; un programme
+ * facultatif absent de la page non plus.
+ */
 function programAccounts(html, programName) {
   const varName = TRADEIFY_PROGRAMS[programName];
   const block = scriptBlock(html, varName);
-  if (!block) throw new Error(`${varName} introuvable dans la page`);
-  const brokers = block.split(/broker_name\s*:/).slice(1);
+  if (!block) {
+    if (OPTIONAL_PROGRAMS.includes(programName)) return [];
+    throw new Error(`${varName} introuvable dans la page`);
+  }
+  const [head, ...brokers] = block.split(/broker_name\s*:/);
   if (!brokers.length) throw new Error(`${varName} : aucune plateforme`);
+  if (!visible(html, head)) return [];
   const [first, ...others] = brokers.map((b) => accountsOf(html, b));
   for (const other of others)
     for (const a of first) {
@@ -162,17 +193,19 @@ export function parseEnds(html, code, now) {
 }
 
 /**
- * Ce que la page affiche : les 12 prix (avec et sans code) et le code public.
- * Lève une erreur dès que quelque chose manque : jamais de relecture partielle.
+ * Ce que la page affiche : les prix en vente (avec et sans code) et le code public.
+ * Lève une erreur dès qu'un des 12 prix de base manque : jamais de relecture partielle.
  */
-export function parseTradeify(html, now = Date.now()) {
-  if (typeof html !== 'string' || html.length < 1000) throw new Error('page vide ou tronquée');
+export function parseTradeify(page, now = Date.now()) {
+  if (typeof page !== 'string' || page.length < 1000) throw new Error('page vide ou tronquée');
+  const html = withoutLineComments(page);
   const coupons = parseCouponDetails(html);
   const plans = [];
   const notices = [];
   for (const programName of Object.keys(TRADEIFY_PROGRAMS)) {
+    const sizes = OPTIONAL_PROGRAMS.includes(programName) ? [] : TRADEIFY_SIZES;
     for (const a of programAccounts(html, programName)) {
-      if (!TRADEIFY_SIZES.includes(a.size) && !TRADEIFY_EXTRA_SIZES[programName]?.includes(a.size)) {
+      if (!sizes.includes(a.size) && !TRADEIFY_EXTRA_SIZES[programName]?.includes(a.size)) {
         notices.push(`vendu chez eux, pas dans notre JSON (pas ajouté) : ${programName} $${a.size / 1000}K (${a.price})`);
         continue;
       }
@@ -194,11 +227,12 @@ export function parseTradeify(html, now = Date.now()) {
     if (p.price < 10 || p.originalPrice > 6000)
       throw new Error(`${p.programName} $${p.size / 1000}K : prix ${p.price}/${p.originalPrice} hors de [10, 6000]`);
   }
-  const missing = Object.keys(TRADEIFY_PROGRAMS).flatMap((pr) =>
+  const missing = CORE_PROGRAMS.flatMap((pr) =>
     TRADEIFY_SIZES.filter((s) => !plans.some((p) => p.programName === pr && p.size === s)).map((s) => `${pr} $${s / 1000}K`),
   );
-  if (plans.length < EXPECTED || missing.length)
-    throw new Error(`${plans.length}/${EXPECTED} prix trouvés${missing.length ? ` (manquent : ${missing.join(', ')})` : ''}`);
+  const core = plans.filter((p) => CORE_PROGRAMS.includes(p.programName) && TRADEIFY_SIZES.includes(p.size)).length;
+  if (core < EXPECTED || missing.length)
+    throw new Error(`${core}/${EXPECTED} prix trouvés${missing.length ? ` (manquent : ${missing.join(', ')})` : ''}`);
 
   // Les firmes varient leurs promos d'un programme à l'autre (Angelo, 01/11/2026 : « c très commun
   // chez les propfirm ») : même code à remises différentes (NOV : Growth -40 %, le reste -30 %), ou
@@ -212,6 +246,7 @@ export function parseTradeify(html, now = Date.now()) {
   const offers = {};
   for (const programName of Object.keys(TRADEIFY_PROGRAMS)) {
     const own = plans.filter((p) => p.programName === programName);
+    if (!own.length) continue; // pas en vente (Inter Miami caché)
     const ownCodes = new Set(own.map((p) => p.code ?? '—'));
     if (ownCodes.size > 1) throw new Error(`${programName} : plusieurs codes dans le même programme (${[...ownCodes].join(' | ')}) : à relire à la main`);
     if (own[0].code) offers[programName] = { code: own[0].code, label: labelOf(own, own[0].code) };
@@ -321,7 +356,7 @@ export async function runTradeify(data, { read = fetchTradeify, now = Date.now()
     // Une firme affiliée sans code imprimé laisserait passer le code public : on s'arrête.
     if (firm.affiliate && !firm.code) throw new Error('firme affiliée sans code imprimé ("code") dans le JSON');
     parsed = parseTradeify(await read(), now);
-    // Les 12 comptes du JSON doivent tous avoir été relus.
+    // Tous les comptes du JSON doivent avoir été relus (16 : les 12 de base, Select 300K, Inter Miami).
     for (const program of firm.programs)
       for (const plan of program.plans)
         if (!parsed.plans.some((p) => p.programName === program.name && p.size === plan.size))

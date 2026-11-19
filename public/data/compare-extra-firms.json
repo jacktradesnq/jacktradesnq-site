@@ -605,6 +605,60 @@
               "note": "Instant funding, no resets. Payout profit goal: $9,000 for payout 1, $4,500 for payout 2+. Daily Loss Limit increases to the max drawdown when account profit hits 6%."
             }
           ]
+        },
+        {
+          "name": "Inter Miami",
+          "type": "eval",
+          "priceType": "one-time",
+          "steps": 1,
+          "split": "80% + 10% to Live Funds",
+          "payoutFrequency": "Daily",
+          "minPayout": "$200 / $400 / $600 gross (10K / 25K / 50K)",
+          "evalConsistency": "None",
+          "plans": [
+            {
+              "size": 10000,
+              "price": 79,
+              "originalPrice": 113,
+              "profitTarget": 1000,
+              "maxDrawdown": 500,
+              "ddType": "Static",
+              "dailyLoss": 300,
+              "dailyLossSoft": true,
+              "consistency": "None",
+              "minDays": 0,
+              "contracts": "10 micros",
+              "note": "Limited Edition. Price with the soft Daily Loss Limit (card default). Without a Daily Loss Limit (DLL Type None): $191 list price. Funded: same static drawdown and soft daily loss limit, daily payouts, minimum gross payout $200, payout split 80% / 10% / 10% (80% profit split + 10% to Live Funds). Live account after $12,000 in payouts."
+            },
+            {
+              "size": 25000,
+              "price": 153,
+              "originalPrice": 219,
+              "profitTarget": 2000,
+              "maxDrawdown": 1000,
+              "ddType": "Static",
+              "dailyLoss": 600,
+              "dailyLossSoft": true,
+              "consistency": "None",
+              "minDays": 0,
+              "contracts": "20 micros",
+              "note": "Limited Edition. Price with the soft Daily Loss Limit (card default). Without a Daily Loss Limit (DLL Type None): $368 list price. Funded: same static drawdown and soft daily loss limit, daily payouts, minimum gross payout $400, payout split 80% / 10% / 10% (80% profit split + 10% to Live Funds). Live account after $12,000 in payouts."
+            },
+            {
+              "size": 50000,
+              "price": 263,
+              "originalPrice": 376,
+              "profitTarget": 3500,
+              "maxDrawdown": 1500,
+              "ddType": "Static",
+              "dailyLoss": 900,
+              "dailyLossSoft": true,
+              "consistency": "None",
+              "minDays": 0,
+              "contracts": "30 micros",
+              "note": "Limited Edition. Price with the soft Daily Loss Limit (card default). Without a Daily Loss Limit (DLL Type None): $628 list price. Funded: same static drawdown and soft daily loss limit, daily payouts, minimum gross payout $600, payout split 80% / 10% / 10% (80% profit split + 10% to Live Funds). Live account after $12,000 in payouts."
+            }
+          ]
         }
       ]
     }

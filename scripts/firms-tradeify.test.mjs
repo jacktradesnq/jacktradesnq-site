@@ -29,11 +29,17 @@ const GEMS_TABLE = [
 
 const table = (plans) => plans.map((p) => [p.programName, p.size, p.price, p.originalPrice]);
 const firmTable = (firm) => firm.programs.flatMap((pr) => pr.plans.map((pl) => [pr.name, pl.size, pl.price, pl.originalPrice]));
-// La page enregistrée le 01/11 cachait le Select 300K (is300visible = false) : le JSON sans lui.
+// La page enregistrée le 01/11 n'avait pas encore Inter Miami (ajouté chez eux depuis) : le JSON sans lui.
+const withoutMiami = (data) => {
+  const firm = data.firms.find((f) => f.id === 'tradeify');
+  firm.programs = firm.programs.filter((p) => p.name !== 'Inter Miami');
+  return data;
+};
+// Elle cachait aussi le Select 300K (is300visible = false) : le JSON sans lui.
 const without300K = (data) => {
   const select = data.firms.find((f) => f.id === 'tradeify').programs.find((p) => p.name === 'Select');
   select.plans = select.plans.filter((p) => p.size !== 300000);
-  return data;
+  return withoutMiami(data);
 };
 const freshData = () => without300K(structuredClone(DATA));
 // La même firme non affiliée (Tradeify avant le 19/11/2026) : son code public est écrit tel quel.
@@ -70,9 +76,9 @@ test('le Select 300K : relu quand ils le vendent, firme stale quand il disparaî
   const p = r.plans.find((x) => x.programName === 'Select' && x.size === 300000);
   assert.ok(p);
   assert.deepEqual(r.notices, []);
-  const withIt = structuredClone(DATA);
+  const withIt = withoutMiami(structuredClone(DATA));
   assert.equal((await runTradeify(withIt, { read: async () => visible, now: RECORDED, log: quiet })).ok, true);
-  const hidden = structuredClone(DATA);
+  const hidden = withoutMiami(structuredClone(DATA));
   assert.equal((await runTradeify(hidden, { read: async () => PAGE, now: RECORDED, log: quiet })).ok, false);
   assert.equal(hidden.firms.find((f) => f.id === 'tradeify').stale, true);
 });
@@ -298,6 +304,82 @@ test('site injoignable (HTTP 403) : données gardées, stale, échec', async () 
   await assertBroken(async () => {
     throw new Error('HTTP 403 sur https://tradeify.co/');
   }, /HTTP 403/);
+});
+
+// tradeify.co enregistrée le 2026-11-19 vers 12:05 UTC (curl, User-Agent navigateur) : code NOV,
+// -45 % sur les 25K (« excluding Miami »), -30 % ailleurs, Select 300K en vente, et le 4e programme
+// Inter Miami (« Limited Edition », 10K / 25K / 50K, onglet Tradovate ; WealthCharts et Tradesea
+// en commentaire dans leur JS).
+const PAGE_1119 = fs.readFileSync(new URL('./__fixtures__/tradeify-2026-11-19.html', import.meta.url), 'utf8');
+const RECORDED_1119 = Date.parse('2026-11-19T12:05:00Z');
+const NOV_TABLE = [
+  ['Growth', 25000, 54, 99],
+  ['Growth', 50000, 102, 145],
+  ['Growth', 100000, 179, 255],
+  ['Growth', 150000, 258, 369],
+  ['Select', 25000, 60, 109],
+  ['Select', 50000, 116, 165],
+  ['Select', 100000, 186, 265],
+  ['Select', 150000, 258, 369],
+  ['Select', 300000, 368, 525],
+  ['Lightning', 25000, 190, 345],
+  ['Lightning', 50000, 344, 492],
+  ['Lightning', 100000, 462, 660],
+  ['Lightning', 150000, 557, 796],
+  ['Inter Miami', 10000, 79, 113],
+  ['Inter Miami', 25000, 153, 219],
+  ['Inter Miami', 50000, 263, 376],
+];
+
+test('page du 19/11 : 16 prix, Inter Miami compris (le 25K Miami à -30 %, pas -45 %), fin le 30/11', () => {
+  assert.match(PAGE_1119, /\/\/\s*broker_name: "WealthCharts"/); // le piège : des plateformes en commentaire
+  const r = parseTradeify(PAGE_1119, RECORDED_1119);
+  assert.deepEqual(table(r.plans), NOV_TABLE);
+  assert.deepEqual(r.promo, { label: '30-45% off with code NOV', code: 'NOV', ends: '2026-11-30T23:59:00-05:00' });
+  assert.deepEqual(r.notices, []);
+});
+
+test('le JSON livré = la page du 19/11 : 16 prix relus, rien n\'a changé, code imprimé JackTNQ', async () => {
+  const data = structuredClone(DATA);
+  const lines = [];
+  const res = await runTradeify(data, { read: async () => PAGE_1119, now: RECORDED_1119, log: (l) => lines.push(l) });
+  assert.deepEqual(res, { ok: true, changes: [] });
+  assert.match(lines.join('\n'), /OK — 16 prix relus, rien n'a changé \(code NOV jusqu'au 2026-11-30T23:59:00-05:00 ; code imprimé JackTNQ\)/);
+  const firm = data.firms.find((f) => f.id === 'tradeify');
+  assert.deepEqual(firmTable(firm), NOV_TABLE);
+  assert.equal(firm.promo.label, '30-45% off with code JackTNQ');
+  assert.doesNotMatch(JSON.stringify(firm), PUBLIC_CODES);
+});
+
+test('Inter Miami caché chez eux (isMiamivisible = false) : 12 + 1 prix lus, le JSON qui l\'a encore = stale, échec', async () => {
+  const hidden = PAGE_1119.replace('const isMiamivisible = true', 'const isMiamivisible = false');
+  assert.notEqual(hidden, PAGE_1119);
+  const r = parseTradeify(hidden, RECORDED_1119);
+  assert.deepEqual(table(r.plans), NOV_TABLE.filter((row) => row[0] !== 'Inter Miami'));
+  const data = structuredClone(DATA);
+  const lines = [];
+  const res = await runTradeify(data, { read: async () => hidden, now: RECORDED_1119, log: (l) => lines.push(l) });
+  assert.deepEqual(res, { ok: false, changes: [] });
+  assert.equal(data.firms.find((f) => f.id === 'tradeify').stale, true);
+  assert.match(lines.join('\n'), /ÉCHEC — pas pu lire la page : Inter Miami \$10K du JSON pas trouvé sur leur page/);
+});
+
+test('Inter Miami dans le JSON : mêmes chiffres que leur carte Tradovate du 19/11', () => {
+  const miami = DATA.firms.find((f) => f.id === 'tradeify').programs.find((p) => p.name === 'Inter Miami');
+  assert.deepEqual(
+    miami.plans.map((p) => [p.size, p.profitTarget, p.maxDrawdown, p.ddType, p.dailyLoss, p.dailyLossSoft, p.contracts, p.minDays, p.consistency]),
+    [
+      [10000, 1000, 500, 'Static', 300, true, '10 micros', 0, 'None'],
+      [25000, 2000, 1000, 'Static', 600, true, '20 micros', 0, 'None'],
+      [50000, 3500, 1500, 'Static', 900, true, '30 micros', 0, 'None'],
+    ],
+  );
+  assert.equal(miami.payoutFrequency, 'Daily');
+  assert.equal(miami.minPayout, '$200 / $400 / $600 gross (10K / 25K / 50K)');
+  // Pas publiés pour Inter Miami : ni max payout (leur « Daily Profit Cap » est en commentaire), ni
+  // activation fee, ni consistency une fois funded.
+  for (const k of ['maxPayout', 'fundedConsistency']) assert.ok(!(k in miami), k);
+  assert.ok(miami.plans.every((p) => !('activationFee' in p)));
 });
 
 test('firme affiliée sans code imprimé : rien écrit (le code public ne passe pas), stale, échec', async () => {
