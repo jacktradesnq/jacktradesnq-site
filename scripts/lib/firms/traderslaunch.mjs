@@ -38,9 +38,17 @@
  * traderslaunch.com/futures/rules n'en cite aucune, la FAQ Static ecrit « There
  * is no separate daily loss limit » (21/10/2026, voir programFrom).
  *
- * L'onglet Early Access (des « drops » limites en quantite et en duree) devient
- * un programme « Early Access » des qu'un drop y est en vente ; sans drop, il
+ * L'onglet des drops (« Early Access », renomme « TL Drops » sur la page relue le
+ * 19/11/2026 ; des « drops » limites en quantite et en duree) devient
+ * un programme « Drop » des qu'un drop y est en vente ; sans drop, il
  * n'ajoute rien. Un drop illisible est signale au journal sans arreter la firme.
+ *
+ * Depuis le 05/11/2026, #pricing a aussi un choix de plateforme (logos Volumetrica /
+ * Hyperprop), des boutons `aria-pressed` comme les onglets ; le logo choisi porte le
+ * mot « Selected ». Lu comme un onglet, il a publie ce jour-la un programme
+ * « Selected », copie exacte de Premium (commit f6d346a). Un bouton dont le contenu
+ * est un logo n'est pas un onglet (`accountLabels`), et deux onglets qui montrent les
+ * memes cartes arretent la firme (`programsFromSnapshot`).
  * Un drop vendu sur une seule plateforme (TL Drop #2, « Hyperprop only », 26/10/2026)
  * n'a aucune carte sur la plateforme par defaut : l'onglet dit seulement « Show
  * Hyperprop Accounts ». La lecture clique alors ce bouton dans un navigateur
@@ -57,8 +65,29 @@ export const TRADERSLAUNCH_SOURCE = 'page traderslaunch.com';
 /** Le split dont le prix est le prix principal du plan. */
 export const PUBLISHED_SPLIT = 80;
 
-/** L'onglet des drops : publie seulement quand un drop est en vente. */
-const EARLY_ACCESS = 'Early Access';
+/**
+ * L'onglet des drops, publie seulement quand un drop est en vente : « Early Access »
+ * jusqu'au 05/11/2026, « TL Drops » sur la page relue le 19/11/2026.
+ */
+const DROPS_TABS = ['Early Access', 'TL Drops'];
+const isDropsTab = (account) => DROPS_TABS.includes(account);
+
+/**
+ * Les onglets « Account » parmi les boutons `aria-pressed` de #pricing, dans l'ordre.
+ * Ni les splits (« 60% », « 80% »), ni le choix de plateforme : ses boutons sont des
+ * logos (`<img>`), et le logo choisi dit « Selected » (page relue le 19/11/2026).
+ * Le libelle est la premiere ligne du bouton (« Premium » dans « Premium\nEOD »).
+ *
+ * @param {Array<{text: string, logo: boolean}>|null} buttons  releves dans la page
+ * @returns {string[]}
+ */
+export function accountLabels(buttons) {
+  return (buttons ?? [])
+    .filter((b) => !b.logo)
+    .map((b) => String(b.text ?? '').trim())
+    .filter((t) => t && !/^\d+%$/.test(t))
+    .map((t) => t.split('\n')[0].trim());
+}
 
 /**
  * Le nom du programme publie pour un drop. Angelo, 26/10/2026 : « c des Drop et c pas
@@ -331,9 +360,28 @@ export function programsFromSnapshot(snap, { log = () => {} } = {}) {
     throw new Error('traderslaunch.com : aucun onglet « Account » dans #pricing, la mise en page a change');
   }
 
+  // Deux onglets qui montrent les memes cartes : le clic n'a rien change, l'un des deux
+  // n'est pas un onglet « Account » (le logo de plateforme « Selected » lu le 05/11/2026
+  // a publie une copie de Premium). La firme s'arrete plutot que de publier un doublon.
+  const seen = new Map();
+  for (const v of views) {
+    const key = (v.splits ?? [])
+      .flatMap((s) => (s.cards ?? []).map((c) => String(c?.href ?? '')))
+      .sort()
+      .join(' ');
+    if (!key) continue;
+    if (seen.has(key)) {
+      throw new Error(
+        `les onglets « ${seen.get(key)} » et « ${v.account} » montrent les memes cartes : ` +
+          "l'un des deux n'est pas un onglet « Account », la lecture doit etre relue",
+      );
+    }
+    seen.set(key, v.account);
+  }
+
   const programmes = [];
   for (const v of views) {
-    if (v.account === EARLY_ACCESS) {
+    if (isDropsTab(v.account)) {
       if (!v.splits?.some((s) => s.cards?.length)) continue; // aucun drop en vente
       try {
         const ea = programFrom(DROP_PROGRAM, v.splits, v.faq, true);
@@ -351,7 +399,7 @@ export function programsFromSnapshot(snap, { log = () => {} } = {}) {
         programmes.push(ea);
       } catch (err) {
         // Un drop au gabarit inconnu ne doit pas geler Premium / Static / Legacy.
-        log(`Early Access : drop en vente mais illisible, NON publie (${err.message})`);
+        log(`${v.account} : drop en vente mais illisible, NON publie (${err.message})`);
       }
       continue;
     }
@@ -365,14 +413,14 @@ export function programsFromSnapshot(snap, { log = () => {} } = {}) {
   return programmes;
 }
 
-/** Une phrase pour le journal sur l'onglet Early Access, ou null s'il n'existe plus. */
+/** Une phrase pour le journal sur l'onglet des drops, ou null s'il n'existe plus. */
 export function earlyAccessStatus(snap) {
-  const v = snap?.views?.find((x) => x.account === EARLY_ACCESS);
+  const v = snap?.views?.find((x) => isDropsTab(x.account));
   if (!v) return null;
   const n = (v.splits ?? []).reduce((k, s) => k + (s.cards?.length ?? 0), 0);
   const sur = v.platform ? ` sur ${v.platform}` : '';
-  if (n) return `Early Access : ${n} carte(s) en vente${sur}, publiees comme programme « ${DROP_PROGRAM} »`;
-  return 'Early Access : aucun drop en vente';
+  if (n) return `${v.account} : ${n} carte(s) en vente${sur}, publiees comme programme « ${DROP_PROGRAM} »`;
+  return `${v.account} : aucun drop en vente`;
 }
 
 /**
@@ -401,19 +449,21 @@ export async function readTradersLaunchPage({ chromium, url = TRADERSLAUNCH_URL,
     await page.waitForTimeout(settleMs);
 
     const inPage = {
+      // Tous les boutons aria-pressed, bruts : accountLabels() garde les onglets.
       accounts: () => {
         const sec = document.querySelector('#pricing');
         if (!sec) return null;
-        const norm = (e) => e.innerText.trim().split('\n')[0].trim();
-        return [...sec.querySelectorAll('button[aria-pressed]')]
-          .filter((b) => b.innerText.trim() && !/^\d+%$/.test(b.innerText.trim()))
-          .map(norm);
+        return [...sec.querySelectorAll('button[aria-pressed]')].map((b) => ({
+          text: b.innerText,
+          logo: !!b.querySelector('img'),
+        }));
       },
       clickAccount: (label) => {
         const sec = document.querySelector('#pricing');
         const vis = (e) => !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
         const b = [...sec.querySelectorAll('button[aria-pressed]')]
           .filter(vis)
+          .filter((x) => !x.querySelector('img'))
           .find((x) => x.innerText.trim().split('\n')[0].trim() === label);
         if (!b) return false;
         if (b.getAttribute('aria-pressed') !== 'true') b.click();
@@ -481,8 +531,8 @@ export async function readTradersLaunchPage({ chromium, url = TRADERSLAUNCH_URL,
       text: () => document.querySelector('#pricing').innerText,
     };
 
-    const accounts = await page.evaluate(inPage.accounts);
-    if (!accounts?.length) throw new Error('traderslaunch.com : pas de section #pricing ou pas d onglet « Account »');
+    const accounts = accountLabels(await page.evaluate(inPage.accounts));
+    if (!accounts.length) throw new Error('traderslaunch.com : pas de section #pricing ou pas d onglet « Account »');
 
     const readSplits = async (legacy) => {
       const { list } = await page.evaluate(inPage.splits, [legacy, null]);
@@ -515,14 +565,14 @@ export async function readTradersLaunchPage({ chromium, url = TRADERSLAUNCH_URL,
     // Un drop vendu sur une seule plateforme : ses cartes n'existent que derriere
     // « Show <plateforme> Accounts ». Navigateur neuf, les autres onglets restent lus
     // sur la plateforme par defaut.
-    const ea = views.find((v) => v.account === EARLY_ACCESS);
+    const ea = views.find((v) => isDropsTab(v.account));
     const platform = ea && !ea.splits.some((s) => s.cards.length) ? ea.text?.match(/Show (\w+) Accounts/)?.[1] : null;
     if (platform) {
       const p2 = await (await browser.newContext({ userAgent: BROWSER_UA, viewport: { width: 1440, height: 1000 } })).newPage();
       const r2 = await p2.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
       if (r2 && !r2.ok()) throw new Error(`${url} : HTTP ${r2.status()}`);
       await p2.waitForTimeout(settleMs);
-      if (!(await p2.evaluate(inPage.clickAccount, EARLY_ACCESS))) throw new Error(`onglet « ${EARLY_ACCESS} » introuvable`);
+      if (!(await p2.evaluate(inPage.clickAccount, ea.account))) throw new Error(`onglet « ${ea.account} » introuvable`);
       await p2.waitForTimeout(1500);
       const shown = await p2.evaluate((label) => {
         const b = [...document.querySelectorAll('#pricing button')].find((x) => x.innerText.trim() === label);
