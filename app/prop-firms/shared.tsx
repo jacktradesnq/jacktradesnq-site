@@ -22,8 +22,10 @@ export const META = {
     eyebrow: 'FUTURES \u00b7 PERPS \u00b7 TRADE COPIER',
     title: 'Trading Partnerships', // Angelo 31/10/2026 : « on fais Trading Partnerships »
     // Angelo, 01/11/2026: plans moved to Prop compare, Lucid/Tradeify carry their own code.
+    // \u00ab except Tradeify \u00bb: a partner since 19/11/2026 with no tracking link, its button applies
+    // nothing, the visitor types code JackTNQ (content/prop-firms/codes.md).
     phrase:
-      'Futures and perps firms I\u2019m partnered with, and the trade copier I use. Use Prop compare to see every plan side by side \u2014 account sizes, prices and risk rules. My code JTNQ or tracked link applied on every partner button.',
+      'Futures and perps firms I\u2019m partnered with, and the trade copier I use. Use Prop compare to see every plan side by side \u2014 account sizes, prices and risk rules. My code JTNQ or tracked link applied on every partner button, except Tradeify: type code JackTNQ.',
   },
   legal: {
     copyright: '\u00a9 2026 JackTradesNQ. All rights reserved.',
