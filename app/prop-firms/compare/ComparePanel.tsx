@@ -324,7 +324,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
             </button>
           ))}
         </div>
-        <FirmSearch value={query} onChange={search} />
+        <FirmSearch value={query} onChange={search} names={[...rowsBy.futures, ...rowsBy.perps].map((r) => r.firmName)} />
         {firmName && (
           <span className="cmp-firm-chip">
             <span className="cmp-firm-chip-k">Firm</span>

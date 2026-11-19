@@ -191,7 +191,7 @@ export default function PropFirms() {
               <ComparePanel firm={compareFirm} onFirmChange={compareOn} />
             ) : (
             <>
-            <FirmSearch value={query} onChange={search} />
+            <FirmSearch value={query} onChange={search} names={[...firmsBy.futures, ...firmsBy.perps].map((f) => f.name)} />
             <p className="fam-caption" aria-live="polite">
               {shownFirms.length === 0 ? (
                 'No partner firm found'

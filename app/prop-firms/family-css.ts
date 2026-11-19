@@ -44,6 +44,17 @@ export const FAMILY_CSS = `
   transition: border-color .2s ease;
 }
 .jtnq-cmp .firm-search:focus-within{ border-color: var(--c-accent); }
+.jtnq-cmp .firm-search{ position: relative; }
+.jtnq-cmp .firm-suggest{
+  position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 30;
+  display: flex; flex-direction: column; padding: 4px; border: 1px solid var(--c-line); border-radius: 12px;
+  background: var(--c-bg-deep); box-shadow: 0 1px 2px oklch(0 0 0 / .3), 0 8px 24px oklch(0 0 0 / .35);
+}
+.jtnq-cmp .firm-suggest [role="option"]{
+  padding: 12px; border-radius: 4px; font-family: var(--f-sans); font-size: 14px; color: var(--c-text); cursor: pointer;
+}
+.jtnq-cmp .firm-suggest [role="option"]:hover,
+.jtnq-cmp .firm-suggest [role="option"].is-on{ background: color-mix(in oklch, var(--c-accent) 16%, transparent); }
 .jtnq-cmp .firm-search svg{ width: 16px; height: 16px; flex-shrink: 0; }
 .jtnq-cmp .firm-search input{
   flex: 1; min-width: 0; height: 100%; border: none; outline: none; background: none; padding: 0;

@@ -76,3 +76,18 @@ test('picked plans come first, even one the filters hide, and never twice', () =
   assert.deepEqual(keys(pickedFirst([b50], [b100, b50])), ['b50', 'b100']);
   assert.deepEqual(keys(pickedFirst([], [b100, b50])), ['b100', 'b50']);
 });
+
+test('suggestions: « trade » propose Tradeify et Trade copier, alphabétique, sans doublon', async () => {
+  const { firmSuggestions } = await import('../lib/compare-order.mjs');
+  assert.deepEqual(firmSuggestions(['Vest Markets', 'Tradeify', 'Tradeify', 'Traders Launch', 'E8 Markets'], 'trade'), ['Tradeify', 'Traders Launch']);
+});
+
+test('suggestions: « Tradei » ne propose que Tradeify ; vide ou nom déjà tapé en entier = rien', async () => {
+  const { firmSuggestions } = await import('../lib/compare-order.mjs');
+  const names = ['Tradeify', 'Traders Launch', 'Lucid Trading'];
+  assert.deepEqual(firmSuggestions(names, 'Tradei'), ['Tradeify']);
+  assert.deepEqual(firmSuggestions(names, ''), []);
+  assert.deepEqual(firmSuggestions(names, '   '), []);
+  assert.deepEqual(firmSuggestions(names, 'tradeify'), []);
+  assert.deepEqual(firmSuggestions(names, 'zzz'), []);
+});
