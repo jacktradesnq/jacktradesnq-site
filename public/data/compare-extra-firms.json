@@ -372,13 +372,13 @@
       "split": "90%",
       "payout": "Daily",
       "promo": {
-        "label": "30-40% off with code JackTNQ",
+        "label": "30-45% off with code JackTNQ",
         "code": "JackTNQ",
-        "ends": "2026-11-13T23:59:00-05:00"
+        "ends": "2026-11-30T23:59:00-05:00"
       },
       "code": "JackTNQ",
       "url": "https://tradeify.co/#pricing",
-      "lastChecked": "2026-11-05",
+      "lastChecked": "2026-11-19",
       "stale": false,
       "programs": [
         {
@@ -395,7 +395,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 59,
+              "price": 54,
               "originalPrice": 99,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
@@ -410,7 +410,7 @@
             },
             {
               "size": 50000,
-              "price": 87,
+              "price": 102,
               "originalPrice": 145,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
@@ -425,7 +425,7 @@
             },
             {
               "size": 100000,
-              "price": 153,
+              "price": 179,
               "originalPrice": 255,
               "profitTarget": 6000,
               "maxDrawdown": 3500,
@@ -440,7 +440,7 @@
             },
             {
               "size": 150000,
-              "price": 221,
+              "price": 258,
               "originalPrice": 369,
               "profitTarget": 9000,
               "maxDrawdown": 5000,
@@ -469,7 +469,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 76,
+              "price": 60,
               "originalPrice": 109,
               "profitTarget": 1500,
               "maxDrawdown": 1000,
@@ -551,7 +551,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 242,
+              "price": 190,
               "originalPrice": 345,
               "profitTarget": null,
               "maxDrawdown": 1000,
