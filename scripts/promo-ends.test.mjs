@@ -50,10 +50,14 @@ test('firme affiliée, promo expirée : son code reste imprimé, prix catalogue 
   assert.equal(firmAt({ ...partner, affiliate: false }, ENDS).code, null);
 });
 
-test('compare-extra-firms.json au 01/12/2026 (après le 30/11) : Tradeify garde JackTNQ aux prix catalogue, Lucid inchangée', () => {
+// La promo du JSON change avec le bot : sa fin est fixée ici au 30/11/2026 (celle relue le 19/11).
+const ENDS_1130 = '2026-11-30T23:59:00-05:00';
+
+test('compare-extra-firms.json au 01/12/2026 (promo finie le 30/11) : Tradeify garde JackTNQ aux prix catalogue, Lucid perd son code comme avant', () => {
   const at = Date.parse('2026-12-01T12:00:00Z');
-  const tradeify = DATA.firms.find((f) => f.id === 'tradeify');
-  assert.ok(Date.parse(tradeify.promo.ends) < at, 'la promo du JSON finit avant le 01/12');
+  const tradeify = structuredClone(DATA.firms.find((f) => f.id === 'tradeify'));
+  tradeify.promo = { label: '30-45% off with code JackTNQ', code: 'JackTNQ', ...tradeify.promo, ends: ENDS_1130 };
+  assert.equal(firmAt(tradeify, Date.parse(ENDS_1130) - 1), tradeify);
   const after = firmAt(tradeify, at);
   assert.equal(after.code, 'JackTNQ');
   assert.equal(after.promo, null);
@@ -65,10 +69,14 @@ test('compare-extra-firms.json au 01/12/2026 (après le 30/11) : Tradeify garde 
       assert.equal(pl.originalPrice, null);
     }
   }
-  // Lucid (non affiliée, sans date de fin) : rendue telle quelle, son code public compris.
-  const lucid = DATA.firms.find((f) => f.id === 'lucid-trading');
+  // Lucid (non affiliée) avec la même date de fin : ni code ni prix remisés, l'ancien comportement.
+  const lucid = structuredClone(DATA.firms.find((f) => f.id === 'lucid-trading'));
   assert.equal(lucid.affiliate, false);
-  assert.equal(firmAt(lucid, at), lucid);
+  lucid.promo = { ...lucid.promo, ends: ENDS_1130 };
+  const lucidAfter = firmAt(lucid, at);
+  assert.equal(lucidAfter.code, null);
+  assert.equal(lucidAfter.promo, null);
+  assert.ok(lucidAfter.programs.every((pr) => pr.plans.every((pl) => pl.originalPrice === null)));
 });
 
 test('compare-extra-firms.json : une firme sans date de fin garde son code', () => {

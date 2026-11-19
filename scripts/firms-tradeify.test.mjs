@@ -354,12 +354,13 @@ test('page du 19/11 : 16 prix, Inter Miami compris (le 25K Miami à -30 %, pas -
   assert.deepEqual(r.notices, []);
 });
 
-test('le JSON livré = la page du 19/11 : 16 prix relus, rien n\'a changé, code imprimé JackTNQ', async () => {
+// Les prix du JSON changent chaque jour (le bot) : seuls ses comptes comptent ici, les 16 relus.
+test('le JSON livré, relu sur la page du 19/11 : ses 16 comptes relus, code imprimé JackTNQ', async () => {
   const data = structuredClone(DATA);
   const lines = [];
   const res = await runTradeify(data, { read: async () => PAGE_1119, now: RECORDED_1119, log: (l) => lines.push(l) });
-  assert.deepEqual(res, { ok: true, changes: [] });
-  assert.match(lines.join('\n'), /OK — 16 prix relus, rien n'a changé \(code NOV jusqu'au 2026-11-30T23:59:00-05:00 ; code imprimé JackTNQ\)/);
+  assert.equal(res.ok, true);
+  assert.match(lines.join('\n'), /OK — 16 prix relus.*code NOV jusqu'au 2026-11-30T23:59:00-05:00 ; code imprimé JackTNQ/);
   const firm = data.firms.find((f) => f.id === 'tradeify');
   assert.deepEqual(firmTable(firm), NOV_TABLE);
   assert.equal(firm.promo.label, '30-45% off with code JackTNQ');
@@ -389,6 +390,8 @@ test('Inter Miami dans le JSON : mêmes chiffres que leur carte Tradovate du 19/
       [50000, 3500, 1500, 'Static', 900, true, '30 micros', 0, 'None'],
     ],
   );
+  // Chaque compte vendu aussi sans daily loss (leur bouton DLL Type « None », dllData) : filtre With et Without.
+  assert.ok(miami.plans.every((p) => p.alsoWithoutDailyLoss === true));
   assert.equal(miami.payoutFrequency, 'Daily');
   assert.equal(miami.minPayout, '$200 / $400 / $600 gross (10K / 25K / 50K)');
   // Pas publiés pour Inter Miami : ni max payout (leur « Daily Profit Cap » est en commentaire), ni

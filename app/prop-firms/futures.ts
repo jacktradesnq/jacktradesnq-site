@@ -35,6 +35,10 @@ type Plan = {
   ddType: DdType;
   dailyLoss?: number | null;
   dailyLossSoft?: boolean;
+  // The same account also sold without a daily loss limit, its price in the note (Tradeify Inter
+  // Miami, « DLL Type None »): the Daily loss limit filter shows it under With and Without
+  // (CLAUDE.md, 01/11/2026: « un plan vendu avec et sans passe les deux »).
+  alsoWithoutDailyLoss?: boolean;
   // A rule no source publishes has no key: inventing a value would be worse than saying so.
   consistency?: string;
   // « Days to Pass: 3 minimum » where the firm's card prints it (Traders Launch).
@@ -468,7 +472,13 @@ function rowsOf(firm: Firm, link: Link): CompareRow[] {
         lossType: DD_LABEL[plan.ddType],
         // The scraper writes null where the firm says there is none, and leaves the key out where
         // no source says (scripts/lib/catalog-sync.mjs): not published.
-        dailyLoss: !('dailyLoss' in plan) ? null : plan.dailyLoss != null && plan.dailyLoss > 0 ? 'with' : 'without',
+        dailyLoss: !('dailyLoss' in plan)
+          ? null
+          : plan.dailyLoss != null && plan.dailyLoss > 0
+            ? plan.alsoWithoutDailyLoss
+              ? 'both'
+              : 'with'
+            : 'without',
         note: plan.note,
         ...link,
         code: rowCode,
