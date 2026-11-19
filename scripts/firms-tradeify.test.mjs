@@ -238,14 +238,17 @@ test('firme affiliée, page sans code : prix catalogue, promo null, le code impr
   assert.ok(firm.programs.every((pr) => pr.plans.every((pl) => pl.price === pl.originalPrice)));
 });
 
-test('firme affiliée, date de fin passée : firmAt retire le code et les prix remisés comme avant', async () => {
+// Une affiliée garde son code imprimé après la fin de la promo, comme les autres partenaires : le
+// code est celui d'Angelo (codes.md), et le disclaimer dit qu'une firme sans code JTNQ ou JackTNQ
+// n'est pas affiliée. Seuls les prix remisés disparaissent.
+test('firme affiliée, date de fin passée : firmAt garde JackTNQ, retire les prix remisés', async () => {
   const data = freshData();
   await runTradeify(data, { read: async () => PAGE, now: RECORDED, log: quiet });
   const firm = data.firms.find((f) => f.id === 'tradeify');
   const ends = Date.parse(firm.promo.ends);
   assert.equal(firmAt(firm, ends - 1).code, 'JackTNQ');
   const after = firmAt(firm, ends);
-  assert.equal(after.code, null);
+  assert.equal(after.code, 'JackTNQ');
   assert.equal(after.promo, null);
   assert.ok(after.programs.every((pr) => pr.plans.every((pl) => pl.originalPrice === null)));
   assert.deepEqual(after.programs.flatMap((pr) => pr.plans.map((pl) => pl.price)), GEMS_TABLE.map((row) => row[3]));
@@ -263,6 +266,18 @@ test('date de fin déjà passée sur leur page (pas mise à jour) : le code rest
   const r = parseTradeify(PAGE, Date.parse('2026-11-02T12:00:00Z'));
   assert.deepEqual(r.promo, { label: '30% off with code GEMS', code: 'GEMS' });
   assert.match(r.notices.join('\n'), /déjà passée/);
+});
+
+test('firme affiliée, date de fin déjà passée sur leur page : prix remisés gardés (ils les appliquent encore), pas de date, JackTNQ', async () => {
+  const data = freshData();
+  const { ok } = await runTradeify(data, { read: async () => PAGE, now: Date.parse('2026-11-02T12:00:00Z'), log: quiet });
+  assert.equal(ok, true);
+  const firm = data.firms.find((f) => f.id === 'tradeify');
+  assert.deepEqual(firm.promo, { label: '30% off with code JackTNQ', code: 'JackTNQ' });
+  assert.equal(firm.code, 'JackTNQ');
+  assert.deepEqual(firmTable(firm), GEMS_TABLE);
+  // Sans date de fin, firmAt la rend telle quelle : le code et les prix qu'ils affichent.
+  assert.equal(firmAt(firm, Date.parse('2026-12-01T12:00:00Z')), firm);
 });
 
 test('plusieurs codes dans un même programme : données gardées, stale, échec', async () => {

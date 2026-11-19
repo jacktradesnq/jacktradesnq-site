@@ -1,6 +1,8 @@
 // The one clock every promo with an end date is judged by: the perps JTNQ promos (endsAt,
-// perps.ts) and the public codes of the comparator's non-partner firms (promo.ends,
-// compare-extra-firms.json, futures.ts). Three moments to get right:
+// perps.ts) and the promos of the firms of compare-extra-firms.json (promo.ends, futures.ts:
+// the comparator's rows and Tradeify's card; at the end a non-partner loses its public code, a
+// partner keeps its own, both lose the discounted prices, lib/promo-ends.mjs). Three moments to
+// get right:
 // - build: a build made after the end never shows the promo (BUILD_TS, inlined by
 //   next.config.js), so the daily rebuild drops it on its own;
 // - before hydration: the static HTML shows the state of the build;
