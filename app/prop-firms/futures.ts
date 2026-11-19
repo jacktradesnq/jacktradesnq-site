@@ -1,12 +1,13 @@
 // Futures firms turned into FirmView (partner cards) and CompareRow (the comparator).
 // - public/data/prop-firms.json: partner firms, scraped daily by scripts/scrape-prop-firms.mjs.
-// - public/data/compare-extra-firms.json: firms shown in the comparator only, with their own
-//   site (Angelo, 01/11/2026). Same shape plus "affiliate" and "code": Lucid Trading, not a
-//   partner ("affiliate": false), "code" = its public code; Tradeify, a partner since
-//   19/11/2026 ("affiliate": true), "code" = JackTNQ, the code Angelo was given there. Once
-//   their promo.ends passes, the comparator drops the code and the discounted prices (firmAt in
-//   lib/promo-ends.mjs, judged by the shared clock of promo-clock.ts); Tradeify's prices and
-//   end date are read again every day by scripts/scrape-tradeify.mjs.
+// - public/data/compare-extra-firms.json: firms with their own scraper or none (Angelo,
+//   01/11/2026). Same shape plus "affiliate" and "code": Lucid Trading, not a partner
+//   ("affiliate": false, comparator only, its site), "code" = its public code; Tradeify, a partner
+//   since 19/11/2026 ("affiliate": true, comparator and a card, /go/ link), "code" = JackTNQ, the
+//   code Angelo was given there. Once their promo.ends passes, the discounted prices go, and the
+//   code of a non-partner with them (firmAt in lib/promo-ends.mjs, judged by the shared clock of
+//   promo-clock.ts); Tradeify's prices and end date are read again every day by
+//   scripts/scrape-tradeify.mjs.
 
 import rawData from '@/public/data/prop-firms.json';
 import rawExtra from '@/public/data/compare-extra-firms.json';
@@ -487,18 +488,26 @@ function partnerLink(firm: Firm): Link {
   };
 }
 
-// A firm of compare-extra-firms.json: its official site. Not a partner: its public code as
+// A firm of compare-extra-firms.json. Not a partner: its official site, its public code as
 // written. A partner there ("affiliate": true, Tradeify since 19/11/2026, Angelo: « c officielle
 // j'ai le code JackTNQ sur tradeify. donc mtn go changer dans mon site »): the code it prints
-// (firm.code, the same as codes.md), never the firm's public code; no /go/ link given, so its site.
+// (firm.code, the same as codes.md), never the firm's public code, and its /go/ link like the
+// other partners (CLAUDE.md, 01/11/2026: « les affiliées gardent JTNQ et leurs liens /go/ »),
+// which leads to its site (lib/go-links.ts: no tracking link given).
 function extraLink(firm: Firm): Link {
   if (!firm.affiliate)
     return { href: firm.url, affiliate: false, code: firm.code ? { code: firm.code, title: 'The firm’s public code' } : null };
   const promo = firm.programs.length ? promoFor(firm, firm.programs[0]) : { title: '' };
-  return { href: firm.url, affiliate: true, code: firm.code ? { code: firm.code, title: promo.title || 'My affiliate code' } : null };
+  return {
+    href: goHref('prop-firms', firm.id),
+    affiliate: true,
+    code: firm.code ? { code: firm.code, title: promo.title || 'My affiliate code' } : null,
+  };
 }
 
-function firmView(firm: Firm, rows: CompareRow[], link: Link): FirmView {
+// `ownStale`: a firm of compare-extra-firms.json is read by its own scraper (scrape-tradeify.mjs),
+// which marks it stale itself; prop-firms.json's sync date says nothing about it.
+function firmView(firm: Firm, rows: CompareRow[], link: Link, ownStale = false): FirmView {
   const programs = firm.programs;
   const allPlans = programs.flatMap((p) => p.plans);
   const p = pace(firm);
@@ -534,8 +543,14 @@ function firmView(firm: Firm, rows: CompareRow[], link: Link): FirmView {
     offer: offerOf(rows),
     // A firm whose scraper failed keeps its old prices while generatedAt says today: name
     // the firms that are behind instead of advertising one sync date for everyone.
-    stale:
-      firm.lastChecked !== DATA.generatedAt
+    stale: ownStale
+      ? firm.stale
+        ? {
+            label: `Prices ${humanDate(firm.lastChecked)}`,
+            title: `Prices last verified on ${humanDate(firm.lastChecked)}. Check the live checkout price.`,
+          }
+        : null
+      : firm.lastChecked !== DATA.generatedAt
         ? {
             label: `Prices ${humanDate(firm.lastChecked)}`,
             title: `Prices last verified on ${humanDate(firm.lastChecked)}, not at the last daily sync (${humanDate(DATA.generatedAt)}). Check the live checkout price.`,
@@ -552,11 +567,25 @@ const PARTNERS = DATA.firms.map((firm) => {
   return { view: firmView(firm, rows, link), rows };
 });
 
-export const FUTURES_FIRMS: FirmView[] = PARTNERS.map((p) => p.view);
-
 // The extra firms' promo ends, for the clock (usePromoClock) to wake up at.
 export const EXTRA_PROMO_ENDS: readonly number[] = promoEnds(EXTRA.firms);
 const EXTRA_ONLY = EXTRA.firms.filter((f) => !DATA.firms.some((d) => d.id === f.id));
+
+// The partner cards of /prop-firms (Futures tab) at time `at` (the promo clock): the firms of
+// prop-firms.json, and the partners of compare-extra-firms.json (Tradeify since 19/11/2026; CLAUDE.md,
+// Angelo 21/10/2026: « Une nouvelle firme affiliée qu'il mentionne s'ajoute à la page »). A partner's
+// card follows the same clock as its comparator rows: once its promo ends, no « % off », the « from »
+// price at list, its code kept (lib/promo-ends.mjs).
+export function futuresFirms(at: number): FirmView[] {
+  return [
+    ...PARTNERS.map((p) => p.view),
+    ...EXTRA_ONLY.filter((f) => f.affiliate).map((f) => {
+      const firm = firmAt(f, at);
+      const link = extraLink(firm);
+      return firmView(firm, rowsOf(firm, link), link, true);
+    }),
+  ];
+}
 
 // Partners and the extra firms, one row per plan, at time `at` (the promo clock). A firm in
 // both files is a partner.

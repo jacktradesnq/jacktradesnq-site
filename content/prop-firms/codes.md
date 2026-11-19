@@ -36,11 +36,15 @@ non ? imagine ils ont pas clique mon lien »).
 Le code est JackTNQ (cette casse), pas JTNQ : Despina (Tradeify Affiliate Team)
 l'a mis a jour le 19/11/2026 (« Sure, this has been updated! », visuel « USE
 CODE: JACKTNQ ») (Angelo, 19/11/2026 : « c officielle j'ai le code JackTNQ sur
-tradeify. donc mtn go changer dans mon site »). Tradeify n'est que dans le
-comparateur : public/data/compare-extra-firms.json porte le meme code
-("code": "JackTNQ", scripts/firms-tradeify.test.mjs verifie que les deux disent
-pareil), le bouton mene a leur site (aucun lien de tracking donne). Le feed des
-promos ne lit que prop-firms.json, il ne voit pas Tradeify.
+tradeify. donc mtn go changer dans mon site »). Tradeify vit dans
+public/data/compare-extra-firms.json, qui porte le meme code ("code": "JackTNQ",
+scripts/firms-tradeify.test.mjs verifie que les deux disent pareil) : ses plans
+dans le comparateur et, depuis le 19/11/2026, sa carte de partenaire sur
+/prop-firms (une nouvelle firme affiliee s'ajoute a la page, CLAUDE.md 21/10).
+Le bouton passe par /go/prop-firms/tradeify/ et mene a leur site (aucun lien de
+tracking donne). A la fin d'une promo, JackTNQ reste imprime, seuls les prix
+remises tombent. Le feed des promos ne lit que prop-firms.json, il ne voit pas
+Tradeify.
 
 ---
 

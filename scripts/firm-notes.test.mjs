@@ -8,6 +8,9 @@ test('the shipped firm-notes.md has every firm, and E8 carries the take Angelo g
   assert.ok(Object.keys(notes).length >= 6);
   assert.match(notes['e8-markets'].take, /^I don't have any preferences for E8/);
   assert.equal(notes['e8-perps'].take, notes['e8-markets'].take);
+  // Tradeify, partner card since 19/11/2026: its section is there for Angelo to write in (an empty
+  // slot is not shown, never a text in his place).
+  assert.ok(notes.tradeify);
 });
 
 test('reads each firm’s intro and take, paragraphs kept, other titles ignored', () => {

@@ -17,8 +17,9 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { BackBar, CSS, META, SiteFooter, money, useBodyBackground } from './shared';
 import { FAMILIES, type Family, type FirmView } from './firm-view';
-import { FUTURES_FIRMS } from './futures';
+import { EXTRA_PROMO_ENDS, futuresFirms } from './futures';
 import { PERPS_PROMO, PERPS_PROMO_FIRM_ID, PROMO_ENDS_MS, perpsFirms, usePromoLive } from './perps';
+import { usePromoClock } from './promo-clock';
 import { FirmLogo, PromoClock } from './FirmTable';
 import { FirmWindow } from './FirmWindow';
 import { FirmSearch } from './FirmSearch';
@@ -44,12 +45,14 @@ const isTab = (s: string): s is Tab => TABS.some((t) => t.id === s);
 
 export default function PropFirms() {
   const promoLive = usePromoLive();
+  // Tradeify's card (a partner of compare-extra-firms.json) follows its promo's end, like its rows.
+  const futuresAt = usePromoClock(EXTRA_PROMO_ENDS);
   const firmsBy = useMemo<Record<Family, FirmView[]>>(
     () => ({
-      futures: [...FUTURES_FIRMS].sort(byName),
+      futures: futuresFirms(futuresAt).sort(byName),
       perps: perpsFirms(promoLive).sort(byName),
     }),
-    [promoLive],
+    [futuresAt, promoLive],
   );
 
   const [family, setFamily] = useState<Tab>('futures');

@@ -50,3 +50,8 @@ Breakout, EXTREMELY solid firm that I love to use for my huge swing trades. All 
 
 ### take
 Vest Markets, super solid firm that I use for intraday trades. Firm that offers the most choices since you can customize your account.
+
+## tradeify
+### intro
+
+### take

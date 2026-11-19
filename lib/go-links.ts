@@ -1,6 +1,7 @@
 import firmsData from '@/public/data/prop-firms.json';
 import promosData from '@/public/data/live-promos.json';
 import perpsData from '@/public/data/perps-firms.json';
+import extraData from '@/public/data/compare-extra-firms.json';
 
 /**
  * Every outbound partner link leaves through /go/<source>/<firm>/ instead of
@@ -45,6 +46,14 @@ const fromPerps: GoLink[] = perpsData.firms.map((f) => ({
   url: f.url,
 }));
 
+// A partner of compare-extra-firms.json ("affiliate": true, Tradeify since 19/11/2026): its card
+// on /prop-firms and its comparator rows leave through /go/ like the other partners. No tracking
+// link was given (code JackTNQ carries the attribution), so it points at the firm's own site.
+// The non-partners (Lucid) keep their plain link.
+const fromExtra: GoLink[] = (extraData.firms as { id: string; name: string; url: string; affiliate?: boolean }[])
+  .filter((f) => f.affiliate)
+  .map((f) => ({ source: 'prop-firms' as const, firmId: f.id, firmName: f.name, url: f.url }));
+
 // The trade copier Angelo uses, linked from /trade-copier/. No Tradecopia affiliate link
 // is known yet (13/10/2026), so it points at the plain site and the page shows code JTNQ.
 const fromTradeCopier: GoLink[] = [
@@ -52,7 +61,7 @@ const fromTradeCopier: GoLink[] = [
 ];
 
 const byKey = new Map<string, GoLink>();
-for (const link of [...fromFirms, ...fromPerps, ...fromPromos, ...fromTradeCopier]) byKey.set(`${link.source}/${link.firmId}`, link);
+for (const link of [...fromExtra, ...fromFirms, ...fromPerps, ...fromPromos, ...fromTradeCopier]) byKey.set(`${link.source}/${link.firmId}`, link);
 
 export const GO_LINKS: GoLink[] = [...byKey.values()];
 
