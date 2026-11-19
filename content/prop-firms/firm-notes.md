@@ -55,3 +55,4 @@ Vest Markets, super solid firm that I use for intraday trades. Firm that offers 
 ### intro
 
 ### take
+Tradeify is a top prop firm, each and every plan is amazing. My favorite is the Select plan, as you can choose daily payouts or the regular 5 winning days one.
