@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-05",
-  "builtFor": "2026-11-05",
+  "generatedAt": "2026-11-19",
+  "builtFor": "2026-11-19",
   "promos": [
     {
       "firmId": "blusky",
@@ -28,7 +28,7 @@
       "consistency": "34%",
       "activationFee": null,
       "contracts": "5 minis or 50 micros",
-      "lastChecked": "2026-11-05"
+      "lastChecked": "2026-11-19"
     },
     {
       "firmId": "e8-markets",
@@ -57,7 +57,7 @@
       "consistency": "None",
       "activationFee": null,
       "contracts": "4 minis / 40 micros",
-      "lastChecked": "2026-11-05"
+      "lastChecked": "2026-11-19"
     },
     {
       "firmId": "traders-launch",
@@ -74,7 +74,7 @@
       "originalPrice": 299,
       "discountPct": 20,
       "priceNote": null,
-      "note": "Trading hours: 6:00pm – 4:00pm ET the following day. Price shown for the 80% split.",
+      "note": "Price shown for the 80% split.",
       "endsAt": null,
       "expiring": false,
       "split": "80%",
@@ -86,7 +86,7 @@
       "consistency": "50%",
       "activationFee": null,
       "contracts": "2 minis or 20 micros",
-      "lastChecked": "2026-11-05"
+      "lastChecked": "2026-11-19"
     }
   ]
 }
