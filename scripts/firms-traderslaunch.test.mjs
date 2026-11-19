@@ -410,3 +410,36 @@ test('programsFromSnapshot : deux onglets aux memes cartes arretent tout (le « 
   s.views.unshift({ ...structuredClone(view(s, 'Premium')), account: 'Selected' });
   assert.throws(() => programsFromSnapshot(s), /« Selected » et « Premium » montrent les memes cartes/);
 });
+
+test('TL Drops (19/11/2026) : le drop Rapid 25K publie tel que ses cartes l ecrivent', () => {
+  const logs = [];
+  const progs = programsFromSnapshot(SNAP_1119, { log: (l) => logs.push(l) });
+  assert.deepEqual(logs, []);
+  assert.deepEqual(progs.map((p) => p.name), ['Premium', 'Static', 'Drop']);
+  const [p] = progs.find((x) => x.name === 'Drop').plans;
+  // Cartes : « $89 » (80 %) / « List price $111.25 », « $59 » (60 %), « $109 » (90 %),
+  // « Profit Target $1,250 », « $500 EOD trailingStops trailing at $25,000 »,
+  // « Daily Loss Limit None », « Consistency Rule None ».
+  assert.deepEqual(p, {
+    size: 25000,
+    price: 89,
+    originalPrice: 111.25,
+    profitTarget: 1250,
+    maxDrawdown: 500,
+    ddType: 'EOD - Stops trailing at $25,000',
+    consistency: 'None',
+    dailyLoss: null,
+    note: 'Rapid. Price shown for the 80% split.',
+    splitPrices: { 60: 59, 90: 109 },
+  });
+});
+
+test('Daily Loss Limit : un texte qui n est ni un montant ni « None » reste une erreur', () => {
+  const s = structuredClone(SNAP_1119);
+  const card = view(s, 'TL Drops').splits[0].cards[0];
+  card.text = card.text.replace('Daily Loss Limit\nNone', 'Daily Loss Limit\nask support');
+  const logs = [];
+  const progs = programsFromSnapshot(s, { log: (l) => logs.push(l) });
+  assert.ok(!progs.some((p) => p.name === 'Drop'));
+  assert.match(logs[0], /TL Drops : drop en vente mais illisible, NON publie .*« Daily Loss Limit » illisible/);
+});

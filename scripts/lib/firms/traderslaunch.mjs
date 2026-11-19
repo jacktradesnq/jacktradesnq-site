@@ -126,7 +126,19 @@ function after(ls, label) {
 }
 
 /** Les libelles de la zone EVALUATION, pour savoir ou s'arrete une valeur. */
-const EVAL_LABELS = ['Profit Target', 'Max Drawdown', 'Best Day', 'Session Profit Limit', 'Days to Pass', 'Consistency Rule'];
+// Les drops ajoutent les leurs (cartes du 26/10 et du 19/11/2026).
+const EVAL_LABELS = [
+  'Profit Target',
+  'Max Drawdown',
+  'Best Day',
+  'Session Profit Limit',
+  'Days to Pass',
+  'Consistency Rule',
+  'Daily Loss Limit',
+  'Minimum Days',
+  'Starting Size',
+  'Contract Limit',
+];
 
 /**
  * « $1 000 EODLocks at starting balance », « $1 000 EOD » + « Locks at starting
@@ -144,8 +156,9 @@ function drawdown(ls) {
   const m = raw.match(/^\$([\d,\s  ]+?)\s*(EOD|static)\s*(.*)$/i);
   if (!m) throw new Error(`drawdown illisible : « ${raw} »`);
   const kind = /^eod$/i.test(m[2]) ? 'EOD' : 'static';
-  // « EOD trailing Stops trailing at $25,000 » (drops) : le « trailing » colle au type.
-  const qualifier = m[3].trim().replace(/^trailing\s+(?=\S)/i, '');
+  // « EOD trailing Stops trailing at $25,000 » (drops) : le « trailing » colle au type,
+  // parfois sans espace (« EOD trailingStops trailing at $25,000 », drop du 19/11/2026).
+  const qualifier = m[3].trim().replace(/^trailing\s*(?=\S)/i, '');
   return { amount: money(m[1]), type: qualifier ? `${kind} - ${qualifier}` : kind };
 }
 
@@ -247,8 +260,10 @@ function parseCard(programme, chosenSplit, card, drop = false) {
   // « Daily Loss Limit » / « $600 » / « Lifted on days that start at or above $25,600 » (drops).
   const dll = after(ev, 'Daily Loss Limit');
   if (dll != null) {
-    const v = money(dll);
-    if (v == null) throw new Error(`${tag} : « Daily Loss Limit » illisible (« ${dll} »)`);
+    // « None » : la carte dit qu'il n'y en a pas (drop Rapid, page du 19/11/2026).
+    const none = /^none$/i.test(dll);
+    const v = none ? null : money(dll);
+    if (v == null && !none) throw new Error(`${tag} : « Daily Loss Limit » illisible (« ${dll} »)`);
     plan.dailyLoss = v;
     const why = ev[ev.findIndex((l) => /^daily loss limit$/i.test(l)) + 2];
     if (why && /^Lifted /.test(why)) note.push(`Daily loss limit ${why[0].toLowerCase()}${why.slice(1)}.`);
