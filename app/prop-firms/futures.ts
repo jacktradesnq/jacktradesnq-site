@@ -93,6 +93,8 @@ const FIRM_LOGOS: Record<string, string> = {
   'traders-launch': '/logos/traders-launch.png',
   'e8-markets': '/logos/e8-markets.svg',
   blusky: '/logos/blusky.svg',
+  // Icône officielle du site de Tradeify (favicon 512x512 de tradeify.co, réduite à 128 px), 19/11/2026.
+  tradeify: '/logos/tradeify.png',
 };
 
 const DD_LABEL: Record<DdType, string> = {
