@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   TRADERSLAUNCH_SOURCE,
+  accountLabels,
   earlyAccessStatus,
   fetchTradersLaunchPrograms,
   programsFromSnapshot,
@@ -359,4 +360,86 @@ test('TL Drop #2 : les autres programmes gardent leur lecture (pas de perte jour
       assert.equal(p.originalPrice, undefined, `${pr.name} ${p.size}`);
     }
   }
+});
+
+/**
+ * La page relevee le 2026-11-19 (lecteur corrige) : onglets Premium, Static et
+ * « TL Drops » (l'ancien Early Access), un choix de plateforme Volumetrica / Hyperprop
+ * au-dessus, plus aucune carte Legacy NYC dans #pricing (plus de bouton
+ * « View Legacy Accounts », plus de lien hours=1).
+ */
+const SNAP_1119 = JSON.parse(
+  fs.readFileSync(path.join(HERE, 'lib/firms/fixtures', 'traderslaunch-pricing-2026-11-19.json'), 'utf8'),
+);
+
+test('accountLabels : le logo de plateforme « Selected » n est pas un onglet (boutons du 19/11/2026)', () => {
+  // Les boutons aria-pressed de #pricing tels que la page les rend le 19/11/2026.
+  const buttons = [
+    { text: 'Selected', logo: true }, // logo Volumetrica, choisi
+    { text: '', logo: true }, // logo Hyperprop
+    { text: 'Premium\nEOD', logo: false },
+    { text: 'Static\nNo Buffer', logo: false },
+    { text: 'TL Drops\nOn Sale Now', logo: false },
+    { text: '60%', logo: false },
+    { text: '80%', logo: false },
+  ];
+  assert.deepEqual(accountLabels(buttons), ['Premium', 'Static', 'TL Drops']);
+  assert.deepEqual(accountLabels(null), []);
+});
+
+test('programsFromSnapshot (19/11/2026) : Premium et Static, aucun « Selected », « TL Drops » lu comme les drops', () => {
+  const logs = [];
+  const progs = programsFromSnapshot(SNAP_1119, { log: (l) => logs.push(l) });
+  const names = progs.map((p) => p.name);
+  assert.ok(names.includes('Premium') && names.includes('Static'), names.join(', '));
+  assert.ok(!names.includes('Selected') && !names.includes('TL Drops'), names.join(', '));
+  assert.deepEqual(
+    progs.find((p) => p.name === 'Premium').plans.map((p) => [p.size, p.price, p.splitPrices]),
+    [
+      [100000, 159, { 60: 99 }],
+      [200000, 299, { 60: 199 }],
+      [300000, 599, { 60: 399 }],
+    ],
+  );
+  assert.equal(earlyAccessStatus(SNAP_1119), 'TL Drops : 3 carte(s) en vente, publiees comme programme « Drop »');
+});
+
+test('programsFromSnapshot : deux onglets aux memes cartes arretent tout (le « Selected » du 05/11/2026)', () => {
+  const s = structuredClone(SNAP_1119);
+  // Ce que lisait l'ancien lecteur : le logo « Selected », deja choisi, relu comme un onglet.
+  s.views.unshift({ ...structuredClone(view(s, 'Premium')), account: 'Selected' });
+  assert.throws(() => programsFromSnapshot(s), /« Selected » et « Premium » montrent les memes cartes/);
+});
+
+test('TL Drops (19/11/2026) : le drop Rapid 25K publie tel que ses cartes l ecrivent', () => {
+  const logs = [];
+  const progs = programsFromSnapshot(SNAP_1119, { log: (l) => logs.push(l) });
+  assert.deepEqual(logs, []);
+  assert.deepEqual(progs.map((p) => p.name), ['Premium', 'Static', 'Drop']);
+  const [p] = progs.find((x) => x.name === 'Drop').plans;
+  // Cartes : « $89 » (80 %) / « List price $111.25 », « $59 » (60 %), « $109 » (90 %),
+  // « Profit Target $1,250 », « $500 EOD trailingStops trailing at $25,000 »,
+  // « Daily Loss Limit None », « Consistency Rule None ».
+  assert.deepEqual(p, {
+    size: 25000,
+    price: 89,
+    originalPrice: 111.25,
+    profitTarget: 1250,
+    maxDrawdown: 500,
+    ddType: 'EOD - Stops trailing at $25,000',
+    consistency: 'None',
+    dailyLoss: null,
+    note: 'Rapid. Price shown for the 80% split.',
+    splitPrices: { 60: 59, 90: 109 },
+  });
+});
+
+test('Daily Loss Limit : un texte qui n est ni un montant ni « None » reste une erreur', () => {
+  const s = structuredClone(SNAP_1119);
+  const card = view(s, 'TL Drops').splits[0].cards[0];
+  card.text = card.text.replace('Daily Loss Limit\nNone', 'Daily Loss Limit\nask support');
+  const logs = [];
+  const progs = programsFromSnapshot(s, { log: (l) => logs.push(l) });
+  assert.ok(!progs.some((p) => p.name === 'Drop'));
+  assert.match(logs[0], /TL Drops : drop en vente mais illisible, NON publie .*« Daily Loss Limit » illisible/);
 });
