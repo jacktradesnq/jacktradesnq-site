@@ -79,7 +79,9 @@ test('no reading at all is no excuse', () => {
 const TL_SNAP = JSON.parse(
   readFileSync(new URL('./lib/firms/fixtures/traderslaunch-pricing-2026-10-21.json', import.meta.url), 'utf8'),
 );
-const DATA = JSON.parse(readFileSync(new URL('../public/data/prop-firms.json', import.meta.url), 'utf8'));
+// Copie figée du JSON du site, pas le fichier vivant que le bot réécrit chaque jour : ce test a bloqué la
+// synchro du 06 au 19/11/2026 (Angelo, 19/11/2026 : « oui » à assouplir les tests figés).
+const DATA = JSON.parse(readFileSync(new URL('./lib/firms/fixtures/prop-firms-snapshot-2026-11-19.json', import.meta.url), 'utf8'));
 
 test('every Traders Launch plan of the JSON is returned by the extractor', () => {
   const rules = tradersLaunchRules(TL_SNAP);

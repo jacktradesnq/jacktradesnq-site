@@ -71,8 +71,11 @@ test('un programme inconnu dans le titre est une erreur, pas un plan de plus', (
 
 /* ------- branchement dans scrape-prop-firms.mjs ------- */
 
+// Une COPIE figée du JSON du site (fixtures/prop-firms-snapshot-2026-11-19.json), pas le fichier vivant :
+// le bot le réécrit chaque jour, et un prix légitime qui bouge ne doit pas bloquer la synchro avant sa
+// lecture (Angelo, 19/11/2026 : « oui » à assouplir ces tests figés ; la synchro est restée rouge 13 jours).
 const firmFromSite = () => {
-  const data = JSON.parse(fs.readFileSync(new URL('../public/data/prop-firms.json', import.meta.url), 'utf8'));
+  const data = JSON.parse(fs.readFileSync(new URL('./lib/firms/fixtures/prop-firms-snapshot-2026-11-19.json', import.meta.url), 'utf8'));
   return structuredClone(data.firms.find((f) => f.id === 'e8-markets'));
 };
 

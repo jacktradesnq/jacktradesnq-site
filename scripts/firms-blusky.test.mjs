@@ -11,7 +11,9 @@ import { apply, guard, scrapeBluSky } from './scrape-prop-firms.mjs';
 const PRODUCTS = JSON.parse(
   fs.readFileSync(new URL('./lib/firms/fixtures/blusky-products-2026-10-27.json', import.meta.url), 'utf8'),
 );
-const DATA = JSON.parse(fs.readFileSync(new URL('../public/data/prop-firms.json', import.meta.url), 'utf8'));
+// Copie figée du JSON du site, pas le fichier vivant que le bot réécrit chaque jour : un prix légitime
+// qui bouge ne doit pas bloquer la synchro avant sa lecture (Angelo, 19/11/2026 : « oui » à assouplir).
+const DATA = JSON.parse(fs.readFileSync(new URL('./lib/firms/fixtures/prop-firms-snapshot-2026-11-19.json', import.meta.url), 'utf8'));
 
 test('les 15 comptes vendus le 2026-10-27, prix avec JTNQ et prix catalogue', () => {
   const table = plansFromProducts(PRODUCTS).map((p) => [p.programName, p.size, p.price, p.originalPrice]);
