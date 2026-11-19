@@ -36,7 +36,7 @@ jobs:
       - name: Build live promos feed
         run: node scripts/build-live-promos.mjs
 
-      # Tradeify (comparateur, compare-extra-firms.json) : code public et 12 prix relus chaque jour
+      # Tradeify (comparateur, compare-extra-firms.json) : code public et prix relus chaque jour (12 prix de base + chaque compte du JSON : 16 au 19/11/2026)
       # (Angelo, 01/11/2026 : « quand c'est expiré check tous les jours jusqu'à ce qu'il y ait le
       # bon code »). Page illisible = firme stale (commitée avec le reste) puis job rouge plus bas.
       - name: Scrape Tradeify (comparator)
@@ -114,7 +114,7 @@ jobs:
       - name: Tradeify unreadable — fail the job
         if: always() && steps.tradeify.outcome == 'failure'
         run: |
-          echo "::error::scrape-tradeify : page Tradeify illisible ou moins de 12 prix (voir l'étape « Scrape Tradeify »). Données gardées, stale: true."
+          echo "::error::scrape-tradeify : page Tradeify illisible, moins de 12 prix de base ou un compte du JSON absent de leur page (voir l'étape « Scrape Tradeify »). Données gardées, stale: true."
           exit 1
 
       - name: Giveaways unreadable — fail the job

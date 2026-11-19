@@ -412,3 +412,12 @@ test('firme affiliée sans code imprimé : rien écrit (le code public ne passe 
   assert.doesNotMatch(JSON.stringify(firm), PUBLIC_CODES);
   assert.match(lines.join('\n'), /firme affiliée sans code imprimé/);
 });
+
+test('Lucid: chaque plan dont la note dit « Daily Loss Limit OFF » est vendu aussi sans daily loss (filtre With et Without)', () => {
+  const lucid = DATA.firms.find((f) => f.id === 'lucid-trading');
+  const offs = lucid.programs.flatMap((p) => p.plans.filter((pl) => /Daily Loss Limit OFF/.test(pl.note ?? '')));
+  assert.equal(offs.length, 12); // Pro, Flex et Daily (EOD) × 4 tailles ; Daily (Intraday) et Direct ne le disent pas
+  assert.ok(offs.every((pl) => pl.dailyLoss > 0 && pl.alsoWithoutDailyLoss === true));
+  const autres = lucid.programs.flatMap((p) => p.plans.filter((pl) => !/Daily Loss Limit OFF/.test(pl.note ?? '')));
+  assert.ok(autres.every((pl) => pl.alsoWithoutDailyLoss !== true)); // jamais deviné
+});
