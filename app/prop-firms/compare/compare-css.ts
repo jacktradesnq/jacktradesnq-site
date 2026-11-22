@@ -136,7 +136,7 @@ export const COMPARE_CSS = `
 }
 .jtnq-cmp .cmp-table{ width: 100%; border-collapse: separate; border-spacing: 0; }
 .jtnq-cmp .cmp-table th, .jtnq-cmp .cmp-table td{
-  padding: 12px 8px; border-bottom: 1px solid var(--c-line-soft); vertical-align: middle; text-align: center;
+  padding: 12px 6px; border-bottom: 1px solid var(--c-line-soft); vertical-align: middle; text-align: center;
 }
 .jtnq-cmp .cmp-table tbody tr:last-child > *{ border-bottom: none; }
 .jtnq-cmp .cmp-table tbody tr{ transition: background .15s ease; }
@@ -146,7 +146,7 @@ export const COMPARE_CSS = `
   border-bottom: 1px solid var(--c-line); vertical-align: bottom;
 }
 .jtnq-cmp .cmp-sort{
-  display: inline-flex; align-items: center; justify-content: center; gap: 4px; width: 100%; padding: 16px 8px 12px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px; width: 100%; padding: 16px 6px 12px;
   border: none; background: none; cursor: pointer;
   font-family: var(--f-sans); font-size: 14px; font-weight: 400; line-height: 1.4;
   color: var(--c-text-soft); transition: color .2s ease;
@@ -160,7 +160,7 @@ export const COMPARE_CSS = `
 
 /* The firm stays in view while the columns scroll sideways. */
 .jtnq-cmp .cmp-firm-col{
-  position: sticky; left: 0; z-index: 2; min-width: 200px; max-width: 232px;
+  position: sticky; left: 0; z-index: 2; min-width: 176px; max-width: 208px;
   box-shadow: inset -1px 0 0 var(--c-line-soft);
 }
 .jtnq-cmp tbody .cmp-firm-col{ background: var(--c-bg-raise); }
@@ -183,7 +183,7 @@ export const COMPARE_CSS = `
 .jtnq-cmp .cmp-val .ft-word, .jtnq-cmp .cmp-val .none{ font-family: var(--f-sans); }
 /* Sentences (a split that changes after 30 days, a payout rule) wrap instead of widening the table. */
 .jtnq-cmp :is(.cmp-c-split, .cmp-c-minPayout, .cmp-c-maxPayout, .cmp-c-payoutFreq, .cmp-c-consistency, .cmp-c-contracts){
-  white-space: normal; min-width: 96px; max-width: 160px;
+  white-space: normal; min-width: 84px; max-width: 140px;
 }
 .jtnq-cmp .cmp-val{ display: inline-flex; flex-direction: column; align-items: center; gap: 4px; }
 .jtnq-cmp .cmp-long > *:first-child{
@@ -206,9 +206,9 @@ export const COMPARE_CSS = `
 }
 .jtnq-cmp .cmp-sub{ font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute); }
 .jtnq-cmp .cmp-dash{ color: var(--c-text-deep); }
-.jtnq-cmp .cmp-td .ft-price{ flex-wrap: nowrap; gap: 4px 8px; }
+.jtnq-cmp .cmp-td .ft-price{ flex-wrap: wrap; justify-content: center; gap: 0 8px; max-width: 120px; }
 .jtnq-cmp .cmp-td .ft-now{ font-size: 15px; }
-.jtnq-cmp .cmp-go{ padding-right: 16px !important; }
+.jtnq-cmp .cmp-price-go{ display: inline-flex; flex-direction: column; align-items: center; gap: 8px; }
 
 .jtnq-cmp .cmp-cards{ display: none; }
 
