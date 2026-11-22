@@ -491,7 +491,7 @@
               "minDays": 3,
               "contracts": "1 mini / 10 micros",
               "activationFee": 0,
-              "note": "50% consistency add-on: $95 (list $135, reset $90). Reset fee $75. Funded path chosen after passing: Daily (daily loss $500, max drawdown $1,000, buffer $1,100) or Flex (no daily loss limit, max drawdown $1,000)."
+              "note": "30% consistency option: $54 (list $99, reset $69). 50% consistency add-on: $74 (list $135, reset $90). Reset fee $75. Funded path chosen after passing: Daily (daily loss $500, max drawdown $1,000, buffer $1,100) or Flex (no daily loss limit, max drawdown $1,000)."
             },
             {
               "size": 50000,
@@ -505,7 +505,7 @@
               "minDays": 3,
               "contracts": "4 minis / 40 micros",
               "activationFee": 0,
-              "note": "50% consistency add-on: $144 (list $205, reset $135). Reset fee $109. Funded path chosen after passing: Daily (daily loss $1,000, max drawdown $2,000, buffer $2,100) or Flex (no daily loss limit, max drawdown $2,000)."
+              "note": "30% consistency option: $102 (list $145, reset $105). 50% consistency add-on: $151 (list $216, reset $152). Reset fee $119. Funded path chosen after passing: Daily (daily loss $1,000, max drawdown $2,000, buffer $2,100) or Flex (no daily loss limit, max drawdown $2,000)."
             },
             {
               "size": 100000,
@@ -519,7 +519,7 @@
               "minDays": 3,
               "contracts": "8 minis / 80 micros",
               "activationFee": 0,
-              "note": "50% consistency add-on: $230 (list $329, reset $209). Reset fee $169. Funded path chosen after passing: Daily (daily loss $1,250, max drawdown $2,500, buffer $2,600) or Flex (no daily loss limit, max drawdown $3,000)."
+              "note": "30% consistency option: $160 (list $229, reset $164). 50% consistency add-on: $230 (list $329, reset $230). Reset fee $169. Funded path chosen after passing: Daily (daily loss $1,250, max drawdown $2,500, buffer $2,600) or Flex (no daily loss limit, max drawdown $3,000)."
             },
             {
               "size": 150000,
@@ -533,7 +533,7 @@
               "minDays": 3,
               "contracts": "12 minis / 120 micros",
               "activationFee": 0,
-              "note": "50% consistency add-on: $321 (list $459, reset $299). Reset fee $239. Funded path chosen after passing: Daily (daily loss $1,750, max drawdown $3,500, buffer $3,600) or Flex (no daily loss limit, max drawdown $4,500)."
+              "note": "30% consistency option: $223 (list $319, reset $225). 50% consistency add-on: $321 (list $459, reset $319). Reset fee $239. Funded path chosen after passing: Daily (daily loss $1,750, max drawdown $3,500, buffer $3,600) or Flex (no daily loss limit, max drawdown $4,500)."
             },
             {
               "size": 300000,

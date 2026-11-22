@@ -444,3 +444,47 @@ test('un compte sans mode coché garde le price du compte', () => {
   const select50 = r.plans.find((p) => p.programName === 'Select' && p.size === 50000);
   assert.equal(select50.originalPrice, 165);
 });
+
+// Les options de consistency (30 % / 40 % / 50 %) de Select, lues sur leur page du 22/11 : le 30 %
+// est apparu chez eux entre le 19/11 (mode 50 % seul) et le 22/11 ; le bot ne lisait pas ces options.
+const modesOf = (r, program, size) => r.plans.find((p) => p.programName === program && p.size === size).modes;
+
+test('page du 22/11 : Select 50K a 3 options de consistency, prix au rabais du compte (30 % : 145 -> 102)', () => {
+  const r = parseTradeify(PAGE_1122, RECORDED_1122);
+  assert.deepEqual(modesOf(r, 'Select', 50000), [
+    { consistency: 30, selected: false, list: 145, price: 102, reset: 105 },
+    { consistency: 40, selected: true, list: 174, price: 122, reset: 119 },
+    { consistency: 50, selected: false, list: 216, price: 151, reset: 152 },
+  ]);
+  // Le 25K a -45 % : les options aussi (99 -> 54, 135 -> 74), comme sur la carte.
+  assert.deepEqual(modesOf(r, 'Select', 25000).map((m) => [m.consistency, m.list, m.price, m.reset]), [[30, 99, 54, 69], [40, 109, 60, 75], [50, 135, 74, 90]]);
+  assert.deepEqual(modesOf(r, 'Select', 300000), []); // pas d'option sur le 300K
+  assert.deepEqual(modesOf(r, 'Growth', 50000), []);
+});
+
+test('la note de Select 50K reprend le 30 %, le 50 % et le reset fee de leur page, le reste de la note ne bouge pas', async () => {
+  const data = structuredClone(DATA);
+  const select = data.firms.find((f) => f.id === 'tradeify').programs.find((p) => p.name === 'Select');
+  const tail = ' Funded path chosen after passing: Daily (daily loss $1,000, max drawdown $2,000, buffer $2,100) or Flex (no daily loss limit, max drawdown $2,000).';
+  select.plans.find((p) => p.size === 50000).note = '50% consistency add-on: $144 (list $205, reset $135). Reset fee $109.' + tail;
+  const note300 = select.plans.find((p) => p.size === 300000).note;
+  const lines = [];
+  const res = await runTradeify(data, { read: async () => PAGE_1122, now: RECORDED_1122, log: (l) => lines.push(l) });
+  assert.equal(res.ok, true);
+  assert.equal(
+    select.plans.find((p) => p.size === 50000).note,
+    '30% consistency option: $102 (list $145, reset $105). 50% consistency add-on: $151 (list $216, reset $152). Reset fee $119.' + tail,
+  );
+  assert.equal(select.plans.find((p) => p.size === 300000).note, note300);
+  // Relue une 2e fois : plus rien à changer.
+  const again = await runTradeify(data, { read: async () => PAGE_1122, now: RECORDED_1122, log: () => {} });
+  assert.deepEqual(again.changes, []);
+});
+
+test('page du 19/11 (mode 50 % seul, aucun mode coché) : la note n\'est pas touchée', async () => {
+  const data = structuredClone(DATA);
+  const select = data.firms.find((f) => f.id === 'tradeify').programs.find((p) => p.name === 'Select');
+  const before = select.plans.map((p) => p.note);
+  await runTradeify(data, { read: async () => PAGE_1119, now: RECORDED_1119, log: () => {} });
+  assert.deepEqual(select.plans.map((p) => p.note), before);
+});

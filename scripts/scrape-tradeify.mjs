@@ -124,8 +124,16 @@ function accountsOf(html, brokerText) {
     // Le prix affiché sur la carte est celui du mode de consistency coché (« isSelected: true »),
     // pas le « price » du compte : Select 50K, 22/11/2026, compte 165, mode coché 174, carte 174.
     const shown = chunk.match(/discount:\s*\d+,\s*isSelected:\s*true,\s*price:\s*([\d.]+)/);
+    // Les options de consistency du compte (« discount: 30 / 40 / 50 » = 30 % / 40 % / 50 % de consistency).
+    const modes = [...chunk.matchAll(/discount:\s*(\d+),\s*(?:isSelected:\s*(true|false),\s*)?price:\s*([\d.]+)[^}]*?reset:\s*['"]\$([\d,]+)['"]/g)].map((x) => ({
+      consistency: Number(x[1]),
+      selected: x[2] === 'true',
+      list: Number(x[3]),
+      reset: Number(x[4].replace(/,/g, '')),
+    }));
     return [{
       size: Math.round(Number(m[1]) * 1000),
+      modes,
       price: shown ? Number(shown[1]) : price ? Number(price[1]) : NaN,
       couponCode: chunk.match(/couponCode:\s*['"]([^'"]*)['"]/)?.[1] ?? null,
       showFraction: /showFraction:\s*true/.test(head),
@@ -221,6 +229,14 @@ export function parseTradeify(page, now = Date.now()) {
         originalPrice: a.price,
         code: pct > 0 ? code : null,
         pct: pct > 0 ? pct : 0,
+        // Chaque option de consistency, au même rabais que le compte (Select 25K, 22/11 : 30 % 99 -> 54, 50 % 135 -> 74 avec -45 %).
+        modes: a.modes.map((md) => ({
+          consistency: md.consistency,
+          selected: md.selected,
+          list: md.list,
+          price: pct > 0 ? formatPriceValue((md.list * (100 - pct)) / 100, a.showFraction) : md.list,
+          reset: md.reset,
+        })),
       });
     }
   }
@@ -288,6 +304,20 @@ export function asPrinted(read, code) {
   };
 }
 
+/** Début de note géré par le bot : « 30% consistency option: $54 (list $99, reset $69). 50% consistency add-on: … Reset fee $75. » */
+const CONSISTENCY_NOTE_HEAD = /^(?:\d+% consistency (?:add-on|option): \$[\d,.]+ \(list \$[\d,.]+, reset \$[\d,.]+\)\. )*(?:Reset fee \$[\d,.]+\. )?/;
+
+/** Les options de consistency d'un compte, du plus bas au plus haut, puis le reset fee du mode coché. */
+export function consistencyNote(modes) {
+  const selected = modes.find((md) => md.selected);
+  const money = (n) => `$${Number.isInteger(n) ? n : n.toFixed(2)}`;
+  const others = modes
+    .filter((md) => !md.selected)
+    .sort((a, b) => a.consistency - b.consistency)
+    .map((md) => `${md.consistency}% consistency ${md.consistency > selected.consistency ? 'add-on' : 'option'}: ${money(md.price)} (list ${money(md.list)}, reset ${money(md.reset)}). `);
+  return `${others.join('')}Reset fee ${money(selected.reset)}. `;
+}
+
 /**
  * Applique une relecture à la firme (copie modifiée en place). Renvoie la liste des changements.
  * Firme affiliée : son code imprimé reste, la relecture est d'abord passée par asPrinted.
@@ -325,6 +355,15 @@ export function applyTradeify(firm, parsed, today) {
       if (plan.originalPrice !== u.originalPrice) {
         changes.push(`${tag} : originalPrice ${plan.originalPrice} -> ${u.originalPrice}`);
         plan.originalPrice = u.originalPrice;
+      }
+      // Les phrases de consistency de la note (30 %, 50 %, reset fee) suivent leur page ; le reste de la note, écrit à la main, ne bouge pas.
+      if (u.modes?.some((md) => md.selected)) {
+        const note = plan.note ?? '';
+        const updated = consistencyNote(u.modes) + note.replace(CONSISTENCY_NOTE_HEAD, '');
+        if (updated !== note) {
+          changes.push(`${tag} : note (consistency)`);
+          plan.note = updated;
+        }
       }
     }
   }
