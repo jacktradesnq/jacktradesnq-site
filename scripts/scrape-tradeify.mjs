@@ -24,7 +24,7 @@
  * et Inter Miami 10K/25K/50K (programme « Limited Edition », isMiamivisible, ajouté le 19/11/2026 :
  * le site reprend tout ce que la firme publie, CLAUDE.md 21/10/2026). Chaque compte du JSON doit
  * être relu : avec le JSON actuel, 16 prix. Les règles des plans restent écrites à la main.
- * Lucid Trading n'est pas relu (403 Cloudflare).
+ * Lucid Trading a son propre script (scrape-lucid.mjs : leur site répond 403 à un fetch, navigateur headless).
  *
  * Firme affiliée ("affiliate": true, Tradeify depuis le 19/11/2026, Angelo : « c officielle j'ai
  * le code JackTNQ sur tradeify. donc mtn go changer dans mon site ») : son code imprimé (firm.code,

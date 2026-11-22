@@ -99,7 +99,7 @@ test('relecture appliquée au JSON : 12 prix, code, lastChecked, pas stale', asy
   assert.equal(firm.promo.code, 'GEMS');
   assert.equal(firm.lastChecked, '2026-11-01');
   assert.equal(firm.stale, false);
-  // Lucid n'est jamais touché (403 Cloudflare, relu à la main).
+  // Lucid n'est jamais touché par ce script (il a le sien : scrape-lucid.mjs).
   assert.deepEqual(data.firms.find((f) => f.id === 'lucid-trading'), DATA.firms.find((f) => f.id === 'lucid-trading'));
 });
 

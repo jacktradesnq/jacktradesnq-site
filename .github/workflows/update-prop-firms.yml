@@ -44,6 +44,14 @@ jobs:
         continue-on-error: true
         run: node scripts/scrape-tradeify.mjs
 
+      # Lucid (comparateur) : leur site répond 403 à un fetch (Cloudflare), la page se lit dans le Chromium
+      # headless de playwright (Angelo, 22/11/2026 : « pk lucid ça a pas fait automatiquement »). Page illisible
+      # = firme stale (commitée avec le reste) puis job rouge plus bas, et l'alerte Discord « stale firms ».
+      - name: Scrape Lucid (comparator)
+        id: lucid
+        continue-on-error: true
+        run: node scripts/scrape-lucid.mjs
+
       # Les giveaways terminés sur Discord (Angelo, 04/11/2026). Discord illisible = job rouge plus bas.
       - name: Sync giveaways from Discord
         id: giveaways
@@ -115,6 +123,12 @@ jobs:
         if: always() && steps.tradeify.outcome == 'failure'
         run: |
           echo "::error::scrape-tradeify : page Tradeify illisible, moins de 12 prix de base ou un compte du JSON absent de leur page (voir l'étape « Scrape Tradeify »). Données gardées, stale: true."
+          exit 1
+
+      - name: Lucid unreadable — fail the job
+        if: always() && steps.lucid.outcome == 'failure'
+        run: |
+          echo "::error::scrape-lucid : page Lucid illisible (403 Cloudflare, plan du JSON absent ou remise changée, voir l'étape « Scrape Lucid »). Données gardées, stale: true."
           exit 1
 
       - name: Giveaways unreadable — fail the job
