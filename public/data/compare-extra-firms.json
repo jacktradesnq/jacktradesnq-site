@@ -13,7 +13,7 @@
       },
       "code": "VAULT",
       "url": "https://lucidtrading.com/#plans",
-      "lastChecked": "2026-11-01",
+      "lastChecked": "2026-11-22",
       "stale": false,
       "programs": [
         {
@@ -29,8 +29,8 @@
           "plans": [
             {
               "size": 25000,
-              "price": 75.6,
-              "originalPrice": 108,
+              "price": 81.2,
+              "originalPrice": 116,
               "profitTarget": 1250,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
@@ -40,12 +40,12 @@
               "minDays": 1,
               "contracts": "2 minis or 20 micros",
               "activationFee": 0,
-              "note": "Price with the Daily Loss Limit ON (card default, gives On Demand Payouts). Daily Loss Limit OFF: $90.30 (end-of-day payouts). Reset fee $75. Funded payout profit goal $250 per cycle, buffer = max loss + $100. Moved live after 5 payouts."
+              "note": "Price with the Daily Loss Limit ON (card default, gives On Demand Payouts). Daily Loss Limit OFF: $95.90 (end-of-day payouts). Reset fee $81. Funded payout profit goal $250 per cycle, buffer = max loss + $100. Moved live after 5 payouts."
             },
             {
               "size": 50000,
-              "price": 120.4,
-              "originalPrice": 172,
+              "price": 126,
+              "originalPrice": 180,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -55,7 +55,7 @@
               "minDays": 1,
               "contracts": "4 minis or 40 micros",
               "activationFee": 0,
-              "note": "Price with the Daily Loss Limit ON (card default, gives On Demand Payouts). Daily Loss Limit OFF: $150.50 (end-of-day payouts). Reset fee $120. Funded payout profit goal $500 per cycle, buffer = max loss + $100. Moved live after 5 payouts."
+              "note": "Price with the Daily Loss Limit ON (card default, gives On Demand Payouts). Daily Loss Limit OFF: $156.10 (end-of-day payouts). Reset fee $126. Funded payout profit goal $500 per cycle, buffer = max loss + $100. Moved live after 5 payouts."
             },
             {
               "size": 100000,
@@ -103,8 +103,8 @@
           "plans": [
             {
               "size": 25000,
-              "price": 45.5,
-              "originalPrice": 65,
+              "price": 53.2,
+              "originalPrice": 76,
               "profitTarget": 1250,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
@@ -115,12 +115,12 @@
               "minDays": 3,
               "contracts": "2 minis or 20 micros",
               "activationFee": 0,
-              "note": "Price with the Daily Loss Limit ON and 40% consistency (card default). 50% consistency add-on: $50.40 (pass in 2 days). Daily Loss Limit OFF: $60.20 (end-of-day payouts). Reset fee $45. Funded scaling plan starts at 1 mini / 10 micros. No payout buffer. Moved live after 5 payouts."
+              "note": "Price with the Daily Loss Limit ON and 40% consistency (card default). 50% consistency add-on: $58.10 (pass in 2 days). Daily Loss Limit OFF: $67.90 (end-of-day payouts). Reset fee $53. Funded scaling plan starts at 1 mini / 10 micros. No payout buffer. Moved live after 5 payouts."
             },
             {
               "size": 50000,
-              "price": 80.5,
-              "originalPrice": 115,
+              "price": 88.2,
+              "originalPrice": 126,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -131,7 +131,7 @@
               "minDays": 3,
               "contracts": "4 minis or 40 micros",
               "activationFee": 0,
-              "note": "Price with the Daily Loss Limit ON and 40% consistency (card default). 50% consistency add-on: $90.30 (pass in 2 days). Daily Loss Limit OFF: $115.50 (end-of-day payouts). Reset fee $80. Funded scaling plan starts at 2 minis / 20 micros. No payout buffer. Moved live after 5 payouts."
+              "note": "Price with the Daily Loss Limit ON and 40% consistency (card default). 50% consistency add-on: $95.90 (pass in 2 days). Daily Loss Limit OFF: $123.20 (end-of-day payouts). Reset fee $88. Funded scaling plan starts at 2 minis / 20 micros. No payout buffer. Moved live after 5 payouts."
             },
             {
               "size": 100000,
@@ -495,8 +495,8 @@
             },
             {
               "size": 50000,
-              "price": 116,
-              "originalPrice": 165,
+              "price": 122,
+              "originalPrice": 174,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",

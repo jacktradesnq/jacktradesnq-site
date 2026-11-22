@@ -421,3 +421,26 @@ test('Lucid: chaque plan dont la note dit « Daily Loss Limit OFF » est vendu a
   const autres = lucid.programs.flatMap((p) => p.plans.filter((pl) => !/Daily Loss Limit OFF/.test(pl.note ?? '')));
   assert.ok(autres.every((pl) => pl.alsoWithoutDailyLoss !== true)); // jamais deviné
 });
+
+// tradeify.co enregistrée le 2026-11-22 vers 20:40 UTC (curl, User-Agent navigateur). Select 50K :
+// « price: 165 » sur le compte, mais le mode de consistency coché (40 %, « isSelected: true ») dit
+// 174 et la carte affiche 174 (Chrome, 22/11/2026 : 174 -> 122). Le bot lisait 165 : le site
+// affichait 116 au lieu de 122.
+const PAGE_1122 = fs.readFileSync(new URL('./__fixtures__/tradeify-2026-11-22.html', import.meta.url), 'utf8');
+const RECORDED_1122 = Date.parse('2026-11-22T20:40:00Z');
+
+test('page du 22/11 : le prix lu est celui du mode de consistency coché (Select 50K 174, pas 165)', () => {
+  assert.match(PAGE_1122, /name:\s*"50K",\s*isSelected:\s*true,\s*isVisible:\s*true,\s*price:\s*165,/);
+  const r = parseTradeify(PAGE_1122, RECORDED_1122);
+  const expected = NOV_TABLE.map((row) => (row[0] === 'Select' && row[1] === 50000 ? ['Select', 50000, 122, 174] : row));
+  assert.deepEqual(table(r.plans), expected);
+  assert.deepEqual(r.notices, []);
+});
+
+test('un compte sans mode coché garde le price du compte', () => {
+  const noModes = PAGE_1122.replace(/discount:\s*\d+,\s*isSelected:\s*true,\s*price:/g, 'discount: 40, isSelected: false, price:');
+  assert.notEqual(noModes, PAGE_1122);
+  const r = parseTradeify(noModes, RECORDED_1122);
+  const select50 = r.plans.find((p) => p.programName === 'Select' && p.size === 50000);
+  assert.equal(select50.originalPrice, 165);
+});

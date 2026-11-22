@@ -121,9 +121,12 @@ function accountsOf(html, brokerText) {
     const price = chunk.match(/\bprice:\s*([\d.]+)/);
     const head = chunk.slice(0, price?.index ?? chunk.length); // avant multiConsistencyData
     if (!visible(html, head)) return [];
+    // Le prix affiché sur la carte est celui du mode de consistency coché (« isSelected: true »),
+    // pas le « price » du compte : Select 50K, 22/11/2026, compte 165, mode coché 174, carte 174.
+    const shown = chunk.match(/discount:\s*\d+,\s*isSelected:\s*true,\s*price:\s*([\d.]+)/);
     return [{
       size: Math.round(Number(m[1]) * 1000),
-      price: price ? Number(price[1]) : NaN,
+      price: shown ? Number(shown[1]) : price ? Number(price[1]) : NaN,
       couponCode: chunk.match(/couponCode:\s*['"]([^'"]*)['"]/)?.[1] ?? null,
       showFraction: /showFraction:\s*true/.test(head),
     }];
