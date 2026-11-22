@@ -27,6 +27,16 @@ import { usePromoClock } from '../promo-clock';
 import { sizeLabel } from '../shared';
 import { Arrow, CellView, FirmLogo, PriceView } from '../FirmTable';
 import { COLUMNS, type Column } from './columns';
+
+// A window narrower than this drops these columns (Angelo, 22/11/2026: « fit on one screen and adjust
+// based on window sizing », a visitor on Discord); Customize lists them, ticking one brings it back.
+const NARROW_PX = 1420; // measured 22/11/2026: 14 columns need 1287 px, the table zone is the window minus 130 px
+const AUTO_HIDE = ['activation', 'steps'];
+// Compact view, the default (Angelo, 22/11/2026: « largeur et quantité de chiffre »; a visitor: « it can get
+// overwhelming with so much information all at once, if people want a detailed view you can give them that
+// option as well »). Detailed shows every column; Customize still ticks any column in either view.
+const COMPACT_IDS = ['firm', 'price', 'size', 'target', 'maxLoss', 'lossType', 'payoutFreq', 'dailyLoss', 'leverage']; // dailyLoss and leverage exist on the perps table only
+type View = 'compact' | 'detailed';
 import { COMPARE_CSS } from './compare-css';
 
 // The comparator's own disclaimer, under the table (Angelo, 01/11/2026: firms showing code JTNQ
@@ -165,6 +175,18 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   const [dailyLoss, setDailyLoss] = useState<DailyLossFilter>(null);
   const [discount, setDiscount] = useState(true);
   const [hidden, setHidden] = useState<Record<Family, string[]>>({ futures: [], perps: [] });
+  // Window under NARROW_PX: the columns of AUTO_HIDE leave the table (it fits one screen); ticking one
+  // in Customize brings it back (forced).
+  const [view, setView] = useState<View>('compact');
+  const [narrow, setNarrow] = useState(false);
+  const [forced, setForced] = useState<Record<Family, string[]>>({ futures: [], perps: [] });
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${NARROW_PX - 1}px)`);
+    const on = () => setNarrow(mq.matches);
+    on();
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
   const [sort, setSort] = useState<Sort>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   // The plans ticked: at the top of the table whatever the filters, so plans of any size or firm
@@ -247,7 +269,14 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   const firmRows = firms.length ? all.filter((r) => firms.includes(r.firmId)) : all;
   // A column no plan of this family has a value for is left out (columns.ts).
   const available = COLUMNS[family].filter((c) => c.fixed || all.some((r) => r.cells[c.id] != null));
-  const cols = available.filter((c) => !hidden[family].includes(c.id));
+  const offByDefault = (id: string) => (view === 'compact' && !COMPACT_IDS.includes(id)) || (narrow && AUTO_HIDE.includes(id));
+  const autoHidden = (id: string) => offByDefault(id) && !forced[family].includes(id);
+  const cols = available.filter((c) => !hidden[family].includes(c.id) && !autoHidden(c.id));
+  const toggleColumn = (id: string, on: boolean) => {
+    const auto = offByDefault(id);
+    setHidden((h) => ({ ...h, [family]: on ? h[family].filter((x) => x !== id) : auto ? h[family] : [...new Set([...h[family], id])] }));
+    if (auto) setForced((f) => ({ ...f, [family]: on ? [...new Set([...f[family], id])] : f[family].filter((x) => x !== id) }));
+  };
   const sizes = [...new Set(firmRows.map((r) => r.size))].sort((a, b) => a - b);
   const stepsList = [...new Set(firmRows.map((r) => r.steps))].sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
   // Max loss types as the column writes them, whatever the firms picked (a type no plan of
@@ -304,7 +333,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   );
 
   return (
-    <div className="cmp">
+    <div className={`cmp cmp-view-${view} cmp-fam-${family}`}>
       <style>{COMPARE_CSS}</style>
 
       <div className="cmp-top">
@@ -466,6 +495,13 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
           </span>
           Apply discount
         </button>
+        <span className="cmp-opts cmp-view" role="group" aria-label="Table view">
+          {(['compact', 'detailed'] as const).map((v) => (
+            <button key={v} type="button" className="cmp-opt" aria-pressed={view === v} onClick={() => setView(v)}>
+              {v === 'compact' ? 'Compact' : 'Detailed'}
+            </button>
+          ))}
+        </span>
         <details className="cmp-custom">
           <summary>Customize</summary>
           <fieldset className="cmp-custom-list">
@@ -476,13 +512,8 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
                 <label key={c.id} className="cmp-check">
                   <input
                     type="checkbox"
-                    checked={!hidden[family].includes(c.id)}
-                    onChange={(e) =>
-                      setHidden((h) => ({
-                        ...h,
-                        [family]: e.target.checked ? h[family].filter((x) => x !== c.id) : [...h[family], c.id],
-                      }))
-                    }
+                    checked={!hidden[family].includes(c.id) && !autoHidden(c.id)}
+                    onChange={(e) => toggleColumn(c.id, e.target.checked)}
                   />
                   {c.label}
                 </label>
@@ -512,9 +543,6 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
               <thead>
                 <tr>
                   {cols.map(head)}
-                  <th scope="col" className="cmp-th">
-                    <span className="sr-only">Link</span>
-                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -538,13 +566,17 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
                         </th>
                       ) : (
                         <td key={c.id} className={`cmp-td cmp-c-${c.id}`}>
-                          {c.id === 'price' ? <PriceCell price={priceNow(r)} discount={discount} /> : <ValCell row={r} col={c.id} options={options} />}
+                          {c.id === 'price' ? (
+                            <span className="cmp-price-go">
+                              <PriceCell price={priceNow(r)} discount={discount} />
+                              <Go row={r} />
+                            </span>
+                          ) : (
+                            <ValCell row={r} col={c.id} options={options} />
+                          )}
                         </td>
                       ),
                     )}
-                    <td className="cmp-td cmp-go">
-                      <Go row={r} />
-                    </td>
                   </tr>
                 ))}
               </tbody>
