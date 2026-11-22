@@ -35,7 +35,7 @@ const AUTO_HIDE = ['activation', 'steps'];
 // Compact view, the default (Angelo, 22/11/2026: « largeur et quantité de chiffre »; a visitor: « it can get
 // overwhelming with so much information all at once, if people want a detailed view you can give them that
 // option as well »). Detailed shows every column; Customize still ticks any column in either view.
-const COMPACT_IDS = ['firm', 'price', 'size', 'target', 'maxLoss', 'lossType', 'payoutFreq'];
+const COMPACT_IDS = ['firm', 'price', 'size', 'target', 'maxLoss', 'lossType', 'payoutFreq', 'dailyLoss', 'leverage']; // dailyLoss and leverage exist on the perps table only
 type View = 'compact' | 'detailed';
 import { COMPARE_CSS } from './compare-css';
 
@@ -333,7 +333,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   );
 
   return (
-    <div className={`cmp cmp-view-${view}`}>
+    <div className={`cmp cmp-view-${view} cmp-fam-${family}`}>
       <style>{COMPARE_CSS}</style>
 
       <div className="cmp-top">
