@@ -32,6 +32,11 @@ import { COLUMNS, type Column } from './columns';
 // based on window sizing », a visitor on Discord); Customize lists them, ticking one brings it back.
 const NARROW_PX = 1420; // measured 22/11/2026: 14 columns need 1287 px, the table zone is the window minus 130 px
 const AUTO_HIDE = ['activation', 'steps'];
+// Compact view, the default (Angelo, 22/11/2026: « largeur et quantité de chiffre »; a visitor: « it can get
+// overwhelming with so much information all at once, if people want a detailed view you can give them that
+// option as well »). Detailed shows every column; Customize still ticks any column in either view.
+const COMPACT_IDS = ['firm', 'price', 'size', 'target', 'maxLoss', 'lossType', 'payoutFreq'];
+type View = 'compact' | 'detailed';
 import { COMPARE_CSS } from './compare-css';
 
 // The comparator's own disclaimer, under the table (Angelo, 01/11/2026: firms showing code JTNQ
@@ -172,6 +177,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   const [hidden, setHidden] = useState<Record<Family, string[]>>({ futures: [], perps: [] });
   // Window under NARROW_PX: the columns of AUTO_HIDE leave the table (it fits one screen); ticking one
   // in Customize brings it back (forced).
+  const [view, setView] = useState<View>('compact');
   const [narrow, setNarrow] = useState(false);
   const [forced, setForced] = useState<Record<Family, string[]>>({ futures: [], perps: [] });
   useEffect(() => {
@@ -263,10 +269,11 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   const firmRows = firms.length ? all.filter((r) => firms.includes(r.firmId)) : all;
   // A column no plan of this family has a value for is left out (columns.ts).
   const available = COLUMNS[family].filter((c) => c.fixed || all.some((r) => r.cells[c.id] != null));
-  const autoHidden = (id: string) => narrow && AUTO_HIDE.includes(id) && !forced[family].includes(id);
+  const offByDefault = (id: string) => (view === 'compact' && !COMPACT_IDS.includes(id)) || (narrow && AUTO_HIDE.includes(id));
+  const autoHidden = (id: string) => offByDefault(id) && !forced[family].includes(id);
   const cols = available.filter((c) => !hidden[family].includes(c.id) && !autoHidden(c.id));
   const toggleColumn = (id: string, on: boolean) => {
-    const auto = narrow && AUTO_HIDE.includes(id);
+    const auto = offByDefault(id);
     setHidden((h) => ({ ...h, [family]: on ? h[family].filter((x) => x !== id) : auto ? h[family] : [...new Set([...h[family], id])] }));
     if (auto) setForced((f) => ({ ...f, [family]: on ? [...new Set([...f[family], id])] : f[family].filter((x) => x !== id) }));
   };
@@ -326,7 +333,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   );
 
   return (
-    <div className="cmp">
+    <div className={`cmp cmp-view-${view}`}>
       <style>{COMPARE_CSS}</style>
 
       <div className="cmp-top">
@@ -488,6 +495,13 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
           </span>
           Apply discount
         </button>
+        <span className="cmp-opts cmp-view" role="group" aria-label="Table view">
+          {(['compact', 'detailed'] as const).map((v) => (
+            <button key={v} type="button" className="cmp-opt" aria-pressed={view === v} onClick={() => setView(v)}>
+              {v === 'compact' ? 'Compact' : 'Detailed'}
+            </button>
+          ))}
+        </span>
         <details className="cmp-custom">
           <summary>Customize</summary>
           <fieldset className="cmp-custom-list">

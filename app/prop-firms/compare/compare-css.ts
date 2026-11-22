@@ -238,8 +238,78 @@ export const COMPARE_CSS = `
 .jtnq-cmp .cmp-table tbody tr.cmp-picked-last > *{ border-bottom: 1px solid var(--c-accent); }
 .jtnq-cmp .cmp-count{ scroll-margin-top: 16px; }
 
-/* ── phone: one card per plan, filters folded ── */
+/* ── cards: one per plan, two across (one across on a phone), where the table stops fitting (measured 22/11/2026, window = table zone + 130 px) ──
+   detailed view: 12 columns need 1134 px of table, so cards under 1264 px; compact view: 7 columns need 699 px, so cards under 830 px ── */
+@media (max-width: 1263px){
+  .jtnq-cmp .cmp-view-detailed .cmp-sort-m{ display: grid; }
+  .jtnq-cmp .cmp-view-detailed .cmp-scroll{ display: none; }
+  .jtnq-cmp .cmp-view-detailed .cmp-cards{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+  .jtnq-cmp .cmp-view-detailed .cmp-card{
+    display: flex; flex-direction: column; gap: 12px; padding: 16px;
+    border: 1px solid var(--c-line); border-radius: 12px; background: var(--c-bg-raise);
+  }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-head{ display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-size{ font-family: var(--f-sans); font-size: 15px; font-weight: 500; color: var(--c-text); }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-price .ft-price{ justify-content: flex-start; }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-price .ft-now{ font-size: 20px; }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-dl{ margin: 0; display: grid; border-top: 1px solid var(--c-line-soft); }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-row{
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); align-items: center; gap: 12px;
+    padding: 8px 0; border-bottom: 1px solid var(--c-line-soft);
+  }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-row dt{
+    font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute); line-height: 1.4;
+  }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-row dd{ margin: 0; text-align: right; }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-row .cmp-val{ align-items: flex-end; }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-row .ft-fig, .jtnq-cmp .cmp-card-row .ft-word{ font-size: 14px; }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-row .ft-word{ font-weight: 400; }
+  .jtnq-cmp .cmp-view-detailed .cmp-long > *:first-child{ display: inline; -webkit-line-clamp: none; cursor: inherit; }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-row:has(.cmp-long){ grid-template-columns: 1fr; gap: 4px; }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-row:has(.cmp-long) dd{ text-align: left; }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-row .cmp-long{ align-items: flex-start; }
+  .jtnq-cmp .cmp-view-detailed .cmp-card .cmp-note-d p{ max-width: none; }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-foot{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+  .jtnq-cmp .cmp-view-detailed .cmp-card.cmp-picked-last{ margin-bottom: 12px; border-color: var(--c-accent); }
+  .jtnq-cmp .cmp-view-detailed .cmp-card-foot .row-cta{ margin-left: auto; }
+}
+@media (max-width: 829px){
+  .jtnq-cmp .cmp-view-compact .cmp-sort-m{ display: grid; }
+  .jtnq-cmp .cmp-view-compact .cmp-scroll{ display: none; }
+  .jtnq-cmp .cmp-view-compact .cmp-cards{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+  .jtnq-cmp .cmp-view-compact .cmp-card{
+    display: flex; flex-direction: column; gap: 12px; padding: 16px;
+    border: 1px solid var(--c-line); border-radius: 12px; background: var(--c-bg-raise);
+  }
+  .jtnq-cmp .cmp-view-compact .cmp-card-head{ display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+  .jtnq-cmp .cmp-view-compact .cmp-card-size{ font-family: var(--f-sans); font-size: 15px; font-weight: 500; color: var(--c-text); }
+  .jtnq-cmp .cmp-view-compact .cmp-card-price .ft-price{ justify-content: flex-start; }
+  .jtnq-cmp .cmp-view-compact .cmp-card-price .ft-now{ font-size: 20px; }
+  .jtnq-cmp .cmp-view-compact .cmp-card-dl{ margin: 0; display: grid; border-top: 1px solid var(--c-line-soft); }
+  .jtnq-cmp .cmp-view-compact .cmp-card-row{
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); align-items: center; gap: 12px;
+    padding: 8px 0; border-bottom: 1px solid var(--c-line-soft);
+  }
+  .jtnq-cmp .cmp-view-compact .cmp-card-row dt{
+    font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute); line-height: 1.4;
+  }
+  .jtnq-cmp .cmp-view-compact .cmp-card-row dd{ margin: 0; text-align: right; }
+  .jtnq-cmp .cmp-view-compact .cmp-card-row .cmp-val{ align-items: flex-end; }
+  .jtnq-cmp .cmp-view-compact .cmp-card-row .ft-fig, .jtnq-cmp .cmp-card-row .ft-word{ font-size: 14px; }
+  .jtnq-cmp .cmp-view-compact .cmp-card-row .ft-word{ font-weight: 400; }
+  .jtnq-cmp .cmp-view-compact .cmp-long > *:first-child{ display: inline; -webkit-line-clamp: none; cursor: inherit; }
+  .jtnq-cmp .cmp-view-compact .cmp-card-row:has(.cmp-long){ grid-template-columns: 1fr; gap: 4px; }
+  .jtnq-cmp .cmp-view-compact .cmp-card-row:has(.cmp-long) dd{ text-align: left; }
+  .jtnq-cmp .cmp-view-compact .cmp-card-row .cmp-long{ align-items: flex-start; }
+  .jtnq-cmp .cmp-view-compact .cmp-card .cmp-note-d p{ max-width: none; }
+  .jtnq-cmp .cmp-view-compact .cmp-card-foot{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+  .jtnq-cmp .cmp-view-compact .cmp-card.cmp-picked-last{ margin-bottom: 12px; border-color: var(--c-accent); }
+  .jtnq-cmp .cmp-view-compact .cmp-card-foot .row-cta{ margin-left: auto; }
+}
+
+/* ── phone: filters folded, cards one across ── */
 @media (max-width: 760px){
+  .jtnq-cmp .cmp .cmp-cards{ grid-template-columns: 1fr; }
   .jtnq-cmp .cmp{ width: 100%; margin-left: 0; margin-top: 24px; }
   .jtnq-cmp .cmp-filters-toggle{
     display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; cursor: pointer;
@@ -255,7 +325,6 @@ export const COMPARE_CSS = `
   .jtnq-cmp .cmp-select, .jtnq-cmp .cmp-money{ width: 100%; }
   .jtnq-cmp .cmp-select select{ width: 100%; min-width: 0; }
   .jtnq-cmp .cmp-money input{ flex: 1; width: auto; }
-  .jtnq-cmp .cmp-sort-m{ display: grid; }
   .jtnq-cmp .cmp-switch{ padding: 0; }
   .jtnq-cmp .cmp-custom-list{ position: static; margin-top: 8px; box-shadow: none; }
   .jtnq-cmp .cmp-multi-sum{ min-width: 0; width: 100%; }
@@ -263,36 +332,6 @@ export const COMPARE_CSS = `
   /* The open list grows the row: the label stays by the field, not in the middle. */
   .jtnq-cmp .cmp-field:has(.cmp-multi) .cmp-field-k{ align-self: start; padding-top: 12px; }
 
-  .jtnq-cmp .cmp-scroll{ display: none; }
-  .jtnq-cmp .cmp-cards{ display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
-  .jtnq-cmp .cmp-card{
-    display: flex; flex-direction: column; gap: 12px; padding: 16px;
-    border: 1px solid var(--c-line); border-radius: 12px; background: var(--c-bg-raise);
-  }
-  .jtnq-cmp .cmp-card-head{ display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; }
-  .jtnq-cmp .cmp-card-size{ font-family: var(--f-sans); font-size: 15px; font-weight: 500; color: var(--c-text); }
-  .jtnq-cmp .cmp-card-price .ft-price{ justify-content: flex-start; }
-  .jtnq-cmp .cmp-card-price .ft-now{ font-size: 20px; }
-  .jtnq-cmp .cmp-card-dl{ margin: 0; display: grid; border-top: 1px solid var(--c-line-soft); }
-  .jtnq-cmp .cmp-card-row{
-    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); align-items: center; gap: 12px;
-    padding: 8px 0; border-bottom: 1px solid var(--c-line-soft);
-  }
-  .jtnq-cmp .cmp-card-row dt{
-    font-family: var(--f-sans); font-size: 14px; color: var(--c-text-mute); line-height: 1.4;
-  }
-  .jtnq-cmp .cmp-card-row dd{ margin: 0; text-align: right; }
-  .jtnq-cmp .cmp-card-row .cmp-val{ align-items: flex-end; }
-  .jtnq-cmp .cmp-card-row .ft-fig, .jtnq-cmp .cmp-card-row .ft-word{ font-size: 14px; }
-  .jtnq-cmp .cmp-card-row .ft-word{ font-weight: 400; }
-  .jtnq-cmp .cmp-long > *:first-child{ display: inline; -webkit-line-clamp: none; cursor: inherit; }
-  .jtnq-cmp .cmp-card-row:has(.cmp-long){ grid-template-columns: 1fr; gap: 4px; }
-  .jtnq-cmp .cmp-card-row:has(.cmp-long) dd{ text-align: left; }
-  .jtnq-cmp .cmp-card-row .cmp-long{ align-items: flex-start; }
-  .jtnq-cmp .cmp-card .cmp-note-d p{ max-width: none; }
-  .jtnq-cmp .cmp-card-foot{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
-  .jtnq-cmp .cmp-card.cmp-picked-last{ margin-bottom: 12px; border-color: var(--c-accent); }
-  .jtnq-cmp .cmp-card-foot .row-cta{ margin-left: auto; }
 }
 .jtnq-cmp .cmp-opts{ display: inline-flex; gap: 4px; flex-wrap: wrap; }
 .jtnq-cmp .cmp-opt{
