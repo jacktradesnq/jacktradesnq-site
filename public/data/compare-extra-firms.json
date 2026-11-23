@@ -14,7 +14,7 @@
       "code": "VAULT",
       "url": "https://lucidtrading.com/#plans",
       "lastChecked": "2026-11-23",
-      "stale": false,
+      "stale": true,
       "programs": [
         {
           "name": "LucidPro",
