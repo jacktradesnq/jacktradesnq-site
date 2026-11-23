@@ -76,8 +76,13 @@ const isNone = (s) => /^none!?$/i.test(String(s).trim());
  * visiteur voit sur Elite Access ne se deduirait plus du HTML.
  */
 export function topOnePageScript(html) {
-  const str = (name) => html.match(new RegExp(`var ${name}\\s*=\\s*'([^']*)'`))?.[1];
-  const raw = (name) => html.match(new RegExp(`var ${name}\\s*=\\s*([^;\\n]+);`))?.[1]?.trim();
+  // Les reglages sont lus dans CE script (son en-tete « PRICES COME FROM CUSTOM ATTRIBUTES »),
+  // jamais dans une autre variable du meme nom ailleurs dans la page.
+  const at = html.indexOf('PRICES COME FROM CUSTOM ATTRIBUTES');
+  const end = at === -1 ? -1 : html.indexOf('</script>', at);
+  const src = at === -1 ? '' : html.slice(at, end === -1 ? undefined : end);
+  const str = (name) => src.match(new RegExp(`var ${name}\\s*=\\s*'([^']*)'`))?.[1];
+  const raw = (name) => src.match(new RegExp(`var ${name}\\s*=\\s*([^;\\n]+);`))?.[1]?.trim();
   const pane = str('DRAWDOWN_PANE');
   const discount = Number(raw('ACTIVATION_DISCOUNT'));
   const round = raw('ROUND_ACTIVATION');
@@ -97,7 +102,8 @@ export function topOnePageScript(html) {
 function targetScript(html) {
   const at = html.indexOf('ELITE ACCESS PROFIT TARGET');
   if (at === -1) return null;
-  const src = html.slice(at, at + 6000);
+  const end = html.indexOf('</script>', at);
+  const src = html.slice(at, end === -1 ? undefined : end);
   const cut = src.match(/var TARGET_CUT\s*=\s*(true|false)\s*;/)?.[1];
   const tab = src.match(/var ACCESS_TAB\s*=\s*'([^']*)'/)?.[1];
   const body = src.match(/var TARGETS\s*=\s*\{([\s\S]*?)\};/)?.[1];
