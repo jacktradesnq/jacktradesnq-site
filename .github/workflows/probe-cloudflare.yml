@@ -1,0 +1,73 @@
+name: Probe Cloudflare (lecture seule)
+
+# Sonde jetable (23/11/2026) : mesure ce que Cloudflare répond à l'IP d'un runner GitHub pour les
+# pages de prop firms, par trois méthodes. AUCUN secret, AUCUN commit, AUCUN déploiement, AUCUN
+# Discord : lecture seule, déclenchée uniquement par un push de cette branche.
+on:
+  push:
+    branches: [feat/scrapers-curl-cffi]
+    paths: ['.github/workflows/probe-cloudflare.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: IP du runner
+        continue-on-error: true
+        run: curl -sS https://api.ipify.org; echo
+
+      - name: urllib / curl_cffi sur les pages de firmes
+        continue-on-error: true
+        run: |
+          pip install curl_cffi
+          python3 - <<'EOF'
+          import urllib.request, urllib.error
+          from curl_cffi import requests as cr
+          UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'
+          URLS = [
+              'https://lucidtrading.com/',
+              'https://support.lucidtrading.com/en/',
+              'https://tradeify.co/',
+              'https://help.tradeify.co/en/',
+              'https://traderslaunch.com/',
+              'https://e8futures.com/',
+              'https://help.e8markets.com/',
+          ]
+          def plain(u):
+              try:
+                  r = urllib.request.urlopen(urllib.request.Request(u, headers={'User-Agent': UA}), timeout=25)
+                  return r.status, r.headers.get('cf-mitigated', '')
+              except urllib.error.HTTPError as e:
+                  return e.code, e.headers.get('cf-mitigated', '')
+              except Exception as e:
+                  return 'ERR ' + type(e).__name__, ''
+          def cffi(u):
+              try:
+                  r = cr.get(u, impersonate='chrome', timeout=25)
+                  has = 'LucidPricingConfig' in r.text
+                  return r.status_code, r.headers.get('cf-mitigated', ''), len(r.content), 'config' if has else '-'
+              except Exception as e:
+                  return 'ERR ' + type(e).__name__, '', 0, '-'
+          for u in URLS:
+              print(f'{u:48s} urllib+UA={plain(u)}  curl_cffi={cffi(u)}')
+          EOF
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: npm ci
+        run: npm ci
+
+      - name: Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: scrape-lucid (Playwright, --dry : n'écrit rien)
+        continue-on-error: true
+        run: node scripts/scrape-lucid.mjs --dry
