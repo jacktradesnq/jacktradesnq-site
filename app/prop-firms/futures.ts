@@ -100,6 +100,8 @@ const FIRM_LOGOS: Record<string, string> = {
   blusky: '/logos/blusky.svg',
   // Icône officielle du site de Tradeify (favicon 512x512 de tradeify.co, réduite à 128 px), 19/11/2026.
   tradeify: '/logos/tradeify.png',
+  // Partenaire à nouveau depuis le 23/11/2026 : le logo publié jusqu'au 27/09/2026 (d0ddfad^).
+  'top-one-futures': '/logos/top-one-futures.png',
 };
 
 const DD_LABEL: Record<DdType, string> = {
@@ -252,7 +254,62 @@ const bluskyInstant = (above: string, cap: string): Funded => ({
   ],
   rows: [],
 });
+// Top One Futures, read 23/11/2026. Each card of toponefutures.com has a « Funded rules » face:
+// Elite Daily « Payout Frequency Daily! », « Consistency None! », « Max Drawdown (EOD) » $1,000 /
+// $2,000 / $2,500 / $3,500, « Daily Loss Limit » as in the evaluation; Elite Access « Payout Frequency
+// 5 Days », « Consistency 40% », « Max Drawdown » $1,000 / $2,000 / $3,000 / $3,500, « Drawdown Mode
+// EOD » and « Daily Loss Limit » $500 / $1,000 / $1,250 / $1,750 with the card's switches on their
+// default (EOD, Standard); Instant Sim Funded « 5 Day Payouts » on the card. help.toponefutures.com:
+// « Elite Daily V2 – Overview » (« Minimum Payout $500 », « Max Payout Per Request » $750 / $1,000 /
+// $1,500 / $2,250), « Elite ACCESS Static – Payout Requirements » (« Profitable days needed 5 », « Min
+// profit for a day to count » $200 / $250 / $300 / $350, « Minimum payout $500 », « Maximum payout per
+// request » $1,000 / $1,500 / $2,000 / $2,500), « Overview of the Instant Sim Funded Program » (rules
+// for accounts bought since 27/07/2026, « Max per payout » $1,000 / $2,000 / $2,500 / $3,000; profit target per payout « 6% » then
+// « 5% » then « 4% »), « Ignite Accounts Overview » (« Max per payout » $500 / $1,000 / $1,500 / $2,000,
+// « Minimum payout: $250 », « Profit target per payout (5%) »).
+const TOP_ONE_CAP = 'Payout cap per request';
 const FUNDED: Record<string, Record<string, Funded>> = {
+  'top-one-futures': {
+    'Elite Daily': {
+      pills: [
+        { label: 'Payout request', value: 'Daily' },
+        { label: 'Consistency', value: 'None' },
+        { label: 'Minimum payout', value: '$500' },
+      ],
+      rows: [
+        { label: 'Funded max drawdown', bySize: { 25000: '$1,000', 50000: '$2,000', 100000: '$2,500', 150000: '$3,500' } },
+        { label: 'Funded daily loss limit', bySize: { 25000: '$500', 50000: '$1,000', 100000: '$1,250', 150000: '$1,750' } },
+        { label: TOP_ONE_CAP, bySize: { 25000: '$750', 50000: '$1,000', 100000: '$1,500', 150000: '$2,250' } },
+      ],
+    },
+    'Elite Access': {
+      pills: [
+        { label: 'Payout request', value: '5 Days (5 profitable days of $200 / $250 / $300 / $350)' },
+        { label: 'Consistency', value: '40%' },
+        { label: 'Minimum payout', value: '$500' },
+        { label: 'Funded drawdown', value: 'EOD' },
+      ],
+      rows: [
+        { label: 'Funded max drawdown', bySize: { 25000: '$1,000', 50000: '$2,000', 100000: '$3,000', 150000: '$3,500' } },
+        { label: 'Funded daily loss limit', bySize: { 25000: '$500', 50000: '$1,000', 100000: '$1,250', 150000: '$1,750' } },
+        { label: TOP_ONE_CAP, bySize: { 25000: '$1,000', 50000: '$1,500', 100000: '$2,000', 150000: '$2,500' } },
+      ],
+    },
+    'Instant Sim Funded': {
+      pills: [
+        { label: 'Payout request', value: '5 Day Payouts' },
+        { label: 'Profit per payout', value: '6%, then 5%, then 4%' },
+      ],
+      rows: [{ label: TOP_ONE_CAP, bySize: { 25000: '$1,000', 50000: '$2,000', 100000: '$2,500', 150000: '$3,000' } }],
+    },
+    Ignite: {
+      pills: [
+        { label: 'Minimum payout', value: '$250' },
+        { label: 'Profit per payout', value: '5%' },
+      ],
+      rows: [{ label: TOP_ONE_CAP, bySize: { 25000: '$500', 50000: '$1,000', 100000: '$1,500', 150000: '$2,000' } }],
+    },
+  },
   'e8-markets': {
     'E8 Signature Futures': {
       pills: [

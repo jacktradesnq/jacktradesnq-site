@@ -1,0 +1,926 @@
+<!-- toponefutures.com (www), read 2026-11-23: the two inline scripts that rewrite the Elite Access cards, then the four pricing panes, verbatim. -->
+<script>
+(function () {
+  // does nothing on /welcome
+  if (/^\/welcome(\/|$)/i.test(location.pathname)) return;
+
+  /* ================= PRICES COME FROM CUSTOM ATTRIBUTES =================
+     Put these on each .v3-pricing-slide (or any wrapper around it).
+     Leave one out and the value already in the Webflow HTML is used.
+
+       data-{mode}-{field}
+
+       mode:  intraday → Intraday on, No DLL off
+              nodll    → No DLL on, Intraday off
+              both     → Intraday + No DLL on
+              eod      → both toggles off (optional, overrides the HTML value)
+
+       field: price      → the big card price (.v3-price-current)
+              reset      → "Reset Fee" row. If left out and the mode has a price,
+                           the reset fee is price - $5 (see RESET_BELOW_PRICE)
+              activation → "Activation Fee" row (full price, BEFORE the
+                           Elite Access discount below is applied)
+
+     The crossed-out "before discount" price is calculated automatically and
+     keeps the card's own discount: new old price = HTML old price x (new price / HTML price).
+     (Elite Daily $25K: $178 / $80, No DLL $104 -> crossed-out $231)
+
+     Examples:
+       Elite Daily $25K:   data-nodll-price=$104  data-nodll-reset=$135
+       Ignite $25K:        data-nodll-price=$113
+       Elite Access $25K:  data-intraday-activation=$52
+                           data-nodll-activation=$135
+                           data-both-activation=$67
+
+     data-hard-activation still works as a fallback for data-intraday-activation.
+     ===================================================================== */
+
+  // pricing tabs (data-w-tab) that get the No DLL toggle
+  // (removed from Elite Daily 'Elite' and 'Ignite Instant Funding')
+  var DLL_PANES = ['Elite Access'];
+  var FIELDS = ['price', 'reset', 'activation'];
+
+  var DRAWDOWN_PANE = 'Elite Access';       // only tab with the EOD / Intraday toggle
+  // Elite Access page: its cards sit in this section instead of a pricing tab,
+  // and work exactly like the Elite Access tab on home (drawdown + DLL toggles)
+  var ACCESS_SCOPE = '#pricing';
+  var SLIDE = '.v3-pricing-slide';
+  var BTN   = '.difficulty-button';
+
+  // crossed-out price on the card (change this to your class if it differs)
+  var OLD_PRICE = '.v3-price-old';
+
+  // Reset Fee = card price minus this, when a mode changes the card price
+  // and has no data-{mode}-reset attribute of its own
+  var RESET_BELOW_PRICE = 5;
+
+  /* ===== ELITE ACCESS (Black Friday) =====
+     Activation Fee, Elite Access only. The REGULAR fee is the one in the
+     Webflow HTML ($139 / $189 / $259 / $359).
+       Static             regular crossed -> 25% off          $139 -> $104    (green)
+       Static + No DLL    No DLL fee crossed -> 25% off of it $222 -> $167    (data-nodll-activation)
+       Intraday           regular crossed -> 35% off, no code $139 -> $90     (data-intraday-activation)
+       Intraday + No DLL  No DLL fee crossed -> 35% off of it $222 -> $144    (data-both-activation)
+     The No DLL fee before any discount is the regular fee + NODLL_MARKUP ($139 -> $222).
+     If a card has no data-*-activation attribute, the fee is worked out from these settings.
+     ROUND_*: true = whole dollars ($69.50 -> $70), false = keep cents */
+  var ACTIVATION_DISCOUNT = 0.25;
+  var ROUND_ACTIVATION    = true;
+  var INTRADAY_DISCOUNT   = 0.35;
+  var ROUND_INTRADAY      = true;
+  var NODLL_MARKUP        = 0.60;
+
+  /* "Drawdown Mode" rows on Elite Access:
+       EOD selected       Evaluation rules: "EOD" crossed + "Static" (green, free promo)
+                          Funded rules:     "EOD"
+       Intraday selected  Evaluation rules: "EOD"
+                          Funded rules:     "Intraday" */
+  var DD_OLD_TEXT      = 'EOD';
+  var DD_STATIC_TEXT   = 'Static';
+  var DD_INTRADAY_TEXT = 'Intraday';
+  // left button of the "Funded Drawdown Mode" toggle (Webflow says "Static")
+  var DD_TOGGLE_TEXT   = 'EOD';
+
+  // pricing tab opened on page load (set to '' to keep Webflow's own default)
+  var DEFAULT_TAB = 'Elite Access';
+
+  var DD_LABEL      = 'Funded Drawdown Mode';
+  var DLL_LABEL     = 'Daily Loss Limit';
+  var DLL_LABEL_BY_PANE = { 'Elite Access': 'Funded Daily Loss Limit' };
+  // tabs where the left DLL button shows the funded DLL amount ("$500 | No DLL")
+  // and only says "Standard" while No DLL is selected
+  var DLL_VALUE_PANES = ['Elite Access'];
+  var DLL_ON_TEXT   = 'Standard';
+  var DLL_OFF_TEXT  = 'No DLL';
+  var DLL_NONE_TEXT = 'None!';
+
+  /* ---------- helpers ---------- */
+
+  // a "pane" is a home pricing tab, or the Elite Access page's #pricing section
+  function isAccessSection(el) {
+    return !!(el && el.matches && el.matches(ACCESS_SCOPE) &&
+              el.querySelector('.v3-pricing-cards.access-page'));
+  }
+
+  function nameOf(pane) {
+    return pane.getAttribute('data-w-tab') || (isAccessSection(pane) ? DRAWDOWN_PANE : null);
+  }
+
+  function isTogglePane(pane) {
+    return !!pane && DLL_PANES.indexOf(nameOf(pane)) !== -1;
+  }
+
+  function paneOf(el) {
+    return el.closest('.acc__content__pane') || el.closest(ACCESS_SCOPE);
+  }
+
+  function dllLabelFor(name) { return DLL_LABEL_BY_PANE[name] || DLL_LABEL; }
+
+  // attribute may sit on the slide or any wrapper around it
+  function attr(slide, name) {
+    var el = slide.closest('[' + name + ']');
+    return el ? el.getAttribute(name) : null;
+  }
+
+  // { price, reset, activation } for the current mode, read from the attributes
+  function valuesFor(slide, mode) {
+    var out = {};
+    FIELDS.forEach(function (f) {
+      var v = attr(slide, 'data-' + mode + '-' + f);
+      if (!v && mode === 'intraday' && f === 'activation') v = attr(slide, 'data-hard-activation');
+      out[f] = v || null;
+    });
+    return out;
+  }
+
+  function togglePanes() {
+    return Array.prototype.filter.call(
+      document.querySelectorAll('.acc__content__pane[data-w-tab], ' + ACCESS_SCOPE), isTogglePane);
+  }
+
+  // the text element of a label/value cell, or null if it holds other markup
+  function leaf(cell) {
+    var el = cell.querySelector('div') || cell;
+    return el.children.length ? null : el;
+  }
+
+  // walk down single-child wrappers to the element holding the text
+  function textEl(el) {
+    while (el && el.children.length === 1) el = el.children[0];
+    return el && !el.children.length ? el : null;
+  }
+
+  // write only when something actually changes (keeps the page quiet for other scripts)
+  function setText(el, v) { if (el.children.length || el.textContent !== v) el.textContent = v; }
+  function setAttr(el, n, v) { if (el.getAttribute(n) !== v) el.setAttribute(n, v); }
+
+  function money(s) {
+    var n = parseFloat(String(s || '').replace(/[^0-9.]/g, ''));
+    return isNaN(n) ? null : n;
+  }
+
+  // put amount n into the same format as tpl ("$116" + 232 -> "$232")
+  function withAmount(tpl, n) {
+    n = Math.round(n * 100) / 100;
+    var parts = (n % 1 === 0 ? String(n) : n.toFixed(2)).split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return String(tpl).replace(/[0-9][0-9,]*(\.[0-9]+)?/, parts.join('.'));
+  }
+
+  function isIntradayBtn(btn) { return /intraday/i.test((btn.textContent || '').trim()); }
+
+  function isDllOffBtn(btn) {
+    return btn.getAttribute('data-dll') === 'off' || /no\s*dll/i.test((btn.textContent || '').trim());
+  }
+
+  // table rows whose label matches re (toggle rows are skipped)
+  function rowsByLabel(slide, re) {
+    var out = [];
+    slide.querySelectorAll('.v3-table-row-info').forEach(function (info) {
+      if (info.closest('.drawdown-table-row')) return;
+      var label = leaf(info);
+      if (!label || !re.test(label.textContent || '')) return;
+      var grid = info.closest('.v3-table-grid');
+      var box  = grid && grid.querySelector('.v3-table-row-value');
+      if (!box) return;
+      out.push({ row: info.closest('.v3-table-row'), val: box.querySelector('div') || box });
+    });
+    return out;
+  }
+
+  // remember the value the Webflow HTML had, once; returns it (or null on unexpected markup)
+  function seedOrig(val) {
+    if (!val.hasAttribute('data-orig')) {
+      // an older drawdown script may already have rewritten the fee; it keeps the original here
+      var seed = val.getAttribute('data-orig-fee');
+      if (!seed) {
+        if (val.children.length) return null;     // unexpected markup, leave it alone
+        seed = (val.textContent || '').trim();
+      }
+      val.setAttribute('data-orig', seed);
+    }
+    return val.getAttribute('data-orig');
+  }
+
+  /* Swap a value, remembering the original from the HTML.
+     next = null restores the original.
+     opts.promo  : class for the row when the new value is cheaper than the base (turns green)
+     opts.strike : cross out the base whenever the shown value differs from it (up or down)
+     opts.base   : value to cross out instead of the original (e.g. the No DLL base fee) */
+  function setValue(val, next, row, opts) {
+    opts = opts || {};
+    var promoClass = opts.promo || null;
+    var orig = seedOrig(val);
+    if (orig === null) return;
+    var shown = (next || orig).trim();
+    var ref   = (opts.base || orig).trim();          // the crossed-out value
+    var a = money(shown), b = money(ref);
+    var cheaper = !!(next && promoClass && a !== null && b !== null && a < b);
+    var strike  = shown !== ref && (cheaper || !!(opts.strike && next));
+
+    if (strike) {
+      var cur = val.querySelector('.fee-old');
+      var same = cur && val.children.length === 1 && cur.textContent === ref &&
+                 val.textContent === ref + ' ' + shown;
+      if (!same) {
+        val.textContent = '';
+        var old = document.createElement('em');
+        old.className = 'fee-old';
+        old.textContent = ref;
+        val.appendChild(old);
+        val.appendChild(document.createTextNode(' ' + shown));
+      }
+    } else {
+      setText(val, shown);
+    }
+    if (row && promoClass) row.classList.toggle(promoClass, cheaper);
+  }
+
+  /* Crossed-out price keeps the card's own discount (55%, 60%, ...):
+     HTML old price x (new price / HTML price).
+     next = null (no attribute for this mode) restores the HTML value.
+     Call after the current price has been set, so its data-orig exists. */
+  function setOldPrice(slide, next) {
+    var box = slide.querySelector(OLD_PRICE);
+    var el  = box && textEl(box);
+    if (!el) return;
+    if (!el.hasAttribute('data-orig')) el.setAttribute('data-orig', (el.textContent || '').trim());
+    var orig = el.getAttribute('data-orig');
+    var cur  = slide.querySelector('.v3-price-current');
+    var base = money(orig);
+    var was  = cur && money(cur.getAttribute('data-orig'));
+    var n    = money(next);
+    setText(el, (n === null || !base || !was) ? orig : withAmount(orig, Math.round(base * n / was)));
+  }
+
+  /* ---------- DLL toggle row (built here, so no Webflow component change is needed) ---------- */
+
+  function buildDllRow(label) {
+    var row = document.createElement('div');
+    row.className = 'v3-table-row drawdown-table-row dll-table-row';
+    row.innerHTML =
+      '<div class="drawdown-table-grid">' +
+        '<div class="v3-table-row-info difficulty"><div>' + label + '</div></div>' +
+        '<div class="v3-table-row-value"><div class="difficulty-mode-toggle">' +
+          '<div class="difficulty-button active" data-dll="on"><div>' + DLL_ON_TEXT + '</div></div>' +
+          '<div class="difficulty-button" data-dll="off"><div>' + DLL_OFF_TEXT + '</div></div>' +
+        '</div></div>' +
+      '</div>';
+    return row;
+  }
+
+  // a Webflow-built toggle row is recognised by its "No DLL" button
+  function tagDllRows(pane) {
+    pane.querySelectorAll('.drawdown-table-row:not(.dll-table-row)').forEach(function (row) {
+      var btns = row.querySelectorAll(BTN);
+      for (var i = 0; i < btns.length; i++) {
+        if (isDllOffBtn(btns[i])) { row.classList.add('dll-table-row'); return; }
+      }
+    });
+  }
+
+  // one DLL row per Eval/Funded stage; goes right under the drawdown toggle if there is one
+  function ensureDllRows(pane) {
+    tagDllRows(pane);
+    var label = dllLabelFor(nameOf(pane));
+    pane.querySelectorAll(SLIDE + ' .rules-tab-content').forEach(function (stage) {
+      if (stage.querySelector('.dll-table-row')) return;
+      var row = buildDllRow(label);
+      var dd  = stage.querySelector('.drawdown-table-row:not(.dll-table-row)');
+      if (dd) dd.insertAdjacentElement('afterend', row);
+      else stage.appendChild(row);
+    });
+  }
+
+  // DLL toggle label: "Funded Daily Loss Limit" on Elite Access, "Daily Loss Limit" elsewhere
+  function setDllLabels(pane) {
+    var label = dllLabelFor(nameOf(pane));
+    pane.querySelectorAll('.dll-table-row .v3-table-row-info').forEach(function (info) {
+      var el = leaf(info);
+      if (el && el.textContent !== label) el.textContent = label;
+    });
+  }
+
+  // "Daily loss limit" rows -> "None!" + green while No DLL is on
+  function setDll(slide, off) {
+    rowsByLabel(slide, /daily\s*loss\s*limit/i).forEach(function (r) {
+      var val = r.val;
+      if (!val.hasAttribute('data-orig-dll')) {
+        if (val.children.length) return;
+        val.setAttribute('data-orig-dll', (val.textContent || '').trim());
+      }
+      var orig = val.getAttribute('data-orig-dll');
+      var change = off && !/none/i.test(orig);    // already "None!" (Access Eval) stays as is
+      setText(val, change ? DLL_NONE_TEXT : orig);
+      if (r.row) r.row.classList.toggle('is-dll-off', change);
+    });
+  }
+
+  // the card's funded DLL amount: the first Daily Loss Limit row that isn't "None!"
+  function fundedDllValue(slide) {
+    var v = null;
+    rowsByLabel(slide, /daily\s*loss\s*limit/i).some(function (r) {
+      var t = r.val.getAttribute('data-orig-dll') || (r.val.textContent || '').trim();
+      if (t && !/none/i.test(t)) { v = t; return true; }
+      return false;
+    });
+    if (v) slide.setAttribute('data-dll-value', v);   // remembered in case the row is rebuilt
+    return v || slide.getAttribute('data-dll-value');
+  }
+
+  // left DLL button: amount while Standard is on, "Standard" while No DLL is on
+  function setDllButtonLabels(slide, name, noDll) {
+    if (DLL_VALUE_PANES.indexOf(name) === -1) return;
+    var value = fundedDllValue(slide);
+    slide.querySelectorAll('.dll-table-row ' + BTN).forEach(function (btn) {
+      if (isDllOffBtn(btn)) return;
+      var el = textEl(btn);
+      if (el) setText(el, (!noDll && value) ? value : DLL_ON_TEXT);
+    });
+  }
+
+  /* ---------- drawdown (Elite Access only) ---------- */
+
+  // "Difficulty" / "Drawdown mode" -> "Funded Drawdown Mode"
+  function setDrawdownLabels(pane) {
+    pane.querySelectorAll('.drawdown-table-row:not(.dll-table-row) .v3-table-row-info').forEach(function (info) {
+      var el = leaf(info);
+      if (el && el.textContent !== DD_LABEL) el.textContent = DD_LABEL;
+    });
+  }
+
+  // "Max Drawdown (EOD)" -> "Max Drawdown" (text in brackets removed)
+  function stripDrawdownLabel(slide) {
+    slide.querySelectorAll('.v3-table-row-info').forEach(function (info) {
+      var el = leaf(info);
+      if (!el) return;
+      if (!el.hasAttribute('data-dd-init')) {
+        var txt = el.textContent || '';
+        if (!/max\s*drawdown/i.test(txt) || !/\(\s*EOD\s*\)/i.test(txt)) return;
+        el.setAttribute('data-dd-init', txt);
+      }
+      setText(el, el.getAttribute('data-dd-init').replace(/\s*\(\s*EOD\s*\)/i, '').trim());
+    });
+  }
+
+  // which rules list a row is in: true = Funded rules, false = Evaluation rules
+  function isFundedStage(el, slide) {
+    var stage = el.closest('.rules-tab-content');
+    if (!stage || !slide.contains(stage)) stage = el.closest('.w-tab-pane');
+    if (!stage || !slide.contains(stage)) return false;
+    // 1) the tab's name, e.g. data-w-tab="Funded rules"
+    var pane = stage.closest('.w-tab-pane');
+    var name = (pane && slide.contains(pane) && pane.getAttribute('data-w-tab')) || '';
+    if (/fund/i.test(name)) return true;
+    if (/eval/i.test(name)) return false;
+    // 2) otherwise: the Evaluation list is the one with a "Profit Target" row
+    var labels = Array.prototype.map.call(
+      stage.querySelectorAll('.v3-table-row-info'),
+      function (info) { return info.textContent || ''; }
+    ).join(' ');
+    return !/profit\s*target/i.test(labels);
+  }
+
+  /* "Drawdown Mode" rows:
+       EOD selected       Evaluation: "EOD" crossed + "Static" (green, free promo)
+                          Funded:     "EOD"
+       Intraday selected  Evaluation: "EOD"
+                          Funded:     "Intraday" */
+  function setDrawdownMode(slide, intraday) {
+    rowsByLabel(slide, /^\s*drawdown\s*mode\s*$/i).forEach(function (r) {
+      var val = r.val;
+      if (!val.hasAttribute('data-orig-ddm')) {
+        if (val.children.length) return;          // unexpected markup, leave it alone
+        val.setAttribute('data-orig-ddm', (val.textContent || '').trim());
+      }
+      var funded = isFundedStage(r.row || val, slide);
+      var promo  = !intraday && !funded;          // Static for free on Evaluation
+
+      if (promo) {
+        var cur = val.querySelector('.fee-old');
+        var same = cur && val.children.length === 1 && cur.textContent === DD_OLD_TEXT &&
+                   val.textContent === DD_OLD_TEXT + ' ' + DD_STATIC_TEXT;
+        if (!same) {
+          val.textContent = '';
+          var old = document.createElement('em');
+          old.className = 'fee-old';
+          old.textContent = DD_OLD_TEXT;
+          val.appendChild(old);
+          val.appendChild(document.createTextNode(' ' + DD_STATIC_TEXT));
+        }
+      } else {
+        setText(val, (funded && intraday) ? DD_INTRADAY_TEXT : DD_OLD_TEXT);
+      }
+      if (r.row) r.row.classList.toggle('is-dd-static', promo);
+    });
+  }
+
+  /* ---------- apply ---------- */
+
+  function modeKey(intraday, noDll) {
+    if (intraday && noDll) return 'both';
+    if (intraday) return 'intraday';
+    if (noDll) return 'nodll';
+    return 'eod';
+  }
+
+  // fee with a discount taken off, same format ("$139", 0.25 -> "$104"); null for "None!" etc.
+  function feeAt(fee, discount, round) {
+    var n = money(fee);
+    if (n === null) return null;
+    var d = n * (1 - discount);
+    return withAmount(fee, round ? Math.round(d) : d);
+  }
+
+  function applySlide(slide, name, intraday, noDll) {
+    slide.querySelectorAll('.dll-table-row ' + BTN).forEach(function (btn) {
+      btn.classList.toggle('active', isDllOffBtn(btn) === noDll);
+    });
+
+    if (name === DRAWDOWN_PANE) {
+      slide.querySelectorAll('.drawdown-table-row:not(.dll-table-row) ' + BTN).forEach(function (btn) {
+        var isIntra = isIntradayBtn(btn);
+        btn.classList.toggle('active', isIntra === intraday);
+        var el = !isIntra && textEl(btn);
+        if (el) setText(el, DD_TOGGLE_TEXT);         // "Static" -> "EOD"
+      });
+      stripDrawdownLabel(slide);
+      setDrawdownMode(slide, intraday);
+    }
+
+    var vals = valuesFor(slide, modeKey(intraday, noDll));
+
+    var price = slide.querySelector('.v3-price-current');
+    if (price) setValue(price, vals.price, null, null);
+    setOldPrice(slide, vals.price);
+
+    // Reset Fee: data-{mode}-reset if set; otherwise $5 under the card price
+    // when a mode changes the price. The original fee is crossed out next to the new one
+    var reset = vals.reset;
+    var p = money(vals.price);
+    if (!reset && p !== null) reset = withAmount(vals.price, Math.max(0, p - RESET_BELOW_PRICE));
+    rowsByLabel(slide, /reset\s*fee/i).forEach(function (r) {
+      setValue(r.val, reset, r.row, { strike: true });
+    });
+
+    /* Activation Fee. Elite Access rules are in the settings at the top;
+       other tabs keep the old behaviour. */
+    var actBase = null;
+    if (intraday && noDll) actBase = valuesFor(slide, 'nodll').activation;
+    rowsByLabel(slide, /activation\s*fee/i).forEach(function (r) {
+      if (name === DRAWDOWN_PANE) {
+        var regular = seedOrig(r.val);                       // regular fee from the HTML ($139)
+        var sale = regular && feeAt(regular, ACTIVATION_DISCOUNT, ROUND_ACTIVATION);
+        if (sale) {
+          var nodllList = feeAt(regular, -NODLL_MARKUP, true);   // $222 / $302 / $414 / $574
+          var shown, base;
+          if (intraday && noDll) { shown = vals.activation || feeAt(nodllList, INTRADAY_DISCOUNT, ROUND_INTRADAY); base = nodllList; }
+          else if (intraday)     { shown = vals.activation || feeAt(regular, INTRADAY_DISCOUNT, ROUND_INTRADAY); base = regular; }
+          else if (noDll)        { shown = vals.activation || feeAt(nodllList, ACTIVATION_DISCOUNT, ROUND_ACTIVATION); base = nodllList; }
+          else                   { shown = sale; base = regular; }
+          setValue(r.val, shown, r.row, { promo: 'is-fee-promo', strike: true, base: base });
+          return;
+        }
+      }
+      setValue(r.val, vals.activation, r.row, { promo: 'is-fee-promo', strike: true, base: actBase });
+    });
+
+    setDll(slide, noDll);
+    setDllButtonLabels(slide, name, noDll);
+  }
+
+  function readState(pane) {
+    return {
+      intraday: nameOf(pane) === DRAWDOWN_PANE && pane.getAttribute('data-drawdown') === 'intraday',
+      noDll: pane.getAttribute('data-dll') === 'off'
+    };
+  }
+
+  // every card in a pricing tab switches together
+  function applyPane(pane, intraday, noDll) {
+    var name = nameOf(pane);
+    setAttr(pane, 'data-drawdown', intraday ? 'intraday' : 'eod');
+    setAttr(pane, 'data-dll', noDll ? 'off' : 'on');
+    ensureDllRows(pane);
+    setDllLabels(pane);
+    if (name === DRAWDOWN_PANE) {
+      setDrawdownLabels(pane);
+      // drawdown switches outside the cards (the configurator on the Elite Access page)
+      pane.querySelectorAll(BTN).forEach(function (btn) {
+        if (btn.closest(SLIDE) || btn.closest('.dll-table-row')) return;
+        btn.classList.toggle('active', isIntradayBtn(btn) === intraday);
+      });
+    }
+    pane.querySelectorAll(SLIDE).forEach(function (slide) {
+      applySlide(slide, name, intraday, noDll);
+    });
+  }
+
+  /* ---------- living alongside older drawdown scripts ----------
+     The Elite Access page still has its own older drawdown embeds. They don't know about
+     the DLL switch: they rename its label, light up both of its buttons and reset the fee.
+     So on that page this script
+       1. handles the switch clicks first and keeps them from reaching the older scripts, and
+       2. watches the #pricing section and puts its own state back whenever something else
+          changes it (e.g. the older scripts' refresh after an Eval/Funded tab click).
+     Nothing has to be deleted for this to work. */
+
+  var watchers = [];
+
+  // run fn, then forget the DOM changes it made itself, so the watcher doesn't react to them
+  function quietly(fn) {
+    try { fn(); } finally {
+      watchers.forEach(function (w) { w.takeRecords(); });
+    }
+  }
+
+  function reassert() {
+    quietly(function () {
+      togglePanes().forEach(function (pane) {
+        var s = readState(pane);
+        applyPane(pane, s.intraday, s.noDll);
+      });
+    });
+  }
+
+  function watchAccessSections() {
+    if (!('MutationObserver' in window)) return;
+    togglePanes().forEach(function (pane) {
+      if (!isAccessSection(pane) || pane.hasAttribute('data-pt-watched')) return;
+      pane.setAttribute('data-pt-watched', '1');
+      var w = new MutationObserver(function () { reassert(); });
+      w.observe(pane, { subtree: true, childList: true, characterData: true,
+                        attributes: true, attributeFilter: ['class'] });
+      watchers.push(w);
+    });
+  }
+
+  function onPress(e) {
+    var btn = e.target && e.target.closest ? e.target.closest(BTN) : null;
+    if (!btn) return;
+    var pane = paneOf(btn);
+    if (!isTogglePane(pane)) return;
+
+    var s = readState(pane);
+    if (btn.closest('.dll-table-row')) {
+      s.noDll = isDllOffBtn(btn);
+    } else if (nameOf(pane) === DRAWDOWN_PANE) {
+      s.intraday = isIntradayBtn(btn);
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopImmediatePropagation();               // the older scripts never see this click
+    quietly(function () { applyPane(pane, s.intraday, s.noDll); });
+  }
+
+  // capture phase on window: runs before any other click handler on the page
+  window.addEventListener('click', onPress, true);
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') onPress(e);
+  }, true);
+
+  /* Evaluation/Funded tab clicks let Webflow rebuild the pane,
+     so restore the remembered modes afterwards */
+  document.addEventListener('click', function (e) {
+    var tab = e.target.closest ? e.target.closest('a.rules-tab') : null;
+    if (!tab) return;
+    setTimeout(reassert, 0);
+    setTimeout(reassert, 350);
+  });
+
+  // open DEFAULT_TAB on page load (Webflow's Tabs "Current tab" setting does the same without code).
+  // Tried a few times, because Webflow's tabs may not be ready the first time.
+  var defaultDone = false;
+  function selectDefaultTab() {
+    if (defaultDone || !DEFAULT_TAB) return;
+    var link = document.querySelector('.v3-acc-menu a[data-w-tab="' + DEFAULT_TAB + '"]');
+    if (!link) return;
+    if (link.classList.contains('w--current')) { defaultDone = true; return; }
+    link.click();
+    if (link.classList.contains('w--current')) defaultDone = true;
+  }
+  window.addEventListener('load', function () {
+    selectDefaultTab();
+    setTimeout(selectDefaultTab, 300);
+    setTimeout(function () { selectDefaultTab(); defaultDone = true; }, 1000);
+  });
+
+  function start() { reassert(); watchAccessSections(); }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
+  window.Webflow = window.Webflow || [];
+  window.Webflow.push(function () { selectDefaultTab(); start(); });
+})();
+</script>
+<script>
+/* ===== ELITE ACCESS PROFIT TARGET: 6% -> 4% (Nov 23, 2026) =====
+   "Profit Target" row (Evaluation rules) of every Elite Access card: the old target is
+   crossed out and the new one is shown next to it, like the Drawdown Mode row.
+
+   Works on every page with the pricing chart, in every language (/pt, /ja): the
+   "Elite Access" pricing tab (home, welcome, affiliate pages) and the Elite Access page
+   (#pricing). It is separate from the "Pricing difficulty" script on purpose, so it also
+   runs on /welcome.
+
+   The two amounts come from the card's account size (its "$50K Evaluation" title), so it
+   does not matter whether the text typed in Webflow is still the old amount or already
+   the new one.
+
+   To change the amounts: edit TARGETS.  To switch it off: TARGET_CUT = false
+   (the text typed in Webflow is then shown as is). */
+(function () {
+  var TARGET_CUT = true;
+  var TARGETS = {                // account size: [old target (6%), new target (4%)]
+    '25':  ['$1,500', '$1,000'],
+    '50':  ['$3,000', '$2,000'],
+    '100': ['$6,000', '$4,000'],
+    '150': ['$9,000', '$6,000']
+  };
+  var ACCESS_TAB  = 'Elite Access';    // pricing tab (data-w-tab) that holds the Elite Access cards
+  var ACCESS_PAGE = '#pricing';        // Elite Access page: the section its cards sit in
+  var SLIDE = '.v3-pricing-slide';
+  var TITLE = '.v3-pricing-title';     // "$50K Evaluation"
+  // the row's label in each site language: English, Portuguese (Meta de Lucro), Japanese
+  var LABEL = /^\s*(profit\s*target|meta\s*de\s*lucro|利益目標)\s*$/i;
+
+  if (!TARGET_CUT) return;
+
+  function accessSlides() {
+    var out = [];
+    function add(scope) {
+      Array.prototype.forEach.call(scope.querySelectorAll(SLIDE), function (s) {
+        if (out.indexOf(s) === -1) out.push(s);
+      });
+    }
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.acc__content__pane[data-w-tab="' + ACCESS_TAB + '"]'), add);
+    Array.prototype.forEach.call(document.querySelectorAll(ACCESS_PAGE), function (sec) {
+      if (sec.querySelector('.v3-pricing-cards.access-page')) add(sec);
+    });
+    return out;
+  }
+
+  // "$50K Evaluation" -> "50"
+  function sizeOf(slide) {
+    var t = slide.querySelector(TITLE);
+    var m = /\$\s*(25|50|100|150)\s*K\b/i.exec((t || slide).textContent || '');
+    return m ? m[1] : null;
+  }
+
+  // writes only when something actually changes, so it can run as often as needed
+  function apply() {
+    accessSlides().forEach(function (slide) {
+      var pair = TARGETS[sizeOf(slide)];
+      if (!pair) return;
+      Array.prototype.forEach.call(slide.querySelectorAll('.v3-table-row-info'), function (info) {
+        if (info.closest('.drawdown-table-row')) return;
+        if (!LABEL.test(info.textContent || '')) return;
+        var stage = info.closest('.w-tab-pane');
+        if (stage && /fund/i.test(stage.getAttribute('data-w-tab') || '')) return;   // Evaluation rules only
+        var grid = info.closest('.v3-table-grid');
+        var box  = grid && grid.querySelector('.v3-table-row-value');
+        var val  = box && (box.querySelector('div') || box);
+        if (!val) return;
+        var old  = val.querySelector('.target-old');
+        var done = old && val.children.length === 1 && old.textContent === pair[0] &&
+                   val.textContent === pair[0] + ' ' + pair[1];
+        if (!done) {
+          if (val.children.length && !old) return;       // unexpected markup, leave it alone
+          val.textContent = '';
+          var em = document.createElement('em');
+          em.className = 'target-old';
+          em.textContent = pair[0];
+          val.appendChild(em);
+          val.appendChild(document.createTextNode(' ' + pair[1]));
+        }
+        var row = info.closest('.v3-table-row');
+        if (row && !row.classList.contains('is-target-cut')) row.classList.add('is-target-cut');
+      });
+    });
+  }
+
+  // a tab click may redraw a card: put the pair back afterwards
+  document.addEventListener('click', function (e) {
+    var t = e.target && e.target.closest ? e.target.closest('.w-tab-link, .rules-tab, .difficulty-button') : null;
+    if (!t) return;
+    setTimeout(apply, 0);
+    setTimeout(apply, 400);
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', apply);
+  } else {
+    apply();
+  }
+  window.addEventListener('load', apply);
+  window.Webflow = window.Webflow || [];
+  window.Webflow.push(apply);
+})();
+</script>
+<div data-w-tab="Elite" class="acc__content__pane v3-pricing-swiper w-tab-pane w--tab-active"><div class="v2-border-glow lime tab-payout blue"><div class="v2-copy-cta-wrap tab-payout home"><div class="v2-copy-content-wrap"><div class="text-block-38">Average Payout for Elite Daily account: <span class="bold-text-2">$948</span></div></div></div></div><div class="v3-pricing-cards"><div data-nodll-price="$120" data-nodll-reset="$115" class="v3-pricing-slide"><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$25K Evaluation</div><div class="v3-pricing-info-wrap"><div>Daily Payouts</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>No Activation Fee</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$178</div><div class="v3-price-current">$80</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>55% OFF</div></div></div></div></div><div class="rules-padding"><div data-current="Eval" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu w-tab-menu"><a data-w-tab="Eval" class="rules-tab w-inline-block w-tab-link w--current"><div>Evaluation rules</div></a><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link"><div>Funded rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Eval" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="double-value" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Profit Target</div></div><div class="v3-table-row-value"><div>$1,500</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Drawdown (EOD)</div></div><div class="v3-table-row-value"><div>$1,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily loss limit</div></div><div class="v3-table-row-value"><div>$500</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Reset Fee</div></div><div class="v3-table-row-value"><div>$75</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency on Eval</div></div><div class="v3-table-row-value"><div>40%</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Activation Fee</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Contracts</div></div><div class="v3-table-row-value"><div>1 mini (10 micros)</div></div></div></div><div data-wf--v3-table-row--variant="variant" class="v3-table-row w-variant-1f5d4f01-d996-8f02-1890-6097e18e822d"><div class="v3-table-grid"><div class="v3-table-row-info"><div>Max Accounts</div></div><div class="v3-table-row-value-wrapper"><div class="v3-table-row-value first"><div>3</div></div><div class="v3-table-row-value"><div>5</div></div></div></div></div></div></div><div data-w-tab="Funded" class="rules-tab-content w-tab-pane"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Payout Frequency</div></div><div class="v3-table-row-value"><div>Daily!</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Drawdown (EOD)</div></div><div class="v3-table-row-value"><div>$1,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$500</div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div data-wf--copy-cta-wrap--variant="text-layout-vertical" class="v2-border-glow w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be lime"><div class="v2-copy-cta-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div class="copy-slot w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><a href="https://checkout.toponefutures.com/?type=elite-daily&amp;billing=onetime&amp;size=25" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 25K</div></a></div><div class="v2-copy-content-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div>55% OFF w. Code:</div><div data-wf--fixed-copy-code--variant="accent" class="v2-copy-code w-variant-ee630dc4-3334-6529-02ce-35016b408a22"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div></div></div><div class="v3-pricing-notice elite-access"><div><span class="monthly-crossed">Monthly Payment</span> One time fee</div></div></div></div></div><div data-nodll-reset="$142" data-nodll-price="$147" class="v3-pricing-slide"><div class="v3-pricing-outline"><div class="v3-pricing-card-accent"><div>MOST POPULAR</div></div><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$50K Evaluation</div><div class="v3-pricing-info-wrap"><div>Daily Payouts</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>No Activation Fee</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$218</div><div class="v3-price-current">$98</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>55% OFF</div></div></div></div></div><div class="rules-padding"><div data-current="Eval" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu w-tab-menu"><a data-w-tab="Eval" class="rules-tab w-inline-block w-tab-link w--current"><div>Evaluation rules</div></a><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link"><div>Funded rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Eval" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Profit Target</div></div><div class="v3-table-row-value"><div>$3,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Drawdown (EOD)</div></div><div class="v3-table-row-value"><div>$2,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily loss limit</div></div><div class="v3-table-row-value"><div>$1,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Reset Fee</div></div><div class="v3-table-row-value"><div>$93</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency on Eval</div></div><div class="v3-table-row-value"><div>40%</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Activation Fee</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Contracts</div></div><div class="v3-table-row-value"><div>3 minis (30 micros)</div></div></div></div><div data-wf--v3-table-row--variant="variant" class="v3-table-row w-variant-1f5d4f01-d996-8f02-1890-6097e18e822d"><div class="v3-table-grid"><div class="v3-table-row-info"><div>Max Accounts</div></div><div class="v3-table-row-value-wrapper"><div class="v3-table-row-value first"><div>3</div></div><div class="v3-table-row-value"><div>5</div></div></div></div></div></div></div><div data-w-tab="Funded" class="rules-tab-content w-tab-pane"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Payout Frequency</div></div><div class="v3-table-row-value"><div>Daily!</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Drawdown (EOD)</div></div><div class="v3-table-row-value"><div>$2,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$1,000</div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div data-wf--copy-cta-wrap--variant="text-layout-vertical" class="v2-border-glow w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be lime"><div class="v2-copy-cta-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div class="copy-slot w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><a href="https://checkout.toponefutures.com/?type=elite-daily&amp;billing=onetime&amp;size=50" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 50K</div></a></div><div class="v2-copy-content-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div>55% OFF w. Code:</div><div data-wf--fixed-copy-code--variant="accent" class="v2-copy-code w-variant-ee630dc4-3334-6529-02ce-35016b408a22"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div></div></div><div class="v3-pricing-notice elite-access"><div><span class="monthly-crossed">Monthly Payment</span> One time fee</div></div></div><div class="v3-pricing-accent-bg"></div></div></div></div><div data-nodll-reset="$264" data-nodll-price="$269" class="v3-pricing-slide"><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$100K Evaluation</div><div class="v3-pricing-info-wrap"><div>Daily Payouts</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>No Activation Fee</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$398</div><div class="v3-price-current">$179</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>55% OFF</div></div></div></div></div><div class="rules-padding"><div data-current="Eval" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu w-tab-menu"><a data-w-tab="Eval" class="rules-tab w-inline-block w-tab-link w--current"><div>Evaluation rules</div></a><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link"><div>Funded rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Eval" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Profit Target</div></div><div class="v3-table-row-value"><div>$6,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Drawdown (EOD)</div></div><div class="v3-table-row-value"><div>$3,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily loss limit</div></div><div class="v3-table-row-value"><div>$1,250</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Reset Fee</div></div><div class="v3-table-row-value"><div>$174</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency on Eval</div></div><div class="v3-table-row-value"><div>40%</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Activation Fee</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Contracts</div></div><div class="v3-table-row-value"><div>5 minis (50 micros)</div></div></div></div><div data-wf--v3-table-row--variant="variant" class="v3-table-row w-variant-1f5d4f01-d996-8f02-1890-6097e18e822d"><div class="v3-table-grid"><div class="v3-table-row-info"><div>Max Accounts</div></div><div class="v3-table-row-value-wrapper"><div class="v3-table-row-value first"><div>3</div></div><div class="v3-table-row-value"><div>5</div></div></div></div></div></div></div><div data-w-tab="Funded" class="rules-tab-content w-tab-pane"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Payout Frequency</div></div><div class="v3-table-row-value"><div>Daily!</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Drawdown (EOD)</div></div><div class="v3-table-row-value"><div>$2,500</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$1,250</div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div data-wf--copy-cta-wrap--variant="text-layout-vertical" class="v2-border-glow w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be lime"><div class="v2-copy-cta-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div class="copy-slot w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><a href="https://checkout.toponefutures.com/?type=elite-daily&amp;billing=onetime&amp;size=100" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 100K</div></a></div><div class="v2-copy-content-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div>55% OFF w. Code:</div><div data-wf--fixed-copy-code--variant="accent" class="v2-copy-code w-variant-ee630dc4-3334-6529-02ce-35016b408a22"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div></div></div><div class="v3-pricing-notice elite-access"><div><span class="monthly-crossed">Monthly Payment</span> One time fee</div></div></div></div></div><div data-nodll-reset="$366" data-nodll-price="$371" class="v3-pricing-slide"><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$150K Evaluation</div><div class="v3-pricing-info-wrap"><div>Daily Payouts</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>No Activation Fee</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$549</div><div class="v3-price-current">$247</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>55% OFF</div></div></div></div></div><div class="rules-padding"><div data-current="Eval" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu w-tab-menu"><a data-w-tab="Eval" class="rules-tab w-inline-block w-tab-link w--current"><div>Evaluation rules</div></a><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link"><div>Funded rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Eval" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Profit Target</div></div><div class="v3-table-row-value"><div>$9,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Drawdown (EOD)</div></div><div class="v3-table-row-value"><div>$4,500</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily loss limit</div></div><div class="v3-table-row-value"><div>$1,750</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Reset Fee</div></div><div class="v3-table-row-value"><div>$242</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency on Eval</div></div><div class="v3-table-row-value"><div>40%</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Activation Fee</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Contracts</div></div><div class="v3-table-row-value"><div>7 minis (70 micros)</div></div></div></div><div data-wf--v3-table-row--variant="variant" class="v3-table-row w-variant-1f5d4f01-d996-8f02-1890-6097e18e822d"><div class="v3-table-grid"><div class="v3-table-row-info"><div>Max Accounts</div></div><div class="v3-table-row-value-wrapper"><div class="v3-table-row-value first"><div>3</div></div><div class="v3-table-row-value"><div>5</div></div></div></div></div></div></div><div data-w-tab="Funded" class="rules-tab-content w-tab-pane"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Payout Frequency</div></div><div class="v3-table-row-value"><div>Daily!</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Drawdown (EOD)</div></div><div class="v3-table-row-value"><div>$3,500</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$1,750</div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div data-wf--copy-cta-wrap--variant="text-layout-vertical" class="v2-border-glow w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be lime"><div class="v2-copy-cta-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div class="copy-slot w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><a href="https://checkout.toponefutures.com/?type=elite-daily&amp;billing=onetime&amp;size=150" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 150K</div></a></div><div class="v2-copy-content-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div>55% OFF w. Code:</div><div data-wf--fixed-copy-code--variant="accent" class="v2-copy-code w-variant-ee630dc4-3334-6529-02ce-35016b408a22"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div></div></div><div class="v3-pricing-notice elite-access"><div><span class="monthly-crossed">Monthly Payment</span> One time fee</div></div></div></div></div></div></div><div data-w-tab="Elite Access" class="acc__content__pane v3-pricing-swiper w-tab-pane"><div class="v2-border-glow tab-payout lime blue"><div class="v2-copy-cta-wrap tab-payout home"><div class="v2-copy-content-wrap"><div class="text-block-38">Average Payout for Elite Access account: <span class="bold-text-2">$1,515</span></div></div></div></div><div class="v3-pricing-cards"><div data-both-activation="$144" data-intraday-activation="$90" data-nodll-activation="$167" class="v3-pricing-slide"><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$25K Evaluation</div><div class="v3-pricing-info-wrap"><div>1 Day to Pass</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>5 Day Payouts</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$139</div><div class="v3-price-current">$39</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>SAVE NOW</div></div></div></div></div><div class="rules-padding"><div data-current="Eval" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu w-tab-menu"><a data-w-tab="Eval" class="rules-tab w-inline-block w-tab-link w--current"><div>Evaluation rules</div></a><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link"><div>Funded rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Eval" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Profit Target</div></div><div class="v3-table-row-value"><div>$1,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown Mode </div></div><div class="v3-table-row-value"><div>(EOD)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily loss limit</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Reset Fee</div></div><div class="v3-table-row-value"><div>Only $35</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency on Eval</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Activation Fee</div></div><div class="v3-table-row-value"><div>$139</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Contracts</div></div><div class="v3-table-row-value"><div>1 mini (10 micros)</div></div></div></div><div data-wf--v3-table-row--variant="variant" class="v3-table-row w-variant-1f5d4f01-d996-8f02-1890-6097e18e822d"><div class="v3-table-grid"><div class="v3-table-row-info"><div>Max Accounts</div></div><div class="v3-table-row-value-wrapper"><div class="v3-table-row-value first"><div>10</div></div><div class="v3-table-row-value"><div>20</div></div></div></div></div></div><div data-wf--v3-table-row-diff--variant="base" class="v3-table-row drawdown-table-row"><div content-set="" class="drawdown-table-grid"><div class="v3-table-row-info difficulty"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div class="difficulty-mode-toggle"><div class="difficulty-button"><div>Static</div></div><div class="difficulty-button active"><div>Intraday</div></div></div></div></div></div></div><div data-w-tab="Funded" class="rules-tab-content w-tab-pane"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Payout Frequency</div></div><div class="v3-table-row-value"><div>5 Days</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>40%</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Drawdown (EOD)</div></div><div class="v3-table-row-value"><div>$1,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown Mode</div></div><div class="v3-table-row-value"><div>Intraday</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$500</div></div></div></div></div><div data-wf--v3-table-row-diff--variant="base" class="v3-table-row drawdown-table-row"><div content-set="" class="drawdown-table-grid"><div class="v3-table-row-info difficulty"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div class="difficulty-mode-toggle"><div class="difficulty-button"><div>Static</div></div><div class="difficulty-button active"><div>Intraday</div></div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div data-wf--copy-cta-wrap-variable--variant="text-layout-vertical" class="v2-border-glow w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a lime"><div class="v2-copy-cta-wrap w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a"><div class="copy-slot w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a"><a href="https://checkout.toponefutures.com/?splitTest=A&amp;type=elite-access&amp;size=25&amp;variation=a&amp;gwtest=a" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 25K</div></a></div><div class="v2-copy-content-wrap w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a"><div>Discounted w. Code:</div><div data-wf--variable-copy-code--variant="accent" class="v2-copy-code w-variant-b3c7e679-860d-5487-c1eb-17e03db5900a"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div></div></div><div class="v3-pricing-notice"><div>One time payment</div></div></div></div></div><div data-both-activation="$196" data-intraday-activation="$123" data-nodll-activation="$227" class="v3-pricing-slide"><div class="v3-pricing-outline"><div class="v3-pricing-card-accent"><div>MOST POPULAR</div></div><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$50K Evaluation</div><div class="v3-pricing-info-wrap"><div>1 Day to Pass</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>5 Day Payouts</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$189</div><div class="v3-price-current">$39</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>SAVE NOW</div></div></div></div></div><div class="rules-padding"><div data-current="Eval" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu w-tab-menu"><a data-w-tab="Eval" class="rules-tab w-inline-block w-tab-link w--current"><div>Evaluation rules</div></a><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link"><div>Funded rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Eval" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Profit Target</div></div><div class="v3-table-row-value"><div>$2,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown Mode</div></div><div class="v3-table-row-value"><div>(EOD)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily loss limit</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Reset Fee</div></div><div class="v3-table-row-value"><div>Only $35</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency on Eval</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854 is-fee-promo"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Activation Fee</div></div><div class="v3-table-row-value"><div>$189</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Contracts</div></div><div class="v3-table-row-value"><div>3 minis (30 micros)</div></div></div></div><div data-wf--v3-table-row--variant="variant" class="v3-table-row w-variant-1f5d4f01-d996-8f02-1890-6097e18e822d"><div class="v3-table-grid"><div class="v3-table-row-info"><div>Max Accounts</div></div><div class="v3-table-row-value-wrapper"><div class="v3-table-row-value first"><div>10</div></div><div class="v3-table-row-value"><div>20</div></div></div></div></div><div data-wf--v3-table-row-diff--variant="base" class="v3-table-row drawdown-table-row"><div content-set="" class="drawdown-table-grid"><div class="v3-table-row-info difficulty"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div class="difficulty-mode-toggle"><div class="difficulty-button"><div>Static</div></div><div class="difficulty-button active"><div>Intraday</div></div></div></div></div></div></div></div><div data-w-tab="Funded" class="rules-tab-content w-tab-pane"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Payout Frequency</div></div><div class="v3-table-row-value"><div>5 Days</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>40%</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Drawdown (EOD)</div></div><div class="v3-table-row-value"><div>$2,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown Mode</div></div><div class="v3-table-row-value"><div>Intraday</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$1,000</div></div></div></div><div data-wf--v3-table-row-diff--variant="base" class="v3-table-row drawdown-table-row"><div content-set="" class="drawdown-table-grid"><div class="v3-table-row-info difficulty"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div class="difficulty-mode-toggle"><div class="difficulty-button"><div>Static</div></div><div class="difficulty-button active"><div>Intraday</div></div></div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div data-wf--copy-cta-wrap-variable--variant="text-layout-vertical" class="v2-border-glow w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a lime"><div class="v2-copy-cta-wrap w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a"><div class="copy-slot w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a"><a href="https://checkout.toponefutures.com/?splitTest=A&amp;type=elite-access&amp;size=50&amp;variation=a&amp;gwtest=a" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 50K</div></a></div><div class="v2-copy-content-wrap w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a"><div>Discounted w. Code:</div><div data-wf--variable-copy-code--variant="accent" class="v2-copy-code w-variant-b3c7e679-860d-5487-c1eb-17e03db5900a"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div></div></div><div class="v3-pricing-notice"><div>One time payment</div></div></div><div class="v3-pricing-accent-bg"></div></div></div></div><div data-both-activation="$269" data-intraday-activation="$168" data-nodll-activation="$311" class="v3-pricing-slide"><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$100K Evaluation</div><div class="v3-pricing-info-wrap"><div>1 Day to Pass</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>5 Day Payouts</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$259</div><div class="v3-price-current">$39</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>SAVE NOW</div></div></div></div></div><div class="rules-padding"><div data-current="Eval" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu w-tab-menu"><a data-w-tab="Eval" class="rules-tab w-inline-block w-tab-link w--current"><div>Evaluation rules</div></a><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link"><div>Funded rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Eval" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Profit Target</div></div><div class="v3-table-row-value"><div>$4,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown Mode</div></div><div class="v3-table-row-value"><div>(EOD)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily loss limit</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Reset Fee</div></div><div class="v3-table-row-value"><div>Only $35</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency on Eval</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854 is-fee-promo"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Activation Fee</div></div><div class="v3-table-row-value"><div>$259</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Contracts</div></div><div class="v3-table-row-value"><div>5 minis (50 micros)</div></div></div></div><div data-wf--v3-table-row--variant="variant" class="v3-table-row w-variant-1f5d4f01-d996-8f02-1890-6097e18e822d"><div class="v3-table-grid"><div class="v3-table-row-info"><div>Max Accounts</div></div><div class="v3-table-row-value-wrapper"><div class="v3-table-row-value first"><div>10</div></div><div class="v3-table-row-value"><div>20</div></div></div></div></div></div><div data-wf--v3-table-row-diff--variant="base" class="v3-table-row drawdown-table-row"><div content-set="" class="drawdown-table-grid"><div class="v3-table-row-info difficulty"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div class="difficulty-mode-toggle"><div class="difficulty-button"><div>Static</div></div><div class="difficulty-button active"><div>Intraday</div></div></div></div></div></div></div><div data-w-tab="Funded" class="rules-tab-content w-tab-pane"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Payout Frequency</div></div><div class="v3-table-row-value"><div>5 Days</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>40%</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Drawdown (EOD)</div></div><div class="v3-table-row-value"><div>$3,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown Mode</div></div><div class="v3-table-row-value"><div>Intraday</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$1,250</div></div></div></div><div data-wf--v3-table-row-diff--variant="base" class="v3-table-row drawdown-table-row"><div content-set="" class="drawdown-table-grid"><div class="v3-table-row-info difficulty"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div class="difficulty-mode-toggle"><div class="difficulty-button"><div>Static</div></div><div class="difficulty-button active"><div>Intraday</div></div></div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div data-wf--copy-cta-wrap-variable--variant="text-layout-vertical" class="v2-border-glow w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a lime"><div class="v2-copy-cta-wrap w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a"><div class="copy-slot w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a"><a href="https://checkout.toponefutures.com/?splitTest=A&amp;type=elite-access&amp;size=100&amp;variation=a&amp;gwtest=a" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 100K</div></a></div><div class="v2-copy-content-wrap w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a"><div>Discounted w. Code:</div><div data-wf--variable-copy-code--variant="accent" class="v2-copy-code w-variant-b3c7e679-860d-5487-c1eb-17e03db5900a"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div></div></div><div class="v3-pricing-notice"><div>One time payment</div></div></div></div></div><div data-both-activation="$373" data-intraday-activation="$233" data-nodll-activation="$431" class="v3-pricing-slide"><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$150K Evaluation</div><div class="v3-pricing-info-wrap"><div>1 Day to Pass</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>5 Day Payouts</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$359</div><div class="v3-price-current">$39</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>SAVE NOW</div></div></div></div></div><div class="rules-padding"><div data-current="Eval" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu w-tab-menu"><a data-w-tab="Eval" class="rules-tab w-inline-block w-tab-link w--current"><div>Evaluation rules</div></a><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link"><div>Funded rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Eval" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Profit Target</div></div><div class="v3-table-row-value"><div>$6,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown Mode</div></div><div class="v3-table-row-value"><div>(EOD)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily loss limit</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Reset Fee</div></div><div class="v3-table-row-value"><div>Only $35</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency on Eval</div></div><div class="v3-table-row-value"><div>None!</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Activation Fee</div></div><div class="v3-table-row-value"><div>$359</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Contracts</div></div><div class="v3-table-row-value"><div>7 minis (70 micros)</div></div></div></div><div data-wf--v3-table-row--variant="variant" class="v3-table-row w-variant-1f5d4f01-d996-8f02-1890-6097e18e822d"><div class="v3-table-grid"><div class="v3-table-row-info"><div>Max Accounts</div></div><div class="v3-table-row-value-wrapper"><div class="v3-table-row-value first"><div>10</div></div><div class="v3-table-row-value"><div>20</div></div></div></div></div><div data-wf--v3-table-row-diff--variant="base" class="v3-table-row drawdown-table-row"><div content-set="" class="drawdown-table-grid"><div class="v3-table-row-info difficulty"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div class="difficulty-mode-toggle"><div class="difficulty-button"><div>Static</div></div><div class="difficulty-button active"><div>Intraday</div></div></div></div></div></div></div></div><div data-w-tab="Funded" class="rules-tab-content w-tab-pane"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Payout Frequency</div></div><div class="v3-table-row-value"><div>5 Days</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>40%</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max Drawdown (EOD)</div></div><div class="v3-table-row-value"><div>$3,500</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown Mode</div></div><div class="v3-table-row-value"><div>Intraday</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$1,750</div></div></div></div><div data-wf--v3-table-row-diff--variant="base" class="v3-table-row drawdown-table-row"><div content-set="" class="drawdown-table-grid"><div class="v3-table-row-info difficulty"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div class="difficulty-mode-toggle"><div class="difficulty-button"><div>Static</div></div><div class="difficulty-button active"><div>Intraday</div></div></div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div data-wf--copy-cta-wrap-variable--variant="text-layout-vertical" class="v2-border-glow w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a lime"><div class="v2-copy-cta-wrap w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a"><div class="copy-slot w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a"><a href="https://checkout.toponefutures.com/?splitTest=A&amp;type=elite-access&amp;size=150&amp;variation=a&amp;gwtest=a" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 150K</div></a></div><div class="v2-copy-content-wrap w-variant-8bb72e1b-e4bc-4232-e0c3-c19286ecdf9a"><div>Discounted w. Code:</div><div data-wf--variable-copy-code--variant="accent" class="v2-copy-code w-variant-b3c7e679-860d-5487-c1eb-17e03db5900a"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div></div></div><div class="v3-pricing-notice"><div>One time payment</div></div></div></div></div></div></div><div data-w-tab="Instant Sim Funded" class="acc__content__pane v3-pricing-swiper w-tab-pane"><div class="v2-border-glow tab-payout lime blue"><div class="v2-copy-cta-wrap tab-payout home"><div class="v2-copy-content-wrap"><div class="text-block-38">Average Payout for Instant Funding account: <span class="bold-text-2">$2,714</span></div></div></div></div><div class="v3-pricing-cards"><div data-nodll-price="$272" class="v3-pricing-slide"><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$25K Account</div><div class="v3-pricing-info-wrap"><div>No Eval</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>5 Day Payouts</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$419</div><div class="v3-price-current">$293</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>30% OFF</div></div></div></div></div><div class="rules-padding"><div data-current="Funded" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu hide w-tab-menu"><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link w--current"><div>Funded rules</div></a><a data-w-tab="Eval" class="rules-tab w-inline-block w-tab-link"><div>Evaluation rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Funded" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$625</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Trailing max drawdown</div></div><div class="v3-table-row-value"><div>$1,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div>End of day</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max contracts</div></div><div class="v3-table-row-value"><div>1 mini (10 micros)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>20%</div></div></div></div><div data-wf--v3-table-row--variant="variant" class="v3-table-row w-variant-1f5d4f01-d996-8f02-1890-6097e18e822d"><div class="v3-table-grid"><div class="v3-table-row-info"><div>Max Accounts</div></div><div class="v3-table-row-value-wrapper"><div class="v3-table-row-value first"><div>3</div></div><div class="v3-table-row-value"><div>5</div></div></div></div></div></div></div><div data-w-tab="Eval" class="rules-tab-content w-tab-pane"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$625</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Trailing max drawdown</div></div><div class="v3-table-row-value"><div>$1,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div>End of day</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max contracts</div></div><div class="v3-table-row-value"><div>1 mini (10 micros)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>20%</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max accounts</div></div><div class="v3-table-row-value"><div><em>3 </em>5</div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div data-wf--copy-cta-wrap--variant="text-layout-vertical" class="v2-border-glow w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be lime"><div class="v2-copy-cta-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div class="copy-slot w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><a href="https://checkout.toponefutures.com/?splitTest=A&amp;type=instant-sim-funded&amp;size=25&amp;variation=a&amp;gwtest=a" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 25K</div></a></div><div class="v2-copy-content-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div>30% OFF w. Code:</div><div data-wf--fixed-copy-code--variant="accent" class="v2-copy-code w-variant-ee630dc4-3334-6529-02ce-35016b408a22"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div></div></div><div class="v3-pricing-notice"><div>One Time Fee</div></div></div></div></div><div data-nodll-price="$441" class="v3-pricing-slide"><div class="v3-pricing-outline"><div class="v3-pricing-card-accent"><div>MOST POPULAR</div></div><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$50K Account</div><div class="v3-pricing-info-wrap"><div>No Eval</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>5 Day Payouts</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$679</div><div class="v3-price-current">$475</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>30% OFF</div></div></div></div></div><div class="rules-padding"><div data-current="Funded" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu hide w-tab-menu"><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link w--current"><div>Funded rules</div></a><a data-w-tab="Eval" class="rules-tab w-inline-block w-tab-link"><div>Evaluation rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Funded" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$1,250</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Trailing max drawdown</div></div><div class="v3-table-row-value"><div>$2,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div>End of day</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max contracts</div></div><div class="v3-table-row-value"><div>3 minis (30 micros)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>20%</div></div></div></div><div data-wf--v3-table-row--variant="variant" class="v3-table-row w-variant-1f5d4f01-d996-8f02-1890-6097e18e822d"><div class="v3-table-grid"><div class="v3-table-row-info"><div>Max Accounts</div></div><div class="v3-table-row-value-wrapper"><div class="v3-table-row-value first"><div>3</div></div><div class="v3-table-row-value"><div>5</div></div></div></div></div></div></div><div data-w-tab="Eval" class="rules-tab-content w-tab-pane"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$1,250</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Trailing max drawdown</div></div><div class="v3-table-row-value"><div>$2,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div>End of day</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max contracts</div></div><div class="v3-table-row-value"><div>3 minis (30 micros)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>20%</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max accounts</div></div><div class="v3-table-row-value"><div><em>3 </em>5</div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div data-wf--copy-cta-wrap--variant="text-layout-vertical" class="v2-border-glow w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be lime"><div class="v2-copy-cta-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div class="copy-slot w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><a href="https://checkout.toponefutures.com/?splitTest=A&amp;type=instant-sim-funded&amp;size=50&amp;variation=a&amp;gwtest=a" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 50K</div></a></div><div class="v2-copy-content-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div>30% OFF w. Code:</div><div data-wf--fixed-copy-code--variant="accent" class="v2-copy-code w-variant-ee630dc4-3334-6529-02ce-35016b408a22"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div></div></div><div class="v3-pricing-notice"><div>One Time Fee</div></div></div><div class="v3-pricing-accent-bg"></div></div></div></div><div data-nodll-price="$533" class="v3-pricing-slide"><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$100K Account</div><div class="v3-pricing-info-wrap"><div>No Eval</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>5 Day Payouts</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$821</div><div class="v3-price-current">$575</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>30% OFF</div></div></div></div></div><div class="rules-padding"><div data-current="Funded" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu hide w-tab-menu"><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link w--current"><div>Funded rules</div></a><a data-w-tab="Eval" class="rules-tab w-inline-block w-tab-link"><div>Evaluation rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Funded" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$2,500</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Trailing max drawdown</div></div><div class="v3-table-row-value"><div><em>$3,000 </em>$4,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div>End of day</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max contracts</div></div><div class="v3-table-row-value"><div>5 minis (50 micros)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>20%</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max accounts</div></div><div class="v3-table-row-value"><div>3</div></div></div></div></div></div><div data-w-tab="Eval" class="rules-tab-content w-tab-pane"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$2,500</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Trailing max drawdown</div></div><div class="v3-table-row-value"><div><em>$3,000 </em>$4,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div>End of day</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max contracts</div></div><div class="v3-table-row-value"><div>5 minis (50 micros)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>20%</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max accounts</div></div><div class="v3-table-row-value"><div>3</div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div data-wf--copy-cta-wrap--variant="text-layout-vertical" class="v2-border-glow w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be lime"><div class="v2-copy-cta-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div class="copy-slot w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><a href="https://checkout.toponefutures.com/?splitTest=A&amp;type=instant-sim-funded&amp;size=100&amp;variation=a&amp;gwtest=a" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 100K</div></a></div><div class="v2-copy-content-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div>30% OFF w. Code:</div><div data-wf--fixed-copy-code--variant="accent" class="v2-copy-code w-variant-ee630dc4-3334-6529-02ce-35016b408a22"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div></div></div><div class="v3-pricing-notice"><div>One Time Fee</div></div></div></div></div><div data-nodll-price="$610" class="v3-pricing-slide"><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$150K Account</div><div class="v3-pricing-info-wrap"><div>No Eval</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>5 Day Payouts</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$939</div><div class="v3-price-current">$657</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>30% OFF</div></div></div></div></div><div class="rules-padding"><div data-current="Funded" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu hide w-tab-menu"><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link w--current"><div>Funded rules</div></a><a data-w-tab="Eval" class="rules-tab w-inline-block w-tab-link"><div>Evaluation rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Funded" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$3,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Trailing max drawdown</div></div><div class="v3-table-row-value"><div><em>$4,500 </em>$5,250</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div>End of day</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max contracts</div></div><div class="v3-table-row-value"><div>7 minis (70 micros)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>20%</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max accounts</div></div><div class="v3-table-row-value"><div>3</div></div></div></div></div></div><div data-w-tab="Eval" class="rules-tab-content w-tab-pane"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$3,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Trailing max drawdown</div></div><div class="v3-table-row-value"><div><em>$4,500 </em>$5,250</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div>End of day</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max contracts</div></div><div class="v3-table-row-value"><div>7 minis (70 micros)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>20%</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max accounts</div></div><div class="v3-table-row-value"><div>3</div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div data-wf--copy-cta-wrap--variant="text-layout-vertical" class="v2-border-glow w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be lime"><div class="v2-copy-cta-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div class="copy-slot w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><a href="https://checkout.toponefutures.com/?splitTest=A&amp;type=instant-sim-funded&amp;size=150&amp;variation=a&amp;gwtest=a" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 150K</div></a></div><div class="v2-copy-content-wrap w-variant-d59fbbc9-94f4-eef9-8b9b-06c3709695be"><div>30% OFF w. Code:</div><div data-wf--fixed-copy-code--variant="accent" class="v2-copy-code w-variant-ee630dc4-3334-6529-02ce-35016b408a22"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div></div></div><div class="v3-pricing-notice"><div>One Time Fee</div></div></div></div></div></div></div><div data-w-tab="Ignite Instant Funding" class="acc__content__pane v3-pricing-swiper w-tab-pane"><div class="v2-border-glow tab-payout lime blue"><div class="v2-copy-cta-wrap tab-payout home"><div class="v2-copy-content-wrap"><div class="text-block-38">Average Payout for Ignite account: <span class="bold-text-2">$1,206</span></div></div></div></div><div class="v3-pricing-cards"><div data-nodll-price="$113" class="v3-pricing-slide"><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$25K Account</div><div class="v3-pricing-info-wrap"><div>No Eval</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>Copy Trade 10 Accounts</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$218</div><div class="v3-price-current">$87</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>60% OFF</div></div></div></div></div><div class="rules-padding"><div data-current="Funded" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu hide w-tab-menu"><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link w--current"><div>Funded rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Funded" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$500</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Trailing max drawdown</div></div><div class="v3-table-row-value"><div>$1,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div>End of day</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max contracts</div></div><div class="v3-table-row-value"><div>1 mini (10 micros)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>15%</div></div></div></div><div data-wf--v3-table-row--variant="variant" class="v3-table-row w-variant-1f5d4f01-d996-8f02-1890-6097e18e822d"><div class="v3-table-grid"><div class="v3-table-row-info"><div>Max Accounts</div></div><div class="v3-table-row-value-wrapper"><div class="v3-table-row-value first"><div>6</div></div><div class="v3-table-row-value"><div>10</div></div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div class="v2-border-glow text-layout-vertical-71 lime"><div class="v2-copy-cta-wrap text-layout-vertical-72"><div class="copy-slot text-layout-vertical-73"><a href="https://checkout.toponefutures.com/?splitTest=A&amp;type=ignite-af&amp;size=25&amp;variation=a&amp;gwtest=a" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 25K</div></a></div><div class="v2-copy-content-wrap text-layout-vertical-74 vertical"><div class="v2-copy-content-wrap text-layout-vertical-74"><div>60% OFF w. Code:</div><div data-wf--fixed-copy-code--variant="accent" class="v2-copy-code w-variant-ee630dc4-3334-6529-02ce-35016b408a22"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div><div>70% Off When Bundling 5</div></div></div></div><div class="v3-pricing-notice"><div>One Time Fee</div></div></div></div><div>One time payment</div></div><div data-nodll-price="$206" class="v3-pricing-slide"><div class="v3-pricing-outline"><div class="v3-pricing-card-accent"><div>MOST POPULAR</div></div><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$50K Account</div><div class="v3-pricing-info-wrap"><div>No Eval</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>Copy Trade 10 Accounts</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$398</div><div class="v3-price-current">$159</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>60% OFF</div></div></div></div></div><div class="rules-padding"><div data-current="Funded" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu hide w-tab-menu"><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link w--current"><div>Funded rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Funded" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$1,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Trailing max drawdown</div></div><div class="v3-table-row-value"><div>$2,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div>End of day</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max contracts</div></div><div class="v3-table-row-value"><div>3 minis (30 micros)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>15%</div></div></div></div><div data-wf--v3-table-row--variant="variant" class="v3-table-row w-variant-1f5d4f01-d996-8f02-1890-6097e18e822d"><div class="v3-table-grid"><div class="v3-table-row-info"><div>Max Accounts</div></div><div class="v3-table-row-value-wrapper"><div class="v3-table-row-value first"><div>6</div></div><div class="v3-table-row-value"><div>10</div></div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div class="v2-border-glow text-layout-vertical-67 lime"><div class="v2-copy-cta-wrap text-layout-vertical-68"><div class="copy-slot text-layout-vertical-69"><a href="https://checkout.toponefutures.com/?splitTest=A&amp;type=ignite-af&amp;size=50&amp;variation=a&amp;gwtest=a" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 50K</div></a></div><div class="v2-copy-content-wrap text-layout-vertical-74 vertical"><div class="v2-copy-content-wrap text-layout-vertical-74"><div>60% OFF w. Code:</div><div data-wf--fixed-copy-code--variant="accent" class="v2-copy-code w-variant-ee630dc4-3334-6529-02ce-35016b408a22"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div><div>70% Off When Bundling 5</div></div></div></div><div class="v3-pricing-notice"><div>One Time Fee</div></div></div><div class="v3-pricing-accent-bg"></div></div></div></div><div data-nodll-price="$292" class="v3-pricing-slide"><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$100K Account</div><div class="v3-pricing-info-wrap"><div>No Eval</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>Copy Trade 10 Accounts</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$563</div><div class="v3-price-current">$225</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>60% OFF</div></div></div></div></div><div class="rules-padding"><div data-current="Funded" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu hide w-tab-menu"><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link w--current"><div>Funded rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Funded" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$2,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Trailing max drawdown</div></div><div class="v3-table-row-value"><div><em>$3,000 </em>$4,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div>End of day</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max contracts</div></div><div class="v3-table-row-value"><div>5 minis (50 micros)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>15%</div></div></div></div><div data-wf--v3-table-row--variant="variant" class="v3-table-row w-variant-1f5d4f01-d996-8f02-1890-6097e18e822d"><div class="v3-table-grid"><div class="v3-table-row-info"><div>Max Accounts</div></div><div class="v3-table-row-value-wrapper"><div class="v3-table-row-value first"><div>6</div></div><div class="v3-table-row-value"><div>10</div></div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div class="v2-border-glow text-layout-vertical-63 lime"><div class="v2-copy-cta-wrap text-layout-vertical-64"><div class="copy-slot text-layout-vertical-65"><div class="v2-copy-content-wrap text-layout-vertical-74 vertical"><div class="v2-copy-content-wrap text-layout-vertical-74"><div>60% OFF w. Code:</div><div data-wf--fixed-copy-code--variant="accent" class="v2-copy-code w-variant-ee630dc4-3334-6529-02ce-35016b408a22"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div><div>70% Off When Bundling 5</div></div><a href="https://checkout.toponefutures.com/?splitTest=A&amp;type=ignite-af&amp;size=100&amp;variation=a&amp;gwtest=a" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 100K</div></a></div></div></div><div class="v3-pricing-notice"><div>One Time Fee</div></div></div></div></div><div data-nodll-price="$415" class="v3-pricing-slide"><div class="v3-pricing-card"><div><div class="v3-pricing-card-banner"><div class="v3-pricing-title">$150K Account</div><div class="v3-pricing-info-wrap"><div>No Eval</div><div class="icon-embed w-embed"><svg width="4" height="4" viewBox="0 0 4 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="2" cy="2" r="2" fill="white" fill-opacity="0.25"/>
+</svg>
+</div><div>Copy Trade 10 Accounts</div></div><div class="v3-price-wrap"><div class="v3-pricing-text-wrap"><div class="v3-price-old">$799</div><div class="v3-price-current">$319</div></div><div class="v2-border-glow lime is-v3-pricing"><div class="v3-pricing-discount"><div>60% OFF</div></div></div></div></div><div class="rules-padding"><div data-current="Funded" data-easing="ease" data-duration-in="300" data-duration-out="100" class="rules-tabs w-tabs"><div class="rules-tabs-menu hide w-tab-menu"><a data-w-tab="Funded" class="rules-tab w-inline-block w-tab-link w--current"><div>Funded rules</div></a></div><div class="rules-content w-tab-content"><div data-w-tab="Funded" class="rules-tab-content w-tab-pane w--tab-active"><div class="v3-pricing-rows"><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Daily Loss Limit</div></div><div class="v3-table-row-value"><div>$3,000</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Trailing max drawdown</div></div><div class="v3-table-row-value"><div><em>$4,500 </em>$6,000</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Drawdown mode</div></div><div class="v3-table-row-value"><div>End of day</div></div></div></div><div data-wf--table-row-2--row-variant="highlight" class="v3-table-row w-variant-6905ca05-1689-d241-deb0-5b0a91529854"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Max contracts</div></div><div class="v3-table-row-value"><div>7 minis (70 micros)</div></div></div></div><div data-wf--table-row-2--row-variant="base" class="v3-table-row"><div content-set="" data-wf--dev-table-row-text-2--variant="base" class="v3-table-grid"><div class="v3-table-row-info"><div>Consistency</div></div><div class="v3-table-row-value"><div>15%</div></div></div></div><div data-wf--v3-table-row--variant="variant" class="v3-table-row w-variant-1f5d4f01-d996-8f02-1890-6097e18e822d"><div class="v3-table-grid"><div class="v3-table-row-info"><div>Max Accounts</div></div><div class="v3-table-row-value-wrapper"><div class="v3-table-row-value first"><div>6</div></div><div class="v3-table-row-value"><div>10</div></div></div></div></div></div></div></div></div></div></div><div class="v3-pricing-cta"><div class="v2-border-glow text-layout-vertical lime"><div class="v2-copy-cta-wrap text-layout-vertical-60"><div class="copy-slot text-layout-vertical-61"><a href="https://checkout.toponefutures.com/?splitTest=A&amp;type=ignite-af&amp;size=150&amp;variation=a&amp;gwtest=a" data-wf--cta-button--variant="white" class="v2-button w-variant-5bf7b43f-7b27-55da-f87d-013965c3f411 w-inline-block"><div class="v2-cta-text">Start with 150K</div></a></div><div class="v2-copy-content-wrap text-layout-vertical-74 vertical"><div class="v2-copy-content-wrap text-layout-vertical-74"><div>60% OFF w. Code:</div><div data-wf--fixed-copy-code--variant="accent" class="v2-copy-code w-variant-ee630dc4-3334-6529-02ce-35016b408a22"><div class="v2-copy-text">BLACKFRIDAY</div><div class="v2-copy-ico-wrap"><div class="v2-success-ico w-embed"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path></svg></div><div class="v2-copy-ico w-embed"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.25 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.25C2.75 9.802 3.198 10.25 3.75 10.25H9.25C9.802 10.25 10.25 9.802 10.25 9.25V3.75C10.25 3.198 9.802 2.75 9.25 2.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.25 7.75H14.25C14.802 7.75 15.25 8.198 15.25 8.75V14.25C15.25 14.802 14.802 15.25 14.25 15.25H8.75C8.198 15.25 7.75 14.802 7.75 14.25V13.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></div></div></div><div>70% Off When Bundling 5</div></div></div></div><div class="v3-pricing-notice"><div>One Time Fee</div></div></div></div></div></div></div></div></div><div class="hide w-embed w-script"><style>
+  /* Mobile/tablet only — desktop grid stays 100% untouched */
+  @media (max-width: 991px) {
+    /*.v3-pricing-swiper {
+      overflow: hidden;
+    }*/
+    .v3-pricing-cards {
+      display: flex; /* swiper needs flex on the wrapper */
+    }
+    .v3-pricing-slide {
+      /* required for slidesPerView: 'auto' */
+      flex-shrink: 0;
+    }
+  }
+</style>
+
+<script>
+  window.addEventListener('load', function () {
+    var swiperInstances = new Map(); // el -> Swiper instance
+    var breakpoint = window.matchMedia('(max-width: 991px)');
+
+    function initSwiper(el) {
+      if (swiperInstances.has(el)) return; // already initialized
+      var instance = new Swiper(el, {
+        wrapperClass: 'v3-pricing-cards',
+        slideClass: 'v3-pricing-slide',
+        slidesPerView: 'auto',
+        spaceBetween: 0,
+        grabCursor: true,
+        centeredSlides: true,
+        observer: true,
+        observeParents: true,
+        observeSlideChildren: true,
+      });
+      swiperInstances.set(el, instance);
+    }
+
+    function destroySwiper(el) {
+      var instance = swiperInstances.get(el);
+      if (!instance) return;
+      instance.destroy(true, true); // remove all swiper styles/classes
+      swiperInstances.delete(el);
+    }
+
+    function checkBreakpoint() {
+      var sliders = document.querySelectorAll('.v3-pricing-swiper');
+      sliders.forEach(function (el) {
+        if (breakpoint.matches) {
+          initSwiper(el);
+        } else {
+          destroySwiper(el);
+        }
+      });
+    }
+
+    // run on load + on resize across the breakpoint
+    checkBreakpoint();
+    breakpoint.addEventListener('change', checkBreakpoint);
+  });
+
+  window.addEventListener('load', function () {
+    var isSyncing = false;
+
+    /* Tab LINKS only. A bare [data-w-tab="Eval"] also matches the tab PANES,
+       and the difficulty toggle lives inside a pane. */
+    var tabs = document.querySelectorAll('a.rules-tab[data-w-tab]');
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        if (isSyncing) return; // ignore clicks we triggered ourselves
+
+        isSyncing = true;
+        var name = tab.getAttribute('data-w-tab');
+
+        /* Sync only the cards inside the same pricing tab. Without this,
+           clicking a rules tab on Elite Daily also switches the Sim Funded
+           cards to a pane that has no difficulty toggle. */
+        var pane = tab.closest('.acc__content__pane') || document;
+
+        pane.querySelectorAll('a.rules-tab[data-w-tab="' + name + '"]').forEach(function (other) {
+          if (other === tab) return;
+          if (other.classList.contains('w--current')) return;  // already active
+          other.click();
+        });
+
+        isSyncing = false;
+      });
+    });
+  });
+</script></div></div></section><section class="v2-section overflow-hidden"><div class="v2-container">

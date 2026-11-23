@@ -12,6 +12,9 @@ test('max contracts: one format, « X minis or Y micros », « 1 mini »', () =>
   assert.equal(text(contractsWords('1 mini / 10 micros')), '1 mini or 10 micros');
   assert.equal(text(contractsWords('2 minis or 25 micros')), '2 minis or 25 micros');
   assert.equal(text(contractsWords('5 micros')), '5 micros');
+  // Top One cards, 23/11/2026.
+  assert.equal(text(contractsWords('1 mini (10 micros)')), '1 mini or 10 micros');
+  assert.equal(text(contractsWords('7 minis (70 micros)')), '7 minis or 70 micros');
   assert.equal(contractsWords('2 minis / 20 micros').title, undefined);
 });
 
@@ -108,6 +111,10 @@ test('payout frequency: one word per meaning, two meanings never share one', () 
   assert.equal(
     text(payoutFreqWords('5 Days (5 winning days of $100 / $150 / $200 / $250)')),
     '5 winning days ($100 / $150 / $200 / $250 minimum per day)',
+  );
+  assert.equal(
+    text(payoutFreqWords('5 Days (5 profitable days of $200 / $250 / $300 / $350)')),
+    '5 winning days ($200 / $250 / $300 / $350 minimum per day)',
   );
   assert.equal(
     text(payoutFreqWords('Chosen after passing: Daily (Select Daily) or 5 days (Select Flex, 5 winning days of $100 / $150 / $200 / $250)')),

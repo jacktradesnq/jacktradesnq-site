@@ -12,7 +12,7 @@
  *
  *  - `{ updates }` — le chemin historique, un metteur a jour de PRIX sur des
  *    programmes figes a la main : guard() + apply() ne touchent que price /
- *    originalPrice / activationFee. E8 reste dessus, faute de lecteur.
+ *    originalPrice / activationFee / note. E8, BluSky et Top One Futures.
  *
  * Dans les deux cas les promos (promo firme, promoCode / promoLabel par
  * programme) passent par applyPromos(), et une firme dont le scraper echoue
@@ -28,6 +28,7 @@ import { guardCatalog, syncCatalog } from './lib/catalog-sync.mjs';
 import { fetchPageText } from './lib/cf-fetch.mjs';
 import { fetchBluSkyPlans } from './lib/firms/blusky.mjs';
 import { fetchE8Plans } from './lib/firms/e8.mjs';
+import { fetchTopOneCards, topOnePromo, topOneUpdates } from './lib/firms/topone.mjs';
 import { fetchTradersLaunchPrograms } from './lib/firms/traderslaunch.mjs';
 
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
@@ -119,6 +120,19 @@ export async function scrapeBluSky(read = fetchBluSkyPlans) {
   return { updates: plans }; // promo stays manual
 }
 
+/* ------------------------------------------------------------------ */
+/* Top One Futures — https://toponefutures.com, rendu serveur (Webflow) */
+/* ------------------------------------------------------------------ */
+
+// Chemin `updates` : prix, prix barre, activation fee et note de chaque carte, lus dans le panneau
+// de son onglet (scripts/lib/firms/topone.mjs) ; la promo de la firme vient des pastilles des
+// onglets, au code JTNQ, jamais leur code public. Regles ecrites dans le JSON, derive relue par
+// scripts/check-rule-drift.mjs.
+export async function scrapeTopOne(read = () => fetchTopOneCards(fetchText)) {
+  const cards = await read();
+  return { updates: topOneUpdates(cards), firmPromo: topOnePromo(cards) };
+}
+
 /** Ce que la firme vend et que le JSON n'a pas : signale, jamais ajoute (choix d'Angelo). */
 export function unlistedPlans(firm, res) {
   return res.updates
@@ -154,12 +168,14 @@ export function apply(firm, res, changes) {
       const tag = `${firm.name} / ${program.name} $${plan.size / 1000}K`;
       // Only firms whose scraper reports the field carry the key: for everyone
       // else it stays hand-maintained, untouched.
-      if ('activationFee' in u) {
-        const before = plan.activationFee ?? null;
-        if (before !== u.activationFee) {
-          changes.push(`${tag}: activationFee ${before} -> ${u.activationFee}`);
-          if (u.activationFee == null) delete plan.activationFee;
-          else plan.activationFee = u.activationFee;
+      for (const key of ['activationFee', 'note']) {
+        if (!(key in u)) continue;
+        const before = plan[key] ?? null;
+        const after = u[key] ?? null;
+        if (before !== after) {
+          changes.push(`${tag}: ${key} ${JSON.stringify(before)} -> ${JSON.stringify(after)}`);
+          if (after == null) delete plan[key];
+          else plan[key] = after;
         }
       }
       if (plan.price !== u.price) {
@@ -206,6 +222,7 @@ const SCRAPERS = {
   'traders-launch': scrapeTradersLaunch,
   'e8-markets': scrapeE8Markets,
   blusky: scrapeBluSky,
+  'top-one-futures': scrapeTopOne,
 };
 
 async function main() {

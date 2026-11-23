@@ -28,10 +28,16 @@
 
 import fs from 'node:fs';
 
+import { fetchPageText } from './lib/cf-fetch.mjs';
 import { fetchE8Panels, parseE8Panel, plansFromPanels } from './lib/firms/e8.mjs';
+import { fetchTopOneCards, topOneCardRules } from './lib/firms/topone.mjs';
 import { programsFromSnapshot, readTradersLaunchPage } from './lib/firms/traderslaunch.mjs';
 
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
+const UA =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
+// fetch simple, puis curl_cffi sur un 403 / 429 / 503 Cloudflare (scripts/lib/cf-fetch.mjs).
+const fetchText = (url) => fetchPageText(url, { headers: { 'user-agent': UA, accept: 'text/html,application/xhtml+xml' } });
 
 const FIELDS = ['profitTarget', 'maxDrawdown', 'dailyLoss', 'consistency', 'contracts'];
 export const BROKEN = Symbol('broken'); // rules[field] === BROKEN => anchor present-but-unreadable
@@ -179,13 +185,49 @@ async function extractE8() {
   return panels.map(({ text }) => e8CardRules(text));
 }
 
+/* ---- Top One Futures — toponefutures.com, rendered server-side ---- */
+/**
+ * The cards as a visitor sees them (scripts/lib/firms/topone.mjs, the same reading as the price
+ * sync, the page's own Elite Access script applied), into the rules of the phase the JSON keeps:
+ * the « Evaluation rules » face of Elite Daily / Elite Access, the « Funded rules » face of the
+ * instant accounts. Every card has both faces since Aug 2026; « Consistency on Eval: None! » on
+ * Elite Access is the evaluation (its 40% is funded only, carried by the site's funded rules).
+ * A row a card no longer carries is BROKEN, except the two it never had:
+ *   - profitTarget on Instant Sim Funded / Ignite (no evaluation, JSON null);
+ *   - maxDrawdown on Elite Access: its evaluation face prints the drawdown mode, not the amount
+ *     (help.toponefutures.com, hand-maintained).
+ */
+const TOPONE_INSTANT = new Set(['Instant Sim Funded', 'Ignite']);
+export function topOneRules(cards) {
+  const read = (v, norm) => (v == null ? BROKEN : norm(v));
+  const amount = (v) => (/^none!?$/i.test(String(v).trim()) ? null : money(v) ?? BROKEN);
+  return cards.map((card) => {
+    const r = topOneCardRules(card);
+    const rules = {
+      dailyLoss: read(r.dailyLoss, amount),
+      consistency: read(r.consistency, consistency),
+      contracts: read(r.contracts, (v) => contracts(v) ?? BROKEN),
+    };
+    if (!TOPONE_INSTANT.has(card.programName)) rules.profitTarget = read(r.profitTarget, amount);
+    if (card.programName !== 'Elite Access') rules.maxDrawdown = read(r.maxDrawdown, amount);
+    return { programName: card.programName, size: card.size, rules };
+  });
+}
+async function extractTopOne() {
+  return topOneRules(await fetchTopOneCards(fetchText));
+}
+
 const EXTRACTORS = {
   'traders-launch': extractTradersLaunch,
   'e8-markets': extractE8,
+  'top-one-futures': extractTopOne,
 };
 
 // Human-readable reason for the fields we knowingly do not auto-verify.
 function skipReason(firmId, programName, field) {
+  if (firmId === 'top-one-futures' && field === 'profitTarget') return 'instant accounts have no profit target (JSON null)';
+  if (firmId === 'top-one-futures' && field === 'maxDrawdown')
+    return 'Elite Access card shows the evaluation drawdown mode, not its amount (help article, manual)';
   if (firmId === 'traders-launch' && field === 'dailyLoss') return 'not stated for Premium / Legacy NYC (manual)';
   if (firmId === 'e8-markets' && field === 'dailyLoss') return 'never shown on E8 cards (manual null)';
   if (firmId === 'e8-markets' && field === 'contracts')

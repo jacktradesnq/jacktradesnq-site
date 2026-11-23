@@ -1,0 +1,247 @@
+{
+  "id": "top-one-futures",
+  "name": "Top One Futures",
+  "split": "90%",
+  "payout": "On-demand",
+  "promo": {
+    "label": "55% off Elite Daily, Elite Access at $39, 30% off Instant Sim Funded, 60% off Ignite",
+    "code": "JTNQ"
+  },
+  "url": "https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures",
+  "lastChecked": "2026-11-23",
+  "stale": false,
+  "programs": [
+    {
+      "name": "Elite Daily",
+      "type": "eval",
+      "priceType": "one-time",
+      "plans": [
+        {
+          "size": 25000,
+          "price": 80,
+          "originalPrice": 178,
+          "profitTarget": 1500,
+          "maxDrawdown": 1000,
+          "ddType": "EOD Trailing",
+          "dailyLoss": 500,
+          "consistency": "40%",
+          "contracts": "1 mini (10 micros)",
+          "activationFee": 0,
+          "note": "Reset fee $75. Max 5 accounts (was 3)."
+        },
+        {
+          "size": 50000,
+          "price": 98,
+          "originalPrice": 218,
+          "profitTarget": 3000,
+          "maxDrawdown": 2000,
+          "ddType": "EOD Trailing",
+          "dailyLoss": 1000,
+          "consistency": "40%",
+          "contracts": "3 minis (30 micros)",
+          "activationFee": 0,
+          "note": "Reset fee $93. Max 5 accounts (was 3)."
+        },
+        {
+          "size": 100000,
+          "price": 179,
+          "originalPrice": 398,
+          "profitTarget": 6000,
+          "maxDrawdown": 3000,
+          "ddType": "EOD Trailing",
+          "dailyLoss": 1250,
+          "consistency": "40%",
+          "contracts": "5 minis (50 micros)",
+          "activationFee": 0,
+          "note": "Reset fee $174. Max 5 accounts (was 3)."
+        },
+        {
+          "size": 150000,
+          "price": 247,
+          "originalPrice": 549,
+          "profitTarget": 9000,
+          "maxDrawdown": 4500,
+          "ddType": "EOD Trailing",
+          "dailyLoss": 1750,
+          "consistency": "40%",
+          "contracts": "7 minis (70 micros)",
+          "activationFee": 0,
+          "note": "Reset fee $242. Max 5 accounts (was 3)."
+        }
+      ]
+    },
+    {
+      "name": "Elite Access",
+      "type": "eval",
+      "priceType": "one-time",
+      "plans": [
+        {
+          "size": 25000,
+          "price": 39,
+          "originalPrice": 139,
+          "profitTarget": 1000,
+          "maxDrawdown": 1000,
+          "ddType": "Static",
+          "dailyLoss": null,
+          "consistency": "None",
+          "contracts": "1 mini (10 micros)",
+          "minDays": 1,
+          "activationFee": 104,
+          "note": "Reset fee $35. Activation fee $104 (was $139). Profit Target $1,000 (was $1,500). Max 20 accounts (was 10)."
+        },
+        {
+          "size": 50000,
+          "price": 39,
+          "originalPrice": 189,
+          "profitTarget": 2000,
+          "maxDrawdown": 2000,
+          "ddType": "Static",
+          "dailyLoss": null,
+          "consistency": "None",
+          "contracts": "3 minis (30 micros)",
+          "minDays": 1,
+          "activationFee": 142,
+          "note": "Reset fee $35. Activation fee $142 (was $189). Profit Target $2,000 (was $3,000). Max 20 accounts (was 10)."
+        },
+        {
+          "size": 100000,
+          "price": 39,
+          "originalPrice": 259,
+          "profitTarget": 4000,
+          "maxDrawdown": 3000,
+          "ddType": "Static",
+          "dailyLoss": null,
+          "consistency": "None",
+          "contracts": "5 minis (50 micros)",
+          "minDays": 1,
+          "activationFee": 194,
+          "note": "Reset fee $35. Activation fee $194 (was $259). Profit Target $4,000 (was $6,000). Max 20 accounts (was 10)."
+        },
+        {
+          "size": 150000,
+          "price": 39,
+          "originalPrice": 359,
+          "profitTarget": 6000,
+          "maxDrawdown": 4000,
+          "ddType": "Static",
+          "dailyLoss": null,
+          "consistency": "None",
+          "contracts": "7 minis (70 micros)",
+          "minDays": 1,
+          "activationFee": 269,
+          "note": "Reset fee $35. Activation fee $269 (was $359). Profit Target $6,000 (was $9,000). Max 20 accounts (was 10)."
+        }
+      ]
+    },
+    {
+      "name": "Instant Sim Funded",
+      "type": "instant",
+      "priceType": "one-time",
+      "plans": [
+        {
+          "size": 25000,
+          "price": 293,
+          "originalPrice": 419,
+          "profitTarget": null,
+          "maxDrawdown": 1000,
+          "ddType": "EOD Trailing",
+          "dailyLoss": 625,
+          "consistency": "20%",
+          "contracts": "1 mini (10 micros)",
+          "note": "Max 5 accounts (was 3)."
+        },
+        {
+          "size": 50000,
+          "price": 475,
+          "originalPrice": 679,
+          "profitTarget": null,
+          "maxDrawdown": 2000,
+          "ddType": "EOD Trailing",
+          "dailyLoss": 1250,
+          "consistency": "20%",
+          "contracts": "3 minis (30 micros)",
+          "note": "Max 5 accounts (was 3)."
+        },
+        {
+          "size": 100000,
+          "price": 575,
+          "originalPrice": 821,
+          "profitTarget": null,
+          "maxDrawdown": 4000,
+          "ddType": "EOD Trailing",
+          "dailyLoss": 2500,
+          "consistency": "20%",
+          "contracts": "5 minis (50 micros)",
+          "note": "Trailing max drawdown $4,000 (was $3,000). Max 3 accounts."
+        },
+        {
+          "size": 150000,
+          "price": 657,
+          "originalPrice": 939,
+          "profitTarget": null,
+          "maxDrawdown": 5250,
+          "ddType": "EOD Trailing",
+          "dailyLoss": 3000,
+          "consistency": "20%",
+          "contracts": "7 minis (70 micros)",
+          "note": "Trailing max drawdown $5,250 (was $4,500). Max 3 accounts."
+        }
+      ]
+    },
+    {
+      "name": "Ignite",
+      "type": "instant",
+      "priceType": "one-time",
+      "plans": [
+        {
+          "size": 25000,
+          "price": 87,
+          "originalPrice": 218,
+          "profitTarget": null,
+          "maxDrawdown": 1000,
+          "ddType": "EOD Trailing",
+          "dailyLoss": 500,
+          "consistency": "15%",
+          "contracts": "1 mini (10 micros)",
+          "note": "Max 10 accounts (was 6). Copy Trade 10 Accounts."
+        },
+        {
+          "size": 50000,
+          "price": 159,
+          "originalPrice": 398,
+          "profitTarget": null,
+          "maxDrawdown": 2000,
+          "ddType": "EOD Trailing",
+          "dailyLoss": 1000,
+          "consistency": "15%",
+          "contracts": "3 minis (30 micros)",
+          "note": "Max 10 accounts (was 6). Copy Trade 10 Accounts."
+        },
+        {
+          "size": 100000,
+          "price": 225,
+          "originalPrice": 563,
+          "profitTarget": null,
+          "maxDrawdown": 4000,
+          "ddType": "EOD Trailing",
+          "dailyLoss": 2000,
+          "consistency": "15%",
+          "contracts": "5 minis (50 micros)",
+          "note": "Trailing max drawdown $4,000 (was $3,000). Max 10 accounts (was 6). Copy Trade 10 Accounts."
+        },
+        {
+          "size": 150000,
+          "price": 319,
+          "originalPrice": 799,
+          "profitTarget": null,
+          "maxDrawdown": 6000,
+          "ddType": "EOD Trailing",
+          "dailyLoss": 3000,
+          "consistency": "15%",
+          "contracts": "7 minis (70 micros)",
+          "note": "Trailing max drawdown $6,000 (was $4,500). Max 10 accounts (was 6). Copy Trade 10 Accounts."
+        }
+      ]
+    }
+  ]
+}

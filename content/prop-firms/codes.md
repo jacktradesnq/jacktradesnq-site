@@ -53,6 +53,7 @@ traders-launch = JTNQ
 e8-markets = JTNQ
 blusky = JTNQ
 tradeify = JackTNQ
+top-one-futures = JTNQ
 
 ---
 
