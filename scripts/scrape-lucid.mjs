@@ -16,8 +16,15 @@
  *   node scripts/scrape-lucid.mjs --dry            relit, n'écrit rien
  *   node scripts/scrape-lucid.mjs --dump=lecture.json   écrit aussi la lecture brute de la page
  * LUCID_CHROMIUM=<chemin> choisit un autre Chromium que celui de playwright.
+ *
+ * Lecture (23/11/2026) : la page est d'abord lue par curl_cffi (impersonate chrome, scripts/lib/cf-get.py ;
+ * `pip install curl_cffi`), qui passe là où fetch reçoit 403 Cloudflare. Tout le tarif est dans le JSON
+ * `var LucidPricingConfig` du HTML : readingFromConfig en tire la même lecture que le DOM (mêmes champs, mesuré
+ * identique à la lecture Playwright du 23/11). curl_cffi en échec (statut, JSON absent ou de schéma inconnu) :
+ * repli sur le navigateur headless ci-dessus, et le log dit laquelle des deux méthodes a lu.
  */
 import fs from 'node:fs';
+import { cfFetch } from './lib/cf-fetch.mjs';
 
 const FIRM_ID = 'lucid-trading';
 const DATA_URL = new URL('../public/data/compare-extra-firms.json', import.meta.url);
@@ -134,6 +141,112 @@ export async function readLucidPage({ chromiumPath = process.env.LUCID_CHROMIUM 
   }
 }
 
+/** Objet JSON qui commence à `start` (premier « { »), en respectant les chaînes et leurs échappements. */
+function jsonObjectAt(text, start) {
+  let depth = 0;
+  let inStr = false;
+  for (let i = start; i < text.length; i++) {
+    const c = text[i];
+    if (inStr) {
+      if (c === '\\') i++;
+      else if (c === '"') inStr = false;
+    } else if (c === '"') inStr = true;
+    else if (c === '{') depth++;
+    else if (c === '}' && --depth === 0) return text.slice(start, i + 1);
+  }
+  throw new Error('LucidPricingConfig : JSON non terminé');
+}
+
+/** Le JSON de tarifs que leur page embarque (`var LucidPricingConfig = {...}`), lu dans le HTML brut. */
+export function lucidConfigFromHtml(html) {
+  const at = html.indexOf('var LucidPricingConfig = ');
+  if (at < 0) {
+    const title = html.match(/<title>([^<]*)/i)?.[1]?.trim() ?? '';
+    throw new Error(`LucidPricingConfig absent de la page (titre « ${title} »)${/just a moment/i.test(title) ? ' : challenge Cloudflare' : ''}`);
+  }
+  const cfg = JSON.parse(jsonObjectAt(html, html.indexOf('{', at)));
+  if (cfg?.plans?.schemaVersion !== 1) throw new Error(`LucidPricingConfig : schemaVersion ${cfg?.plans?.schemaVersion} inconnue (1 attendue)`);
+  return cfg;
+}
+
+const cents = (x) => Number(x.toFixed(2));
+
+/**
+ * La lecture que readInPage tirait du DOM (mêmes champs : par onglet puis par taille, original / price / reset,
+ * dllOff, c50, intraday), calculée depuis le JSON de leur page :
+ *  - base = productPrices du produit de la taille ; price = base moins la remise de la taille (code VAULT) ;
+ *  - reset = productPrices du produit reset (remise reset du JSON, 0 aujourd'hui) ;
+ *  - dllOff = (base + addonFees) moins la remise « nodll » de la taille ; c50 = (base + consistencyAddon.fees) moins la remise.
+ * Un produit absent du JSON laisse le champ absent : applyLucid le dit (« pas trouvé sur leur page »).
+ */
+export function readingFromConfig(cfg, html = '') {
+  const prices = cfg.productPrices ?? {};
+  const price = (id) => (id != null && prices[id] != null ? Number(prices[id]) : null);
+  const front = (pt, id) => pt.front.find((f) => f.id === id)?.cells ?? {};
+  const resetPct = Number(cfg.plans.global?.resetDiscountPct ?? 0);
+  const consistency = cfg.consistencyAddon ?? {};
+  const visible = html.replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ');
+  const out = { codeSeen: /\bVAULT\b/.test(visible), tabs: {} };
+  const byId = Object.fromEntries(cfg.plans.planTypes.map((pt) => [pt.id, pt]));
+  for (const [tab, key] of [['Pro', 'pro'], ['Flex', 'flex'], ['Daily', 'daily'], ['Direct', 'direct']]) {
+    const pt = byId[key];
+    if (!pt || pt.enabled === false) { out.tabs[tab] = null; continue; }
+    const fee = front(pt, 'one_time_fee');
+    const reset = front(pt, 'reset_fee');
+    const tabOut = {};
+    for (const size of pt.sizes) {
+      const sizePct = Number(size.discountPct ?? 0);
+      const noDllPct = Number(cfg.noDllDiscounts?.[`${String(size.discountSlug).toLowerCase()}nodll`] ?? sizePct);
+      const after = (base, pct) => (base == null ? null : cents((base * (100 - pct)) / 100));
+      const feeIds = fee[size.id];
+      const resetIds = reset[size.id];
+      const eodId = typeof feeIds === 'object' ? feeIds?.EOD : feeIds;
+      const eodResetId = typeof resetIds === 'object' ? resetIds?.EOD : resetIds;
+      const original = price(eodId);
+      if (original == null) continue;
+      const entry = {
+        original,
+        price: after(original, sizePct),
+        reset: price(eodResetId) == null ? null : after(price(eodResetId), resetPct),
+      };
+      const dllFee = cfg.addonFees?.[eodId];
+      if (key !== 'direct' && dllFee != null) entry.dllOff = after(original + dllFee, noDllPct);
+      const c50Fee = consistency.fees?.[eodId];
+      if ((consistency.planTypes ?? []).includes(pt.slug) && c50Fee != null) entry.c50 = after(original + c50Fee, sizePct);
+      if (key === 'daily' && typeof feeIds === 'object') {
+        const base = price(feeIds.Intraday);
+        const rs = price(resetIds?.Intraday);
+        entry.intraday = base == null ? null : { original: base, price: after(base, sizePct), reset: rs == null ? null : after(rs, resetPct) };
+      }
+      tabOut[parseInt(size.title, 10) * 1000] = entry;
+    }
+    out.tabs[tab] = tabOut;
+  }
+  return out;
+}
+
+/** Lit lucidtrading.com par curl_cffi et renvoie la même lecture que readLucidPage (sans navigateur). */
+export async function readLucidViaCurlCffi({ fetchPage = cfFetch, log = () => {} } = {}) {
+  const { status, text, via } = await fetchPage(LUCID_URL.replace(/#.*$/, ''));
+  if (status !== 200) throw new Error(`page des plans pas servie par curl_cffi (HTTP ${status}${via ? `, profil ${via}` : ''})`);
+  log(`lucid-trading: page lue par curl_cffi, profil ${via ?? '?'}`);
+  return readingFromConfig(lucidConfigFromHtml(text), text);
+}
+
+/** curl_cffi d'abord ; en échec, le navigateur headless. `log` dit quelle méthode a lu. */
+export async function readLucid({ viaCurl = readLucidViaCurlCffi, viaBrowser = readLucidPage, log = console.log } = {}) {
+  try {
+    const reading = await viaCurl({ log });
+    log('lucid-trading: lu par curl_cffi');
+    return reading;
+  } catch (e) {
+    log(`lucid-trading: curl_cffi a échoué (${e.message}), repli sur le navigateur headless`);
+    const reading = await viaBrowser();
+    log('lucid-trading: lu par le navigateur headless');
+    return reading;
+  }
+}
+
 const money2 = (n) => (Number.isInteger(n) ? `${n}.00` : n.toFixed(2));
 const sameNum = (a, b) => Math.abs(a - b) < 0.005;
 
@@ -198,7 +311,7 @@ export function applyLucid(firm, reading, today) {
  * Une relecture complète, sans fichier : `data` = contenu de compare-extra-firms.json (modifié en
  * place). ok:false = page illisible, la firme est seulement marquée stale.
  */
-export async function runLucid(data, { read = readLucidPage, now = Date.now(), log = console.log } = {}) {
+export async function runLucid(data, { read = readLucid, now = Date.now(), log = console.log } = {}) {
   const firm = data.firms.find((f) => f.id === FIRM_ID);
   if (!firm) throw new Error(`${FIRM_ID} absent de compare-extra-firms.json`);
   const today = new Date(now).toISOString().slice(0, 10);
@@ -227,7 +340,7 @@ async function main() {
   const data = JSON.parse(fs.readFileSync(DATA_URL, 'utf8'));
   const { ok } = await runLucid(data, {
     read: async () => {
-      const reading = await readLucidPage();
+      const reading = await readLucid();
       if (dump) fs.writeFileSync(dump, JSON.stringify(reading, null, 2) + '\n');
       return reading;
     },

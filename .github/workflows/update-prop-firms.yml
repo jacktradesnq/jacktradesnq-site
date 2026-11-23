@@ -24,6 +24,11 @@ jobs:
       - name: Install deps
         run: npm ci
 
+      # curl_cffi (scripts/lib/cf-get.py) : lit les pages derrière un défi Cloudflare (Lucid). Mesuré le 23/11/2026 sur un
+      # runner : fetch, curl_cffi « chrome » et Chromium headless reçoivent 403 sur lucidtrading.com, curl_cffi « safari » 200.
+      - name: Install curl_cffi (pages behind Cloudflare)
+        run: python3 -m pip install curl_cffi
+
       - name: Unit tests (parsers must pass before touching public data)
         run: npm test
 
@@ -44,9 +49,10 @@ jobs:
         continue-on-error: true
         run: node scripts/scrape-tradeify.mjs
 
-      # Lucid (comparateur) : leur site répond 403 à un fetch (Cloudflare), la page se lit dans le Chromium
-      # headless de playwright (Angelo, 22/11/2026 : « pk lucid ça a pas fait automatiquement »). Page illisible
-      # = firme stale (commitée avec le reste) puis job rouge plus bas, et l'alerte Discord « stale firms ».
+      # Lucid (comparateur) : leur site répond 403 à un fetch (Cloudflare) ; la page se lit par curl_cffi (le tarif est
+      # dans son JSON LucidPricingConfig), repli sur le Chromium headless de playwright (Angelo, 22/11/2026 : « pk lucid
+      # ça a pas fait automatiquement »). Page illisible = firme stale (commitée avec le reste) puis job rouge plus
+      # bas, et l'alerte Discord « stale firms ».
       - name: Scrape Lucid (comparator)
         id: lucid
         continue-on-error: true
