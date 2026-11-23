@@ -30,3 +30,21 @@ export function cfFetch(url, { timeoutMs = 30_000, python = process.env.CF_PYTHO
     );
   });
 }
+
+/**
+ * Texte d'une page : fetch simple d'abord (il passe là où le site ne bloque pas : tradeify.co, BluSky…), et seulement sur
+ * un 403 / 429 / 503 (défi Cloudflare, limite) la même page par curl_cffi. Lève « HTTP <code> sur <url> » si rien ne passe.
+ */
+export async function fetchPageText(url, { headers = {}, timeoutMs = 30_000, fetchImpl = fetch, viaCurl = cfFetch } = {}) {
+  const res = await fetchImpl(url, { headers, redirect: 'follow', signal: AbortSignal.timeout(timeoutMs) });
+  if (res.ok) return res.text();
+  if (![403, 429, 503].includes(res.status)) throw new Error(`HTTP ${res.status} sur ${url}`);
+  let alt;
+  try {
+    alt = await viaCurl(url, { timeoutMs });
+  } catch (e) {
+    throw new Error(`HTTP ${res.status} sur ${url} (repli curl_cffi impossible : ${e.message})`);
+  }
+  if (alt.status >= 200 && alt.status < 300) return alt.text;
+  throw new Error(`HTTP ${res.status} sur ${url} (curl_cffi : HTTP ${alt.status})`);
+}

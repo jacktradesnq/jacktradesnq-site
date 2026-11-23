@@ -45,6 +45,7 @@
  */
 
 import fs from 'node:fs';
+import { fetchPageText } from './lib/cf-fetch.mjs';
 
 export const TRADEIFY_URL = 'https://tradeify.co/';
 const DATA_URL = new URL('../public/data/compare-extra-firms.json', import.meta.url);
@@ -376,13 +377,8 @@ export function applyTradeify(firm, parsed, today) {
 const URL_ARG = process.argv.find((a) => a.startsWith('--url='))?.slice('--url='.length);
 
 async function fetchTradeify(fetchImpl = fetch, url = URL_ARG ?? TRADEIFY_URL) {
-  const res = await fetchImpl(url, {
-    headers: { 'user-agent': UA, accept: 'text/html,application/xhtml+xml' },
-    redirect: 'follow',
-    signal: AbortSignal.timeout(30_000),
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status} sur ${url}`);
-  return res.text();
+  // fetch simple, puis curl_cffi sur un 403 / 429 / 503 Cloudflare (scripts/lib/cf-fetch.mjs, 23/11/2026).
+  return fetchPageText(url, { headers: { 'user-agent': UA, accept: 'text/html,application/xhtml+xml' }, fetchImpl });
 }
 
 /**

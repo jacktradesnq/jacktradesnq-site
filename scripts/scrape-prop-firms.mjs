@@ -25,6 +25,7 @@
 import fs from 'node:fs';
 
 import { guardCatalog, syncCatalog } from './lib/catalog-sync.mjs';
+import { fetchPageText } from './lib/cf-fetch.mjs';
 import { fetchBluSkyPlans } from './lib/firms/blusky.mjs';
 import { fetchE8Plans } from './lib/firms/e8.mjs';
 import { fetchTradersLaunchPrograms } from './lib/firms/traderslaunch.mjs';
@@ -40,12 +41,8 @@ const UA =
 const num = (s) => parseFloat(String(s).replace(/[,\s]/g, ''));
 
 async function fetchText(url) {
-  const res = await fetch(url, {
-    headers: { 'user-agent': UA, accept: 'text/html,application/xhtml+xml' },
-    redirect: 'follow',
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-  return res.text();
+  // fetch simple, puis curl_cffi sur un 403 / 429 / 503 Cloudflare (scripts/lib/cf-fetch.mjs, 23/11/2026).
+  return fetchPageText(url, { headers: { 'user-agent': UA, accept: 'text/html,application/xhtml+xml' } });
 }
 
 /* ------------------------------------------------------------------ */

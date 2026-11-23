@@ -99,3 +99,16 @@ test('cfFetch : rend le statut et le texte (200 puis 403), erreur réseau claire
   }
   await assert.rejects(cfFetch('http://127.0.0.1:1/', { timeoutMs: 5_000 }), /cf-get/);
 });
+
+test('fetchPageText : 200 direct sans curl_cffi ; 403/429/503 puis curl_cffi passe ; 404 ou curl_cffi bloqué = erreur claire', async () => {
+  const { fetchPageText } = await import('./lib/cf-fetch.mjs');
+  const res = (status, text = '') => async () => ({ ok: status >= 200 && status < 300, status, text: async () => text });
+  const never = async () => { throw new Error('curl_cffi ne devait pas être appelé'); };
+  assert.equal(await fetchPageText('https://x/', { fetchImpl: res(200, 'ok'), viaCurl: never }), 'ok');
+  for (const code of [403, 429, 503]) {
+    assert.equal(await fetchPageText('https://x/', { fetchImpl: res(code), viaCurl: async () => ({ status: 200, text: 'via curl' }) }), 'via curl');
+  }
+  await assert.rejects(fetchPageText('https://x/', { fetchImpl: res(404), viaCurl: never }), /^Error: HTTP 404 sur https:\/\/x\/$/);
+  await assert.rejects(fetchPageText('https://x/', { fetchImpl: res(403), viaCurl: async () => ({ status: 403, text: '' }) }), /HTTP 403 sur https:\/\/x\/ \(curl_cffi : HTTP 403\)/);
+  await assert.rejects(fetchPageText('https://x/', { fetchImpl: res(403), viaCurl: async () => { throw new Error('curl_cffi absent'); } }), /HTTP 403.*repli curl_cffi impossible : curl_cffi absent/);
+});
