@@ -68,6 +68,6 @@ jobs:
       - name: Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: scrape-lucid (Playwright, --dry : n'écrit rien)
+      - name: "scrape-lucid (Playwright, --dry, n'écrit rien)"
         continue-on-error: true
         run: node scripts/scrape-lucid.mjs --dry
