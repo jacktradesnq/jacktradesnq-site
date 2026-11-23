@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-22",
+  "generatedAt": "2026-11-23",
   "firms": [
     {
       "id": "traders-launch",
@@ -8,7 +8,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-11-22",
+      "lastChecked": "2026-11-23",
       "stale": false,
       "programs": [
         {
@@ -18,7 +18,7 @@
           "plans": [
             {
               "size": 100000,
-              "price": 159,
+              "price": 111.3,
               "profitTarget": 2000,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
@@ -26,14 +26,15 @@
               "contracts": "2 minis or 20 micros",
               "note": "Session profit limit: 40% of profit target. Price shown for the 80% split.",
               "splitPrices": {
-                "60": 99
+                "60": 69.3
               },
               "minDays": 0,
-              "dailyLoss": null
+              "dailyLoss": null,
+              "originalPrice": 159
             },
             {
               "size": 200000,
-              "price": 299,
+              "price": 209.3,
               "profitTarget": 4000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -41,14 +42,15 @@
               "contracts": "4 minis or 40 micros",
               "note": "Session profit limit: 40% of profit target. Price shown for the 80% split.",
               "splitPrices": {
-                "60": 199
+                "60": 139.3
               },
               "minDays": 0,
-              "dailyLoss": null
+              "dailyLoss": null,
+              "originalPrice": 299
             },
             {
               "size": 300000,
-              "price": 599,
+              "price": 419.3,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
@@ -56,10 +58,11 @@
               "contracts": "6 minis or 60 micros",
               "note": "Session profit limit: 40% of profit target. Price shown for the 80% split.",
               "splitPrices": {
-                "60": 399
+                "60": 279.3
               },
               "minDays": 0,
-              "dailyLoss": null
+              "dailyLoss": null,
+              "originalPrice": 599
             }
           ]
         },
@@ -70,7 +73,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 149,
+              "price": 104.3,
               "profitTarget": 1500,
               "maxDrawdown": 500,
               "ddType": "Static",
@@ -78,14 +81,15 @@
               "contracts": "1 mini or 10 micros",
               "note": "Price shown for the 80% split.",
               "splitPrices": {
-                "60": 119,
-                "90": 169
+                "60": 83.3,
+                "90": 118.3
               },
-              "dailyLoss": null
+              "dailyLoss": null,
+              "originalPrice": 149
             },
             {
               "size": 50000,
-              "price": 299,
+              "price": 209.3,
               "profitTarget": 3000,
               "maxDrawdown": 1000,
               "ddType": "Static",
@@ -93,14 +97,15 @@
               "contracts": "2 minis or 20 micros",
               "note": "Price shown for the 80% split.",
               "splitPrices": {
-                "60": 239,
-                "90": 339
+                "60": 167.3,
+                "90": 237.3
               },
-              "dailyLoss": null
+              "dailyLoss": null,
+              "originalPrice": 299
             },
             {
               "size": 100000,
-              "price": 599,
+              "price": 419.3,
               "profitTarget": 6000,
               "maxDrawdown": 2000,
               "ddType": "Static",
@@ -108,10 +113,11 @@
               "contracts": "4 minis or 40 micros",
               "note": "Price shown for the 80% split.",
               "splitPrices": {
-                "60": 479,
-                "90": 679
+                "60": 335.3,
+                "90": 475.3
               },
-              "dailyLoss": null
+              "dailyLoss": null,
+              "originalPrice": 599
             }
           ]
         },
@@ -122,7 +128,7 @@
           "plans": [
             {
               "size": 25000,
-              "price": 89,
+              "price": 77.88,
               "originalPrice": 111.25,
               "profitTarget": 1250,
               "maxDrawdown": 500,
@@ -131,8 +137,8 @@
               "consistency": "None",
               "note": "Rapid. Price shown for the 80% split.",
               "splitPrices": {
-                "60": 59,
-                "90": 109
+                "60": 51.63,
+                "90": 95.38
               }
             }
           ]
@@ -151,7 +157,7 @@
       },
       "code": "JTNQ",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-11-22",
+      "lastChecked": "2026-11-23",
       "stale": false,
       "programs": [
         {
@@ -332,7 +338,7 @@
         "code": "JTNQ"
       },
       "url": "https://trader.blusky.pro/checkout?referral_id=09577e87582233340375",
-      "lastChecked": "2026-11-22",
+      "lastChecked": "2026-11-23",
       "stale": false,
       "programs": [
         {
