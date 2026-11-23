@@ -63,16 +63,31 @@ test('readLucidViaCurlCffi : statut 403 = erreur ; 200 = lecture', async () => {
   assert.match(lines[0], /curl_cffi, profil safari/);
 });
 
-test('readLucid : curl_cffi d\'abord ; en échec, repli sur le navigateur ; le log dit lequel a lu', async () => {
+test('readLucid : curl_cffi d\'abord, 3 essais ; en échec, repli sur le navigateur ; le log dit lequel a lu', async () => {
   const lines = [];
   const log = (l) => lines.push(l);
-  assert.equal(await readLucid({ viaCurl: async () => 'A', viaBrowser: async () => 'B', log }), 'A');
+  const opts = { log, pauseMs: 0 };
+  assert.equal(await readLucid({ ...opts, viaCurl: async () => 'A', viaBrowser: async () => 'B' }), 'A');
   assert.match(lines.join('\n'), /lu par curl_cffi/);
+
+  // un blocage passager : le 2e essai passe, le navigateur n'est pas lancé
   lines.length = 0;
-  assert.equal(await readLucid({ viaCurl: async () => { throw new Error('HTTP 403'); }, viaBrowser: async () => 'B', log }), 'B');
-  assert.match(lines.join('\n'), /curl_cffi a échoué \(HTTP 403\).*repli.*navigateur/);
+  let n = 0;
+  const flaky = async () => { if (++n < 2) throw new Error('HTTP 403'); return 'A'; };
+  assert.equal(await readLucid({ ...opts, viaCurl: flaky, viaBrowser: async () => { throw new Error('navigateur lancé à tort'); } }), 'A');
+  assert.equal(n, 2);
+  assert.match(lines.join('\n'), /essai 1\/3 échoué \(HTTP 403\)/);
+
+  // trois échecs : repli navigateur
+  lines.length = 0;
+  n = 0;
+  const blocked = async () => { n++; throw new Error('HTTP 403'); };
+  assert.equal(await readLucid({ ...opts, viaCurl: blocked, viaBrowser: async () => 'B' }), 'B');
+  assert.equal(n, 3);
+  assert.match(lines.join('\n'), /curl_cffi a échoué 3 fois \(HTTP 403\), repli sur le navigateur/);
   assert.match(lines.join('\n'), /lu par le navigateur headless/);
-  await assert.rejects(readLucid({ viaCurl: async () => { throw new Error('x'); }, viaBrowser: async () => { throw new Error('challenge'); }, log }), /challenge/);
+
+  await assert.rejects(readLucid({ ...opts, viaCurl: blocked, viaBrowser: async () => { throw new Error('challenge'); } }), /challenge/);
 });
 
 // cfFetch lance python3 + curl_cffi : ignoré là où curl_cffi n'est pas installé (le workflow l'installe).

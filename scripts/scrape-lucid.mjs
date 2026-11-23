@@ -233,18 +233,27 @@ export async function readLucidViaCurlCffi({ fetchPage = cfFetch, log = () => {}
   return readingFromConfig(lucidConfigFromHtml(text), text);
 }
 
-/** curl_cffi d'abord ; en échec, le navigateur headless. `log` dit quelle méthode a lu. */
-export async function readLucid({ viaCurl = readLucidViaCurlCffi, viaBrowser = readLucidPage, log = console.log } = {}) {
-  try {
-    const reading = await viaCurl({ log });
-    log('lucid-trading: lu par curl_cffi');
-    return reading;
-  } catch (e) {
-    log(`lucid-trading: curl_cffi a échoué (${e.message}), repli sur le navigateur headless`);
-    const reading = await viaBrowser();
-    log('lucid-trading: lu par le navigateur headless');
-    return reading;
+/**
+ * curl_cffi d'abord, `attempts` essais espacés de `pauseMs` (Cloudflare bloque par intermittence : sur un runner GitHub le
+ * 23/11/2026, 2 lectures sur 3 passaient) ; tous en échec, le navigateur headless. `log` dit quelle méthode a lu.
+ */
+export async function readLucid({ viaCurl = readLucidViaCurlCffi, viaBrowser = readLucidPage, log = console.log, attempts = 3, pauseMs = 20_000 } = {}) {
+  let last;
+  for (let i = 1; i <= attempts; i++) {
+    try {
+      const reading = await viaCurl({ log });
+      log('lucid-trading: lu par curl_cffi');
+      return reading;
+    } catch (e) {
+      last = e;
+      log(`lucid-trading: curl_cffi essai ${i}/${attempts} échoué (${e.message})`);
+      if (i < attempts && pauseMs > 0) await new Promise((r) => setTimeout(r, pauseMs));
+    }
   }
+  log(`lucid-trading: curl_cffi a échoué ${attempts} fois (${last.message}), repli sur le navigateur headless`);
+  const reading = await viaBrowser();
+  log('lucid-trading: lu par le navigateur headless');
+  return reading;
 }
 
 const money2 = (n) => (Number.isInteger(n) ? `${n}.00` : n.toFixed(2));
