@@ -13,8 +13,8 @@
       },
       "code": "VAULT",
       "url": "https://lucidtrading.com/#plans",
-      "lastChecked": "2026-11-23",
-      "stale": true,
+      "lastChecked": "2026-11-24",
+      "stale": false,
       "programs": [
         {
           "name": "LucidPro",
@@ -390,7 +390,7 @@
       },
       "code": "JackTNQ",
       "url": "https://tradeify.co/#pricing",
-      "lastChecked": "2026-11-23",
+      "lastChecked": "2026-11-24",
       "stale": false,
       "programs": [
         {
