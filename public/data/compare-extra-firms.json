@@ -13,7 +13,7 @@
       },
       "code": "VAULT",
       "url": "https://lucidtrading.com/#plans",
-      "lastChecked": "2026-11-24",
+      "lastChecked": "2026-11-25",
       "stale": false,
       "programs": [
         {
@@ -119,8 +119,8 @@
             },
             {
               "size": 50000,
-              "price": 88.2,
-              "originalPrice": 126,
+              "price": 88.9,
+              "originalPrice": 127,
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -131,7 +131,7 @@
               "minDays": 3,
               "contracts": "4 minis or 40 micros",
               "activationFee": 0,
-              "note": "Price with the Daily Loss Limit ON and 40% consistency (card default). 50% consistency add-on: $95.90 (pass in 2 days). Daily Loss Limit OFF: $123.20 (end-of-day payouts). Reset fee $88. Funded scaling plan starts at 2 minis / 20 micros. No payout buffer. Moved live after 5 payouts."
+              "note": "Price with the Daily Loss Limit ON and 40% consistency (card default). 50% consistency add-on: $96.60 (pass in 2 days). Daily Loss Limit OFF: $123.90 (end-of-day payouts). Reset fee $88. Funded scaling plan starts at 2 minis / 20 micros. No payout buffer. Moved live after 5 payouts."
             },
             {
               "size": 100000,
@@ -390,7 +390,7 @@
       },
       "code": "JackTNQ",
       "url": "https://tradeify.co/#pricing",
-      "lastChecked": "2026-11-24",
+      "lastChecked": "2026-11-25",
       "stale": false,
       "programs": [
         {
