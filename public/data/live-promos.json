@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-25",
-  "builtFor": "2026-11-25",
+  "generatedAt": "2026-11-26",
+  "builtFor": "2026-11-26",
   "promos": [
     {
       "firmId": "top-one-futures",
@@ -29,7 +29,7 @@
       "consistency": "40%",
       "activationFee": 0,
       "contracts": "3 minis (30 micros)",
-      "lastChecked": "2026-11-25"
+      "lastChecked": "2026-11-26"
     },
     {
       "firmId": "blusky",
@@ -57,7 +57,7 @@
       "consistency": "34%",
       "activationFee": null,
       "contracts": "5 minis or 50 micros",
-      "lastChecked": "2026-11-25"
+      "lastChecked": "2026-11-26"
     },
     {
       "firmId": "traders-launch",
@@ -86,7 +86,7 @@
       "consistency": "50%",
       "activationFee": null,
       "contracts": "2 minis or 20 micros",
-      "lastChecked": "2026-11-25"
+      "lastChecked": "2026-11-26"
     },
     {
       "firmId": "e8-markets",
@@ -115,7 +115,7 @@
       "consistency": "None",
       "activationFee": null,
       "contracts": "4 minis / 40 micros",
-      "lastChecked": "2026-11-25"
+      "lastChecked": "2026-11-26"
     }
   ]
 }
