@@ -329,7 +329,9 @@ const ENTITES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', r
  * (« Updated November 23, 2026 ») reste.
  */
 export function texteDePage(html) {
-  let h = String(html).replace(/<(script|style|noscript|svg|template|head)\b[\s\S]*?<\/\1\s*>/gi, ' ');
+  let h = String(html)
+    .replace(/<!--[\s\S]*?-->/g, ' ') // commentaires (tradeify.co y range un vieux <script>)
+    .replace(/<(script|style|noscript|svg|template|head)\b[\s\S]*?<\/\1\s*>/gi, ' ');
   const bloc = (tag) => {
     const m = h.match(new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*)<\\/${tag}\\s*>`, 'i'));
     return m ? m[1] : null;
@@ -350,13 +352,16 @@ export function texteDePage(html) {
     .trim();
 }
 
-/** Titre d'une page (<h1> sinon <title>), pour l'alerte. */
+/** Titre d'une page pour l'alerte : <title> sans le nom du site (« LucidPro Payouts | Lucid Trading Help Center »,
+ *  « 50% Consistency Requirement - Apex Trader Funding »), à défaut le 1er <h1> (celui d'Apex dit « Help Center »). */
 export function titreDePage(html) {
   const h = String(html);
   const sans = (s) => texteDePage(`<body>${s}</body>`);
   const t = h.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  const titre = t && sans(t[1]).replace(/\s+[|–-]\s+[^|–-]+$/, '').trim();
+  if (titre) return titre;
   const h1 = h.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
-  return (h1 && sans(h1[1])) || (t && sans(t[1])) || null;
+  return (h1 && sans(h1[1])) || null;
 }
 
 /**

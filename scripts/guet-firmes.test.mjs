@@ -172,11 +172,13 @@ test('une page citée par plusieurs fichiers : une seule lecture, tous les fichi
 });
 
 test("texte d'une page : l'article, sans scripts ni dates relatives ; une date écrite reste", () => {
-  const html = `<html><head><title>T</title><script>var x=1</script></head><body><nav>menu</nav>
+  const html = `<html><head><title>Loss Limits | Vest Markets</title><script>var x=1</script></head><body><nav>menu</nav><!--script>document.x()</script-->
     <article><h1>Loss Limits</h1><p>Max&nbsp;drawdown 6&#37; &amp; more</p><p>Updated November 23, 2026</p></article>
     <footer>Last updated 2 days ago</footer></body></html>`;
   assert.equal(texteDePage(html), 'Loss Limits Max drawdown 6% & more Updated November 23, 2026');
   assert.equal(titreDePage(html), 'Loss Limits');
+  assert.equal(titreDePage('<title>50% Consistency Requirement - Apex Trader Funding</title><h1>Help Center</h1>'), '50% Consistency Requirement');
+  assert.equal(titreDePage('<h1>Rules</h1>'), 'Rules');
   const gitbook = '<main><p>Rule A</p><p>Last updated 2 days ago</p> Updated over a week ago</main>';
   assert.equal(texteDePage(gitbook), 'Rule A');
   assert.equal(texteDePage('<main><p>Rule A</p><p>Last updated 3 hours ago</p></main>'), texteDePage(gitbook));
