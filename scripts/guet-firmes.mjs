@@ -208,6 +208,18 @@ function envoyer(textes) {
 const sha = (algo, s) => crypto.createHash(algo).update(s).digest('hex');
 const pause = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/** Texte enregistré au tour d'avant : « url\n\ntexte\n ». */
+function texteSauve(fichier) {
+  try {
+    const brut = fs.readFileSync(fichier, 'utf8');
+    const i = brut.indexOf('\n\n');
+    if (i < 0) return null;
+    return brut.slice(i + 2).replace(/\n$/, '');
+  } catch {
+    return null;
+  }
+}
+
 async function lirePage(url) {
   try {
     const { status, text } = await cfFetch(url, { timeoutMs: 30_000 });
@@ -233,14 +245,22 @@ async function guetPages(etat, dossierEtat, quand) {
     const { etat: nouveau, evenement } = suivrePage(ancien, lu, empreinte, quand);
     nouveau.firme = firme;
     etat.pages[url] = nouveau;
+    const f = path.join(dossierTextes, `${sha('sha1', url).slice(0, 16)}.txt`);
+    const texteAvant = evenement === 'texte' ? texteSauve(f) : null;
     if (empreinte) {
       bilan.lues++;
-      const f = path.join(dossierTextes, `${sha('sha1', url).slice(0, 16)}.txt`);
       if (evenement === 'texte' && fs.existsSync(f)) fs.copyFileSync(f, f.replace(/\.txt$/, `.avant-${quand.slice(0, 10)}.txt`));
       fs.writeFileSync(f, `${url}\n\n${lu.texte}\n`);
     } else if (lu.statut === 404 || lu.statut === 410) bilan.absentes.push(`${url} (HTTP ${lu.statut})`);
     else bilan.echecs.push(`${url} (${lu.erreur || `HTTP ${lu.statut}`})`);
-    if (evenement) changements.push({ url, firme, evenement, titre: nouveau.titre, statut: lu.statut, fichiers });
+    if (evenement) {
+      const ch = { url, firme, evenement, titre: nouveau.titre, statut: lu.statut, fichiers };
+      if (evenement === 'texte' && typeof texteAvant === 'string') {
+        ch.texteAvant = texteAvant;
+        ch.texteApres = lu.texte;
+      }
+      changements.push(ch);
+    }
     await pause(400);
   }
   return { changements, bilan, total: pages.size };

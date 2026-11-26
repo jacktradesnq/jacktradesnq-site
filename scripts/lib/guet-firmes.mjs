@@ -5,10 +5,12 @@
  *
  * Deux guets :
  *  1. Offres : deux versions des JSON que le site écrit (public/data/*.json, l'historique git = le relevé jour par
- *     jour) -> nouveau plan, plan retiré, prix changé, promo changée ; pour chaque plan nouveau ou au prix changé, le
- *     rapport perte max / prix payé, et les fichiers de règles propsim du même plan (peut-être périmés).
+ *     jour) -> nouveau plan, plan retiré, prix changé, perte max changée, promo changée ; pour chaque plan nouveau,
+ *     au prix changé ou à la perte max changée, le rapport perte max / prix payé, et les fichiers de règles propsim
+ *     du même plan (peut-être périmés).
  *  2. Pages de règles : les URL citées par les fichiers de règles que le runner simule (Apex, FundedNext, Lucid,
- *     Tradeify, Vest) -> texte changé, page disparue. Le guet ne modifie JAMAIS un fichier de règles.
+ *     Tradeify, Vest) -> texte changé (extrait de la première zone), page disparue, page illisible 3 jours de suite.
+ *     L'accueil tradeify.co n'est pas suivi. Le guet ne modifie JAMAIS un fichier de règles.
  *
  * L'alerte liste les changements firme par firme, ordre alphabétique, sans classement ni mise en avant (contrats
  * partenaires, Angelo 01/11/2026 et 11/10/2026).
@@ -124,7 +126,7 @@ const memeJson = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 /**
  * Changements entre deux versions, par firme :
- * Map<cléFirme, { nom, marche, firmeId, promo?: {avant, apres}, nouveaux: [], retires: [], prix: [] }>.
+ * Map<cléFirme, { nom, marche, firmeId, promo?: {avant, apres}, nouveaux: [], retires: [], prix: [], pertes: [] }>.
  */
 export function differences(avant, apres) {
   const A = aPlat(avant);
@@ -133,7 +135,7 @@ export function differences(avant, apres) {
   const firme = (cf) => {
     if (!parFirme.has(cf)) {
       const f = B.firmes.get(cf) || A.firmes.get(cf);
-      parFirme.set(cf, { nom: f.nom, marche: f.marche, firmeId: f.id, promo: null, nouveaux: [], retires: [], prix: [] });
+      parFirme.set(cf, { nom: f.nom, marche: f.marche, firmeId: f.id, promo: null, nouveaux: [], retires: [], prix: [], pertes: [] });
     }
     return parFirme.get(cf);
   };
@@ -145,7 +147,10 @@ export function differences(avant, apres) {
   for (const [cle, pb] of B.plans) {
     const pa = A.plans.get(cle);
     if (!pa) firme(pb.cleFirme).nouveaux.push(pb);
-    else if (!memeJson(pa.prix, pb.prix)) firme(pb.cleFirme).prix.push({ avant: pa, apres: pb });
+    else {
+      if (!memeJson(pa.prix, pb.prix)) firme(pb.cleFirme).prix.push({ avant: pa, apres: pb });
+      if (pa.perteMax !== pb.perteMax) firme(pb.cleFirme).pertes.push({ avant: pa, apres: pb });
+    }
   }
   for (const [cle, pa] of A.plans) if (!B.plans.has(cle)) firme(pa.cleFirme).retires.push(pa);
   return parFirme;
@@ -300,6 +305,22 @@ export const FIRME_DU_DOSSIER = {
 };
 
 /**
+ * Accueil https://tradeify.co, avec ou sans www et avec ou sans / final : la page bouge avec les bannières de promo,
+ * ce n'est pas une page de règles (27/11/2026). Les articles help.tradeify.co restent.
+ */
+function estAccueilTradeify(url) {
+  let u;
+  try {
+    u = new URL(url);
+  } catch {
+    return false;
+  }
+  const hote = u.hostname.toLowerCase();
+  if (hote !== 'tradeify.co' && hote !== 'www.tradeify.co') return false;
+  return u.pathname.replace(/\/+$/, '') === '';
+}
+
+/**
  * Map<url, { firme, fichiers: Set<"dossier/fichier"> }> depuis regles = [{ dossier, fichier, note }].
  * Seules les firmes de FIRME_DU_DOSSIER comptent (les modèles TEMPLATE / EXEMPLE sont à la racine, sans dossier).
  */
@@ -309,6 +330,7 @@ export function pagesARelire(regles, sources = {}) {
     const firme = FIRME_DU_DOSSIER[r.dossier];
     if (!firme) continue;
     for (const url of pagesDeLaNote(firme, r.note || '', sources)) {
+      if (estAccueilTradeify(url)) continue;
       if (!pages.has(url)) pages.set(url, { firme, fichiers: new Set() });
       pages.get(url).fichiers.add(`${r.dossier}/${r.fichier}`);
     }
@@ -364,10 +386,14 @@ export function titreDePage(html) {
   return (h1 && sans(h1[1])) || null;
 }
 
+const ECHECS_PAGE_ILLISIBLE = 3;
+
 /**
  * Nouvel état d'une page + ce qui change. lu = { statut, texte?, titre?, erreur? } ; ancien = état enregistré ou null.
  * evenement : null (rien, ou 1re lecture = état de départ), 'texte' (texte changé), 'disparue' (404/410 après une
- * lecture réussie), 'revenue' (relue après une disparition). Une lecture ratée (403, réseau) ne change rien.
+ * lecture réussie), 'revenue' (relue après une disparition), 'illisible' (3e échec de suite : 403, réseau, 5xx ;
+ * une seule fois, le compteur repart à zéro quand la page redevient lisible). Une lecture ratée ne change pas
+ * l'empreinte.
  */
 export function suivrePage(ancien, lu, empreinte, quand) {
   const ok = lu.statut >= 200 && lu.statut < 300 && typeof lu.texte === 'string';
@@ -377,7 +403,7 @@ export function suivrePage(ancien, lu, empreinte, quand) {
     etat.echecs = (ancien?.echecs || 0) + 1;
     etat.derniereErreur = lu.erreur || `HTTP ${lu.statut}`;
     etat.tenteLe = quand;
-    return { etat, evenement: null };
+    return { etat, evenement: etat.echecs === ECHECS_PAGE_ILLISIBLE ? 'illisible' : null };
   }
   const etat = {
     statut: lu.statut,
@@ -496,7 +522,7 @@ const parPlan = (a, b) => parNom(a.programme, b.programme) || (a.taille ?? 0) - 
  */
 export function blocsOffres(diff, regles = []) {
   const blocs = [];
-  const firmes = [...diff.values()].filter((f) => f.promo || f.nouveaux.length || f.retires.length || f.prix.length);
+  const firmes = [...diff.values()].filter((f) => f.promo || f.nouveaux.length || f.retires.length || f.prix.length || f.pertes.length);
   for (const f of firmes.sort((a, b) => parNom(nomFirme(a), nomFirme(b)))) {
     const l = [nomFirme(f)];
     if (f.promo) l.push(`- promo : ${textePromo(f.promo.avant)} → ${textePromo(f.promo.apres)}`);
@@ -506,6 +532,10 @@ export function blocsOffres(diff, regles = []) {
     }
     for (const c of f.prix.slice().sort((a, b) => parPlan(a.apres, b.apres))) {
       l.push(`- prix changé · ${nomPlan(c.apres)} : ${lignePrix(c)} · ${rapport(c.apres)}`);
+      l.push(...ligneRegles(c.apres, regles));
+    }
+    for (const c of f.pertes.slice().sort((a, b) => parPlan(a.apres, b.apres))) {
+      l.push(`- perte max changée · ${nomPlan(c.apres)} : perte max ${usd(c.avant.perteMax)} → ${usd(c.apres.perteMax)} · ${rapport(c.apres)}`);
       l.push(...ligneRegles(c.apres, regles));
     }
     for (const p of f.retires.slice().sort(parPlan)) {
@@ -523,8 +553,29 @@ const MOTS_EVENEMENT = {
 };
 
 /**
+ * Première zone différente entre deux textes : le milieu entre le préfixe commun et le suffixe commun,
+ * 300 caractères au plus de chaque côté. null si les textes sont identiques.
+ */
+export function extraitChangement(avant, apres, max = 300) {
+  const a = String(avant);
+  const b = String(apres);
+  if (a === b) return null;
+  let i = 0;
+  const n = Math.min(a.length, b.length);
+  while (i < n && a[i] === b[i]) i++;
+  let finA = a.length;
+  let finB = b.length;
+  while (finA > i && finB > i && a[finA - 1] === b[finB - 1]) {
+    finA--;
+    finB--;
+  }
+  const coupe = (s) => s.slice(0, max).replace(/\r?\n/g, ' ');
+  return `avant : ${coupe(a.slice(i, finA))}\naprès : ${coupe(b.slice(i, finB))}`;
+}
+
+/**
  * Blocs de l'alerte des pages, un par firme, ordre alphabétique. changements = [{ url, firme, evenement, titre, statut,
- * fichiers: Set|[] }].
+ * fichiers: Set|[], texteAvant?, texteApres? }].
  */
 export function blocsPages(changements) {
   const parFirme = new Map();
@@ -536,8 +587,16 @@ export function blocsPages(changements) {
   for (const firme of [...parFirme.keys()].sort(parNom)) {
     const l = [firme];
     for (const c of parFirme.get(firme).sort((a, b) => a.url.localeCompare(b.url))) {
+      if (c.evenement === 'illisible') {
+        l.push(`- page illisible depuis ${ECHECS_PAGE_ILLISIBLE} jours : ${c.titre ? `${c.titre} ` : ''}${c.url}`);
+        continue;
+      }
       const statut = c.evenement === 'disparue' ? ` (HTTP ${c.statut})` : '';
       l.push(`- ${MOTS_EVENEMENT[c.evenement] || c.evenement}${statut} · ${c.titre ? `${c.titre} · ` : ''}${c.url}`);
+      if (c.evenement === 'texte' && typeof c.texteAvant === 'string' && typeof c.texteApres === 'string') {
+        const ex = extraitChangement(c.texteAvant, c.texteApres);
+        if (ex) for (const ligne of ex.split('\n')) l.push(`  ${ligne}`);
+      }
       const fichiers = [...(c.fichiers || [])].sort();
       if (fichiers.length) l.push(`  fichiers de règles propsim peut-être périmés (non modifiés) : ${fichiers.join(', ')}`);
     }

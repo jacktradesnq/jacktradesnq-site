@@ -5,6 +5,7 @@ import {
   blocsOffres,
   blocsPages,
   differences,
+  extraitChangement,
   messages,
   pagesARelire,
   pagesDeLaNote,
@@ -61,6 +62,14 @@ test('prix changé : avant → après, rapport perte max / prix payé', () => {
   const blocs = blocsOffres(differences(futures([lucid(53.2)]), futures([lucid(45.6)])));
   assert.equal(blocs.length, 1);
   assert.match(blocs[0], /^Lucid Trading\n- prix changé · LucidFlex 25K : prix 53,20 \$ → 45,60 \$ · perte max 1 000 \$ \/ prix 45,60 \$ = 21,9x$/);
+});
+
+test('perte max changée, prix identique : même format que prix changé', () => {
+  const apres = lucid(53.2);
+  apres.programs[0].plans[0] = { ...apres.programs[0].plans[0], maxDrawdown: 1500 };
+  const blocs = blocsOffres(differences(futures([lucid(53.2)]), futures([apres])));
+  assert.equal(blocs.length, 1);
+  assert.match(blocs[0], /^Lucid Trading\n- perte max changée · LucidFlex 25K : perte max 1 000 \$ → 1 500 \$ · perte max 1 500 \$ \/ prix 53,20 \$ = 28,2x$/);
 });
 
 test('nouveau plan, plan retiré, promo changée', () => {
@@ -167,8 +176,26 @@ test('une page citée par plusieurs fichiers : une seule lecture, tous les fichi
     { dossier: 'racine-inconnue', fichier: 'TEMPLATE.json', note: 'https://example.com/' },
   ];
   const pages = pagesARelire(regles);
-  assert.deepEqual([...pages.keys()].sort(), ['https://help.tradeify.co/en/articles/10468320', 'https://tradeify.co/']);
+  assert.deepEqual([...pages.keys()].sort(), ['https://help.tradeify.co/en/articles/10468320']);
   assert.deepEqual([...pages.get('https://help.tradeify.co/en/articles/10468320').fichiers], ['tradeify/a.json', 'tradeify-paliers/b.json']);
+});
+
+test('accueil tradeify.co non suivi (avec ou sans / final ou www), articles help.tradeify.co gardés', () => {
+  const note = [
+    'https://tradeify.co',
+    'https://tradeify.co/',
+    'https://www.tradeify.co',
+    'https://www.tradeify.co/',
+    'http://tradeify.co',
+    'http://www.tradeify.co/',
+    'https://help.tradeify.co/en/articles/10468320-consistency',
+    'https://tradeify.co/funded-trader-agreement',
+  ].join(' ');
+  const pages = pagesARelire([{ dossier: 'tradeify', fichier: 'a.json', note }]);
+  assert.deepEqual([...pages.keys()].sort(), [
+    'https://help.tradeify.co/en/articles/10468320',
+    'https://tradeify.co/funded-trader-agreement',
+  ]);
 });
 
 test("texte d'une page : l'article, sans scripts ni dates relatives ; une date écrite reste", () => {
@@ -203,6 +230,40 @@ test('suivi d\'une page : départ silencieux, texte changé, échec sans alerte,
   assert.equal(suivrePage(partie.etat, { statut: 200, texte: 'a' }, 'h1', q).evenement, 'revenue');
 });
 
+test('page illisible 3 échecs de suite : une alerte, une seule fois, jusqu\'à ce qu\'elle redevienne lisible', () => {
+  const q = '2026-11-27T08:00:00Z';
+  let etat = suivrePage(null, { statut: 200, texte: 'a', titre: 'Rules' }, 'h1', q).etat;
+  let r = suivrePage(etat, { statut: 403 }, null, q);
+  assert.equal(r.evenement, null);
+  assert.equal(r.etat.echecs, 1);
+  assert.equal(r.etat.empreinte, 'h1');
+  r = suivrePage(r.etat, { statut: 502 }, null, q);
+  assert.equal(r.evenement, null);
+  assert.equal(r.etat.echecs, 2);
+  r = suivrePage(r.etat, { statut: null, erreur: 'réseau coupé' }, null, q);
+  assert.equal(r.evenement, 'illisible');
+  assert.equal(r.etat.echecs, 3);
+  assert.equal(r.etat.titre, 'Rules');
+  r = suivrePage(r.etat, { statut: 403 }, null, q);
+  assert.equal(r.evenement, null);
+  assert.equal(r.etat.echecs, 4);
+  r = suivrePage(r.etat, { statut: 200, texte: 'a', titre: 'Rules' }, 'h1', q);
+  assert.equal(r.etat.echecs, 0);
+  assert.equal(r.evenement, null);
+  r = suivrePage(r.etat, { statut: 500 }, null, q);
+  r = suivrePage(r.etat, { statut: 500 }, null, q);
+  r = suivrePage(r.etat, { statut: 500 }, null, q);
+  assert.equal(r.evenement, 'illisible');
+  const [bloc] = blocsPages([{
+    url: 'https://help.tradeify.co/en/articles/1',
+    firme: 'Tradeify',
+    evenement: 'illisible',
+    titre: 'Rules',
+    fichiers: ['tradeify/a.json'],
+  }]);
+  assert.equal(bloc, 'Tradeify\n- page illisible depuis 3 jours : Rules https://help.tradeify.co/en/articles/1');
+});
+
 test('alerte des pages : firmes en ordre alphabétique, fichiers de règles mentionnés', () => {
   const blocs = blocsPages([
     { url: 'https://help.tradeify.co/en/articles/1', firme: 'Tradeify', evenement: 'texte', titre: 'Rules', fichiers: new Set(['tradeify/a.json']) },
@@ -212,6 +273,29 @@ test('alerte des pages : firmes en ordre alphabétique, fichiers de règles ment
     'Lucid\n- page disparue (HTTP 404) · Payouts · https://support.lucidtrading.com/en/articles/2\n  fichiers de règles propsim peut-être périmés (non modifiés) : lucid/b.json',
     'Tradeify\n- texte changé · Rules · https://help.tradeify.co/en/articles/1\n  fichiers de règles propsim peut-être périmés (non modifiés) : tradeify/a.json',
   ]);
+});
+
+test('texte changé : extrait de la première zone différente, 300 caractères max de chaque côté', () => {
+  const avant = `${'A'.repeat(40)}ANCIEN${'B'.repeat(80)}`;
+  const apres = `${'A'.repeat(40)}NOUVEAU${'B'.repeat(80)}`;
+  assert.equal(extraitChangement(avant, apres), 'avant : ANCIEN\naprès : NOUVEAU');
+  assert.equal(extraitChangement('préfixe' + 'X'.repeat(500), 'préfixe' + 'Y'.repeat(500)), `avant : ${'X'.repeat(300)}\naprès : ${'Y'.repeat(300)}`);
+  const [bloc] = blocsPages([{
+    url: 'https://help.tradeify.co/en/articles/1',
+    firme: 'Tradeify',
+    evenement: 'texte',
+    titre: 'Rules',
+    fichiers: new Set(['tradeify/a.json']),
+    texteAvant: 'Max drawdown 6% and the rest stays',
+    texteApres: 'Max drawdown 8% and the rest stays',
+  }]);
+  assert.equal(bloc, [
+    'Tradeify',
+    '- texte changé · Rules · https://help.tradeify.co/en/articles/1',
+    '  avant : 6',
+    '  après : 8',
+    '  fichiers de règles propsim peut-être périmés (non modifiés) : tradeify/a.json',
+  ].join('\n'));
 });
 
 test('messages Discord : en-tête en tête, aucun message au-dessus de la limite', () => {
