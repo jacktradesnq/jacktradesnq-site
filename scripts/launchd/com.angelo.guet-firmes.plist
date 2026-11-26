@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Guet des firmes (scripts/guet-firmes.mjs, point 18 de la liste d'Angelo du 26/11/2026) : chaque jour à 9:30, après
+     la synchro des prix du site (06:17 UTC), compare les offres du site au tour d'avant et relit les pages de règles
+     citées par les fichiers de règles propsim ; alerte dans #runner (chemin d'envoi des bots du runner) SEULEMENT
+     quand quelque chose change. Mac fermé à 9:30 : launchd lance le tour manqué au réveil.
+     NON INSTALLÉ tant que la branche feat/guet-firmes n'est pas sur main (le lanceur fait tourner le main de GitHub).
+     Installer : cp scripts/launchd/com.angelo.guet-firmes.plist ~/Library/LaunchAgents/ puis
+     launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.angelo.guet-firmes.plist
+     Le lanceur vit dans le clone du guet : le 1er clone se fait à la main (commande dans le rapport). -->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.angelo.guet-firmes</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/zsh</string>
+		<string>/Users/angelo/.local/share/guet-firmes/site/scripts/guet-firmes.sh</string>
+		<string>--envoyer</string>
+	</array>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>9</integer>
+		<key>Minute</key>
+		<integer>30</integer>
+	</dict>
+	<key>RunAtLoad</key>
+	<false/>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/Users/angelo/.local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+		<!-- curl_cffi (pages derrière Cloudflare) et envoi Discord : le python du runner -->
+		<key>CF_PYTHON</key>
+		<string>/Users/angelo/monfxreplay-python/.venv/bin/python</string>
+		<key>GUET_PYTHON</key>
+		<string>/Users/angelo/monfxreplay-python/.venv/bin/python</string>
+		<key>RUNNER_CODE</key>
+		<string>/Users/angelo/.local/share/runner-auto/code</string>
+	</dict>
+	<key>StandardOutPath</key>
+	<string>/Users/angelo/Library/Logs/guet-firmes.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/angelo/Library/Logs/guet-firmes.log</string>
+</dict>
+</plist>
