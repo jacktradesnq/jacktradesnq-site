@@ -1,0 +1,3699 @@
+{
+ "source": {
+  "page": "https://e8markets.com/?market=perpetual",
+  "products": "https://e8markets.com/api/data/global",
+  "codes": "https://e8markets.com/api/data/discount-codes",
+  "symbolsPage": "https://e8x.e8markets.com/trading-symbols",
+  "symbols": "https://api.e8markets.com/graphql/front?query=query%20getSymbols(%24filter%3A%20SymbolEntityFilterInput%2C%20%24pagination%3A%20PaginationArg%2C%20%24sort%3A%20%5BSortArg%5D)%20%7B%20symbols(filter%3A%20%24filter%2C%20pagination%3A%20%24pagination%2C%20sort%3A%20%24sort)%20%7B%20nodes%20%7B%20symbol%20group%20market%20%7D%20totalRows%20%7D%20%7D&variables=%7B%22filter%22%3A%7B%22market%22%3A%7B%22eq%22%3A%22perpetual%22%7D%7D%2C%22pagination%22%3A%7B%22limit%22%3A500%2C%22start%22%3A0%7D%2C%22sort%22%3A%5B%7B%22column%22%3A%22symbol%22%2C%22desc%22%3Afalse%7D%5D%7D"
+ },
+ "readAt": "2026-11-27T23:29:58.976Z",
+ "products": {
+  "e8pro_v2": {
+   "id": "e8pro_v2",
+   "code": "1V",
+   "drawdownType": "static",
+   "dailyDrawdownType": "drawdown",
+   "evaluation": {
+    "profitTargetFrom": {
+     "from": "drawdown",
+     "multiplier": 1
+    },
+    "drawdown": 8,
+    "dailyDrawdown": 2.5,
+    "profitCap": 2
+   },
+   "balances": {
+    "5000": {
+     "balance": 5000,
+     "price": 32,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    },
+    "10000": {
+     "balance": 10000,
+     "price": 68,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    },
+    "25000": {
+     "balance": 25000,
+     "price": 148,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    },
+    "50000": {
+     "balance": 50000,
+     "price": 228,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    },
+    "100000": {
+     "balance": 100000,
+     "price": 488,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    },
+    "200000": {
+     "balance": 200000,
+     "price": 998,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    },
+    "400000": {
+     "balance": 400000,
+     "price": 2098,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    },
+    "500000": {
+     "balance": 500000,
+     "price": 2598,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    }
+   },
+   "firstDiscount": 30,
+   "discount": 30,
+   "maxOrderCount": 1,
+   "firstPayout": 0,
+   "funded": {
+    "drawdown": 8,
+    "dailyDrawdown": 2.5,
+    "passDays": 1,
+    "profitCap": 2
+   },
+   "settings": {
+    "drawdowns": [
+     6,
+     8,
+     10
+    ],
+    "dailyDrawdowns": null,
+    "deposits": null,
+    "payoutShares": [
+     80,
+     100
+    ],
+    "executions": [
+     "stp",
+     "ecn"
+    ],
+    "swapFree": 10,
+    "platforms": [
+     "MTR",
+     "CTRADER",
+     "MT5",
+     "TRADELOCKER"
+    ],
+    "pricing": [
+     {
+      "price": 32,
+      "depositFrom": 5000,
+      "depositTo": 10000,
+      "apps": -0.0018382352941176464,
+      "ppp": 156.25,
+      "dlt": 0.0625,
+      "dht": 0.25,
+      "plt": 0.01,
+      "pht": 0.01
+     },
+     {
+      "price": 68,
+      "depositFrom": 10000,
+      "depositTo": 25000,
+      "apps": 0.0014573396926338092,
+      "ppp": 147.05882352941177,
+      "dlt": 0.073529,
+      "dht": 0.073529,
+      "plt": 0.01,
+      "pht": 0.01
+     },
+     {
+      "price": 148,
+      "depositFrom": 25000,
+      "depositTo": 50000,
+      "apps": 0.0020151730678046476,
+      "ppp": 168.9189189189189,
+      "dlt": 0.033784,
+      "dht": 0.033784,
+      "plt": 0.01,
+      "pht": 0.01
+     },
+     {
+      "price": 228,
+      "depositFrom": 50000,
+      "depositTo": 100000,
+      "apps": -0.000287604256542997,
+      "ppp": 219.2982456140351,
+      "dlt": 0.02193,
+      "dht": 0.04386,
+      "plt": 0.01,
+      "pht": 0.01
+     },
+     {
+      "price": 488,
+      "depositFrom": 100000,
+      "depositTo": 200000,
+      "apps": -0.00004517231183678831,
+      "ppp": 204.91803278688525,
+      "dlt": 0.020492,
+      "dht": 0.05123,
+      "plt": 0.01,
+      "pht": 0.01
+     },
+     {
+      "price": 998,
+      "depositFrom": 200000,
+      "depositTo": 400000,
+      "apps": -0.00004871516149553642,
+      "ppp": 200.40080160320642,
+      "dlt": 0.02505,
+      "dht": 0.0501,
+      "plt": 0.01,
+      "pht": 0.01
+     },
+     {
+      "price": 2098,
+      "depositFrom": 400000,
+      "depositTo": 500000,
+      "apps": 0.000017979658768092575,
+      "ppp": 190.65776930409913,
+      "dlt": 0.023832,
+      "dht": 0.050048,
+      "plt": 0.01,
+      "pht": 0.01
+     },
+     {
+      "price": 2598,
+      "depositFrom": 500000,
+      "depositTo": null,
+      "apps": 0.000017979658768092575,
+      "ppp": 190.65776930409913,
+      "dlt": 0.025019,
+      "dht": 0.050038,
+      "plt": 0.01,
+      "pht": 0.01
+     }
+    ]
+   }
+  },
+  "e8classic": {
+   "id": "e8classic",
+   "code": "PC",
+   "drawdownType": "static",
+   "dailyDrawdownType": "drawdown",
+   "evaluation": {
+    "profitTarget": 8,
+    "drawdown": 5,
+    "dailyDrawdown": 2,
+    "passDays": 1
+   },
+   "balances": {
+    "2000": {
+     "balance": 2000,
+     "price": 29,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "instant_payout": true
+     }
+    },
+    "5000": {
+     "balance": 5000,
+     "price": 59,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "instant_payout": true
+     }
+    },
+    "10000": {
+     "balance": 10000,
+     "price": 119,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "instant_payout": true
+     }
+    },
+    "25000": {
+     "balance": 25000,
+     "price": 229,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "instant_payout": true
+     }
+    },
+    "50000": {
+     "balance": 50000,
+     "price": 449,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "instant_payout": true
+     }
+    }
+   },
+   "firstDiscount": 10,
+   "discount": 10,
+   "maxOrderCount": 1,
+   "firstPayout": 0,
+   "funded": {
+    "drawdown": 5,
+    "dailyDrawdown": 2,
+    "passDays": 1
+   },
+   "settings": {
+    "drawdowns": [
+     5
+    ],
+    "dailyDrawdowns": [
+     2,
+     0
+    ],
+    "deposits": [
+     2000,
+     5000,
+     10000,
+     25000,
+     50000
+    ],
+    "payoutShares": [
+     80,
+     90
+    ],
+    "executions": [
+     "stp",
+     "ecn"
+    ],
+    "swapFree": 10,
+    "platforms": [
+     "MT5",
+     "TRADELOCKER",
+     "TERMINAL",
+     "CTRADER",
+     "MTR"
+    ],
+    "pricing": [
+     {
+      "price": 29,
+      "depositFrom": 2000,
+      "depositTo": 5000,
+      "apps": 0.005260081823495028,
+      "ppp": 68.96551724137932,
+      "ddlt": -0.12069,
+      "pht": 0.02
+     },
+     {
+      "price": 59,
+      "depositFrom": 5000,
+      "depositTo": 10000,
+      "apps": -0.00014242985329725,
+      "ppp": 84.7457627118644,
+      "ddlt": -0.084746,
+      "pht": 0.02
+     },
+     {
+      "price": 119,
+      "depositFrom": 10000,
+      "depositTo": 25000,
+      "apps": 0.001675779482098516,
+      "ppp": 84.03361344537815,
+      "ddlt": -0.042017,
+      "pht": 0.02
+     },
+     {
+      "price": 229,
+      "depositFrom": 25000,
+      "depositTo": 50000,
+      "apps": 0.00008753075733556386,
+      "ppp": 109.17030567685589,
+      "ddlt": -0.196507,
+      "pht": 0.02
+     },
+     {
+      "price": 449,
+      "depositFrom": 50000,
+      "depositTo": null,
+      "apps": 0.00008753075733556386,
+      "ppp": 109.17030567685589,
+      "ddlt": -0.200445,
+      "pht": 0.02
+     }
+    ]
+   }
+  },
+  "e8pro_v2_perp": {
+   "id": "e8pro_v2_perp",
+   "code": "PV",
+   "drawdownType": "static",
+   "dailyDrawdownType": "drawdown",
+   "evaluation": {
+    "profitTargetFrom": {
+     "from": "drawdown",
+     "multiplier": 1
+    },
+    "drawdown": 8,
+    "dailyDrawdown": 2.5,
+    "profitCap": 2
+   },
+   "balances": {
+    "5000": {
+     "balance": 5000,
+     "price": 32,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    },
+    "10000": {
+     "balance": 10000,
+     "price": 68,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    },
+    "25000": {
+     "balance": 25000,
+     "price": 148,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    },
+    "50000": {
+     "balance": 50000,
+     "price": 228,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    },
+    "100000": {
+     "balance": 100000,
+     "price": 488,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    },
+    "200000": {
+     "balance": 200000,
+     "price": 998,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    },
+    "400000": {
+     "balance": 400000,
+     "price": 2098,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    },
+    "500000": {
+     "balance": 500000,
+     "price": 2598,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_profit",
+       "amount": 50
+      },
+      "min_profit": {
+       "type": "relative",
+       "amount": 1
+      }
+     }
+    }
+   },
+   "firstDiscount": 50,
+   "discount": 50,
+   "maxOrderCount": 1,
+   "firstPayout": 0,
+   "funded": {
+    "drawdown": 8,
+    "dailyDrawdown": 2.5,
+    "passDays": 1,
+    "profitCap": 2
+   },
+   "settings": {
+    "drawdowns": [
+     6,
+     8,
+     10
+    ],
+    "dailyDrawdowns": null,
+    "deposits": null,
+    "payoutShares": [
+     80,
+     100
+    ],
+    "executions": [],
+    "swapFree": null,
+    "platforms": [
+     "TERMINAL"
+    ],
+    "pricing": [
+     {
+      "price": 32,
+      "depositFrom": 5000,
+      "depositTo": 10000,
+      "apps": -0.0018382352941176464,
+      "ppp": 156.25,
+      "dlt": 0.0625,
+      "dht": 0.25,
+      "plt": 0.01,
+      "pht": 0.01
+     },
+     {
+      "price": 68,
+      "depositFrom": 10000,
+      "depositTo": 25000,
+      "apps": 0.0014573396926338092,
+      "ppp": 147.05882352941177,
+      "dlt": 0.073529,
+      "dht": 0.073529,
+      "plt": 0.01,
+      "pht": 0.01
+     },
+     {
+      "price": 148,
+      "depositFrom": 25000,
+      "depositTo": 50000,
+      "apps": 0.0020151730678046476,
+      "ppp": 168.9189189189189,
+      "dlt": 0.033784,
+      "dht": 0.033784,
+      "plt": 0.01,
+      "pht": 0.01
+     },
+     {
+      "price": 228,
+      "depositFrom": 50000,
+      "depositTo": 100000,
+      "apps": -0.000287604256542997,
+      "ppp": 219.2982456140351,
+      "dlt": 0.02193,
+      "dht": 0.04386,
+      "plt": 0.01,
+      "pht": 0.01
+     },
+     {
+      "price": 488,
+      "depositFrom": 100000,
+      "depositTo": 200000,
+      "apps": -0.00004517231183678831,
+      "ppp": 204.91803278688525,
+      "dlt": 0.020492,
+      "dht": 0.05123,
+      "plt": 0.01,
+      "pht": 0.01
+     },
+     {
+      "price": 998,
+      "depositFrom": 200000,
+      "depositTo": 400000,
+      "apps": -0.00004871516149553642,
+      "ppp": 200.40080160320642,
+      "dlt": 0.02505,
+      "dht": 0.0501,
+      "plt": 0.01,
+      "pht": 0.01
+     },
+     {
+      "price": 2098,
+      "depositFrom": 400000,
+      "depositTo": 500000,
+      "apps": 0.000017979658768092575,
+      "ppp": 190.65776930409913,
+      "dlt": 0.023832,
+      "dht": 0.050048,
+      "plt": 0.01,
+      "pht": 0.01
+     },
+     {
+      "price": 2598,
+      "depositFrom": 500000,
+      "depositTo": null,
+      "apps": 0.000017979658768092575,
+      "ppp": 190.65776930409913,
+      "dlt": 0.025019,
+      "dht": 0.050038,
+      "plt": 0.01,
+      "pht": 0.01
+     }
+    ]
+   }
+  },
+  "e8one": {
+   "id": "e8one",
+   "code": "1S",
+   "drawdownType": "dynamic",
+   "dailyDrawdownType": "drawdown",
+   "evaluation": {
+    "profitTargetFrom": {
+     "from": "drawdown",
+     "multiplier": 1.5
+    },
+    "drawdown": 6,
+    "dailyDrawdownFrom": {
+     "from": "drawdown",
+     "multiplier": 0.66
+    },
+    "passDays": 1
+   },
+   "balances": {
+    "5000": {
+     "balance": 5000,
+     "price": 48,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    },
+    "10000": {
+     "balance": 10000,
+     "price": 88,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    },
+    "25000": {
+     "balance": 25000,
+     "price": 188,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    },
+    "50000": {
+     "balance": 50000,
+     "price": 288,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    },
+    "100000": {
+     "balance": 100000,
+     "price": 488,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    },
+    "200000": {
+     "balance": 200000,
+     "price": 798,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    },
+    "400000": {
+     "balance": 400000,
+     "price": 1598,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    },
+    "500000": {
+     "balance": 500000,
+     "price": 1998,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    }
+   },
+   "firstDiscount": 30,
+   "discount": 30,
+   "maxOrderCount": 1,
+   "firstPayout": 3,
+   "funded": {
+    "drawdown": 6,
+    "dailyDrawdownFrom": {
+     "from": "drawdown",
+     "multiplier": 0.66
+    },
+    "passDays": 1,
+    "consistency": 40
+   },
+   "settings": {
+    "drawdowns": [
+     4,
+     6,
+     8,
+     10,
+     14
+    ],
+    "dailyDrawdowns": null,
+    "deposits": null,
+    "payoutShares": [
+     80,
+     90,
+     100
+    ],
+    "executions": [
+     "stp",
+     "ecn"
+    ],
+    "swapFree": 10,
+    "platforms": [
+     "MTR",
+     "MT5",
+     "TRADELOCKER",
+     "CTRADER"
+    ],
+    "pricing": [
+     {
+      "price": 48,
+      "depositFrom": 5000,
+      "depositTo": 10000,
+      "apps": 0.0018939393939393938,
+      "ppp": 104.16666666666667,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     },
+     {
+      "price": 88,
+      "depositFrom": 10000,
+      "depositTo": 25000,
+      "apps": 0.0012894906511927776,
+      "ppp": 113.63636363636364,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     },
+     {
+      "price": 188,
+      "depositFrom": 25000,
+      "depositTo": 50000,
+      "apps": 0.0016252955082742323,
+      "ppp": 132.9787234042553,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     },
+     {
+      "price": 288,
+      "depositFrom": 50000,
+      "depositTo": 100000,
+      "apps": 0.0006261384335154827,
+      "ppp": 173.61111111111111,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     },
+     {
+      "price": 488,
+      "depositFrom": 100000,
+      "depositTo": 200000,
+      "apps": 0.00045708533629154857,
+      "ppp": 204.91803278688525,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     },
+     {
+      "price": 798,
+      "depositFrom": 200000,
+      "depositTo": 400000,
+      "apps": -0.000001568376510738716,
+      "ppp": 250.6265664160401,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     },
+     {
+      "price": 1598,
+      "depositFrom": 400000,
+      "depositTo": 500000,
+      "apps": -6.264086364211607e-7,
+      "ppp": 250.31289111389236,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     },
+     {
+      "price": 1998,
+      "depositFrom": 500000,
+      "depositTo": null,
+      "apps": -6.264086364211607e-7,
+      "ppp": 250.31289111389236,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     }
+    ]
+   }
+  },
+  "e8classic_perp": {
+   "id": "e8classic_perp",
+   "code": "PP",
+   "drawdownType": "static",
+   "dailyDrawdownType": "drawdown",
+   "evaluation": {
+    "profitTarget": 8,
+    "drawdown": 5,
+    "dailyDrawdown": 2,
+    "passDays": 1
+   },
+   "balances": {
+    "2000": {
+     "balance": 2000,
+     "price": 29,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "instant_payout": true
+     }
+    },
+    "5000": {
+     "balance": 5000,
+     "price": 59,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "instant_payout": true
+     }
+    },
+    "10000": {
+     "balance": 10000,
+     "price": 119,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "instant_payout": true
+     }
+    },
+    "25000": {
+     "balance": 25000,
+     "price": 229,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "instant_payout": true
+     }
+    },
+    "50000": {
+     "balance": 50000,
+     "price": 449,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "instant_payout": true
+     }
+    }
+   },
+   "firstDiscount": 10,
+   "discount": 10,
+   "maxOrderCount": 1,
+   "firstPayout": 0,
+   "funded": {
+    "drawdown": 5,
+    "dailyDrawdown": 2,
+    "passDays": 1
+   },
+   "settings": {
+    "drawdowns": [
+     5
+    ],
+    "dailyDrawdowns": [
+     2,
+     0
+    ],
+    "deposits": [
+     2000,
+     5000,
+     10000,
+     25000,
+     50000
+    ],
+    "payoutShares": [
+     80,
+     90
+    ],
+    "executions": [
+     "stp",
+     "ecn"
+    ],
+    "swapFree": 10,
+    "platforms": [
+     "TERMINAL"
+    ],
+    "pricing": [
+     {
+      "price": 29,
+      "depositFrom": 2000,
+      "depositTo": 5000,
+      "apps": 0.005260081823495028,
+      "ppp": 68.96551724137932,
+      "ddlt": -0.12069,
+      "pht": 0.02
+     },
+     {
+      "price": 59,
+      "depositFrom": 5000,
+      "depositTo": 10000,
+      "apps": -0.00014242985329725,
+      "ppp": 84.7457627118644,
+      "ddlt": -0.084746,
+      "pht": 0.02
+     },
+     {
+      "price": 119,
+      "depositFrom": 10000,
+      "depositTo": 25000,
+      "apps": 0.001675779482098516,
+      "ppp": 84.03361344537815,
+      "ddlt": -0.042017,
+      "pht": 0.02
+     },
+     {
+      "price": 229,
+      "depositFrom": 25000,
+      "depositTo": 50000,
+      "apps": 0.00008753075733556386,
+      "ppp": 109.17030567685589,
+      "ddlt": -0.196507,
+      "pht": 0.02
+     },
+     {
+      "price": 449,
+      "depositFrom": 50000,
+      "depositTo": null,
+      "apps": 0.00008753075733556386,
+      "ppp": 109.17030567685589,
+      "ddlt": -0.200445,
+      "pht": 0.02
+     }
+    ]
+   }
+  },
+  "e8one_perp": {
+   "id": "e8one_perp",
+   "code": "P1",
+   "drawdownType": "dynamic",
+   "dailyDrawdownType": "drawdown",
+   "evaluation": {
+    "profitTargetFrom": {
+     "from": "drawdown",
+     "multiplier": 1.5
+    },
+    "drawdown": 6,
+    "dailyDrawdownFrom": {
+     "from": "drawdown",
+     "multiplier": 0.66
+    },
+    "passDays": 1
+   },
+   "balances": {
+    "5000": {
+     "balance": 5000,
+     "price": 48,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    },
+    "10000": {
+     "balance": 10000,
+     "price": 88,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    },
+    "25000": {
+     "balance": 25000,
+     "price": 188,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    },
+    "50000": {
+     "balance": 50000,
+     "price": 288,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    },
+    "100000": {
+     "balance": 100000,
+     "price": 488,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    },
+    "200000": {
+     "balance": 200000,
+     "price": 798,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    },
+    "400000": {
+     "balance": 400000,
+     "price": 1598,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    },
+    "500000": {
+     "balance": 500000,
+     "price": 1998,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "relative_daily",
+       "amount": 50
+      },
+      "consistency": 40,
+      "withdraw_funds": true
+     }
+    }
+   },
+   "firstDiscount": 50,
+   "discount": 50,
+   "maxOrderCount": 1,
+   "firstPayout": 3,
+   "funded": {
+    "drawdown": 6,
+    "dailyDrawdownFrom": {
+     "from": "drawdown",
+     "multiplier": 0.66
+    },
+    "passDays": 1,
+    "consistency": 40
+   },
+   "settings": {
+    "drawdowns": [
+     4,
+     6,
+     8,
+     10,
+     14
+    ],
+    "dailyDrawdowns": null,
+    "deposits": null,
+    "payoutShares": [
+     80,
+     90,
+     100
+    ],
+    "executions": [],
+    "swapFree": null,
+    "platforms": [
+     "TERMINAL"
+    ],
+    "pricing": [
+     {
+      "price": 48,
+      "depositFrom": 5000,
+      "depositTo": 10000,
+      "apps": 0.0018939393939393938,
+      "ppp": 104.16666666666667,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     },
+     {
+      "price": 88,
+      "depositFrom": 10000,
+      "depositTo": 25000,
+      "apps": 0.0012894906511927776,
+      "ppp": 113.63636363636364,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     },
+     {
+      "price": 188,
+      "depositFrom": 25000,
+      "depositTo": 50000,
+      "apps": 0.0016252955082742323,
+      "ppp": 132.9787234042553,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     },
+     {
+      "price": 288,
+      "depositFrom": 50000,
+      "depositTo": 100000,
+      "apps": 0.0006261384335154827,
+      "ppp": 173.61111111111111,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     },
+     {
+      "price": 488,
+      "depositFrom": 100000,
+      "depositTo": 200000,
+      "apps": 0.00045708533629154857,
+      "ppp": 204.91803278688525,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     },
+     {
+      "price": 798,
+      "depositFrom": 200000,
+      "depositTo": 400000,
+      "apps": -0.000001568376510738716,
+      "ppp": 250.6265664160401,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     },
+     {
+      "price": 1598,
+      "depositFrom": 400000,
+      "depositTo": 500000,
+      "apps": -6.264086364211607e-7,
+      "ppp": 250.31289111389236,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     },
+     {
+      "price": 1998,
+      "depositFrom": 500000,
+      "depositTo": null,
+      "apps": -6.264086364211607e-7,
+      "ppp": 250.31289111389236,
+      "dlt": 0.093,
+      "dht": 0.1,
+      "plt": 0.008,
+      "pht": 0.012
+     }
+    ]
+   }
+  },
+  "e8zero_start_fu": {
+   "id": "e8zero_start_fu",
+   "code": "ZS",
+   "drawdownType": "eod",
+   "dailyDrawdownType": null,
+   "evaluation": {
+    "profitTarget": 6,
+    "drawdown": 3,
+    "consistency": 40
+   },
+   "balances": {
+    "25000": {
+     "balance": 25000,
+     "price": 128,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_daily",
+       "amount": [
+        2.4,
+        2.4,
+        2.4,
+        2.4
+       ]
+      }
+     },
+     "evaluation": {
+      "drawdown": 4,
+      "profitTarget": 6
+     },
+     "funded": {
+      "drawdown": 4
+     }
+    },
+    "50000": {
+     "balance": 50000,
+     "price": 218,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_daily",
+       "amount": [
+        2,
+        2,
+        2,
+        2
+       ]
+      }
+     },
+     "evaluation": {
+      "drawdown": 3,
+      "profitTarget": 6
+     },
+     "funded": {
+      "drawdown": 3
+     }
+    },
+    "100000": {
+     "balance": 100000,
+     "price": 338,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_daily",
+       "amount": [
+        1.6,
+        1.6,
+        1.6,
+        1.6
+       ]
+      }
+     },
+     "evaluation": {
+      "drawdown": 3,
+      "profitTarget": 6.5
+     },
+     "funded": {
+      "drawdown": 3
+     }
+    },
+    "150000": {
+     "balance": 150000,
+     "price": 438,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_daily",
+       "amount": [
+        1.33,
+        1.33,
+        1.33,
+        1.33
+       ]
+      }
+     },
+     "evaluation": {
+      "drawdown": 2.66,
+      "profitTarget": 6
+     },
+     "funded": {
+      "drawdown": 2.66
+     }
+    }
+   },
+   "firstDiscount": 35,
+   "discount": 35,
+   "maxOrderCount": 1,
+   "firstPayout": 0,
+   "funded": {
+    "drawdown": 3,
+    "passDays": 1
+   },
+   "settings": {
+    "drawdowns": [
+     3
+    ],
+    "dailyDrawdowns": null,
+    "deposits": null,
+    "payoutShares": [
+     80,
+     100
+    ],
+    "executions": [],
+    "swapFree": null,
+    "platforms": [
+     "TRADOVATE"
+    ],
+    "pricing": [
+     {
+      "price": 128,
+      "depositFrom": 25000,
+      "depositTo": 50000,
+      "apps": 0.0013618119266055044,
+      "ppp": 195.3125,
+      "dlt": 0,
+      "dht": 0,
+      "plt": 0.01,
+      "pht": 0.0155
+     },
+     {
+      "price": 218,
+      "depositFrom": 50000,
+      "depositTo": 100000,
+      "apps": 0.0013300038000108572,
+      "ppp": 229.3577981651376,
+      "dlt": 0,
+      "dht": 0,
+      "plt": 0.01,
+      "pht": 0.01145
+     },
+     {
+      "price": 338,
+      "depositFrom": 100000,
+      "depositTo": 150000,
+      "apps": 0.0009321553051795411,
+      "ppp": 295.85798816568047,
+      "dlt": 0,
+      "dht": 0,
+      "plt": 0.01,
+      "pht": 0.01182
+     },
+     {
+      "price": 438,
+      "depositFrom": 150000,
+      "depositTo": null,
+      "apps": 0.0009321553051795411,
+      "ppp": 295.85798816568047,
+      "dlt": 0,
+      "dht": 0,
+      "plt": 0.01,
+      "pht": 0.0148
+     }
+    ]
+   }
+  },
+  "e8signature_v_fu": {
+   "id": "e8signature_v_fu",
+   "code": "HV",
+   "drawdownType": "eod",
+   "dailyDrawdownType": "pause",
+   "evaluation": {
+    "profitTarget": 6,
+    "drawdown": 3,
+    "passDays": 1
+   },
+   "balances": {
+    "25000": {
+     "balance": 25000,
+     "price": 120,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_profitable_days": {
+       "count": 5,
+       "amount": 0.3,
+       "type": "skip_first"
+      },
+      "consistency": 35,
+      "min_payout_buffer": 4,
+      "withdraw_funds": true,
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "max_payout": {
+       "type": "relative_daily",
+       "amount": [
+        4,
+        4,
+        5,
+        5
+       ]
+      }
+     },
+     "evaluation": {
+      "drawdown": 4
+     },
+     "funded": {
+      "drawdown": 4
+     }
+    },
+    "50000": {
+     "balance": 50000,
+     "price": 170,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_profitable_days": {
+       "count": 5,
+       "amount": 0.3,
+       "type": "skip_first"
+      },
+      "consistency": 35,
+      "min_payout_buffer": 4,
+      "withdraw_funds": true,
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "max_payout": {
+       "type": "relative_daily",
+       "amount": [
+        2.5,
+        2.5,
+        4,
+        4
+       ]
+      }
+     },
+     "evaluation": {
+      "drawdown": 4
+     },
+     "funded": {
+      "drawdown": 4
+     }
+    },
+    "100000": {
+     "balance": 100000,
+     "price": 280,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_profitable_days": {
+       "count": 5,
+       "amount": 0.3,
+       "type": "skip_first"
+      },
+      "consistency": 35,
+      "min_payout_buffer": 3,
+      "withdraw_funds": true,
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "max_payout": {
+       "type": "relative_daily",
+       "amount": [
+        2,
+        2,
+        3,
+        3
+       ]
+      }
+     },
+     "evaluation": {
+      "drawdown": 3
+     },
+     "funded": {
+      "drawdown": 3
+     }
+    },
+    "150000": {
+     "balance": 150000,
+     "price": 450,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_profitable_days": {
+       "count": 5,
+       "amount": 0.3,
+       "type": "skip_first"
+      },
+      "consistency": 35,
+      "min_payout_buffer": 3,
+      "withdraw_funds": true,
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "max_payout": {
+       "type": "relative_daily",
+       "amount": [
+        2,
+        2,
+        2.33,
+        2.33
+       ]
+      }
+     },
+     "evaluation": {
+      "drawdown": 2.66
+     },
+     "funded": {
+      "drawdown": 2.66
+     }
+    }
+   },
+   "firstDiscount": 25,
+   "discount": 25,
+   "maxOrderCount": 1,
+   "firstPayout": 3,
+   "funded": {
+    "drawdown": 3,
+    "dailyDrawdown": 2,
+    "passDays": 1,
+    "consistency": 35
+   },
+   "settings": {
+    "drawdowns": [
+     3
+    ],
+    "dailyDrawdowns": null,
+    "deposits": null,
+    "payoutShares": [
+     80
+    ],
+    "executions": [],
+    "swapFree": null,
+    "platforms": [
+     "TRADOVATE"
+    ],
+    "pricing": []
+   }
+  },
+  "e8trialone_perp": {
+   "id": "e8trialone_perp",
+   "code": "PT",
+   "drawdownType": "dynamic",
+   "dailyDrawdownType": null,
+   "evaluation": {
+    "profitTarget": 6,
+    "drawdown": 6,
+    "dailyDrawdown": 4,
+    "passDays": 1
+   },
+   "balances": {
+    "5000": {
+     "balance": 5000,
+     "price": 0,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      }
+     }
+    },
+    "10000": {
+     "balance": 10000,
+     "price": 0,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      }
+     }
+    },
+    "25000": {
+     "balance": 25000,
+     "price": 0,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      }
+     }
+    },
+    "50000": {
+     "balance": 50000,
+     "price": 0,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      }
+     }
+    },
+    "100000": {
+     "balance": 100000,
+     "price": 0,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      }
+     }
+    },
+    "200000": {
+     "balance": 200000,
+     "price": 0,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      }
+     }
+    }
+   },
+   "firstDiscount": 5,
+   "discount": 5,
+   "maxOrderCount": 1,
+   "firstPayout": 8,
+   "settings": {
+    "drawdowns": [
+     6
+    ],
+    "dailyDrawdowns": null,
+    "deposits": null,
+    "payoutShares": [
+     0
+    ],
+    "executions": [],
+    "swapFree": null,
+    "platforms": [
+     "TERMINAL"
+    ],
+    "pricing": []
+   }
+  },
+  "e8trialone": {
+   "id": "e8trialone",
+   "code": "T1",
+   "drawdownType": "dynamic",
+   "dailyDrawdownType": null,
+   "evaluation": {
+    "profitTarget": 6,
+    "drawdown": 6,
+    "dailyDrawdown": 4,
+    "passDays": 1
+   },
+   "balances": {
+    "5000": {
+     "balance": 5000,
+     "price": 0,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      }
+     }
+    },
+    "10000": {
+     "balance": 10000,
+     "price": 0,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      }
+     }
+    },
+    "25000": {
+     "balance": 25000,
+     "price": 0,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      }
+     }
+    },
+    "50000": {
+     "balance": 50000,
+     "price": 0,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      }
+     }
+    },
+    "100000": {
+     "balance": 100000,
+     "price": 0,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      }
+     }
+    },
+    "200000": {
+     "balance": 200000,
+     "price": 0,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      }
+     }
+    }
+   },
+   "firstDiscount": 5,
+   "discount": 5,
+   "maxOrderCount": 1,
+   "firstPayout": 8,
+   "settings": {
+    "drawdowns": [
+     6
+    ],
+    "dailyDrawdowns": null,
+    "deposits": null,
+    "payoutShares": [
+     0
+    ],
+    "executions": [
+     "stp",
+     "ecn"
+    ],
+    "swapFree": null,
+    "platforms": [
+     "TERMINAL"
+    ],
+    "pricing": []
+   }
+  },
+  "e8zero_max_fu": {
+   "id": "e8zero_max_fu",
+   "code": "ZM",
+   "drawdownType": "eod",
+   "dailyDrawdownType": null,
+   "evaluation": {
+    "profitTarget": 6,
+    "drawdown": 3,
+    "consistency": 40
+   },
+   "balances": {
+    "25000": {
+     "balance": 25000,
+     "price": 228,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_daily",
+       "amount": [
+        6,
+        6,
+        6,
+        6
+       ]
+      }
+     },
+     "evaluation": {
+      "drawdown": 4,
+      "profitTarget": 6
+     },
+     "funded": {
+      "drawdown": 4
+     }
+    },
+    "50000": {
+     "balance": 50000,
+     "price": 328,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_daily",
+       "amount": [
+        6,
+        6,
+        6,
+        6
+       ]
+      }
+     },
+     "evaluation": {
+      "drawdown": 3,
+      "profitTarget": 6
+     },
+     "funded": {
+      "drawdown": 3
+     }
+    },
+    "100000": {
+     "balance": 100000,
+     "price": 588,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_daily",
+       "amount": [
+        5,
+        5,
+        5,
+        5
+       ]
+      }
+     },
+     "evaluation": {
+      "drawdown": 3,
+      "profitTarget": 6.5
+     },
+     "funded": {
+      "drawdown": 3
+     }
+    },
+    "200000": {
+     "balance": 200000,
+     "price": 1088,
+     "batch_free_item": null,
+     "payoutConfiguration": {
+      "min_payout": {
+       "type": "absolute",
+       "amount": 100
+      },
+      "withdraw_funds": true,
+      "max_payout": {
+       "type": "relative_daily",
+       "amount": [
+        3.5,
+        3.5,
+        3.5,
+        3.5
+       ]
+      }
+     },
+     "evaluation": {
+      "drawdown": 3,
+      "profitTarget": 6.75
+     },
+     "funded": {
+      "drawdown": 3
+     }
+    }
+   },
+   "firstDiscount": 35,
+   "discount": 35,
+   "maxOrderCount": 1,
+   "firstPayout": 0,
+   "funded": {
+    "drawdown": 3,
+    "passDays": 1
+   },
+   "settings": {
+    "drawdowns": [
+     3
+    ],
+    "dailyDrawdowns": null,
+    "deposits": null,
+    "payoutShares": [
+     80,
+     100
+    ],
+    "executions": [],
+    "swapFree": null,
+    "platforms": [
+     "TRADOVATE"
+    ],
+    "pricing": [
+     {
+      "price": 228,
+      "depositFrom": 25000,
+      "depositTo": 50000,
+      "apps": 0.0017115960633290541,
+      "ppp": 109.64912280701755,
+      "dlt": 0,
+      "dht": 0,
+      "plt": 0.01,
+      "pht": 0.013
+     },
+     {
+      "price": 328,
+      "depositFrom": 50000,
+      "depositTo": 100000,
+      "apps": 0.00035258005641280934,
+      "ppp": 152.4390243902439,
+      "dlt": 0,
+      "dht": 0,
+      "plt": 0.01,
+      "pht": 0.01524
+     },
+     {
+      "price": 588,
+      "depositFrom": 100000,
+      "depositTo": 200000,
+      "apps": 0.0001375550220088033,
+      "ppp": 170.06802721088437,
+      "dlt": 0,
+      "dht": 0,
+      "plt": 0.01,
+      "pht": 0.0136
+     },
+     {
+      "price": 1088,
+      "depositFrom": 200000,
+      "depositTo": null,
+      "apps": 0.0001375550220088033,
+      "ppp": 170.06802721088437,
+      "dlt": 0,
+      "dht": 0,
+      "plt": 0.01,
+      "pht": 0.01516
+     }
+    ]
+   }
+  }
+ },
+ "discountCodes": [
+  {
+   "available_products": [
+    "e8one",
+    "e8pro"
+   ],
+   "available_condition": "all_purchase",
+   "condition_custom_text": null,
+   "percentage_discount": 30,
+   "expiration_date": null
+  },
+  {
+   "available_products": [
+    "e8pro_v2_perp",
+    "e8one_perp"
+   ],
+   "available_condition": "all_purchase",
+   "condition_custom_text": null,
+   "percentage_discount": 50,
+   "expiration_date": null
+  },
+  {
+   "available_products": [
+    "e8classic",
+    "e8classic_perp"
+   ],
+   "available_condition": "custom",
+   "condition_custom_text": "In addition to the 10% discount code, you will receive a 1% bonus on your Maximum Drawdown amount (All purchases).",
+   "percentage_discount": 10,
+   "expiration_date": null
+  },
+  {
+   "available_products": [
+    "e8zero_max_fu",
+    "e8zero_start_fu"
+   ],
+   "available_condition": "all_purchase",
+   "condition_custom_text": null,
+   "percentage_discount": 35,
+   "expiration_date": null
+  },
+  {
+   "available_products": [
+    "e8signature_v_fu"
+   ],
+   "available_condition": "all_purchase",
+   "condition_custom_text": null,
+   "percentage_discount": 25,
+   "expiration_date": null
+  }
+ ],
+ "code": {
+  "files": {
+   "pricing": "/_nuxt/BJIdYD55.js",
+   "catalog": "/_nuxt/1d0qaIw2.js",
+   "rules": "/_nuxt/DmOaCSkE.js"
+  },
+  "pricing": "!function(){try{var e=\"undefined\"!=typeof window?window:\"undefined\"!=typeof global?global:\"undefined\"!=typeof globalThis?globalThis:\"undefined\"!=typeof self?self:{};e._posthogReleaseId=e._posthogReleaseId||\"01a21880-b09d-0000-d9f7-41a644a3868f\";var n=(new e.Error).stack;n&&(e._posthogChunkIds=e._posthogChunkIds||{},e._posthogChunkIds[n]=\"e94f0bf9-d8ed-545a-9207-1e75db238c51\")}catch(e){}}();import{a as b}from\"./1d0qaIw2.js\";import{bE as h,bt as y,w as m,G as v,aa as d,v as P}from\"./_ZKseTGu.js\";import{c as $}from\"./CN-WQt5h.js\";function E(){const{data:t}=h(v);return{data:m(()=>t.value?{data:t.value.data.products}:null),status:y()}}function D(t,n){return t[n]}function f(t,n){return t[n]?.balances??{}}function I(t,n){return Object.keys(f(t,n)).length>0}function _(t,n){return Object.values(f(t,n)).map(r=>r.balance).sort((r,e)=>r-e)}function S(t,n,r){return f(t,n)[String(r)]?.price??0}function N(t,n,r){return(t[n]?.settings.pricing??[]).find(({depositFrom:a,depositTo:s})=>r>=a&&(s===null||r<s))??null}function L(t,n){return t?t.balances[String(n)]?.evaluation?.drawdown??t.evaluation?.drawdown??t.drawdown??t.settings?.drawdowns?.[0]??null:null}const A=0;function j(t,n){return t===A?n:`${t}%`}function p(t){return t?.settings?.dailyDrawdowns??[]}function C(t){const n=w(t),r=t?.settings?.pricing??[];return p(t).filter(e=>{if(e===n||n===null)return!0;const a=e<n?\"ddlt\":\"ddht\";return r.length>0&&r.every(s=>Number.isFinite(s[a]))})}function w(t){const n=p(t),r=t?.evaluation?.dailyDrawdown;return r!==void 0&&n.includes(r)?r:n[0]??null}function F(t,n){return n!==null&&C(t).includes(n)?n:w(t)}function M(t){const{tier:n,drawdown:r,baseDrawdown:e,payoutShare:a,baseProfitSplit:s,dailyDrawdown:o,baseDailyDrawdown:u}=t;let i=t.price;const l=(r<e?n.dlt:n.dht)??0;if(i*=1+(r-e)*l,o!==null&&u!==null&&o!==u){const g=o<u?n.ddlt:n.ddht;if(!Number.isFinite(g))return Number.NaN;i*=1+(o-u)*g}const c=(a<s?n.plt:n.pht)??0;return i*=1+(a-s)*c,o===null?i:Math.round(i*100)/100}function k(t,n,r,e,a){const s=a===null?\"\":`&ddr=${a}`;return`/orders/purchase?a=${t}&b=${n/1e3}&dr=${r}&p=${e}${s}`}function G(t,n,r,e,a,s=null){const o=D(t,n);if(!o)return 0;let u=S(t,n,r);if(o.settings.pricing.length>0){const i=N(t,n,r);if(!i)return 0;const l=o.evaluation.drawdown??o.settings.drawdowns[0]??e,c=o.settings.payoutShares[0]??a;u=M({price:u,tier:i,drawdown:e,baseDrawdown:l,payoutShare:a,baseProfitSplit:c,dailyDrawdown:s,baseDailyDrawdown:w(o)})}return Math.ceil(u)}function T(t,n){return n<=0?t:Math.ceil(t*(100-n)/100)}function U(t,n,r,e,a=null){const s=P[t]?.code??b[t]?.code??\"\",o=d(t,\"evaluation\",\"discountCode\",n)??\"E8\",{e8xLink:u}=$();return u(k(s,n,r,e,a),o)}function K(t,n,r,e){return e??L(D(t,n),r)??d(n,\"evaluation\",\"drawdown\",r)??0}function Y(t,n,r){return r??d(t,\"evaluation\",\"payoutShare\",n)??80}function R(t){return`$${Math.round(t).toLocaleString(\"en-US\")}`}function z(t){return`${t}%`}function H(t){if(t>=1e6){const n=t/1e6;return`$${Number.isInteger(n)?n:n.toFixed(1)}M`}return`$${Math.round(t/1e3)}K`}export{A as N,T as a,k as b,U as c,G as d,j as e,H as f,z as g,R as h,_ as i,C as j,w as k,D as l,I as m,K as n,Y as o,F as r,E as u};\n\n//# chunkId=e94f0bf9-d8ed-545a-9207-1e75db238c51",
+  "catalog": "!function(){try{var e=\"undefined\"!=typeof window?window:\"undefined\"!=typeof global?global:\"undefined\"!=typeof globalThis?globalThis:\"undefined\"!=typeof self?self:{};e._posthogReleaseId=e._posthogReleaseId||\"01a1e4dc-faa7-0000-013c-f7cd79d8ad31\";var n=(new e.Error).stack;n&&(e._posthogChunkIds=e._posthogChunkIds||{},e._posthogChunkIds[n]=\"184d7ea8-8120-59de-aefe-1f7240ba74a6\")}catch(e){}}();var r=(e=>(e.FOREX=\"forex\",e.FUTURES=\"futures\",e.CRYPTO=\"crypto\",e.PERPETUAL=\"perpetual\",e))(r||{}),_=(e=>(e.E8_ONE=\"e8one\",e.E8_ONE_CRY=\"e8one_cry\",e.E8_ONE_PERP=\"e8one_perp\",e.E8_SIGNATURE=\"e8signature\",e.E8_SIGNATURE_FU=\"e8signature_fu\",e.E8_SIGNATURE_V2_FU=\"e8signature_v_fu\",e.E8_SIGNATURE_FX=\"e8signature_fx\",e.E8_STATIC=\"e8static\",e.E8_PRO_V2=\"e8pro_v2\",e.E8_PRO=\"e8pro\",e.E8_PRO_V2_CRY=\"e8pro_v2_cry\",e.E8_PRO_V2_PERP=\"e8pro_v2_perp\",e.E8_CLASSIC=\"e8classic\",e.E8_CLASSIC_PERP=\"e8classic_perp\",e.E8ZERO=\"e8zero\",e.E8ZERO_FU=\"e8zero_fu\",e.E8ZERO_CRY=\"e8zero_cry\",e.E8_ZERO_MAX_FU=\"e8zero_max_fu\",e.E8_ZERO_START_FU=\"e8zero_start_fu\",e))(_||{});const a={e8one:{id:\"e8one\",name:\"E8 One\",code:\"1S\",market:\"forex\"},e8one_cry:{id:\"e8one_cry\",name:\"E8 One\",code:\"1C\",market:\"crypto\"},e8one_perp:{id:\"e8one_perp\",name:\"E8 One\",code:\"P1\",market:\"perpetual\"},e8pro:{id:\"e8pro\",name:\"E8 Pro\",code:\"1P\",market:\"forex\"},e8pro_v2:{id:\"e8pro_v2\",name:\"E8 Pro\",code:\"1V\",market:\"forex\"},e8pro_v2_cry:{id:\"e8pro_v2_cry\",name:\"E8 Pro\",code:\"CV\",market:\"crypto\"},e8pro_v2_perp:{id:\"e8pro_v2_perp\",name:\"E8 Pro\",code:\"PV\",market:\"perpetual\"},e8classic:{id:\"e8classic\",name:\"E8 Classic\",code:\"PC\",market:\"forex\"},e8classic_perp:{id:\"e8classic_perp\",name:\"E8 Classic\",code:\"PP\",market:\"perpetual\"},e8signature:{id:\"e8signature\",name:\"E8 Signature\",code:\"SC\",market:\"crypto\"},e8signature_fx:{id:\"e8signature_fx\",name:\"E8 Signature\",code:\"SX\",market:\"forex\"},e8signature_v_fu:{id:\"e8signature_v_fu\",name:\"E8 Signature\",code:\"HV\",market:\"futures\"},e8zero_max_fu:{id:\"e8zero_max_fu\",name:\"E8 Zero MAX\",code:\"ZM\",market:\"futures\"},e8zero_start_fu:{id:\"e8zero_start_fu\",name:\"E8 Zero Starter\",code:\"ZS\",market:\"futures\"}},E={forex:\"challenges.markets.forex\",futures:\"challenges.markets.futures\",crypto:\"challenges.markets.crypto\",perpetual:\"challenges.markets.perpetual\"};export{_ as A,r as M,a,E as m};\n\n//# chunkId=184d7ea8-8120-59de-aefe-1f7240ba74a6",
+  "rules": "!function(){try{var e=\"undefined\"!=typeof window?window:\"undefined\"!=typeof global?global:\"undefined\"!=typeof globalThis?globalThis:\"undefined\"!=typeof self?self:{};e._posthogReleaseId=e._posthogReleaseId||\"01a21880-b09d-0000-d9f7-41a644a3868f\";var n=(new e.Error).stack;n&&(e._posthogChunkIds=e._posthogChunkIds||{},e._posthogChunkIds[n]=\"36e0e552-c3b7-52e0-89d0-c1b83582f578\")}catch(e){}}();import{aa as d,v as T}from\"./_ZKseTGu.js\";import{h,g as m,N as K,i as _,n as $,o as A,d as F,c as O,f as L,a as N}from\"./BJIdYD55.js\";import{A as g}from\"./1d0qaIw2.js\";const x={eod:{key:\"eodDynamicDrawdown\",labelKey:\"challenges.rules.labels.eodDynamicDrawdown\"},static:{key:\"staticDrawdown\",labelKey:\"challenges.rules.labels.staticDrawdown\"},dynamic:{key:\"dynamicDrawdown\",labelKey:\"challenges.rules.labels.dynamicDrawdown\"}},b={drawdown:{key:\"dailyDrawdown\",labelKey:\"challenges.rules.labels.dailyDrawdown\"},pause:{key:\"dailyPause\",labelKey:\"challenges.rules.labels.dailyPause\"}},M={evaluation:\"challenges.card.phases.evaluation\",funded:\"challenges.card.phases.funded\"},I=[g.E8_ONE,g.E8_ONE_CRY,g.E8_ONE_PERP];function S(r,s){return I.includes(r)&&s===4?.75:null}function P(r,s,e,a,n,t){const l=d(r,s,a,e);if(l)return l;const i=d(r,s,n,e);if(!i)return 0;let o=i.multiplier;n===\"dailyDrawdownFrom\"&&(o=S(r,t)??o);const u=i.from===\"drawdown\"?t:e;return Math.round(u*o*10)/10}function E({t:r,te:s},e,a){const n=`tradingRules.${e}.${a}`;if(!s(`${n}.title`))return null;const t=s(`${n}.link`)?r(`${n}.link`):\"\";return{title:r(`${n}.title`),definition:r(`${n}.definition`),link:t||null}}function R(r,s,e,a,n,t=null){const{t:l}=r,i=P(s,e,a,\"profitTarget\",\"profitTargetFrom\",n),o=t??P(s,e,a,\"dailyDrawdown\",\"dailyDrawdownFrom\",n),u=d(s,e,\"drawdownType\",a)??\"eod\",y=d(s,e,\"maxContracts\",a),p=d(s,e,\"consistency\",a),v=d(s,e,\"profitCap\",a),f=[];e===\"evaluation\"&&i>0&&f.push({key:\"profitTarget\",label:l(\"challenges.rules.labels.profitTarget\"),value:h(a*i/100),percentValue:m(i)});const k=x[u];f.push({key:k.key,label:l(k.labelKey),value:h(a*n/100),percentValue:m(n)});const c=b[d(s,e,\"dailyDrawdownType\",a)??\"drawdown\"];if(t===K?f.push({key:c.key,label:l(c.labelKey),value:l(\"challenges.card.noDailyLimit\")}):o>0&&f.push({key:c.key,label:l(c.labelKey),value:h(a*o/100),percentValue:m(o)}),y&&y>0&&f.push({key:\"maxContracts\",label:l(\"challenges.rules.labels.maxContracts\"),value:String(y)}),p&&p>0&&f.push({key:\"consistency\",label:l(\"challenges.rules.labels.consistency\"),value:`${p}%`}),v&&v>0&&f.push({key:\"profitCap\",label:l(\"challenges.rules.labels.profitCap\"),value:h(a*v/100),percentValue:m(v)}),e===\"evaluation\"){const w=d(s,\"evaluation\",\"passDays\",a);w&&w>0&&f.push({key:\"passDays\",label:l(\"challenges.rewards.labels.passDays\"),value:l(\"challenges.rewards.days\",w)})}return f.map(w=>{const D=E(r,s,w.key);return D?{...w,info:D}:w})}function C(r,s,e,a,n){if(e===\"evaluation\")return[];const{t}=r,l=d(s,\"funded\",\"firstPayout\",a)??0,i=d(s,\"funded\",\"activationFee\",a)??0;return[{key:\"payout\",label:t(\"challenges.rewards.labels.payout\"),value:`${n}%`},{key:\"firstPayout\",label:t(\"challenges.rewards.labels.firstPayout\"),value:t(\"challenges.rewards.days\",l)},{key:\"activationFee\",label:t(\"challenges.rewards.labels.activationFee\"),value:i>0?h(i):t(\"challenges.rewards.noActivationFee\")}].map(u=>{const y=E(r,s,u.key);return y?{...u,info:y}:u})}function Y(r,s,e,a,n,t=null){return _(s,e).map(l=>{const i=$(s,e,l,a),o=A(e,l,n),u=F(s,e,l,i,o,t),y=d(e,\"evaluation\",\"firstDiscount\",l)??d(e,\"evaluation\",\"discount\",l)??0,p=N(u,y);return{account:e,balance:l,label:L(l),recommended:T[e]?.balances[String(l)]?.recommended??l===1e5,price:p,wasPrice:u,saveAmount:u-p,discountPct:y,discountCode:y>0?d(e,\"evaluation\",\"discountCode\",l)??null:null,drawdown:i,payoutShare:o,dailyDrawdown:t,purchaseUrl:O(e,l,i,o,t),rules:{evaluation:R(r,e,\"evaluation\",l,i,t),funded:R(r,e,\"funded\",l,i,t)},rewards:{evaluation:C(r,e,\"evaluation\",l,o),funded:C(r,e,\"funded\",l,o)}}})}export{Y as b,M as p};\n\n//# chunkId=36e0e552-c3b7-52e0-89d0-c1b83582f578"
+ },
+ "configurator": [
+  "Account configurator",
+  "Configure",
+  "Your",
+  "Account",
+  "in",
+  "Seconds",
+  "Classic Markets",
+  "Perpetual",
+  "E8 One",
+  "Most customizable product · Pass in one day · Uncapped earnings",
+  "E8 Pro",
+  "Daily payouts · Static drawdown · No payout caps",
+  "E8 Classic",
+  "Daily payouts · 4% static drawdown · Pick your daily drawdown",
+  "50% OFF",
+  "$5K",
+  "$48",
+  "$24",
+  "50% OFF",
+  "$10K",
+  "$88",
+  "$44",
+  "50% OFF",
+  "$25K",
+  "$188",
+  "$94",
+  "50% OFF",
+  "$50K",
+  "$288",
+  "$144",
+  "50% OFF",
+  "$100K",
+  "Recommended",
+  "$488",
+  "$244",
+  "50% OFF",
+  "$200K",
+  "$798",
+  "$399",
+  "50% OFF",
+  "$400K",
+  "$1,598",
+  "$799",
+  "50% OFF",
+  "$500K",
+  "$1,998",
+  "$999",
+  "$5K",
+  "$10K",
+  "$25K",
+  "$50K",
+  "$100K",
+  "$200K",
+  "$400K",
+  "$500K",
+  "$100K selected",
+  "E8 One · Account · $100K",
+  "One phase",
+  "$488",
+  "$244",
+  "Save $244 with code [code]",
+  "Configure account:",
+  "Drawdown",
+  "6% Max",
+  "Payout",
+  "80%",
+  "$488",
+  "$244",
+  "Save $244 with code [code]",
+  "GET STARTED",
+  "Pay with",
+  "Challenge",
+  "Performance",
+  "$",
+  "%",
+  "Challenge rules",
+  "Profit",
+  "Target",
+  "$9,000",
+  "Dynamic",
+  "Drawdown",
+  "$6,000",
+  "Daily",
+  "drawdown",
+  "$4,000",
+  "Pass in as little as",
+  "1 Day",
+  "Performance rules",
+  "Dynamic",
+  "Drawdown",
+  "$6,000",
+  "Daily",
+  "drawdown",
+  "$4,000",
+  "Consistency",
+  "rule",
+  "40%",
+  "Rewards",
+  "Payout",
+  "80%",
+  "First payout in as little as",
+  "3 Days",
+  "Activation fee",
+  "No Activation Fee",
+  "Average First",
+  "Payout",
+  "$3,530",
+  "Save with code"
+ ],
+ "symbols": {
+  "totalRows": 263,
+  "nodes": [
+   {
+    "symbol": "0G",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "2Z",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "AAOI",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "AAPL",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "AAVE",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ACE",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ADA",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "AERO",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "AIXBT",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ALGO",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ALT",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "AMAT",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "AMD",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "AMZN",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ANIME",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "APE",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "APT",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "AR",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ARB",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ARM",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ASML",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ASTER",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ATOM",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "AVAX",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "AVGO",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "AVNT",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "AXS",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "AZTEC",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BABA",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BABY",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BANANA",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BB",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BCH",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BE",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BERA",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BIGTIME",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BIO",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BLUR",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BNB",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BOME",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BOT",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BRENTOIL",
+    "group": "energy",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BSV",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BTC",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BTCD",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "BX",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "CAKE",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "CASHCAT",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "CBRS",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "CC",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "CELO",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "CFX",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "CHIP",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "CL",
+    "group": "energy",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "COIN",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "COMP",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "COPPER",
+    "group": "metals",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "COST",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "CRCL",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "CRV",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "CRWD",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "CRWV",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "CXMT",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "DASH",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "DELL",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "DKNG",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "DOGE",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "DOT",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "DRAM",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "DYDX",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "EBAY",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "EIGEN",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ENA",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ENS",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ETC",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ETH",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ETHFI",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "EURUSD",
+    "group": "fx",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "EWJ",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "EWT",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "EWY",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "EWZ",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "FARTCOIN",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "FET",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "FIL",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "FOGO",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "GALA",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "GBPUSD",
+    "group": "fx",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "GEV",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "GME",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "GMT",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "GMX",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "GOLD",
+    "group": "metals",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "GOOGL",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "GRAM",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "GRASS",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "GRIFFAIN",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "HBAR",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "HEMI",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "HIMS",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "HOOD",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "HYPE",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "HYUNDAI",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "IBM",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ICP",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "IMX",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "INIT",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "INJ",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "INTC",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "IO",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "IOTA",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "IREN",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "JP225",
+    "group": "index",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "JTO",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "JUP",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "KAITO",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "KAS",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "kBONK",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "kFLOKI",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "KIOXIA",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "kLUNC",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "KORU",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "kPEPE",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "KR200",
+    "group": "index",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "kSHIB",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "KSTR",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "LDO",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "LINEA",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "LINK",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "LIT",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "LITE",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "LLY",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "LTC",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "LYTE",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MAGS",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MANTA",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MEGA",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MELANIA",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MEME",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MERL",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MET",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "META",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MINA",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MINIMAX",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MNT",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MON",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MOODENG",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MORPHO",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MOVE",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MRNA",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MRVL",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MSFT",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MSTR",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "MU",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "NATGAS",
+    "group": "energy",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "NBIS",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "NEAR",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "NEO",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "NET",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "NFLX",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "NIL",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "NOK",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "NOT",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "NOW",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "NVDA",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "NXPC",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ONDO",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "OP",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ORCL",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ORDI",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "OTHERS",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "PALLADIUM",
+    "group": "metals",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "PAXG",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "PENDLE",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "PENGU",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "PEOPLE",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "PLATINUM",
+    "group": "metals",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "PLTR",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "PNUT",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "POL",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "POLYX",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "POPCAT",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "PROVE",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "PUMP",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "PURRDAT",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "PYTH",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "QCOM",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "QNT",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "RDDT",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "RENDER",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "REZ",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "RIVN",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "RKLB",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "RSR",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "RUNE",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "S",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SAGA",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SAND",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SEI",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SHAZ",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SHEIN",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SILVER",
+    "group": "metals",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SKHX",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SKHY",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SKR",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SKY",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SMH",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SMSN",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SNDK",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SNX",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SOFTBANK",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SOL",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SOXL",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SP500",
+    "group": "index",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SPCX",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SPX",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "STABLE",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "STBL",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "STRC",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "STRK",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "STX",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SUI",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SUPER",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SUSHI",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "SYRUP",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "TAO",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "TIA",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "TOTAL2",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "TRB",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "TRUMP",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "TRX",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "TSLA",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "TSM",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "TURBO",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "UNI",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "UNITREE",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "URNM",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "USAR",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "USDJPY",
+    "group": "fx",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "USUAL",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "VIRTUAL",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "VVV",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "W",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "WDC",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "WIF",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "WLD",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "WLFI",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "XAI",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "XBI",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "XLE",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "XLM",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "XMR",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "XPL",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "XRP",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "XYZ100",
+    "group": "index",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "YGG",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ZEC",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ZEN",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ZHIPU",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ZK",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ZM",
+    "group": "stocks",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ZORA",
+    "group": "crypto",
+    "market": "perpetual"
+   },
+   {
+    "symbol": "ZRO",
+    "group": "crypto",
+    "market": "perpetual"
+   }
+  ]
+ }
+}
