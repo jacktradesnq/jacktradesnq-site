@@ -18,7 +18,10 @@
  * Dans les deux cas les promos (promo firme, promoCode / promoLabel par
  * programme) passent par applyPromos(), et une firme dont le scraper echoue
  * garde ses donnees avec stale: true — les autres firmes continuent.
- * Exit code is 0 unless the JSON write fails.
+ * Exit code is 0 unless the JSON write fails. Une erreur marquee `failJob`
+ * (lecture incoherente, ex. Traders Launch : bannière « 30% Off All Accounts »
+ * et une carte sans prix barre) ecrit `fail_job=<firmes>` dans $GITHUB_OUTPUT :
+ * le workflow passe rouge a la fin, apres le commit des autres firmes.
  *
  * Usage: node scripts/scrape-prop-firms.mjs [--dry] [--only=<firm id>]
  */
@@ -103,7 +106,10 @@ export async function scrapeE8Markets(read) {
     read = () => fetchE8Plans(pw, launch);
   }
   const plans = await read();
-  return { programs: e8Programs(plans) }; // promo stays manual — site banner label is vaguer than the curated JSON copy
+  // Une taille nouvelle reprend une regle ecrite a la main quand toutes les tailles deja
+  // publiees de son programme ont la meme valeur (consistency « None » du Signature) ;
+  // une valeur qui differe selon les tailles ne se reprend jamais (decision du Claude principal, 28/11/2026).
+  return { programs: e8Programs(plans), catalog: { inheritUniformRules: true } }; // promo stays manual — site banner label is vaguer than the curated JSON copy
 }
 
 /* ------------------------------------------------------------------ */
@@ -232,6 +238,7 @@ const SCRAPERS = {
 async function main() {
   const data = JSON.parse(fs.readFileSync(DATA_URL, 'utf8'));
   let totalChanges = 0;
+  const failJob = []; // firmes dont la lecture doit faire passer le job rouge
 
   for (const firm of data.firms) {
     if (ONLY && firm.id !== ONLY) continue;
@@ -247,7 +254,7 @@ async function main() {
       if (res.programs) {
         // Un lecteur a rendu tout ce que la firme vend : le catalogue suit.
         guardCatalog(firm, res.programs);
-        syncCatalog(firm, res.programs, changes);
+        syncCatalog(firm, res.programs, changes, res.catalog);
         applyPromos(firm, res, changes);
       } else {
         // Chemin historique : des prix sur des programmes figes a la main.
@@ -267,7 +274,13 @@ async function main() {
     } catch (e) {
       firm.stale = true;
       console.error(`${firm.id}: FAILED — ${e.message} — keeping existing data, stale: true`);
+      if (e.failJob) failJob.push(firm.id);
     }
+  }
+
+  if (failJob.length) {
+    console.error(`::error::lecture incoherente, job rouge : ${failJob.join(', ')} (donnees gardees, stale: true)`);
+    if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `fail_job=${failJob.join(',')}\n`);
   }
 
   if (DRY) {

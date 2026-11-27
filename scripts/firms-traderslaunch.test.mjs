@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url';
 import {
   TRADERSLAUNCH_SOURCE,
   accountLabels,
+  bannerSaleOnAllAccounts,
+  checkSaleCoherence,
   earlyAccessStatus,
   fetchTradersLaunchPrograms,
   programsFromSnapshot,
@@ -285,7 +287,10 @@ test('fetchTradersLaunchPrograms : lit le releve, journalise Early Access', asyn
   const progs = await fetchTradersLaunchPrograms({ read: async () => SNAP, log: (l) => logs.push(l) });
   assert.equal(progs.length, 3);
   assert.equal(progs[1].plans[0].price, 149);
-  assert.deepEqual(logs, ['Early Access : aucun drop en vente']);
+  assert.deepEqual(logs, [
+    'Early Access : aucun drop en vente',
+    'bannière sans remise sur tous les comptes (ou illisible) : pas de recoupement',
+  ]);
   assert.equal(TRADERSLAUNCH_SOURCE, 'page traderslaunch.com');
 });
 
@@ -344,7 +349,7 @@ test('TL Drop #2 (Hyperprop only) : publie comme programme Early Access', () => 
       contracts: '1 mini or 10 micros',
     },
   );
-  assert.equal(p.minDays, undefined);
+  assert.equal(p.minDays, 0); // « Minimum Days None »
   assert.equal(
     p.note,
     'TL Drop #2 · Hyperprop only. Ends Mon, Nov 2, 6:53 AM ET. ' +
@@ -431,6 +436,7 @@ test('TL Drops (19/11/2026) : le drop Rapid 25K publie tel que ses cartes l ecri
     consistency: 'None',
     dailyLoss: null,
     contracts: '10 micros total; no minis',
+    minDays: 0,
     note: 'Rapid. Price shown for the 80% split.',
     splitPrices: { 60: 59, 90: 109 },
   });
@@ -470,12 +476,110 @@ test('programsFromSnapshot (28/11/2026) : Premium remise de 30 %, lu avec son pr
     [100000, 419.3, 599, { 60: 335.3, 90: 475.3 }],
   ]);
   const [drop] = progs.find((p) => p.name === 'Drop').plans;
-  assert.deepEqual([drop.price, drop.originalPrice, drop.splitPrices, drop.contracts], [
+  assert.deepEqual([drop.price, drop.originalPrice, drop.splitPrices, drop.contracts, drop.minDays], [
     77.88,
     111.25,
     { 60: 51.63, 90: 95.38 },
     '10 micros total; no minis',
+    0,
   ]);
+});
+
+test('Minimum Days : un texte qui n est ni « None » ni un nombre de jours arrete le drop', () => {
+  const s = structuredClone(SNAP_1119);
+  for (const c of view(s, 'TL Drops').splits[0].cards) c.text = c.text.replace('Minimum Days\nNone', 'Minimum Days\nask support');
+  const logs = [];
+  const progs = programsFromSnapshot(s, { log: (l) => logs.push(l) });
+  assert.ok(!progs.some((p) => p.name === 'Drop'));
+  assert.match(logs[0], /« Minimum Days » illisible/);
+  const ok = structuredClone(SNAP_1119);
+  for (const c of view(ok, 'TL Drops').splits[0].cards) c.text = c.text.replace('Minimum Days\nNone', 'Minimum Days\n3 days');
+  assert.equal(programsFromSnapshot(ok).find((p) => p.name === 'Drop').plans[0].minDays, 3);
+});
+
+/* ------- garde-fou du 27/11/2026 : bannière « X% Off All Accounts » contre cartes sans prix barre ------- */
+
+/**
+ * La reponse de /api/promo-banner relue le 27/11/2026 vers 23:15 UTC, quelques minutes apres le
+ * releve SNAP_1128 : « 30% Off All Accounts », code TL30, public « everyone », fin 2026-12-01T04:59Z.
+ */
+const BANNER_1128 = JSON.parse(
+  fs.readFileSync(path.join(HERE, 'lib/firms/fixtures', 'traderslaunch-promo-banner-2026-11-28.json'), 'utf8'),
+);
+const withBanner = (snap, banner = { status: BANNER_1128.status, body: BANNER_1128.body }) => ({
+  ...structuredClone(snap),
+  banner,
+});
+/** Ce que la synchro du 27/11 a 16:41 UTC a lu : les cartes Premium sans « List price ». */
+const premiumAtFullPrice = (snap) => {
+  for (const sp of view(snap, 'Premium').splits) {
+    for (const c of sp.cards) {
+      const list = /List price\n(\$[\d,.]+)\n\d+% Off\n/.exec(c.text);
+      c.text = c.text.replace(/\$[\d,.]+\n\nOne-Time Fee/, `${list[1]}\n\nOne-Time Fee`).replace(list[0], '');
+    }
+  }
+  return snap;
+};
+
+test('bannière du 28/11/2026 : 30 % sur tous les comptes, en cours', () => {
+  assert.deepEqual(bannerSaleOnAllAccounts(BANNER_1128, '2026-11-27T23:13:57.562Z'), {
+    percent: 30,
+    message: '30% Off All Accounts',
+    expiresAt: '2026-12-01T04:59:00Z',
+  });
+});
+
+test('bannière : illisible, absente, eteinte, expiree, public restreint ou autre message = pas de recoupement', () => {
+  const at = '2026-11-27T23:13:57.562Z';
+  const payload = JSON.parse(JSON.parse(BANNER_1128.body).payload);
+  const body = (p) => JSON.stringify({ flagValue: 'x', payload: JSON.stringify({ ...payload, ...p }) });
+  assert.equal(bannerSaleOnAllAccounts(null, at), null);
+  assert.equal(bannerSaleOnAllAccounts({ status: 0, error: 'TypeError: Failed to fetch' }, at), null);
+  assert.equal(bannerSaleOnAllAccounts({ status: 500, body: BANNER_1128.body }, at), null);
+  assert.equal(bannerSaleOnAllAccounts({ status: 200, body: '<html>' }, at), null);
+  assert.equal(bannerSaleOnAllAccounts({ status: 200, body: body({ enabled: false }) }, at), null);
+  assert.equal(bannerSaleOnAllAccounts({ status: 200, body: body({ audience: 'new-traders' }) }, at), null);
+  assert.equal(bannerSaleOnAllAccounts({ status: 200, body: body({ message: '30% Off Static Accounts' }) }, at), null);
+  assert.equal(bannerSaleOnAllAccounts(BANNER_1128, '2026-12-01T05:00:00Z'), null);
+  assert.equal(bannerSaleOnAllAccounts(BANNER_1128, 'pas une date'), null);
+});
+
+test('garde-fou : la page du 28/11/2026 est coherente, la lecture passe et le dit', async () => {
+  const logs = [];
+  const progs = await fetchTradersLaunchPrograms({ read: async () => withBanner(SNAP_1128), log: (l) => logs.push(l) });
+  assert.equal(progs.find((p) => p.name === 'Premium').plans[0].price, 111.3);
+  assert.ok(logs.includes('bannière « 30% Off All Accounts » : chaque carte a son prix barre'), logs.join(' | '));
+});
+
+test('garde-fou : Premium sans prix barre pendant « 30% Off All Accounts » = lecture refusee, job rouge', async () => {
+  const snap = premiumAtFullPrice(withBanner(SNAP_1128));
+  // Sans le garde-fou, le lecteur publiait le plein tarif (la synchro du 27/11 a 16:41 UTC).
+  assert.deepEqual(
+    programsFromSnapshot(snap).find((p) => p.name === 'Premium').plans.map((p) => [p.price, p.originalPrice]),
+    [
+      [159, undefined],
+      [299, undefined],
+      [599, undefined],
+    ],
+  );
+  const err = await fetchTradersLaunchPrograms({ read: async () => snap }).then(
+    () => null,
+    (e) => e,
+  );
+  assert.ok(err, 'la lecture aurait du etre refusee');
+  assert.equal(err.failJob, true);
+  assert.match(err.message, /bannière « 30% Off All Accounts » jusqu'au 2026-12-01T04:59:00Z, mais 6 carte\(s\) sans prix barre/);
+  assert.match(err.message, /Premium « Futures 100K » 80%/);
+});
+
+test('garde-fou : bannière illisible ou absente, la meme page passe (la bannière ne bloque jamais seule)', async () => {
+  // undefined : un releve sans bannière (lu avant le 28/11/2026, ou par un autre chemin).
+  for (const banner of [undefined, { status: 0, error: 'TypeError: Failed to fetch' }, { status: 200, body: 'oops' }]) {
+    const snap = premiumAtFullPrice({ ...structuredClone(SNAP_1128), banner });
+    assert.equal(checkSaleCoherence(snap), null);
+    const progs = await fetchTradersLaunchPrograms({ read: async () => snap });
+    assert.equal(progs.find((p) => p.name === 'Premium').plans[0].price, 159);
+  }
 });
 
 test('Daily Loss Limit : un texte qui n est ni un montant ni « None » reste une erreur', () => {

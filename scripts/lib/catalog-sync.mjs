@@ -164,13 +164,40 @@ function mergePlan(plan, read, tag, changes) {
 }
 
 /**
+ * Les regles qu'une taille nouvelle reprend de son programme : chaque champ de regle
+ * que TOUTES les tailles deja publiees portent, avec la meme valeur. Une valeur qui
+ * differe selon les tailles, ou une cle absente d'une seule taille, ne se reprend
+ * jamais. Programme sans taille publiee : rien.
+ *
+ * @param {Array<object>} plans  les tailles du programme dans le JSON, avant la synchro
+ * @returns {Record<string, unknown>}
+ */
+export function uniformRules(plans) {
+  const out = {};
+  if (!plans.length) return out;
+  for (const key of RULE_FIELDS) {
+    if (!plans.every((pl) => key in pl)) continue;
+    const first = JSON.stringify(plans[0][key]);
+    if (plans.every((pl) => JSON.stringify(pl[key]) === first)) out[key] = plans[0][key];
+  }
+  return out;
+}
+
+/**
  * Ecrit le catalogue lu dans la firme, en place.
+ *
+ * `opts.inheritUniformRules` (E8, decision du Claude principal, 28/11/2026) : une taille
+ * nouvelle d'un programme deja publie reprend les regles ecrites a la main que toutes ses
+ * tailles partagent (uniformRules), pour chaque cle que le lecteur ne porte pas ; ce que
+ * le lecteur porte gagne toujours. Sans l'option, une cle que le lecteur ne porte pas
+ * reste absente du plan cree.
  *
  * @param {{name: string, programs: Array}} firm  mutee
  * @param {Array} programs  ce que rend le lecteur, deja passe par guardCatalog()
  * @param {string[]} changes  les lignes lisibles du journal, completees ici
+ * @param {{inheritUniformRules?: boolean}} [opts]
  */
-export function syncCatalog(firm, programs, changes) {
+export function syncCatalog(firm, programs, changes, opts = {}) {
   const published = new Map(firm.programs.map((p) => [p.name, p]));
   const kept = [];
 
@@ -194,13 +221,18 @@ export function syncCatalog(firm, programs, changes) {
     }
 
     const plansBySize = new Map(program.plans.map((pl) => [pl.size, pl]));
+    const shared = opts?.inheritUniformRules ? uniformRules(program.plans) : {};
     const plans = [];
     for (const readPlan of read.plans) {
       const tag = `${firm.name} / ${read.name} ${sizeTag(readPlan.size)}`;
       let plan = plansBySize.get(readPlan.size);
       if (!plan) {
-        plan = newPlan(readPlan);
-        if (program.plans.length > 0) changes.push(`${tag}: plan ajoute`);
+        const inherited = Object.fromEntries(Object.entries(shared).filter(([key]) => !(key in readPlan)));
+        plan = newPlan({ ...inherited, ...readPlan });
+        if (program.plans.length > 0) {
+          const from = Object.entries(inherited).map(([key, v]) => `${key} ${show(v)}`);
+          changes.push(`${tag}: plan ajoute${from.length ? ` (repris des autres tailles : ${from.join(', ')})` : ''}`);
+        }
       } else {
         plansBySize.delete(readPlan.size);
         mergePlan(plan, readPlan, tag, changes);

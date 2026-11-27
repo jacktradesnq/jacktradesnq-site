@@ -257,6 +257,15 @@ function parseCard(programme, chosenSplit, card, drop = false) {
     const d = days.match(/^(\d+)\s+minimum$/i);
     if (!d && !/^no minimum$/i.test(days)) throw new Error(`${tag} : « Days to Pass » illisible (« ${days} »)`);
     plan.minDays = d ? Number(d[1]) : 0;
+  } else {
+    // « Minimum Days — None » (cartes des drops, 26/10, 19/11 et 28/11/2026) : 0, comme
+    // « No minimum » des autres programmes. Un nombre de jours se lit, le reste est une erreur.
+    const minimum = after(ev, 'Minimum Days');
+    if (minimum != null) {
+      const d = minimum.match(/^(\d+)(?:\s+(?:days?|minimum))?$/i);
+      if (!d && !/^none$/i.test(minimum)) throw new Error(`${tag} : « Minimum Days » illisible (« ${minimum} »)`);
+      plan.minDays = d ? Number(d[1]) : 0;
+    }
   }
 
   const bestDay = after(ev, 'Best Day');
@@ -454,6 +463,81 @@ export function earlyAccessStatus(snap) {
   return `${v.account} : aucun drop en vente`;
 }
 
+/** La bannière de promo de leur page, relue avec les cartes. */
+export const PROMO_BANNER_PATH = '/api/promo-banner';
+
+/**
+ * La remise que leur bannière annonce sur TOUS les comptes, en cours a `at`, ou null.
+ *
+ * Reponse relue le 28/11/2026 : {"flagValue":"black-friday-2026","payload":"{\"enabled\": true,
+ * \"message\": \"30% Off All Accounts\", \"code\": \"TL30\", \"audience\": \"everyone\",
+ * \"expiresAt\": \"2026-12-01T04:59:00Z\", ...}"} (le payload est une chaine JSON).
+ *
+ * null des qu'un doute existe, pour que la bannière ne bloque jamais seule : reponse absente,
+ * illisible ou pas en 200, bannière eteinte, message qui ne dit pas « <n>% Off All Accounts »,
+ * public restreint (autre que « everyone »), date de fin passee ou illisible.
+ *
+ * @param {{status?: number, body?: string}|null|undefined} banner  la reponse brute
+ * @param {string} at  l'heure du releve (ISO)
+ * @returns {{percent: number, message: string, expiresAt: string|null}|null}
+ */
+export function bannerSaleOnAllAccounts(banner, at) {
+  try {
+    if (!banner || banner.status !== 200 || typeof banner.body !== 'string') return null;
+    const outer = JSON.parse(banner.body);
+    const p = typeof outer?.payload === 'string' ? JSON.parse(outer.payload) : outer?.payload;
+    if (!p || p.enabled !== true) return null;
+    if (p.audience != null && p.audience !== 'everyone') return null;
+    const m = /(\d+)\s*%\s*off\s+all\s+accounts/i.exec(String(p.message ?? ''));
+    if (!m) return null;
+    if (p.expiresAt != null) {
+      const end = Date.parse(p.expiresAt);
+      const now = Date.parse(at);
+      if (!Number.isFinite(end) || !Number.isFinite(now) || now >= end) return null;
+    }
+    return { percent: Number(m[1]), message: String(p.message), expiresAt: p.expiresAt ?? null };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Le garde-fou du 27/11/2026 : ce jour-la, a 16:41 UTC, les cartes Premium ont ete lues
+ * sans prix barre (159 / 299 / 599) en pleine remise Black Friday « 30% Off All Accounts »,
+ * et la synchro a publie le plein tarif ; relues a 23:13 UTC, elles etaient remisees.
+ * Quand la bannière annonce une remise sur tous les comptes et qu'une carte n'a pas de
+ * « List price », la lecture est incoherente : la firme s'arrete (stale, donnees gardees)
+ * et l'erreur porte `failJob` pour que le job passe rouge. Bannière illisible ou absente :
+ * aucun recoupement, la lecture suit son cours (decision du Claude principal, 28/11/2026).
+ *
+ * @param {object} snap  le releve de `readTradersLaunchPage` (avec `banner`)
+ * @returns {{percent: number, message: string, expiresAt: string|null}|null}  la remise recoupee, ou null
+ * @throws  une erreur `failJob: true` quand une carte contredit la bannière
+ */
+export function checkSaleCoherence(snap) {
+  const sale = bannerSaleOnAllAccounts(snap?.banner, snap?.readAt);
+  if (!sale) return null;
+  const groups = [...(snap.views ?? []), ...(snap.legacy ? [{ account: 'Legacy NYC', ...snap.legacy }] : [])];
+  const bare = [];
+  for (const v of groups) {
+    for (const s of v.splits ?? []) {
+      for (const card of s.cards ?? []) {
+        const ls = lines(card?.text);
+        if (ls.some((l) => /^list price$/i.test(l))) continue;
+        const split = ls.find((l) => /^\d+% Profit Split$/i.test(l))?.replace(/ Profit Split$/i, '') ?? '?';
+        bare.push(`${v.account} « ${ls[0] ?? '?'} » ${split}`);
+      }
+    }
+  }
+  if (!bare.length) return sale;
+  const err = new Error(
+    `bannière « ${sale.message} »${sale.expiresAt ? ` jusqu'au ${sale.expiresAt}` : ''}, mais ` +
+      `${bare.length} carte(s) sans prix barre : ${bare.join(', ')} — lecture incoherente, plein tarif NON publie`,
+  );
+  err.failJob = true;
+  throw err;
+}
+
 /**
  * Ouvre la page dans Chromium headless, clique chaque onglet « Account » de
  * #pricing puis chacun de ses splits, et releve les cartes (et la FAQ de
@@ -593,6 +677,19 @@ export async function readTradersLaunchPage({ chromium, url = TRADERSLAUNCH_URL,
     await page.waitForTimeout(2000);
     const legacy = { splits: await readSplits(true) };
 
+    // La bannière de promo, relue juste apres les cartes (checkSaleCoherence). Une panne ici
+    // n'arrete rien : la bannière ne bloque jamais seule.
+    const banner = await page
+      .evaluate(async (p) => {
+        try {
+          const r = await fetch(p, { cache: 'no-store' });
+          return { status: r.status, body: await r.text() };
+        } catch (e) {
+          return { status: 0, error: String(e) };
+        }
+      }, PROMO_BANNER_PATH)
+      .catch((e) => ({ status: 0, error: String(e?.message ?? e) }));
+
     // Un drop vendu sur une seule plateforme : ses cartes n'existent que derriere
     // « Show <plateforme> Accounts ». Navigateur neuf, les autres onglets restent lus
     // sur la plateforme par defaut.
@@ -636,7 +733,7 @@ export async function readTradersLaunchPage({ chromium, url = TRADERSLAUNCH_URL,
       ea.text = await p2.evaluate(inPage.text);
     }
 
-    return { url, readAt: new Date().toISOString(), views, legacy };
+    return { url, readAt: new Date().toISOString(), views, legacy, banner };
   } finally {
     await browser.close();
   }
@@ -663,5 +760,11 @@ export async function fetchTradersLaunchPrograms({ read, log = () => {} } = {}) 
   }
   const ea = earlyAccessStatus(snap);
   if (ea) log(ea);
+  const sale = checkSaleCoherence(snap); // leve une erreur failJob si une carte contredit la bannière
+  log(
+    sale
+      ? `bannière « ${sale.message} » : chaque carte a son prix barre`
+      : 'bannière sans remise sur tous les comptes (ou illisible) : pas de recoupement',
+  );
   return programsFromSnapshot(snap, { log });
 }
