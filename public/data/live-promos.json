@@ -54,8 +54,9 @@
       "ddType": "EOD Trailing",
       "profitTarget": 3000,
       "maxDrawdown": 2000,
-      "consistency": "34%",
-      "activationFee": null,
+      "dailyLoss": null,
+      "consistency": "55%",
+      "activationFee": 0,
       "contracts": "5 minis or 50 micros",
       "lastChecked": "2026-11-27"
     },
