@@ -58,6 +58,14 @@ jobs:
         continue-on-error: true
         run: node scripts/scrape-lucid.mjs
 
+      # Perps (perps-firms.json : MyFundedPerps, Breakout, Vest, E8 perps) relus chaque jour sur le site de
+      # chaque firme, comptes ajoutés / retirés compris (Angelo, 28/11/2026 : « le sync est où la »). Page
+      # illisible ou compte annoncé absent = firme stale (commitée avec le reste) puis job rouge plus bas.
+      - name: Scrape perps firms
+        id: perps
+        continue-on-error: true
+        run: node scripts/scrape-perps.mjs
+
       # Les giveaways terminés sur Discord (Angelo, 04/11/2026). Discord illisible = job rouge plus bas.
       - name: Sync giveaways from Discord
         id: giveaways
@@ -69,7 +77,7 @@ jobs:
       - name: Check for data changes
         id: diff
         run: |
-          if [ -n "$(git status --porcelain public/data/prop-firms.json public/data/live-promos.json public/data/compare-extra-firms.json content/giveaways/giveaways.json)" ]; then
+          if [ -n "$(git status --porcelain public/data/prop-firms.json public/data/live-promos.json public/data/compare-extra-firms.json public/data/perps-firms.json content/giveaways/giveaways.json)" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -80,7 +88,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/data/prop-firms.json public/data/live-promos.json public/data/compare-extra-firms.json content/giveaways/giveaways.json
+          git add public/data/prop-firms.json public/data/live-promos.json public/data/compare-extra-firms.json public/data/perps-firms.json content/giveaways/giveaways.json
           git commit -m "chore(data): daily prop-firms price sync"
           git push origin HEAD:main
 
@@ -106,7 +114,7 @@ jobs:
       - name: Discord alert — stale firms
         if: always()
         run: |
-          STALE=$(python3 -c "import json; fs=[f for p in ('public/data/prop-firms.json', 'public/data/compare-extra-firms.json') for f in json.load(open(p))['firms']]; print(', '.join(f['name'] for f in fs if f.get('stale')))")
+          STALE=$(python3 -c "import json; fs=[f for p in ('public/data/prop-firms.json', 'public/data/compare-extra-firms.json', 'public/data/perps-firms.json') for f in json.load(open(p))['firms']]; print(', '.join(f['name'] for f in fs if f.get('stale')))")
           if [ -n "$STALE" ]; then
             code=$(curl -sS -o /dev/null -w '%{http_code}' -H "Content-Type: application/json" -d "{\"content\": \"⚠️ **prop-firms sync** — firmes STALE (site illisible, anciennes données conservées) : $STALE\"}" "${{ secrets.DISCORD_WEBHOOK }}") || true
             case "$code" in
@@ -135,6 +143,12 @@ jobs:
         if: always() && steps.lucid.outcome == 'failure'
         run: |
           echo "::error::scrape-lucid : page Lucid illisible (403 Cloudflare, plan du JSON absent ou remise changée, voir l'étape « Scrape Lucid »). Données gardées, stale: true."
+          exit 1
+
+      - name: Perps unreadable — fail the job
+        if: always() && steps.perps.outcome == 'failure'
+        run: |
+          echo "::error::scrape-perps : une firme perps illisible (page, compte annoncé absent ou prix aberrant, voir l'étape « Scrape perps firms »). Données gardées, stale: true."
           exit 1
 
       - name: Giveaways unreadable — fail the job
