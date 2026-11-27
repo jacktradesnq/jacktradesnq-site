@@ -17,7 +17,7 @@ const withPricing = (fn) => ({ ...SNAP, pricing: { ...SNAP.pricing, html: fn(SNA
 const withPromo = (fn) => ({ ...SNAP, promo: { ...SNAP.promo, html: fn(SNAP.promo.html) } });
 const table = (r) => r.programs.map((p) => [p.name, p.plans.map((x) => [x.size, x.price, x.promoPrice])]);
 
-const RULES = { steps: '1 step', split: '80%', ddType: 'Static', note: '' };
+const RULES = { steps: '1 step', split: '80% / 90%', ddType: 'Static', note: '' };
 
 test('les 3 programmes, toutes les tailles et les règles du 28/11/2026', () => {
   const { programs } = breakoutPerpsFromSnapshot(SNAP, { checkedOn: DAY });
@@ -31,7 +31,21 @@ test('les 3 programmes, toutes les tailles et les règles du 28/11/2026', () => 
   );
   // Ordre des clés = celui de public/data/perps-firms.json.
   assert.deepEqual(Object.keys(programs[0]), ['name', 'steps', 'split', 'profitTarget', 'maxDrawdown', 'ddType', 'dailyLoss', 'note', 'plans']);
-  assert.deepEqual(Object.keys(programs[0].plans[0]), ['size', 'price', 'promoPrice']);
+  assert.deepEqual(Object.keys(programs[0].plans[0]), ['size', 'price', 'promoPrice', 'altPrice', 'altPromoPrice']);
+});
+
+test('le 90/10 (« the 90/10 upgrade at checkout costs 20% more ») : second prix de la case, celui de la carte', () => {
+  const r = breakoutPerpsFromSnapshot(SNAP, { checkedOn: DAY });
+  const alt = r.programs.map((p) => [p.name, p.plans.map((x) => [x.size, x.altPrice, x.altPromoPrice])]);
+  assert.deepEqual(alt[0], ['Classic', [[5000, 54, 40.5], [10000, 102, 76.5], [25000, 258, 193.5], [50000, 480, 360], [100000, 960, 720]]]);
+  assert.deepEqual(alt[1][1][0], [5000, 39.6, 29.7]); // la carte affiche $39.60
+  const later = breakoutPerpsFromSnapshot(at('2026-12-01T00:00:00Z'), { checkedOn: '2026-12-01' });
+  assert.deepEqual(later.programs[2].plans[0], { size: 5000, price: 20, promoPrice: 19, altPrice: 24, altPromoPrice: 22.8 });
+  // Une page qui ne parle plus du 90/10 : un seul prix, split 80 %.
+  const noUpgrade = withPricing((h) => h.split('; the 90/10 upgrade at checkout costs 20% more').join(''));
+  const one = breakoutPerpsFromSnapshot(noUpgrade, { checkedOn: DAY });
+  assert.equal(one.programs[0].split, '80%');
+  assert.deepEqual(Object.keys(one.programs[0].plans[0]), ['size', 'price', 'promoPrice']);
 });
 
 test('Black Friday : 25 % pour JTNQ jusqu au 30/11 23:59 UTC, prix remisés affichés par leur page', () => {
@@ -80,6 +94,7 @@ test('un plan retiré disparaît, un plan ajouté apparaît seul', () => {
     noTable(hp(h, (d) => ({ ...d, plans: [...d.plans, { id: 'x', name: '2-Step Swing', target: '8%', dailyLoss: '4%', drawdown: '8%', phases: '2', sizes: { 10000: { p: 70 } } }] }))),
   );
   const last = breakoutPerpsFromSnapshot(added, { checkedOn: DAY }).programs.at(-1);
+  // Le tableau <noscript> (qui porte la légende du 90/10) est retiré ici : un seul prix, split 80 %.
   assert.deepEqual(last, { name: 'Swing', steps: '2 steps', split: '80%', profitTarget: '8%', maxDrawdown: '8%', ddType: 'Static', dailyLoss: '4%', note: '', plans: [{ size: 10000, price: 70, promoPrice: 52.5 }] });
 });
 

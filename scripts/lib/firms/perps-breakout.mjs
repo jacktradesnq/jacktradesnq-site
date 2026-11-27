@@ -45,9 +45,13 @@
  *    vont dans `steps`) ;
  *  - `note` : la page n'en porte pas ; celle du JSON précédent (option `previous`) est gardée,
  *    sinon vide.
- * Ce que la page montre et que la forme du JSON ne sait pas porter n'est pas rendu (prix 90/10,
- *    frais de trading de la promo) ; Spark affiché sur /pricing/ arrête la firme : comment le
- *    caser n'est pas tranché.
+ *  - le 90/10 (« the 90/10 upgrade at checkout costs 20% more », « Upgrade to 90/10 split: $X » sur
+ *    chaque carte) = second prix de la case après un « / », split « 80% / 90% », comme Vest et E8 One
+ *    (Angelo, 12/10/2026 : « dans la même colonne et dans chaque truc t'as un / qui met les 2 prix ») ;
+ *    prix = celui de la carte (prix × 1,2 au centime), avec le code = ce prix − la remise, au centime.
+ * Ce que la page montre et que la forme du JSON ne sait pas porter n'est pas rendu (frais de trading
+ *    de la promo : aucune colonne du site ne montre de frais de trading) ; Spark affiché sur /pricing/
+ *    arrête la firme : comment le caser n'est pas tranché.
  */
 import { fetchPageText } from '../cf-fetch.mjs';
 
@@ -243,6 +247,12 @@ function checkTable(table, plans) {
   }
 }
 
+/** « the 90/10 upgrade at checkout costs 20% more » -> { split: 90, factor: 1.2 } ; null si la page n'en parle pas. */
+function upgradeOf(table, pageText) {
+  const m = [table?.caption ?? '', pageText].join(' ').match(/(\d{1,3})\/(\d{1,3}) upgrade at checkout costs (\d{1,3})% more/i);
+  return m ? { split: Number(m[1]), factor: 1 + Number(m[3]) / 100 } : null;
+}
+
 /** « 80/20 » de la page -> « 80% ». */
 function splitOf(table, pageText) {
   const m =
@@ -319,7 +329,8 @@ export function breakoutPerpsFromSnapshot(snapshot, { checkedOn, previous } = {}
   const plans = plansOf(hp);
   const table = noscriptTable(html);
   checkTable(table, plans);
-  const split = splitOf(table, pageText);
+  const upgrade = upgradeOf(table, pageText);
+  const split = upgrade ? splitOf(table, pageText) + ' / ' + upgrade.split + '%' : splitOf(table, pageText);
   const ddType = ddTypeOf(hp, v2);
 
   const bannerOn = banner && banner.start <= at && at < banner.end;
@@ -338,10 +349,15 @@ export function breakoutPerpsFromSnapshot(snapshot, { checkedOn, previous } = {}
     dailyLoss: p.dailyLoss,
     note: notes.get(p.name) ?? '',
     plans: p.plans.map(({ size, price }) => {
-      if (promo.endsAt == null) return { size, price, promoPrice: discounted(price, pct) };
-      const shown = live.prices[p.name.toLowerCase()]?.[size];
-      if (shown && shown.list !== price) fail(`${p.name} ${size} : $${price} sur /pricing/, $${shown.list} sur ${snapshot.promo.url}`);
-      return { size, price, promoPrice: shown ? cents(shown.promo) : discounted(price, pct) };
+      let promoPrice = discounted(price, pct);
+      if (promo.endsAt != null) {
+        const shown = live.prices[p.name.toLowerCase()]?.[size];
+        if (shown && shown.list !== price) fail(`${p.name} ${size} : $${price} sur /pricing/, $${shown.list} sur ${snapshot.promo.url}`);
+        if (shown) promoPrice = cents(shown.promo);
+      }
+      if (!upgrade) return { size, price, promoPrice };
+      const altPrice = cents(price * upgrade.factor);
+      return { size, price, promoPrice, altPrice, altPromoPrice: discounted(altPrice, pct) };
     }),
   }));
   return { programs, promo };

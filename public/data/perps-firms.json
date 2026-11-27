@@ -166,7 +166,7 @@
       "name": "Breakout",
       "logo": "/logos/breakout.svg",
       "url": "https://breakoutprop.com",
-      "lastChecked": "2026-10-13",
+      "lastChecked": "2026-11-27",
       "markets": [
         "Crypto",
         "Indices",
@@ -174,15 +174,15 @@
       ],
       "promo": {
         "code": "JTNQ",
-        "discountPct": 5,
-        "endsAt": null,
-        "lastChecked": "2026-10-13"
+        "discountPct": 25,
+        "endsAt": "2026-11-30T23:59:00Z",
+        "lastChecked": "2026-11-27"
       },
       "programs": [
         {
           "name": "Classic",
           "steps": "1 step",
-          "split": "80%",
+          "split": "80% / 90%",
           "profitTarget": "10%",
           "maxDrawdown": "6%",
           "ddType": "Static",
@@ -192,34 +192,44 @@
             {
               "size": 5000,
               "price": 45,
-              "promoPrice": 42.75
+              "promoPrice": 33.75,
+              "altPrice": 54,
+              "altPromoPrice": 40.5
             },
             {
               "size": 10000,
               "price": 85,
-              "promoPrice": 80.75
+              "promoPrice": 63.75,
+              "altPrice": 102,
+              "altPromoPrice": 76.5
             },
             {
               "size": 25000,
               "price": 215,
-              "promoPrice": 204.25
+              "promoPrice": 161.25,
+              "altPrice": 258,
+              "altPromoPrice": 193.5
             },
             {
               "size": 50000,
               "price": 400,
-              "promoPrice": 380
+              "promoPrice": 300,
+              "altPrice": 480,
+              "altPromoPrice": 360
             },
             {
               "size": 100000,
               "price": 800,
-              "promoPrice": 760
+              "promoPrice": 600,
+              "altPrice": 960,
+              "altPromoPrice": 720
             }
           ]
         },
         {
           "name": "Pro",
           "steps": "1 step",
-          "split": "80%",
+          "split": "80% / 90%",
           "profitTarget": "12%",
           "maxDrawdown": "5%",
           "ddType": "Static",
@@ -229,39 +239,51 @@
             {
               "size": 5000,
               "price": 33,
-              "promoPrice": 31.35
+              "promoPrice": 24.75,
+              "altPrice": 39.6,
+              "altPromoPrice": 29.7
             },
             {
               "size": 10000,
               "price": 65,
-              "promoPrice": 61.75
+              "promoPrice": 48.75,
+              "altPrice": 78,
+              "altPromoPrice": 58.5
             },
             {
               "size": 25000,
               "price": 150,
-              "promoPrice": 142.5
+              "promoPrice": 112.5,
+              "altPrice": 180,
+              "altPromoPrice": 135
             },
             {
               "size": 50000,
               "price": 280,
-              "promoPrice": 266
+              "promoPrice": 210,
+              "altPrice": 336,
+              "altPromoPrice": 252
             },
             {
               "size": 100000,
               "price": 545,
-              "promoPrice": 517.75
+              "promoPrice": 408.75,
+              "altPrice": 654,
+              "altPromoPrice": 490.5
             },
             {
               "size": 200000,
               "price": 1090,
-              "promoPrice": 1035.5
+              "promoPrice": 817.5,
+              "altPrice": 1308,
+              "altPromoPrice": 981
             }
           ]
         },
         {
           "name": "Turbo",
           "steps": "1 step",
-          "split": "80%",
+          "split": "80% / 90%",
           "profitTarget": "9%",
           "maxDrawdown": "3%",
           "ddType": "Static",
@@ -271,36 +293,49 @@
             {
               "size": 5000,
               "price": 20,
-              "promoPrice": 19
+              "promoPrice": 15,
+              "altPrice": 24,
+              "altPromoPrice": 18
             },
             {
               "size": 10000,
               "price": 40,
-              "promoPrice": 38
+              "promoPrice": 30,
+              "altPrice": 48,
+              "altPromoPrice": 36
             },
             {
               "size": 25000,
               "price": 95,
-              "promoPrice": 90.25
+              "promoPrice": 71.25,
+              "altPrice": 114,
+              "altPromoPrice": 85.5
             },
             {
               "size": 50000,
               "price": 180,
-              "promoPrice": 171
+              "promoPrice": 135,
+              "altPrice": 216,
+              "altPromoPrice": 162
             },
             {
               "size": 100000,
               "price": 330,
-              "promoPrice": 313.5
+              "promoPrice": 247.5,
+              "altPrice": 396,
+              "altPromoPrice": 297
             },
             {
               "size": 200000,
               "price": 660,
-              "promoPrice": 627
+              "promoPrice": 495,
+              "altPrice": 792,
+              "altPromoPrice": 594
             }
           ]
         }
-      ]
+      ],
+      "stale": false
     },
     {
       "id": "vest-markets",

@@ -24,6 +24,7 @@ import { fileURLToPath } from 'node:url';
 
 import { fetchPageText } from './lib/cf-fetch.mjs';
 import { readVestPerps, vestPerpsFromSnapshot } from './lib/firms/perps-vest.mjs';
+import { readBreakoutPerps, breakoutPerpsFromSnapshot } from './lib/firms/perps-breakout.mjs';
 
 const DATA_URL = new URL('../public/data/perps-firms.json', import.meta.url);
 
@@ -32,6 +33,10 @@ export const READERS = {
   'vest-markets': {
     read: (ctx) => readVestPerps(ctx),
     apply: (snap, firm, checkedOn) => vestPerpsFromSnapshot(snap, { checkedOn, promo: firm.promo }),
+  },
+  breakout: {
+    read: (ctx) => readBreakoutPerps({ fetchText: ctx.fetchText }),
+    apply: (snap, firm, checkedOn) => breakoutPerpsFromSnapshot(snap, { checkedOn, previous: firm }),
   },
 };
 
