@@ -71,6 +71,8 @@ type PerpsFirm = {
     firstPurchase?: boolean;
     thenPct?: number;
     instantPct?: number;
+    // Lower rates on other programs (E8 Classic 10% while E8 One and E8 Pro are at 50%, 28/11/2026).
+    otherPcts?: number[];
     lastChecked: string;
   } | null;
   // true: the daily sync could not read the firm's site, the prices are the last ones read (lastChecked).
@@ -110,19 +112,26 @@ function promoOf(firm: PerpsFirm, promoLive: boolean): PerpsFirm['promo'] {
 // live in FUNDED below.
 const DETAILS: Record<string, Record<string, { split?: string; leverage: string; leverageTitle?: string }>> = {
   // E8 Perpetual, read 01/11/2026 on help.e8markets.com, « How much leverage do you offer? »
-  // (Perpetual futures table, the same for E8 One and E8 Pro) and the product overview (« Payout
-  // 80%, 90%, 100% » for E8 One, « 80%, 100% » for E8 Pro). Its own id, e8-perps: e8-markets is the
-  // futures firm, and one id in both families would open #compare=e8-markets on the wrong table.
+  // (Perpetual futures table) and the product overview (« Payout 80%, 90%, 100% » for E8 One, « 80%,
+  // 100% » for E8 Pro). Re-read 28/11/2026: « Other Crypto instruments 1:3 » for E8 One and E8 Pro
+  // (1:2 on 01/11), and E8 Classic (back on 28/11/2026, help article « E8 Classic v.2 ») « 1:15 1:15
+  // 1:3 1:5 1:30 1:20 1:25 1:10 » (BTC, ETH, other crypto, stocks, indices, metals, forex, energy).
+  // Splits come from the synced programs. Its own id, e8-perps: e8-markets is the futures firm, and
+  // one id in both families would open #compare=e8-markets on the wrong table.
   'e8-perps': {
     One: {
       split: '80% / 90% / 100%',
       leverage: 'Up to 25x',
-      leverageTitle: 'BTC, ETH, indices, metals, energy 15x · stocks 5x · other crypto 2x · forex 25x',
+      leverageTitle: 'BTC, ETH, indices, metals, energy 15x · stocks 5x · other crypto 3x · forex 25x',
     },
     Pro: {
       split: '80% / 100%',
       leverage: 'Up to 25x',
-      leverageTitle: 'BTC, ETH, indices, metals, energy 15x · stocks 5x · other crypto 2x · forex 25x',
+      leverageTitle: 'BTC, ETH, indices, metals, energy 15x · stocks 5x · other crypto 3x · forex 25x',
+    },
+    Classic: {
+      leverage: 'Up to 30x',
+      leverageTitle: 'BTC, ETH 15x · indices 30x · metals 20x · energy 10x · stocks 5x · other crypto 3x · forex 25x',
     },
   },
   // MyFundedPerps checkout and docs, 12/10/2026.
@@ -222,6 +231,19 @@ const FUNDED: Record<string, Record<string, Funded>> = {
       ],
       rows: [],
     },
+    // E8 Classic, read 28/11/2026 on e8markets.com/perpetual-futures (« No Consistency Rule », « Daily
+    // Payouts », « Min. Payout $100 », « Your loss floor sits 5% below your start and never moves, even
+    // after a payout ») and help.e8markets.com « E8 Classic v.2 » (« Minimum profit is $100 », « you can
+    // request as many times per day as you want »).
+    Classic: {
+      pills: [
+        { label: 'Consistency', value: 'None' },
+        { label: 'Payout request', value: 'Daily' },
+        { label: 'Minimum payout', value: '$100 net profit' },
+        { label: 'Drawdown after a payout', value: 'Never moves' },
+      ],
+      rows: [],
+    },
   },
   breakout: { Classic: BREAKOUT_FUNDED, Pro: BREAKOUT_FUNDED, Turbo: BREAKOUT_FUNDED },
   myfundedperps: {
@@ -231,8 +253,10 @@ const FUNDED: Record<string, Record<string, Funded>> = {
     Elite: {
       pills: [
         { label: 'Consistency', value: 'None' },
-        // Checkout, 12/10/2026: « Payout Eligibility Day one » / « Payout Frequency Daily ».
-        { label: 'Payout request', value: 'Daily, from day one' },
+        // docs.myfundedperpetuals.com/guides/elite-accounts, 28/11/2026: « When you can request On
+        // demand », « On demand: you can request from your first day funded », « no daily request limit »
+        // (the checkout said « Payout Frequency Daily » on 12/10/2026).
+        { label: 'Payout request', value: 'On demand, from day one' },
         { label: 'Minimum payout', value: '1% of the account' },
         { label: 'Drawdown after a payout', value: 'Stays at -5%' },
         { label: 'Lifetime payouts', value: 'Up to $100K' },
@@ -346,7 +370,12 @@ export const perpsFirms = (promoLive: boolean): FirmView[] =>
     code: { code: 'JTNQ', title: 'My affiliate code' },
     // The firm's published rate; MFP: 35% on a first order, then 30%, so « Up to 35% off »; Vest:
     // 10% on evaluations, 5% on Instant, « Up to 10% off ».
-    offer: discountWords([promoOf(firm, promoLive)?.discountPct, promoOf(firm, promoLive)?.thenPct, promoOf(firm, promoLive)?.instantPct]),
+    offer: discountWords([
+      promoOf(firm, promoLive)?.discountPct,
+      promoOf(firm, promoLive)?.thenPct,
+      promoOf(firm, promoLive)?.instantPct,
+      ...(promoOf(firm, promoLive)?.otherPcts ?? []),
+    ]),
     // A firm whose site the daily sync could not read keeps its last prices: say from when, like the
     // futures firms read by their own scraper (futures.ts, firmView).
     stale: firm.stale

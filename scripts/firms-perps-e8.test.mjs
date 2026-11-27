@@ -115,7 +115,7 @@ test('le calcul du site, pas a pas (arrondi au dollar superieur, remise arrondie
 });
 
 test('promo : JTNQ, la meilleure remise affichee sur le Perpetual, sans fin annoncee', () => {
-  assert.deepEqual(OUT.promo, { code: 'JTNQ', discountPct: 50, endsAt: null, lastChecked: '2026-11-28' });
+  assert.deepEqual(OUT.promo, { code: 'JTNQ', discountPct: 50, endsAt: null, otherPcts: [10], lastChecked: '2026-11-28' }); // E8 Classic à 10 %
   // Le code public de la firme n'est nulle part : ni dans l'instantane, ni dans la sortie.
   for (const c of ['E8BF', 'REB8']) {
     assert.ok(!JSON.stringify(SNAP).includes(c), `${c} dans la fixture`);

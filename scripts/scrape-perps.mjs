@@ -25,11 +25,21 @@ import { fileURLToPath } from 'node:url';
 import { fetchPageText } from './lib/cf-fetch.mjs';
 import { readVestPerps, vestPerpsFromSnapshot } from './lib/firms/perps-vest.mjs';
 import { readBreakoutPerps, breakoutPerpsFromSnapshot } from './lib/firms/perps-breakout.mjs';
+import { readMfpPerps, mfpPerpsFromSnapshot } from './lib/firms/perps-mfp.mjs';
+import { readE8Perps, e8PerpsFromSnapshot } from './lib/firms/perps-e8.mjs';
 
 const DATA_URL = new URL('../public/data/perps-firms.json', import.meta.url);
 
 /** id de la firme -> { read(ctx) : lecture brute, apply(snapshot, firm, checkedOn) : { programs, promo, pairs? } }. */
 export const READERS = {
+  myfundedperps: {
+    read: (ctx) => readMfpPerps({ fetchText: ctx.fetchText }),
+    apply: (snap, firm, checkedOn) => mfpPerpsFromSnapshot(snap, { checkedOn, previous: firm }),
+  },
+  'e8-perps': {
+    read: (ctx) => readE8Perps({ fetchText: ctx.fetchText }),
+    apply: (snap, firm, checkedOn) => e8PerpsFromSnapshot(snap, { checkedOn, previous: firm }),
+  },
   'vest-markets': {
     read: (ctx) => readVestPerps(ctx),
     apply: (snap, firm, checkedOn) => vestPerpsFromSnapshot(snap, { checkedOn, promo: firm.promo }),

@@ -6,7 +6,7 @@
       "name": "MyFundedPerps",
       "logo": "/logos/myfundedperps.png",
       "url": "https://myfundedperpetuals.com/@JTNQ",
-      "lastChecked": "2026-10-12",
+      "lastChecked": "2026-11-27",
       "markets": [
         "Crypto",
         "Indices",
@@ -16,11 +16,11 @@
       ],
       "promo": {
         "code": "JTNQ",
-        "discountPct": 35,
-        "endsAt": null,
+        "discountPct": 40,
+        "endsAt": "2026-11-28T08:59:59.999Z",
         "firstPurchase": true,
-        "lastChecked": "2026-10-12",
-        "thenPct": 30
+        "lastChecked": "2026-11-27",
+        "thenPct": 35
       },
       "programs": [
         {
@@ -36,54 +36,22 @@
             {
               "size": 10000,
               "price": 40,
-              "promoPrice": 26
+              "promoPrice": 24
             },
             {
               "size": 25000,
               "price": 100,
-              "promoPrice": 65
+              "promoPrice": 60
             },
             {
               "size": 50000,
               "price": 190,
-              "promoPrice": 123
+              "promoPrice": 114
             },
             {
               "size": 100000,
               "price": 360,
-              "promoPrice": 234
-            }
-          ]
-        },
-        {
-          "name": "Prime",
-          "steps": "1 step",
-          "split": "80%",
-          "profitTarget": "12%",
-          "maxDrawdown": "5%",
-          "ddType": "Static",
-          "dailyLoss": "3%",
-          "note": "Daily payouts · 90% split option · the loss limit locks at your starting balance on the 1st payout",
-          "plans": [
-            {
-              "size": 10000,
-              "price": 60,
-              "promoPrice": 39
-            },
-            {
-              "size": 25000,
-              "price": 160,
-              "promoPrice": 104
-            },
-            {
-              "size": 50000,
-              "price": 300,
-              "promoPrice": 195
-            },
-            {
-              "size": 100000,
-              "price": 595,
-              "promoPrice": 386
+              "promoPrice": 216
             }
           ]
         },
@@ -99,23 +67,23 @@
           "plans": [
             {
               "size": 10000,
-              "price": 90,
-              "promoPrice": 58
+              "price": 87,
+              "promoPrice": 52
             },
             {
               "size": 25000,
-              "price": 225,
-              "promoPrice": 146
+              "price": 209,
+              "promoPrice": 125
             },
             {
               "size": 50000,
-              "price": 430,
-              "promoPrice": 279
+              "price": 419,
+              "promoPrice": 251
             },
             {
               "size": 100000,
-              "price": 870,
-              "promoPrice": 565
+              "price": 839,
+              "promoPrice": 503
             }
           ]
         },
@@ -131,35 +99,36 @@
           "plans": [
             {
               "size": 5000,
-              "price": 89,
-              "promoPrice": 57,
+              "price": 99,
+              "promoPrice": 59,
               "altPrice": 49,
-              "altPromoPrice": 31
+              "altPromoPrice": 29
             },
             {
               "size": 10000,
-              "price": 175,
-              "promoPrice": 113,
+              "price": 194,
+              "promoPrice": 116,
               "altPrice": 95,
-              "altPromoPrice": 61
+              "altPromoPrice": 57
             },
             {
               "size": 25000,
-              "price": 449,
-              "promoPrice": 291,
+              "price": 482,
+              "promoPrice": 289,
               "altPrice": 249,
-              "altPromoPrice": 161
+              "altPromoPrice": 149
             },
             {
               "size": 50000,
-              "price": 889,
-              "promoPrice": 577,
+              "price": 959,
+              "promoPrice": 575,
               "altPrice": 495,
-              "altPromoPrice": 321
+              "altPromoPrice": 297
             }
           ]
         }
-      ]
+      ],
+      "stale": false
     },
     {
       "id": "breakout",
@@ -2722,7 +2691,7 @@
       "name": "E8 Markets",
       "logo": "/logos/e8-markets.svg",
       "url": "https://e8markets.com/d/B1770991?market=perpetual",
-      "lastChecked": "2026-11-01",
+      "lastChecked": "2026-11-27",
       "markets": [
         "Crypto",
         "Stocks",
@@ -2731,14 +2700,17 @@
         "Forex"
       ],
       "pairs": {
-        "count": 256,
-        "title": "Crypto 158 · Stocks 83 · Metals 5 · Indices 4 · Energy 3 · FX 3"
+        "count": 263,
+        "title": "Crypto 162 · Stocks 86 · Metals 5 · Indices 4 · Energy 3 · FX 3"
       },
       "promo": {
         "code": "JTNQ",
         "discountPct": 50,
         "endsAt": null,
-        "lastChecked": "2026-11-01"
+        "otherPcts": [
+          10
+        ],
+        "lastChecked": "2026-11-27"
       },
       "programs": [
         {
@@ -4156,8 +4128,138 @@
               "note": "Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum. No best-day rule, 2% daily profit cap. No payout caps. No activation fee. The drawdown only moves when you request the first payout."
             }
           ]
+        },
+        {
+          "name": "E8 Classic · 5% Max",
+          "rulesKey": "Classic",
+          "steps": "1 step",
+          "split": "80% / 90%",
+          "profitTarget": "8%",
+          "maxDrawdown": "5%",
+          "ddType": "Static",
+          "dailyLoss": "2% or none",
+          "priceLabel": "2% DLL",
+          "note": "",
+          "plans": [
+            {
+              "size": 2000,
+              "price": 29,
+              "promoPrice": 27,
+              "altPrice": 35,
+              "altPromoPrice": 32,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$100"
+                }
+              ],
+              "more": [
+                {
+                  "label": "No DLL",
+                  "price": 36,
+                  "promoPrice": 33,
+                  "altPrice": 44,
+                  "altPromoPrice": 40
+                }
+              ],
+              "note": "Prices for 80% and 90% payout, in that order."
+            },
+            {
+              "size": 5000,
+              "price": 59,
+              "promoPrice": 54,
+              "altPrice": 71,
+              "altPromoPrice": 64,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$250"
+                }
+              ],
+              "more": [
+                {
+                  "label": "No DLL",
+                  "price": 69,
+                  "promoPrice": 63,
+                  "altPrice": 83,
+                  "altPromoPrice": 75
+                }
+              ],
+              "note": "Prices for 80% and 90% payout, in that order."
+            },
+            {
+              "size": 10000,
+              "price": 119,
+              "promoPrice": 108,
+              "altPrice": 143,
+              "altPromoPrice": 129,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$500"
+                }
+              ],
+              "more": [
+                {
+                  "label": "No DLL",
+                  "price": 129,
+                  "promoPrice": 117,
+                  "altPrice": 155,
+                  "altPromoPrice": 140
+                }
+              ],
+              "note": "Prices for 80% and 90% payout, in that order."
+            },
+            {
+              "size": 25000,
+              "price": 229,
+              "promoPrice": 207,
+              "altPrice": 275,
+              "altPromoPrice": 248,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$1,250"
+                }
+              ],
+              "more": [
+                {
+                  "label": "No DLL",
+                  "price": 319,
+                  "promoPrice": 288,
+                  "altPrice": 383,
+                  "altPromoPrice": 345
+                }
+              ],
+              "note": "Prices for 80% and 90% payout, in that order."
+            },
+            {
+              "size": 50000,
+              "price": 449,
+              "promoPrice": 405,
+              "altPrice": 539,
+              "altPromoPrice": 486,
+              "lines": [
+                {
+                  "label": "Max drawdown",
+                  "value": "$2,500"
+                }
+              ],
+              "more": [
+                {
+                  "label": "No DLL",
+                  "price": 629,
+                  "promoPrice": 567,
+                  "altPrice": 755,
+                  "altPromoPrice": 680
+                }
+              ],
+              "note": "Prices for 80% and 90% payout, in that order."
+            }
+          ]
         }
-      ]
+      ],
+      "stale": false
     }
   ]
 }

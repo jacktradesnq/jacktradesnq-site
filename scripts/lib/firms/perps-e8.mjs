@@ -549,6 +549,10 @@ export function e8PerpsFromSnapshot(snapshot, { checkedOn = new Date().toISOStri
     promo = { code: E8_PERPS_CODE, discountPct: best, endsAt: endOf(top.flatMap((e) => discounts[e.id].listed)) };
     const first = top.map((e) => discounts[e.id].firstOnly).find(Boolean);
     if (first) Object.assign(promo, { firstPurchase: true, thenPct: first.thenPct });
+    // Les taux plus bas d'autres comptes (E8 Classic à 10 % le 28/11/2026) : la pastille de la carte dit
+    // alors « Up to 50% off » (discountWords dans app/prop-firms/perps.ts), jamais « 50% off » pour tous.
+    const lower = [...new Set(entries.map((e) => discounts[e.id].pct).filter((p) => p > 0 && p < best))].sort((a, b) => b - a);
+    if (lower.length) promo.otherPcts = lower;
     promo.lastChecked = checkedOn;
   }
 
