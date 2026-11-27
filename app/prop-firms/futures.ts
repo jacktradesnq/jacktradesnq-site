@@ -30,9 +30,11 @@ type Plan = {
   size: number;
   price: number;
   originalPrice?: number | null;
-  profitTarget: number | null;
-  maxDrawdown: number;
-  ddType: DdType;
+  // A rule the firm's card does not state has no key (scripts/lib/catalog-sync.mjs: a plan the
+  // daily sync creates carries only what the page says): its cell reads « — », never a guess.
+  profitTarget?: number | null;
+  maxDrawdown?: number;
+  ddType?: DdType;
   dailyLoss?: number | null;
   dailyLossSoft?: boolean;
   // The same account also sold without a daily loss limit, its price in the note (Tradeify Inter
@@ -479,11 +481,12 @@ function rowsOf(firm: Firm, link: Link): CompareRow[] {
     return pr.plans.map((plan, i): CompareRow => {
       const price = effectivePrice(firm, plan);
       const steps = stepsOf(pr);
-      // No profit target written on an instant account that has none (Angelo, 22/10/2026).
+      // No profit target written on an instant account that has none (Angelo, 22/10/2026), nor where
+      // no source states one (no key): « None » only where the firm says there is none (null).
       const target =
         plan.profitTarget != null
           ? { text: money(plan.profitTarget), sort: plan.profitTarget }
-          : pr.type === 'instant'
+          : pr.type === 'instant' || !('profitTarget' in plan)
             ? undefined
             : textVal('None');
       return {
@@ -510,23 +513,25 @@ function rowsOf(firm: Firm, link: Link): CompareRow[] {
           activation: activation(firm, plan, firmHasFee),
           contracts: cellVal('contracts', plan.contracts),
           target,
-          maxLoss: { text: money(plan.maxDrawdown), sort: plan.maxDrawdown },
-          lossType: {
-            text: '',
-            sort: DD_LABEL[plan.ddType],
-            tag: {
-              label: DD_LABEL[plan.ddType],
-              title: DD_TITLE[plan.ddType],
-              accent: plan.ddType !== 'EOD' && plan.ddType !== 'Static',
-            },
-          },
+          maxLoss: plan.maxDrawdown != null ? { text: money(plan.maxDrawdown), sort: plan.maxDrawdown } : undefined,
+          lossType: plan.ddType
+            ? {
+                text: '',
+                sort: DD_LABEL[plan.ddType],
+                tag: {
+                  label: DD_LABEL[plan.ddType],
+                  title: DD_TITLE[plan.ddType],
+                  accent: plan.ddType !== 'EOD' && plan.ddType !== 'Static',
+                },
+              }
+            : undefined,
           split: splitVal(firm, pr, plan),
           maxPayout: maxPayout(pr, funded, plan.size),
           minPayout: cellVal('minPayout', pr.minPayout ?? pillValue(funded, 'Minimum payout'), { size: plan.size }),
           consistency: consistency(pr, plan, funded),
           payoutFreq: cellVal('payoutFreq', pr.payoutFrequency ?? pillValue(funded, 'Payout request') ?? pace(firm)),
         },
-        lossType: DD_LABEL[plan.ddType],
+        lossType: plan.ddType ? DD_LABEL[plan.ddType] : null,
         // The scraper writes null where the firm says there is none, and leaves the key out where
         // no source says (scripts/lib/catalog-sync.mjs): not published.
         dailyLoss: !('dailyLoss' in plan)

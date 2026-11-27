@@ -29,6 +29,7 @@
 import fs from 'node:fs';
 
 import { fetchPageText } from './lib/cf-fetch.mjs';
+import { fetchBluSky } from './lib/firms/blusky.mjs';
 import { fetchE8Panels, parseE8Panel, plansFromPanels } from './lib/firms/e8.mjs';
 import { fetchTopOneCards, topOneCardRules } from './lib/firms/topone.mjs';
 import { programsFromSnapshot, readTradersLaunchPage } from './lib/firms/traderslaunch.mjs';
@@ -71,12 +72,24 @@ function consistency(v) {
   return s;
 }
 
-// Contracts: pull the two integers (minis, micros) regardless of format
+// Contracts: the two integers (minis, micros) regardless of format
 // (site "4 Mini | 40 Micro" / "1 mini (10 micros)" vs JSON "4 minis / 40 micros").
+// Read by unit when the text names one: the Traders Launch drops write
+// "10 micros total; no minis" (cards of 19/11 and 28/11/2026), which the old
+// positional read took for 10 minis. No unit word: first integer = minis.
 function contracts(v) {
   if (v == null) return null;
   if (typeof v === 'object') return v;
-  const nums = String(v).match(/\d+/g);
+  const s = String(v);
+  const unit = (name) => {
+    if (new RegExp(`\\bno ${name}s?\\b`, 'i').test(s)) return 0;
+    const m = s.match(new RegExp(`(\\d+)\\s*${name}s?\\b`, 'i'));
+    return m ? parseInt(m[1], 10) : undefined;
+  };
+  const minis = unit('mini');
+  const micros = unit('micro');
+  if (minis !== undefined || micros !== undefined) return { minis: minis ?? null, micros: micros ?? null };
+  const nums = s.match(/\d+/g);
   if (!nums || !nums.length) return null;
   return { minis: parseInt(nums[0], 10), micros: nums[1] != null ? parseInt(nums[1], 10) : null };
 }
@@ -193,11 +206,11 @@ async function extractE8() {
  * instant accounts. Every card has both faces since Aug 2026; « Consistency on Eval: None! » on
  * Elite Access is the evaluation (its 40% is funded only, carried by the site's funded rules).
  * A row a card no longer carries is BROKEN, except the two it never had:
- *   - profitTarget on Instant Sim Funded / Ignite (no evaluation, JSON null);
+ *   - profitTarget on an account without evaluation (Instant Sim Funded, Ignite: card.type
+ *     'instant', JSON null);
  *   - maxDrawdown on Elite Access: its evaluation face prints the drawdown mode, not the amount
  *     (help.toponefutures.com, hand-maintained).
  */
-const TOPONE_INSTANT = new Set(['Instant Sim Funded', 'Ignite']);
 export function topOneRules(cards) {
   const read = (v, norm) => (v == null ? BROKEN : norm(v));
   const amount = (v) => (/^none!?$/i.test(String(v).trim()) ? null : money(v) ?? BROKEN);
@@ -208,7 +221,7 @@ export function topOneRules(cards) {
       consistency: read(r.consistency, consistency),
       contracts: read(r.contracts, (v) => contracts(v) ?? BROKEN),
     };
-    if (!TOPONE_INSTANT.has(card.programName)) rules.profitTarget = read(r.profitTarget, amount);
+    if (card.type !== 'instant') rules.profitTarget = read(r.profitTarget, amount);
     if (card.programName !== 'Elite Access') rules.maxDrawdown = read(r.maxDrawdown, amount);
     return { programName: card.programName, size: card.size, rules };
   });
@@ -217,10 +230,22 @@ async function extractTopOne() {
   return topOneRules(await fetchTopOneCards(fetchText));
 }
 
+/* ---- BluSky — l'API du checkout, recoupee par la page des plans de blusky.pro ---- */
+/**
+ * The same reading as the price sync (scripts/lib/firms/blusky.mjs): the first phase of each
+ * checkout product. Where the checkout and the blusky.pro plans table disagree, the plans table
+ * (what a visitor reads) is compared, so a JSON that follows neither shows up as a drift.
+ * A daily loss above the max drawdown (Propel 300K checkout, help center « None ») is not emitted.
+ */
+async function extractBluSky() {
+  return (await fetchBluSky()).rules;
+}
+
 const EXTRACTORS = {
   'traders-launch': extractTradersLaunch,
   'e8-markets': extractE8,
   'top-one-futures': extractTopOne,
+  blusky: extractBluSky,
 };
 
 // Human-readable reason for the fields we knowingly do not auto-verify.
@@ -232,6 +257,7 @@ function skipReason(firmId, programName, field) {
   if (firmId === 'e8-markets' && field === 'dailyLoss') return 'never shown on E8 cards (manual null)';
   if (firmId === 'e8-markets' && field === 'contracts')
     return 'their cards stopped listing the contract limit (manual)';
+  if (firmId === 'blusky' && field === 'dailyLoss') return 'checkout daily drawdown above the max drawdown (Propel 300K), help center says none (manual)';
   return 'not published on buy-screen (manual)';
 }
 

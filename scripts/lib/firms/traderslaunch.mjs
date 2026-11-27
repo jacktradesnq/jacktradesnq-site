@@ -163,6 +163,19 @@ function drawdown(ls) {
 }
 
 /**
+ * « Contract Limit » des drops (cartes TL Drops du 19/11 et du 28/11/2026) : la valeur,
+ * puis une explication collee sans espace par le rendu :
+ *   « 10 micros total; no minisVolumetrica's platform limits each symbol to 10 on its own; ... »
+ * On garde la valeur (« 10 micros total; no minis »), coupee la ou une minuscule touche une
+ * majuscule qui commence un mot. Une valeur qui ne dit ni mini ni micro : null, jamais devinee.
+ */
+function contractLimit(raw) {
+  if (raw == null) return null;
+  const value = String(raw).split(/(?<=[a-z0-9%)])(?=[A-Z][a-z])/)[0].trim();
+  return /\b(minis?|micros?)\b/i.test(value) ? value : null;
+}
+
+/**
  * Une carte : son texte rendu et son lien « Get Funded ».
  * @param {string} programme  l'onglet sous lequel la carte a ete lue (ou 'Legacy NYC')
  * @param {number} chosenSplit  le split selectionne dans l'onglet au moment de la lecture
@@ -270,7 +283,10 @@ function parseCard(programme, chosenSplit, card, drop = false) {
   }
 
   const starts = ls.find((l) => /^Starts at /i.test(l));
-  const contracts = starts?.match(/^Starts at (.+?)(?:, up to [^.]*|; that is your fixed limit)?\.(?:\s|$)/i)?.[1] ?? after(ev, 'Starting Size');
+  const contracts =
+    starts?.match(/^Starts at (.+?)(?:, up to [^.]*|; that is your fixed limit)?\.(?:\s|$)/i)?.[1] ??
+    after(ev, 'Starting Size') ??
+    contractLimit(after(ev, 'Contract Limit'));
   if (contracts) plan.contracts = contracts;
 
   // « Trading hours: 6:00pm – 4:00pm ET the following day » (Premium, Static),

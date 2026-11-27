@@ -24,6 +24,14 @@
  * La section PERFORMANCE RULES (compte finance : « Daily Pause », consistency
  * 35 % du Signature) n'est pas comparee — le JSON ne dit pas encore s'il doit
  * la montrer, c'est a Angelo de le decider.
+ *
+ * Depuis le 28/11/2026, la lecture est le CATALOGUE d'E8 (chemin `{ programs }` de
+ * scripts/scrape-prop-firms.mjs, comme Traders Launch) : les programmes sont les
+ * boutons du groupe « Account type » de la page, les tailles ses tuiles. Un
+ * programme ou une taille qu'E8 ajoute apparait sur le site, ce qu'ils ne vendent
+ * plus en disparait (Angelo, 21/10/2026 : « tant que y a sur leur site faut que ca
+ * sois sur nôtre site aussi » ; 28/11/2026 : « un plan que la firme ajoute
+ * n'apparaît pas tout seul sur le site. pourquoi?? »).
  */
 
 export const E8_URL = 'https://e8futures.com';
@@ -34,6 +42,23 @@ export const E8_TABS = {
   'E8 Zero MAX': 'E8 Zero MAX Futures',
   'E8 Zero Starter': 'E8 Zero Starter Futures',
 };
+
+/**
+ * Le nom publie d'un programme : celui d'E8_TABS, sinon le nom du bouton suivi de
+ * « Futures », comme les trois programmes publies (e8futures.com ne vend que des
+ * futures ; E8 vend aussi des perps, sous un autre id du site).
+ */
+export function e8ProgramName(tab) {
+  return E8_TABS[tab] ?? (/\bFutures$/i.test(tab) ? tab : `${tab} Futures`);
+}
+
+/**
+ * Le libelle de drawdown de CHALLENGE RULES -> le vocabulaire du comparateur.
+ * « EOD Dynamic Drawdown » : les 12 plans publies, ecrits a la main, portent
+ * « EOD Trailing » sous ce libelle (le bouton Signature dit « End of the day
+ * drawdown »). Un libelle inconnu ne donne pas de ddType : jamais devine.
+ */
+const E8_DD = { 'EOD Dynamic Drawdown': 'EOD Trailing' };
 
 const money = (s) => {
   const n = parseFloat(String(s).replace(/[$,\s]/g, ''));
@@ -70,6 +95,14 @@ function valueAfter(lines, re) {
  * ligne manque : c'est l'appelant qui decide si c'est casse). rules.consistency
  * vaut le pourcentage de la section CHALLENGE RULES, ou null si elle n'en a pas.
  * rules.contracts n'existe que si une ligne « Max contracts » existe.
+ *
+ * Hors de `rules` (que lit le controle de derive) : ddLabel, le libelle de la
+ * ligne de drawdown de CHALLENGE RULES, et contractsText, la valeur brute de
+ * « Max contracts » quand la ligne existe.
+ *
+ * Un programme absent d'E8_TABS est un programme qu'E8 vient d'ajouter : il est
+ * lu comme les autres (le titre du panneau doit toujours nommer le bouton clique,
+ * plansFromPanels le verifie).
  */
 export function parseE8Panel(text) {
   const lines = String(text)
@@ -82,8 +115,7 @@ export function parseE8Panel(text) {
     .find(Boolean);
   if (!head) throw new Error('panneau E8 sans titre « <programme> · Account · $<taille>K »');
   const tab = head[1].trim();
-  const programName = E8_TABS[tab];
-  if (!programName) throw new Error(`programme E8 inconnu dans le titre du panneau : « ${tab} »`);
+  const programName = e8ProgramName(tab);
   const size = parseInt(head[2], 10) * 1000;
   const tag = `${programName} $${size / 1000}K`;
 
@@ -116,10 +148,54 @@ export function parseE8Panel(text) {
   };
   if (cons != null && rules.consistency == null) rules.consistencyUnreadable = cons;
   const ct = valueAfter(challenge, /^Max contracts$/i);
-  if (challenge.some((l) => /^Max contracts$/i.test(l)))
+  const hasContracts = challenge.some((l) => /^Max contracts$/i.test(l));
+  if (hasContracts)
     rules.contracts = ct != null && /^\d+$/.test(ct) ? { minis: parseInt(ct, 10), micros: null } : undefined;
 
-  return { tab, programName, size, price, originalPrice, rules };
+  const ddLabel = challenge.find((l) => /drawdown/i.test(l)) ?? null;
+  const contractsText = hasContracts ? ct ?? null : null;
+  return { tab, programName, size, price, originalPrice, rules, ddLabel, contractsText };
+}
+
+/**
+ * Les plans lus -> le catalogue, dans la forme du dataset (chemin `{ programs }`
+ * de scripts/scrape-prop-firms.mjs, scripts/lib/catalog-sync.mjs).
+ *
+ * Chaque plan porte ce que le panneau dit, et seulement ca : une regle que le
+ * panneau ne donne pas, ou pas lisiblement, n'a pas de cle (le JSON garde alors
+ * la valeur ecrite a la main d'un plan deja publie ; un plan nouveau n'en a pas).
+ * Jamais de valeur inventee. Ce que CHALLENGE RULES ne porte jamais (daily loss)
+ * reste donc a la main.
+ *
+ * Tous les programmes sont des evaluations payees une fois : chaque panneau dit
+ * « One phase » et liste ses CHALLENGE RULES, et la FAQ de e8futures.com ecrit
+ * « You pay a one-time challenge fee » (relu le 28/11/2026). Un programme sans
+ * CHALLENGE RULES (un compte instantane) arrete deja la lecture dans parseE8Panel.
+ *
+ * @param {ReturnType<typeof parseE8Panel>[]} plans  dans l'ordre de la page
+ * @returns {Array<{name: string, type: 'eval', priceType: 'one-time', plans: object[]}>}
+ */
+export function e8Programs(plans) {
+  const programs = [];
+  for (const p of plans) {
+    let program = programs.find((x) => x.name === p.programName);
+    if (!program) {
+      program = { name: p.programName, type: 'eval', priceType: 'one-time', plans: [] };
+      programs.push(program);
+    }
+    if (program.plans.some((x) => x.size === p.size))
+      throw new Error(`${p.programName} $${p.size / 1000}K : deux panneaux pour la meme taille`);
+    const plan = { size: p.size, price: p.price, originalPrice: p.originalPrice };
+    if (p.rules.profitTarget != null) plan.profitTarget = p.rules.profitTarget;
+    if (p.rules.maxDrawdown != null) plan.maxDrawdown = p.rules.maxDrawdown;
+    if (E8_DD[p.ddLabel]) plan.ddType = E8_DD[p.ddLabel];
+    if (p.rules.consistency != null) plan.consistency = p.rules.consistency;
+    // « Max contracts » : leurs mots, seulement s'ils disent l'unite (minis / micros).
+    // Un nombre nu ne dit pas s'il compte des minis ou des micros : pas de cle.
+    if (p.contractsText && /\b(minis?|micros?)\b/i.test(p.contractsText)) plan.contracts = p.contractsText;
+    program.plans.push(plan);
+  }
+  return programs;
 }
 
 /**
@@ -177,9 +253,22 @@ export async function fetchE8Panels(pw, launch = {}) {
       }
     };
 
+    // Les programmes sont les boutons du groupe « Account type » (role=radio), lus sur
+    // la page et non tires d'une liste : un programme qu'E8 ajoute est clique comme
+    // les autres. Le nom est la premiere ligne du bouton (« E8 Zero MAX », puis sa
+    // description).
+    const typeRadios = page.locator('[role=radiogroup][aria-label="Account type"] [role=radio]:visible');
+    const tabs = await typeRadios.evaluateAll((els) =>
+      els.map((e) => (e.innerText || '').split('\n').map((l) => l.trim()).filter(Boolean)[0] ?? ''),
+    );
+    if (tabs.length === 0 || tabs.some((t) => !t))
+      throw new Error(`configurateur E8 : boutons « Account type » illisibles (${JSON.stringify(tabs)})`);
+    if (new Set(tabs).size !== tabs.length) throw new Error(`configurateur E8 : deux programmes au meme nom (${tabs.join(', ')})`);
+
     const out = [];
-    for (const tab of Object.keys(E8_TABS)) {
-      await clickUntil(page.locator('button:visible', { hasText: tab }).first(), `${tab} · Account ·`);
+    for (let t = 0; t < tabs.length; t++) {
+      const tab = tabs[t];
+      await clickUntil(typeRadios.nth(t), `${tab} · Account ·`);
       // Des tuiles « $25K » cachees existent aussi (vue mobile) : seulement les visibles.
       const tiles = page.locator('button:visible').filter({ hasText: /^\s*(\d+% OFF\s*)?\$\d+K/ });
       const n = await tiles.count();

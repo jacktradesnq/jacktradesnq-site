@@ -18,7 +18,7 @@
           "plans": [
             {
               "size": 100000,
-              "price": 159,
+              "price": 111.3,
               "profitTarget": 2000,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
@@ -26,14 +26,15 @@
               "contracts": "2 minis or 20 micros",
               "note": "Session profit limit: 40% of profit target. Price shown for the 80% split.",
               "splitPrices": {
-                "60": 99
+                "60": 69.3
               },
               "minDays": 0,
-              "dailyLoss": null
+              "dailyLoss": null,
+              "originalPrice": 159
             },
             {
               "size": 200000,
-              "price": 299,
+              "price": 209.3,
               "profitTarget": 4000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -41,14 +42,15 @@
               "contracts": "4 minis or 40 micros",
               "note": "Session profit limit: 40% of profit target. Price shown for the 80% split.",
               "splitPrices": {
-                "60": 199
+                "60": 139.3
               },
               "minDays": 0,
-              "dailyLoss": null
+              "dailyLoss": null,
+              "originalPrice": 299
             },
             {
               "size": 300000,
-              "price": 599,
+              "price": 419.3,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
@@ -56,10 +58,11 @@
               "contracts": "6 minis or 60 micros",
               "note": "Session profit limit: 40% of profit target. Price shown for the 80% split.",
               "splitPrices": {
-                "60": 399
+                "60": 279.3
               },
               "minDays": 0,
-              "dailyLoss": null
+              "dailyLoss": null,
+              "originalPrice": 599
             }
           ]
         },
@@ -136,7 +139,8 @@
               "splitPrices": {
                 "60": 51.63,
                 "90": 95.38
-              }
+              },
+              "contracts": "10 micros total; no minis"
             }
           ]
         }
