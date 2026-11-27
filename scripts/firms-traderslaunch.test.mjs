@@ -419,7 +419,8 @@ test('TL Drops (19/11/2026) : le drop Rapid 25K publie tel que ses cartes l ecri
   const [p] = progs.find((x) => x.name === 'Drop').plans;
   // Cartes : « $89 » (80 %) / « List price $111.25 », « $59 » (60 %), « $109 » (90 %),
   // « Profit Target $1,250 », « $500 EOD trailingStops trailing at $25,000 »,
-  // « Daily Loss Limit None », « Consistency Rule None ».
+  // « Daily Loss Limit None », « Consistency Rule None »,
+  // « Contract Limit 10 micros total; no minisVolumetrica's platform limits ... ».
   assert.deepEqual(p, {
     size: 25000,
     price: 89,
@@ -429,9 +430,52 @@ test('TL Drops (19/11/2026) : le drop Rapid 25K publie tel que ses cartes l ecri
     ddType: 'EOD - Stops trailing at $25,000',
     consistency: 'None',
     dailyLoss: null,
+    contracts: '10 micros total; no minis',
     note: 'Rapid. Price shown for the 80% split.',
     splitPrices: { 60: 59, 90: 109 },
   });
+});
+
+test('Contract Limit : la valeur sans l explication collee, une valeur sans unite n est pas devinee', () => {
+  const s = structuredClone(SNAP_1119);
+  for (const c of view(s, 'TL Drops').splits[0].cards) {
+    c.text = c.text.replace(/Contract Limit\n[^\n]*/, 'Contract Limit\nask support');
+  }
+  const [p] = programsFromSnapshot(s).find((x) => x.name === 'Drop').plans;
+  assert.equal('contracts' in p, false);
+});
+
+/**
+ * La page relevee le 28/11/2026 a 00:13 heure de Paris (27/11 23:13 UTC ; Black Friday « 30% Off All Accounts »,
+ * code TL30, jusqu'au 2026-12-01 04:59 UTC selon leur /api/promo-banner) : chaque carte
+ * affiche son prix remise, puis « List price » et « 30% Off ». Premium compris : la
+ * synchro du 27/11 a 16:41 UTC l'avait lu sans prix barre (159 / 299 / 599).
+ */
+const SNAP_1128 = JSON.parse(
+  fs.readFileSync(path.join(HERE, 'lib/firms/fixtures', 'traderslaunch-pricing-2026-11-28.json'), 'utf8'),
+);
+
+test('programsFromSnapshot (28/11/2026) : Premium remise de 30 %, lu avec son prix barre', () => {
+  const progs = programsFromSnapshot(SNAP_1128);
+  assert.deepEqual(progs.map((p) => p.name), ['Premium', 'Static', 'Drop']);
+  const table = (name) => progs.find((p) => p.name === name).plans.map((p) => [p.size, p.price, p.originalPrice, p.splitPrices]);
+  assert.deepEqual(table('Premium'), [
+    [100000, 111.3, 159, { 60: 69.3 }],
+    [200000, 209.3, 299, { 60: 139.3 }],
+    [300000, 419.3, 599, { 60: 279.3 }],
+  ]);
+  assert.deepEqual(table('Static'), [
+    [25000, 104.3, 149, { 60: 83.3, 90: 118.3 }],
+    [50000, 209.3, 299, { 60: 167.3, 90: 237.3 }],
+    [100000, 419.3, 599, { 60: 335.3, 90: 475.3 }],
+  ]);
+  const [drop] = progs.find((p) => p.name === 'Drop').plans;
+  assert.deepEqual([drop.price, drop.originalPrice, drop.splitPrices, drop.contracts], [
+    77.88,
+    111.25,
+    { 60: 51.63, 90: 95.38 },
+    '10 micros total; no minis',
+  ]);
 });
 
 test('Daily Loss Limit : un texte qui n est ni un montant ni « None » reste une erreur', () => {

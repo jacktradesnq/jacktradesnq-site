@@ -121,3 +121,27 @@ test('Traders Launch: a card that lost its fee throws, the firm is reported brok
   card.text = card.text.replace('One-Time Fee', 'Fee');
   assert.throws(() => tradersLaunchRules(snap), /One-Time Fee/);
 });
+
+// Captured 2026-11-19: the « TL Drops » tab sells the Rapid 25K drop, whose card writes its
+// limit as « Contract Limit » (« 10 micros total; no minis » + an explanation glued on by the
+// renderer), not « Starts at … ». The 27/11/2026 check reported it unreadable.
+const TL_SNAP_1119 = JSON.parse(
+  readFileSync(new URL('./lib/firms/fixtures/traderslaunch-pricing-2026-11-19.json', import.meta.url), 'utf8'),
+);
+
+test('Traders Launch Drop: the contract limit is read, 10 micros and no minis', () => {
+  const rules = tradersLaunchRules(TL_SNAP_1119);
+  const drop = rules.find((r) => r.programName === 'Drop' && r.size === 25000).rules;
+  assert.deepEqual(drop.contracts, { minis: 0, micros: 10 });
+  const premium = rules.find((r) => r.programName === 'Premium' && r.size === 100000).rules;
+  assert.deepEqual(premium.contracts, { minis: 2, micros: 20 });
+});
+
+test('Traders Launch Drop: a contract limit the card no longer states is still a broken scraper', () => {
+  const snap = structuredClone(TL_SNAP_1119);
+  for (const c of snap.views.find((v) => v.account === 'TL Drops').splits[0].cards) {
+    c.text = c.text.replace(/Contract Limit\n[^\n]*/, 'Contract Limit\nask support');
+  }
+  const drop = tradersLaunchRules(snap).find((r) => r.programName === 'Drop').rules;
+  assert.equal(drop.contracts, BROKEN);
+});

@@ -1,0 +1,137 @@
+{
+  "url": "https://traderslaunch.com/",
+  "readAt": "2026-11-27T23:13:57.562Z",
+  "views": [
+    {
+      "account": "Premium",
+      "splits": [
+        {
+          "split": 60,
+          "cards": [
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=100000&split=60&hours=2",
+              "text": "Futures 100K\n60% Profit Split\n\n$100,000 starting capital\n\n$69.30\n\nOne-Time Fee\n\nList price\n$99\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$2,000\nMax Drawdown\n$1,000 EODLocks at starting balance\nSession Profit Limit\n40% of profit target\nDays to Pass\nNo minimum\n\nSIMFUNDED\n\nGet Paid\nDailyEligible for payouts once +1%\nProfit Split\n60%\nConsistency Rule\nNone\nPayout Caps\nNone\nActivation Fee\nNone\n\nStarts at 2 minis or 20 micros; that is your fixed limit."
+            },
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=200000&split=60&hours=2",
+              "text": "Futures 200K\n60% Profit Split\n\n$200,000 starting capital\n\n$139.30\n\nOne-Time Fee\n\nList price\n$199\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$4,000\nMax Drawdown\n$2,000 EODLocks at starting balance\nSession Profit Limit\n40% of profit target\nDays to Pass\nNo minimum\n\nSIMFUNDED\n\nGet Paid\nDailyEligible for payouts once +1%\nProfit Split\n60%\nConsistency Rule\nNone\nPayout Caps\nNone\nActivation Fee\nNone\n\nStarts at 4 minis or 40 micros; that is your fixed limit."
+            },
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=300000&split=60&hours=2",
+              "text": "Futures 300K\n60% Profit Split\n\n$300,000 starting capital\n\n$279.30\n\nOne-Time Fee\n\nList price\n$399\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$6,000\nMax Drawdown\n$3,000 EODLocks at starting balance\nSession Profit Limit\n40% of profit target\nDays to Pass\nNo minimum\n\nSIMFUNDED\n\nGet Paid\nDailyEligible for payouts once +1%\nProfit Split\n60%\nConsistency Rule\nNone\nPayout Caps\nNone\nActivation Fee\nNone\n\nStarts at 6 minis or 60 micros; that is your fixed limit."
+            }
+          ]
+        },
+        {
+          "split": 80,
+          "cards": [
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=100000&split=80&hours=2",
+              "text": "Futures 100K\n80% Profit Split\n\n$100,000 starting capital\n\n$111.30\n\nOne-Time Fee\n\nList price\n$159\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$2,000\nMax Drawdown\n$1,000 EODLocks at starting balance\nSession Profit Limit\n40% of profit target\nDays to Pass\nNo minimum\n\nSIMFUNDED\n\nGet Paid\nDailyEligible for payouts once +1%\nProfit Split\n80%\nConsistency Rule\nNone\nPayout Caps\nNone\nActivation Fee\nNone\n\nStarts at 2 minis or 20 micros; that is your fixed limit."
+            },
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=200000&split=80&hours=2",
+              "text": "Futures 200K\n80% Profit Split\n\n$200,000 starting capital\n\n$209.30\n\nOne-Time Fee\n\nList price\n$299\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$4,000\nMax Drawdown\n$2,000 EODLocks at starting balance\nSession Profit Limit\n40% of profit target\nDays to Pass\nNo minimum\n\nSIMFUNDED\n\nGet Paid\nDailyEligible for payouts once +1%\nProfit Split\n80%\nConsistency Rule\nNone\nPayout Caps\nNone\nActivation Fee\nNone\n\nStarts at 4 minis or 40 micros; that is your fixed limit."
+            },
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=300000&split=80&hours=2",
+              "text": "Futures 300K\n80% Profit Split\n\n$300,000 starting capital\n\n$419.30\n\nOne-Time Fee\n\nList price\n$599\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$6,000\nMax Drawdown\n$3,000 EODLocks at starting balance\nSession Profit Limit\n40% of profit target\nDays to Pass\nNo minimum\n\nSIMFUNDED\n\nGet Paid\nDailyEligible for payouts once +1%\nProfit Split\n80%\nConsistency Rule\nNone\nPayout Caps\nNone\nActivation Fee\nNone\n\nStarts at 6 minis or 60 micros; that is your fixed limit."
+            }
+          ]
+        }
+      ],
+      "faq": null
+    },
+    {
+      "account": "Static",
+      "splits": [
+        {
+          "split": 60,
+          "cards": [
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=25000&split=60&hours=2&planId=57d1d46e808ce022434a79ec",
+              "text": "Static 25K\n60% Profit Split\n\n$25,000 starting capital\n\n$83.30\n\nOne-Time Fee\n\nList price\n$119\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$1,500\nMax Drawdown\n$500 staticDoes not trail\nConsistency Rule\n50%\n\nSIMFUNDED\n\nBuffer\nNone\nWithdraw From\n$200Profit before your split\nDaily Earnings\nUp to $1,000Positions flatten at this amount\nProfit Split\n60%\nConsistency Rule\nNone\n\nStarts at 1 mini or 10 micros; that is your fixed limit."
+            },
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=50000&split=60&hours=2&planId=0ab42606d9a323c120008610",
+              "text": "Static 50K\n60% Profit Split\n\n$50,000 starting capital\n\n$167.30\n\nOne-Time Fee\n\nList price\n$239\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$3,000\nMax Drawdown\n$1,000 staticDoes not trail\nConsistency Rule\n50%\n\nSIMFUNDED\n\nBuffer\nNone\nWithdraw From\n$200Profit before your split\nDaily Earnings\nUp to $2,000Positions flatten at this amount\nProfit Split\n60%\nConsistency Rule\nNone\n\nStarts at 2 minis or 20 micros; that is your fixed limit."
+            },
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=100000&split=60&hours=2&planId=2113b877582a334d9fa6c1e7",
+              "text": "Static 100K\n60% Profit Split\n\n$100,000 starting capital\n\n$335.30\n\nOne-Time Fee\n\nList price\n$479\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$6,000\nMax Drawdown\n$2,000 staticDoes not trail\nConsistency Rule\n50%\n\nSIMFUNDED\n\nBuffer\nNone\nWithdraw From\n$200Profit before your split\nDaily Earnings\nUp to $4,000Positions flatten at this amount\nProfit Split\n60%\nConsistency Rule\nNone\n\nStarts at 4 minis or 40 micros; that is your fixed limit."
+            }
+          ]
+        },
+        {
+          "split": 80,
+          "cards": [
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=25000&split=80&hours=2&planId=b842c4e2a241f4a33aefd09d",
+              "text": "Static 25K\n80% Profit Split\n\n$25,000 starting capital\n\n$104.30\n\nOne-Time Fee\n\nList price\n$149\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$1,500\nMax Drawdown\n$500 staticDoes not trail\nConsistency Rule\n50%\n\nSIMFUNDED\n\nBuffer\nNone\nWithdraw From\n$200Profit before your split\nDaily Earnings\nUp to $1,000Positions flatten at this amount\nProfit Split\n80%\nConsistency Rule\nNone\n\nStarts at 1 mini or 10 micros; that is your fixed limit."
+            },
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=50000&split=80&hours=2&planId=ba268ba81e4d1fb71b4d24f2",
+              "text": "Static 50K\n80% Profit Split\n\n$50,000 starting capital\n\n$209.30\n\nOne-Time Fee\n\nList price\n$299\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$3,000\nMax Drawdown\n$1,000 staticDoes not trail\nConsistency Rule\n50%\n\nSIMFUNDED\n\nBuffer\nNone\nWithdraw From\n$200Profit before your split\nDaily Earnings\nUp to $2,000Positions flatten at this amount\nProfit Split\n80%\nConsistency Rule\nNone\n\nStarts at 2 minis or 20 micros; that is your fixed limit."
+            },
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=100000&split=80&hours=2&planId=f6504f78be31170da14365f2",
+              "text": "Static 100K\n80% Profit Split\n\n$100,000 starting capital\n\n$419.30\n\nOne-Time Fee\n\nList price\n$599\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$6,000\nMax Drawdown\n$2,000 staticDoes not trail\nConsistency Rule\n50%\n\nSIMFUNDED\n\nBuffer\nNone\nWithdraw From\n$200Profit before your split\nDaily Earnings\nUp to $4,000Positions flatten at this amount\nProfit Split\n80%\nConsistency Rule\nNone\n\nStarts at 4 minis or 40 micros; that is your fixed limit."
+            }
+          ]
+        },
+        {
+          "split": 90,
+          "cards": [
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=25000&split=90&hours=2&planId=7971e80f5f5bdd1312121e07",
+              "text": "Static 25K\n90% Profit Split\n\n$25,000 starting capital\n\n$118.30\n\nOne-Time Fee\n\nList price\n$169\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$1,500\nMax Drawdown\n$500 staticDoes not trail\nConsistency Rule\n50%\n\nSIMFUNDED\n\nBuffer\nNone\nWithdraw From\n$200Profit before your split\nDaily Earnings\nUnlimited\nProfit Split\n90%\nConsistency Rule\nNone\n\nStarts at 1 mini or 10 micros; that is your fixed limit."
+            },
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=50000&split=90&hours=2&planId=0f7bffa33d814635bfa678b4",
+              "text": "Static 50K\n90% Profit Split\n\n$50,000 starting capital\n\n$237.30\n\nOne-Time Fee\n\nList price\n$339\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$3,000\nMax Drawdown\n$1,000 staticDoes not trail\nConsistency Rule\n50%\n\nSIMFUNDED\n\nBuffer\nNone\nWithdraw From\n$200Profit before your split\nDaily Earnings\nUnlimited\nProfit Split\n90%\nConsistency Rule\nNone\n\nStarts at 2 minis or 20 micros; that is your fixed limit."
+            },
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=100000&split=90&hours=2&planId=a5b48461c403da619d89a94e",
+              "text": "Static 100K\n90% Profit Split\n\n$100,000 starting capital\n\n$475.30\n\nOne-Time Fee\n\nList price\n$679\n30% Off\n\nGet Funded\n\nEVALUATION\n\nProfit Target\n$6,000\nMax Drawdown\n$2,000 staticDoes not trail\nConsistency Rule\n50%\n\nSIMFUNDED\n\nBuffer\nNone\nWithdraw From\n$200Profit before your split\nDaily Earnings\nUnlimited\nProfit Split\n90%\nConsistency Rule\nNone\n\nStarts at 4 minis or 40 micros; that is your fixed limit."
+            }
+          ]
+        }
+      ],
+      "faq": {
+        "title": "Static",
+        "text": "Static Accounts FAQStatic evaluation, trading rules and payouts.What are Static accounts?Static accounts are available in $25K, $50K, $100K sizes with 60%, 80% or 90% profit splits. These accounts have one evaluation, static drawdown and no separate buffer stage after passing. This FAQ applies to Static, rather than Premium accounts.How much do Static accounts cost?The cards above show the current evaluation fee for each account size and profit split, in US dollars. The price shown is what you pay with code TL30, which is applied automatically at checkout.Can I use a different discount code?Yes. TL30 is applied automatically at checkout, and you can remove it and enter any other valid code instead. One code applies per order, so codes never stack, and your price follows the code you use.What does my profit split mean?Your profit split is your share of eligible profits. On $1,000 of eligible profits, a 60% split gives you $600, an 80% split gives you $800, and a 90% split gives you $900. Payouts remain subject to the account rules.How long do I have to pass the evaluation?60 days, under the same evaluation time rules as other accounts. If you haven't passed by day 60 but you're above 50% of your profit target, you get a free 30-day extension automatically. SimFunded accounts have no time limit once you're funded.Is there a consistency rule during the evaluation?Yes. Every Static evaluation has a 50% consistency rule, including the 90% profit-split option. This is enforced as a daily profit limit at 50% of the evaluation profit target; trading stops for the day when the limit is reached. The 90% plan removes the daily earnings limit once sim funded, not during the evaluation.What are the profit target and drawdown rules?Static accounts use static drawdown: the loss threshold does not trail upward as you make profits. There is no separate daily loss limit, but you must still stay within the account’s static drawdown limit. The current evaluation terms for each account are:AccountProfit TargetMax Drawdown$25K$1,500$500$50K$3,000$1,000$100K$6,000$2,000Do I need another evaluation or a buffer after passing?No. Static accounts have a one-step evaluation. After passing, our team reviews and approves creation of your SimFunded account. There is no separate buffer stage to complete. Identity verification and a signed contract are required before we create your SimFunded account.What happens when I reach my daily earnings limit?On 60% and 80% SimFunded accounts, open positions are closed automatically and trading stops for the day when you reach the daily earnings limit:AccountDaily Earnings Limit$25K$1,000 per day$50K$2,000 per day$100K$4,000 per dayThe 90% option has unlimited daily earnings once SimFunded. Drawdown and other trading rules still apply. Daily earnings limits govern trading activity; they are not payout limits or guaranteed take-home amounts.Can I request payouts daily, and what is the minimum?Yes, once you meet the payout requirements, including completed identity verification and a signed contract. The minimum payout is $200 of trading profit above the starting balance, measured before your split: $120 to you at 60%, $160 at 80%, or $180 at 90%. Daily availability does not guarantee approval or instant arrival; requests remain subject to eligibility, verification, and account rules.Can I trade near a price limit?No. CME limits how far an index future (ES, NQ, YM and their micros) can move in a day: 7% today. While it is within 2% of that limit, that is at a 5% move from the previous settlement, up or down, close your position and do not trade it. You can trade it again once it is back out. Holding or opening a position inside the zone is a rule breach.Is the funded stage a live brokerage account?Evaluation and funded accounts operate in a simulated trading environment. Payouts are real.LiveRapid Drop Is Open · Limited time"
+      }
+    },
+    {
+      "account": "TL Drops",
+      "splits": [
+        {
+          "split": null,
+          "cards": [
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=25000&split=60&hours=2&planId=6890d67d1856a46a2247514b",
+              "text": "Rapid 25K\n60% Profit Split\n\n$25,000 starting capital · $1,000 daily earning potential when sim funded\n\n$51.63\n\nOne-Time Fee\n\nList price\n$73.75\n30% Off\n\nGet Rapid\n\nEVALUATION\n\nProfit Target\n$1,250\nMax Drawdown\n$500 EOD trailingStops trailing at $25,000\nDaily Loss Limit\nNone\nConsistency Rule\nNone\nMinimum Days\nNone\nContract Limit\n10 micros total; no minisVolumetrica's platform limits each symbol to 10 on its own; holding more than 10 micros in total across symbols breaks the rule.\n\nSIMFUNDED\n\nDaily Earnings\nUp to $1,000\nWithdraw Above\n$25,600$250 minimum, before your split\nPayouts\nOne every 24 hours per trader\nConsistency Rule\nNone\nFull Rules\nShow"
+            },
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=25000&split=80&hours=2&planId=e5bf78b38d10bbd08dd9e6fa",
+              "text": "Rapid 25K\n80% Profit Split\n\n$25,000 starting capital · $1,000 daily earning potential when sim funded\n\n$77.88\n\nOne-Time Fee\n\nList price\n$111.25\n30% Off\n\nGet Rapid\n\nEVALUATION\n\nProfit Target\n$1,250\nMax Drawdown\n$500 EOD trailingStops trailing at $25,000\nDaily Loss Limit\nNone\nConsistency Rule\nNone\nMinimum Days\nNone\nContract Limit\n10 micros total; no minisVolumetrica's platform limits each symbol to 10 on its own; holding more than 10 micros in total across symbols breaks the rule.\n\nSIMFUNDED\n\nDaily Earnings\nUp to $1,000\nWithdraw Above\n$25,600$250 minimum, before your split\nPayouts\nOne every 24 hours per trader\nConsistency Rule\nNone\nFull Rules\nShow"
+            },
+            {
+              "href": "https://app.traderslaunch.com/auth/purchasing-signup?type=futures&size=25000&split=90&hours=2&planId=e7d51fcb6ae04289f2049f6f",
+              "text": "Rapid 25K\n90% Profit Split\n\n$25,000 starting capital · $1,000 daily earning potential when sim funded\n\n$95.38\n\nOne-Time Fee\n\nList price\n$136.25\n30% Off\n\nGet Rapid\n\nEVALUATION\n\nProfit Target\n$1,250\nMax Drawdown\n$500 EOD trailingStops trailing at $25,000\nDaily Loss Limit\nNone\nConsistency Rule\nNone\nMinimum Days\nNone\nContract Limit\n10 micros total; no minisVolumetrica's platform limits each symbol to 10 on its own; holding more than 10 micros in total across symbols breaks the rule.\n\nSIMFUNDED\n\nDaily Earnings\nUp to $1,000\nWithdraw Above\n$25,600$250 minimum, before your split\nPayouts\nOne every 24 hours per trader\nConsistency Rule\nNone\nFull Rules\nShow"
+            }
+          ]
+        }
+      ],
+      "faq": null
+    }
+  ],
+  "legacy": {
+    "splits": [
+      {
+        "split": null,
+        "cards": []
+      }
+    ]
+  }
+}

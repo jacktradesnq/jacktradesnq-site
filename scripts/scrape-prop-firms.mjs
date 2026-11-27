@@ -8,11 +8,11 @@
  *    tout ce que la firme vend. guardCatalog() + syncCatalog() creent les
  *    programmes et les tailles nouveaux, retirent ce qui n'est plus vendu, et
  *    gardent les regles curatees a la main que le lecteur n'encode pas.
- *    Traders Launch.
+ *    Traders Launch, E8 Markets.
  *
  *  - `{ updates }` — le chemin historique, un metteur a jour de PRIX sur des
  *    programmes figes a la main : guard() + apply() ne touchent que price /
- *    originalPrice / activationFee / note. E8, BluSky et Top One Futures.
+ *    originalPrice / activationFee / note. BluSky et Top One Futures.
  *
  * Dans les deux cas les promos (promo firme, promoCode / promoLabel par
  * programme) passent par applyPromos(), et une firme dont le scraper echoue
@@ -27,7 +27,7 @@ import fs from 'node:fs';
 import { guardCatalog, syncCatalog } from './lib/catalog-sync.mjs';
 import { fetchPageText } from './lib/cf-fetch.mjs';
 import { fetchBluSkyPlans } from './lib/firms/blusky.mjs';
-import { fetchE8Plans } from './lib/firms/e8.mjs';
+import { e8Programs, fetchE8Plans } from './lib/firms/e8.mjs';
 import { fetchTopOneCards, topOnePromo, topOneUpdates } from './lib/firms/topone.mjs';
 import { fetchTradersLaunchPrograms } from './lib/firms/traderslaunch.mjs';
 
@@ -84,8 +84,10 @@ async function scrapeTradersLaunch() {
 /* ------------------------------------------------------------------ */
 
 // E8 : le configurateur de e8futures.com, lu tuile par tuile (scripts/lib/firms/e8.mjs).
-// Chemin `updates` : seuls price / originalPrice bougent ; les programmes et les
-// tailles du JSON restent decides a la main.
+// Chemin catalogue, comme Traders Launch : un programme ou une taille qu'E8 ajoute
+// apparait, ce qu'ils ne vendent plus disparait, les regles que leur panneau ne
+// donne pas restent celles ecrites a la main (Angelo, 21/10/2026 : « tant que y a
+// sur leur site faut que ca sois sur nôtre site aussi »).
 export async function scrapeE8Markets(read) {
   if (!read) {
     let pw;
@@ -100,14 +102,7 @@ export async function scrapeE8Markets(read) {
     read = () => fetchE8Plans(pw, launch);
   }
   const plans = await read();
-  return {
-    updates: plans.map(({ programName, size, price, originalPrice }) => ({
-      programName,
-      size,
-      price,
-      originalPrice,
-    })),
-  }; // promo stays manual — site banner label is vaguer than the curated JSON copy
+  return { programs: e8Programs(plans) }; // promo stays manual — site banner label is vaguer than the curated JSON copy
 }
 
 /* ------------------------------------------------------------------ */

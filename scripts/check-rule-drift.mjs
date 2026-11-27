@@ -71,12 +71,24 @@ function consistency(v) {
   return s;
 }
 
-// Contracts: pull the two integers (minis, micros) regardless of format
+// Contracts: the two integers (minis, micros) regardless of format
 // (site "4 Mini | 40 Micro" / "1 mini (10 micros)" vs JSON "4 minis / 40 micros").
+// Read by unit when the text names one: the Traders Launch drops write
+// "10 micros total; no minis" (cards of 19/11 and 28/11/2026), which the old
+// positional read took for 10 minis. No unit word: first integer = minis.
 function contracts(v) {
   if (v == null) return null;
   if (typeof v === 'object') return v;
-  const nums = String(v).match(/\d+/g);
+  const s = String(v);
+  const unit = (name) => {
+    if (new RegExp(`\\bno ${name}s?\\b`, 'i').test(s)) return 0;
+    const m = s.match(new RegExp(`(\\d+)\\s*${name}s?\\b`, 'i'));
+    return m ? parseInt(m[1], 10) : undefined;
+  };
+  const minis = unit('mini');
+  const micros = unit('micro');
+  if (minis !== undefined || micros !== undefined) return { minis: minis ?? null, micros: micros ?? null };
+  const nums = s.match(/\d+/g);
   if (!nums || !nums.length) return null;
   return { minis: parseInt(nums[0], 10), micros: nums[1] != null ? parseInt(nums[1], 10) : null };
 }
