@@ -36,8 +36,10 @@
  * Règles d'Angelo appliquées ici :
  *  - le code imprimé est TOUJOURS JTNQ ; la meilleure remise affichée par la firme lui est
  *    attribuée ; leur code public est lu pour rien et jamais rendu ;
- *  - hors promo affichée, JTNQ vaut 5 % sans date de fin (Angelo, 01/11/2026 : « breakout premier
- *    eval c'est belle et bien du 5% ») : le site ne le montre pas, la valeur vient de lui ;
+ *  - hors promo affichée, JTNQ vaut le taux d'un code créateur que publie leur page affiliés
+ *    (breakoutprop.com/affiliates/, 28/11/2026 : « Anyone using your code gets 5% off their first
+ *    order »), sans date de fin, au premier achat (Angelo, 01/11/2026 : « breakout premier eval c'est
+ *    belle et bien du 5% ») ; phrase introuvable = firme illisible ;
  *  - promoPrice = le prix remisé que la page affiche quand elle en affiche un, sinon prix × (1 − taux)
  *    au centime (« Checkout prices include cents », conditions de la promo du 27/11/2026) ;
  *  - un plan que la firme ajoute ou retire apparaît / disparaît seul (28/11/2026) : le nom affiché
@@ -57,8 +59,9 @@ import { fetchPageText } from '../cf-fetch.mjs';
 
 export const BREAKOUT_PERPS_SOURCE = 'https://www.breakoutprop.com/pricing/';
 export const BREAKOUT_CODE = 'JTNQ';
-/** Remise JTNQ hors promo affichée (Angelo, 01/11/2026). */
-export const BREAKOUT_JTNQ_STANDARD_PCT = 5;
+/** Page affiliés : le taux d'un code créateur hors promo (« Anyone using your code gets 5% off their first order »). */
+export const BREAKOUT_AFFILIATES = 'https://www.breakoutprop.com/affiliates/';
+
 
 const fail = (why) => {
   throw new Error(`Breakout illisible : ${why}`);
@@ -335,8 +338,12 @@ export function breakoutPerpsFromSnapshot(snapshot, { checkedOn, previous } = {}
 
   const bannerOn = banner && banner.start <= at && at < banner.end;
   const live = bannerOn ? landingPromo(snapshot.promo, banner, at) : null;
-  const pct = live && live.pct > BREAKOUT_JTNQ_STANDARD_PCT ? live.pct : BREAKOUT_JTNQ_STANDARD_PCT;
-  const promo = { code: BREAKOUT_CODE, discountPct: pct, endsAt: pct === BREAKOUT_JTNQ_STANDARD_PCT ? null : live.endsAt, lastChecked: day };
+  const standard = breakoutCreatorPct(snapshot.affiliates);
+  const pct = live && live.pct > standard ? live.pct : standard;
+  const promo =
+    pct === standard
+      ? { code: BREAKOUT_CODE, discountPct: pct, endsAt: null, firstPurchase: true, lastChecked: day }
+      : { code: BREAKOUT_CODE, discountPct: pct, endsAt: live.endsAt, lastChecked: day };
 
   const notes = new Map((previous?.programs ?? []).map((p) => [p.name, p.note ?? '']));
   const programs = plans.map((p) => ({
@@ -386,5 +393,18 @@ export async function readBreakoutPerps({ fetchText = (url) => fetchPageText(url
       }
     }
   }
+  try {
+    snapshot.affiliates = { url: BREAKOUT_AFFILIATES, html: await fetchText(BREAKOUT_AFFILIATES) };
+  } catch (e) {
+    snapshot.affiliates = { url: BREAKOUT_AFFILIATES, error: e.message };
+  }
   return snapshot;
+}
+
+/** Le taux d'un code créateur hors promo, lu sur la page affiliés du snapshot. */
+export function breakoutCreatorPct(affiliates) {
+  if (!affiliates?.html) fail(`page affiliés ${affiliates?.url ?? BREAKOUT_AFFILIATES} illisible${affiliates?.error ? ` : ${affiliates.error}` : ''}`);
+  const m = text(affiliates.html).match(/Anyone using your code gets (\d{1,2}(?:\.\d+)?)% off their first order/i);
+  if (!m) fail('page affiliés : « Anyone using your code gets X% off their first order » introuvable');
+  return Number(m[1]);
 }

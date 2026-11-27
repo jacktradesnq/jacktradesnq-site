@@ -7,6 +7,7 @@ import {
   breakoutEndsAt,
   breakoutPerpsFromSnapshot,
   readBreakoutPerps,
+  BREAKOUT_AFFILIATES,
 } from './lib/firms/perps-breakout.mjs';
 
 // Lu sur https://www.breakoutprop.com/pricing/ et sa page de promo /lp/bfcm25 le 28/11/2026 (Paris).
@@ -61,7 +62,7 @@ test('Black Friday : 25 % pour JTNQ jusqu au 30/11 23:59 UTC, prix remisés affi
 
 test('après la fin annoncée : retour à JTNQ 5 % sans date de fin, prix × 0,95 au centime', () => {
   const r = breakoutPerpsFromSnapshot(at('2026-12-01T00:00:00Z'), { checkedOn: '2026-12-01' });
-  assert.deepEqual(r.promo, { code: 'JTNQ', discountPct: 5, endsAt: null, lastChecked: '2026-12-01' });
+  assert.deepEqual(r.promo, { code: 'JTNQ', discountPct: 5, endsAt: null, firstPurchase: true, lastChecked: '2026-12-01' });
   assert.deepEqual(table(r), [
     ['Classic', [[5000, 45, 42.75], [10000, 85, 80.75], [25000, 215, 204.25], [50000, 400, 380], [100000, 800, 760]]],
     ['Pro', [[5000, 33, 31.35], [10000, 65, 61.75], [25000, 150, 142.5], [50000, 280, 266], [100000, 545, 517.75], [200000, 1090, 1035.5]]],
@@ -137,7 +138,7 @@ test('fin annoncée sans année : l année la plus proche de la lecture', () => 
 
 test('readBreakoutPerps : /pricing/, puis la page de la bannière ; même résultat que la fixture', async () => {
   const asked = [];
-  const pages = { [BREAKOUT_PERPS_SOURCE]: SNAP.pricing.html, [SNAP.promo.url]: SNAP.promo.html };
+  const pages = { [BREAKOUT_PERPS_SOURCE]: SNAP.pricing.html, [SNAP.promo.url]: SNAP.promo.html, [BREAKOUT_AFFILIATES]: SNAP.affiliates.html };
   const snap = await readBreakoutPerps({
     fetchText: async (url) => {
       asked.push(url);
@@ -145,7 +146,7 @@ test('readBreakoutPerps : /pricing/, puis la page de la bannière ; même résul
     },
     now: () => new Date(SNAP.fetchedAt),
   });
-  assert.deepEqual(asked, [BREAKOUT_PERPS_SOURCE, 'https://www.breakoutprop.com/lp/bfcm25']);
+  assert.deepEqual(asked, [BREAKOUT_PERPS_SOURCE, 'https://www.breakoutprop.com/lp/bfcm25', BREAKOUT_AFFILIATES]);
   assert.deepEqual(breakoutPerpsFromSnapshot(snap, { checkedOn: DAY }), breakoutPerpsFromSnapshot(SNAP, { checkedOn: DAY }));
   const failing = await readBreakoutPerps({
     fetchText: async (url) => {
@@ -155,4 +156,14 @@ test('readBreakoutPerps : /pricing/, puis la page de la bannière ; même résul
     now: () => new Date(SNAP.fetchedAt),
   });
   assert.deepEqual(failing.promo, { url: 'https://www.breakoutprop.com/lp/bfcm25', error: 'HTTP 503' });
+  assert.deepEqual(failing.affiliates, { url: BREAKOUT_AFFILIATES, error: 'HTTP 503' });
+});
+
+test('hors promo, le taux JTNQ = celui que leur page affiliés publie (« Anyone using your code gets 5% off their first order »)', () => {
+  const later = at('2026-12-01T00:00:00Z');
+  const ten = { ...later, affiliates: { ...SNAP.affiliates, html: SNAP.affiliates.html.split('gets 5% off their first order').join('gets 10% off their first order') } };
+  assert.equal(breakoutPerpsFromSnapshot(ten, { checkedOn: '2026-12-01' }).promo.discountPct, 10);
+  assert.throws(() => breakoutPerpsFromSnapshot({ ...later, affiliates: { url: BREAKOUT_AFFILIATES, error: 'HTTP 403' } }, { checkedOn: '2026-12-01' }), /Breakout illisible : page affiliés .* HTTP 403/);
+  const gone = { ...later, affiliates: { ...SNAP.affiliates, html: SNAP.affiliates.html.split('Anyone using your code gets').join('Your code gives') } };
+  assert.throws(() => breakoutPerpsFromSnapshot(gone, { checkedOn: '2026-12-01' }), /introuvable/);
 });
