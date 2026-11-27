@@ -29,6 +29,7 @@
 import fs from 'node:fs';
 
 import { fetchPageText } from './lib/cf-fetch.mjs';
+import { fetchBluSky } from './lib/firms/blusky.mjs';
 import { fetchE8Panels, parseE8Panel, plansFromPanels } from './lib/firms/e8.mjs';
 import { fetchTopOneCards, topOneCardRules } from './lib/firms/topone.mjs';
 import { programsFromSnapshot, readTradersLaunchPage } from './lib/firms/traderslaunch.mjs';
@@ -217,10 +218,22 @@ async function extractTopOne() {
   return topOneRules(await fetchTopOneCards(fetchText));
 }
 
+/* ---- BluSky — l'API du checkout, recoupee par la page des plans de blusky.pro ---- */
+/**
+ * The same reading as the price sync (scripts/lib/firms/blusky.mjs): the first phase of each
+ * checkout product. Where the checkout and the blusky.pro plans table disagree, the plans table
+ * (what a visitor reads) is compared, so a JSON that follows neither shows up as a drift.
+ * A daily loss above the max drawdown (Propel 300K checkout, help center « None ») is not emitted.
+ */
+async function extractBluSky() {
+  return (await fetchBluSky()).rules;
+}
+
 const EXTRACTORS = {
   'traders-launch': extractTradersLaunch,
   'e8-markets': extractE8,
   'top-one-futures': extractTopOne,
+  blusky: extractBluSky,
 };
 
 // Human-readable reason for the fields we knowingly do not auto-verify.
@@ -232,6 +245,7 @@ function skipReason(firmId, programName, field) {
   if (firmId === 'e8-markets' && field === 'dailyLoss') return 'never shown on E8 cards (manual null)';
   if (firmId === 'e8-markets' && field === 'contracts')
     return 'their cards stopped listing the contract limit (manual)';
+  if (firmId === 'blusky' && field === 'dailyLoss') return 'checkout daily drawdown above the max drawdown (Propel 300K), help center says none (manual)';
   return 'not published on buy-screen (manual)';
 }
 

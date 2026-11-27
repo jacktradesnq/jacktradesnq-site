@@ -26,7 +26,7 @@ import fs from 'node:fs';
 
 import { guardCatalog, syncCatalog } from './lib/catalog-sync.mjs';
 import { fetchPageText } from './lib/cf-fetch.mjs';
-import { fetchBluSkyPlans } from './lib/firms/blusky.mjs';
+import { fetchBluSky } from './lib/firms/blusky.mjs';
 import { fetchE8Plans } from './lib/firms/e8.mjs';
 import { fetchTopOneCards, topOnePromo, topOneUpdates } from './lib/firms/topone.mjs';
 import { fetchTradersLaunchPrograms } from './lib/firms/traderslaunch.mjs';
@@ -114,10 +114,13 @@ export async function scrapeE8Markets(read) {
 /* BluSky — l'API publique de leur checkout (JSON, pas de navigateur)  */
 /* ------------------------------------------------------------------ */
 
-// Chemin `updates`, comme E8 : prix seulement, regles ecrites a la main.
-export async function scrapeBluSky(read = fetchBluSkyPlans) {
-  const plans = await read();
-  return { updates: plans }; // promo stays manual
+// Chemin `programs`, comme Traders Launch : le checkout est le catalogue (programmes, tailles,
+// prix, frais d'activation, regles de la 1re phase recoupees par la page des plans de blusky.pro,
+// scripts/lib/firms/blusky.mjs). Promo de la firme ecrite a la main (code JTNQ).
+export async function scrapeBluSky(read = fetchBluSky) {
+  const { programs, notes } = await read();
+  for (const n of notes ?? []) console.log(`blusky: ${n}`);
+  return { programs }; // promo stays manual
 }
 
 /* ------------------------------------------------------------------ */

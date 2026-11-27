@@ -11,6 +11,7 @@ import {
   tradersLaunchRules,
   BROKEN,
 } from './check-rule-drift.mjs';
+import { readBluSky } from './lib/firms/blusky.mjs';
 
 // Captured 2026-10-21 from the configurator on e8futures.com (Signature $25K panel).
 const E8_PANELS = JSON.parse(
@@ -71,6 +72,57 @@ test('a stamp written one day ahead of UTC reads as today, not as the future', (
 test('no reading at all is no excuse', () => {
   assert.equal(handCheck({}, '2026-08-21'), null);
   assert.equal(handCheck({ rulesCheckedAt: 'un jour' }, '2026-08-21').expired, true);
+});
+
+/* ------- BluSky: checkout API, cross-checked by the blusky.pro plans table ------- */
+
+// Captured 2026-11-28: the checkout product list and the blusky.pro plans page.
+const BLUSKY_PRODUCTS = JSON.parse(
+  readFileSync(new URL('./lib/firms/fixtures/blusky-products-2026-11-28.json', import.meta.url), 'utf8'),
+);
+const BLUSKY_PLANS = readFileSync(new URL('./lib/firms/fixtures/blusky-plans-2026-11-28.html', import.meta.url), 'utf8');
+
+test('every BluSky plan of the JSON is returned by the extractor, with all five rules', () => {
+  const { rules } = readBluSky(BLUSKY_PRODUCTS, BLUSKY_PLANS);
+  const bs = DATA.firms.find((f) => f.id === 'blusky');
+  for (const program of bs.programs) {
+    for (const plan of program.plans) {
+      const m = rules.find((r) => r.programName === program.name && r.size === plan.size);
+      assert.ok(m, `${program.name} ${plan.size}: not returned`);
+      assert.equal(m.rules.profitTarget, plan.profitTarget, `${program.name} ${plan.size} profitTarget`);
+      assert.equal(m.rules.maxDrawdown, plan.maxDrawdown, `${program.name} ${plan.size} maxDrawdown`);
+      for (const field of ['consistency', 'contracts']) assert.equal(typeof m.rules[field], 'string', `${program.name} ${plan.size} ${field}`);
+    }
+  }
+});
+
+test('BluSky: where the checkout and blusky.pro disagree, what a visitor of blusky.pro reads is compared', () => {
+  const { rules } = readBluSky(BLUSKY_PRODUCTS, BLUSKY_PLANS);
+  const at = (program, size) => rules.find((r) => r.programName === program && r.size === size).rules;
+  // Checkout 2 minis / 25 micros, blusky.pro and the help center 4 Mini / 40 Micros: the JSON's 2/25 is a drift.
+  assert.equal(at('Propel', 25000).contracts, '4 minis or 40 micros');
+  // Checkout $20,001 / $5,001 (rounded percentages), blusky.pro $20,000 / $5,000: no drift.
+  assert.equal(at('Propel', 300000).profitTarget, 20000);
+  assert.equal(at('Propel', 300000).maxDrawdown, 5000);
+  // A daily loss above the max drawdown is not a rule: left out, skipped by the report.
+  assert.equal('dailyLoss' in at('Propel', 300000), false);
+  // The Propel evaluation is at 55% on all three pages (JSON 34% on 19/11): a drift.
+  assert.equal(at('Propel', 50000).consistency, '55%');
+  assert.equal(at('Orbit', 50000).consistency, 'None');
+  assert.equal(at('Launch', 50000).dailyLoss, null);
+  assert.equal(at('Instant Funded', 50000).dailyLoss, 1000);
+  assert.equal(at('Instant Funded', 50000).profitTarget, null);
+});
+
+test('BluSky: a checkout rule that cannot be read and that nothing cross-checks is broken', () => {
+  const list = structuredClone(BLUSKY_PRODUCTS);
+  list.find((g) => g.challenge_type === 'Direct 2 Funded').products[0].challenge.phases[0].minis_limit = null;
+  const r = readBluSky(list, BLUSKY_PLANS).rules.find((x) => x.programName === 'Direct 2 Funded').rules;
+  // blusky.pro writes « 5 Mini / 50 Micros » for it: the plans table still answers.
+  assert.equal(r.contracts, '5 minis or 50 micros');
+  list.find((g) => g.challenge_type === 'Direct 2 Funded').products[0].challenge.phases[0].maximum_drawdown_amount = 'n/a';
+  const r2 = readBluSky(list, BLUSKY_PLANS).rules.find((x) => x.programName === 'Direct 2 Funded').rules;
+  assert.match(r2.maxDrawdown.broken, /maxDrawdown illisible/);
 });
 
 /* ------- Traders Launch: the #pricing snapshot, not the old « 1-Step » cards ------- */
