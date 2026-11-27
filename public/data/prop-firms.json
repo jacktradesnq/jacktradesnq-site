@@ -140,7 +140,8 @@
                 "60": 51.63,
                 "90": 95.38
               },
-              "contracts": "10 micros total; no minis"
+              "contracts": "10 micros total; no minis",
+              "minDays": 0
             }
           ]
         }

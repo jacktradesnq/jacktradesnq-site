@@ -152,7 +152,7 @@ const sync = async (firm, panels) => {
   const res = await scrapeE8Markets(async () => plansFromPanels(panels));
   guardCatalog(firm, res.programs);
   const changes = [];
-  syncCatalog(firm, res.programs, changes);
+  syncCatalog(firm, res.programs, changes, res.catalog);
   return changes;
 };
 
@@ -169,9 +169,12 @@ test('une taille vendue chez E8 mais absente du site est ajoutee, avec les regle
   const firm = firmFromSite();
   firm.programs[1].plans = firm.programs[1].plans.filter((p) => p.size !== 200000);
   const changes = await sync(firm, PANELS);
-  assert.deepEqual(changes, ['E8 Markets / E8 Zero MAX Futures $200K: plan ajoute']);
+  assert.deepEqual(changes, [
+    'E8 Markets / E8 Zero MAX Futures $200K: plan ajoute (repris des autres tailles : dailyLoss null, dailyLossSoft false)',
+  ]);
   assert.deepEqual(firm.programs[1].plans.map((p) => p.size), [25000, 50000, 100000, 200000]);
-  // Ce que le panneau dit, et rien d'autre : pas de dailyLoss ni de contracts (absents de CHALLENGE RULES).
+  // Ce que le panneau dit, plus ce que les 3 autres tailles ecrites a la main partagent
+  // (dailyLoss null, dailyLossSoft false). Contracts differe selon les tailles : jamais repris.
   assert.deepEqual(firm.programs[1].plans[3], {
     size: 200000,
     price: 708,
@@ -179,8 +182,46 @@ test('une taille vendue chez E8 mais absente du site est ajoutee, avec les regle
     profitTarget: 13500,
     maxDrawdown: 6000,
     ddType: 'EOD Trailing',
+    dailyLoss: null,
+    dailyLossSoft: false,
     consistency: '40%',
   });
+});
+
+/** Le panneau Signature 150K, relu comme une taille 200K qu'E8 ajouterait. */
+const signature200K = () => {
+  const p = PANELS.find((x) => x.tab === 'E8 Signature' && /\$150K/.test(x.tile));
+  return { ...p, tile: p.tile.replace('$150K', '$200K'), text: p.text.replace('· $150K', '· $200K') };
+};
+
+test('une taille Signature nouvelle reprend la consistency « None » que toutes ses tailles portent', async () => {
+  const firm = firmFromSite();
+  const changes = await sync(firm, [...PANELS.slice(0, 4), signature200K(), ...PANELS.slice(4)]);
+  assert.deepEqual(changes, [
+    'E8 Markets / E8 Signature Futures $200K: plan ajoute (repris des autres tailles : dailyLoss null, dailyLossSoft false, consistency "None")',
+  ]);
+  const plan = firm.programs[0].plans.find((p) => p.size === 200000);
+  assert.equal(plan.consistency, 'None'); // pas de ligne dans CHALLENGE RULES : la regle ecrite a la main passe avant la cle absente
+  assert.equal('contracts' in plan, false); // 2 / 4 / 8 / 12 minis selon les tailles : jamais repris
+  assert.equal(plan.profitTarget, 9000); // ce que le panneau dit reste le sien
+});
+
+test('une valeur qui differe selon les tailles ne se reprend jamais, une valeur lue gagne', async () => {
+  const firm = firmFromSite();
+  firm.programs[0].plans[1].consistency = '35%'; // Signature : plus la meme valeur partout
+  firm.programs[0].plans[2].dailyLossSoft = true;
+  let changes = await sync(firm, [...PANELS.slice(0, 4), signature200K(), ...PANELS.slice(4)]);
+  assert.deepEqual(changes, ['E8 Markets / E8 Signature Futures $200K: plan ajoute (repris des autres tailles : dailyLoss null)']);
+  const plan = firm.programs[0].plans.find((p) => p.size === 200000);
+  assert.equal('consistency' in plan, false);
+  assert.equal('dailyLossSoft' in plan, false);
+
+  // Zero MAX ecrit « None » a la main sur ses 3 tailles, le panneau de la 4e dit « 40% » : le panneau gagne.
+  const zero = firmFromSite();
+  zero.programs[1].plans = zero.programs[1].plans.filter((p) => p.size !== 200000);
+  for (const p of zero.programs[1].plans) p.consistency = 'None';
+  changes = await sync(zero, PANELS);
+  assert.equal(zero.programs[1].plans[3].consistency, '40%');
 });
 
 test('un programme qu E8 ajoute apparait seul sur le site', async () => {
@@ -188,6 +229,8 @@ test('un programme qu E8 ajoute apparait seul sur le site', async () => {
   const changes = await sync(firm, [...PANELS, ...renamed('E8 Zero MAX', 'E8 Turbo')]);
   assert.deepEqual(changes, ['E8 Markets: programme « E8 Turbo Futures » ajoute (4 tailles)']);
   const turbo = firm.programs.find((p) => p.name === 'E8 Turbo Futures');
+  // Aucune taille publiee a qui reprendre une regle : seulement ce que les panneaux disent.
+  assert.equal('dailyLoss' in turbo.plans[0], false);
   assert.equal(turbo.type, 'eval');
   assert.equal(turbo.priceType, 'one-time');
   assert.deepEqual(turbo.plans.map((p) => [p.size, p.price, p.originalPrice]), [

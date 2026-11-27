@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { guardCatalog, syncCatalog } from './lib/catalog-sync.mjs';
+import { guardCatalog, syncCatalog, uniformRules } from './lib/catalog-sync.mjs';
 
 /** Une firme publiee minimale : un programme, une taille, des regles curatees. */
 const firmeJSON = () => ({
@@ -333,4 +333,47 @@ test('les garde-fous numeriques sont ceux du chemin historique', () => {
     /aucun plan lu/,
   );
   assert.doesNotThrow(() => guardCatalog(firm, avec({ size: 50000, price: 300, originalPrice: 600 })));
+});
+
+/* ---------------- reprise des regles communes (opt-in, E8 depuis le 28/11/2026) ---------------- */
+
+const deuxTailles = () => ({
+  name: 'E8 Markets',
+  programs: [
+    {
+      name: 'Signature',
+      type: 'eval',
+      priceType: 'one-time',
+      plans: [
+        { size: 25000, price: 90, consistency: 'None', dailyLoss: null, contracts: '2 minis / 20 micros', note: 'x' },
+        { size: 50000, price: 128, consistency: 'None', dailyLoss: null, contracts: '4 minis / 40 micros' },
+      ],
+    },
+  ],
+});
+
+test('uniformRules : seulement les regles que toutes les tailles portent a l identique', () => {
+  assert.deepEqual(uniformRules(deuxTailles().programs[0].plans), { dailyLoss: null, consistency: 'None' });
+  assert.deepEqual(uniformRules([]), {});
+});
+
+test('sans l option, une taille nouvelle ne reprend rien', () => {
+  const firm = deuxTailles();
+  const changes = [];
+  syncCatalog(firm, [{ name: 'Signature', plans: [{ size: 25000, price: 90 }, { size: 50000, price: 128 }, { size: 100000, price: 210 }] }], changes);
+  assert.deepEqual(changes, ['E8 Markets / Signature $100K: plan ajoute']);
+  assert.deepEqual(firm.programs[0].plans[2], { size: 100000, price: 210 });
+});
+
+test('avec l option, une taille nouvelle reprend les regles communes, le lecteur gagne sur ce qu il porte', () => {
+  const firm = deuxTailles();
+  const changes = [];
+  syncCatalog(
+    firm,
+    [{ name: 'Signature', plans: [{ size: 25000, price: 90 }, { size: 50000, price: 128 }, { size: 100000, price: 210, consistency: '40%' }] }],
+    changes,
+    { inheritUniformRules: true },
+  );
+  assert.deepEqual(changes, ['E8 Markets / Signature $100K: plan ajoute (repris des autres tailles : dailyLoss null)']);
+  assert.deepEqual(firm.programs[0].plans[2], { size: 100000, price: 210, dailyLoss: null, consistency: '40%' });
 });

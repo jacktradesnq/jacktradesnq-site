@@ -1,0 +1,5 @@
+{
+  "path": "/api/promo-banner",
+  "status": 200,
+  "body": "{\"flagValue\":\"black-friday-2026\",\"payload\":\"{\\\"enabled\\\": true, \\\"saleId\\\": \\\"black-friday-tl30-2026-11-23\\\", \\\"eyebrow\\\": \\\"Black Friday Sale:\\\", \\\"message\\\": \\\"30% Off All Accounts\\\", \\\"code\\\": \\\"TL30\\\", \\\"audience\\\": \\\"everyone\\\", \\\"showCountdown\\\": true, \\\"expiresAt\\\": \\\"2026-12-01T04:59:00Z\\\", \\\"ctaLabel\\\": \\\"See Accounts\\\", \\\"ctaHref\\\": \\\"/#pricing\\\", \\\"theme\\\": \\\"blue\\\"}\"}"
+}

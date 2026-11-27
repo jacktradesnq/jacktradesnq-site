@@ -35,7 +35,10 @@ jobs:
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 
+      # Une lecture incoherente (Traders Launch : bannière « X% Off All Accounts » et une carte sans prix barre,
+      # 27/11/2026) garde les donnees de la firme (stale) et ecrit fail_job : job rouge plus bas.
       - name: Scrape prop firms prices
+        id: scrape
         run: node scripts/scrape-prop-firms.mjs
 
       - name: Build live promos feed
@@ -135,6 +138,12 @@ jobs:
         if: always() && steps.lucid.outcome == 'failure'
         run: |
           echo "::error::scrape-lucid : page Lucid illisible (403 Cloudflare, plan du JSON absent ou remise changée, voir l'étape « Scrape Lucid »). Données gardées, stale: true."
+          exit 1
+
+      - name: Prop firm read incoherent — fail the job
+        if: always() && steps.scrape.outputs.fail_job != ''
+        run: |
+          echo "::error::scrape-prop-firms : lecture incoherente pour ${{ steps.scrape.outputs.fail_job }} (voir l'étape « Scrape prop firms prices »). Données gardées, stale: true."
           exit 1
 
       - name: Giveaways unreadable — fail the job
