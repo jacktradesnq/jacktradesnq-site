@@ -1,5 +1,6 @@
-// Perps firms (public/data/perps-firms.json, read by hand, not auto-synced) turned into
-// FirmView (partner cards) and CompareRow (the comparator, one row per plan).
+// Perps firms (public/data/perps-firms.json, re-read every day on each firm's own site by
+// scripts/scrape-perps.mjs since 28/11/2026) turned into FirmView (partner cards) and CompareRow
+// (the comparator, one row per plan).
 //
 // The JTNQ promo has a hard end (endsAt), judged by the shared clock (promo-clock.ts): a
 // build made after endsAt never shows it, the static HTML shows the state of the build with a
@@ -14,13 +15,14 @@ import { BUILD_TS, usePromoClock } from './promo-clock';
 import { goHref } from '@/lib/go-links';
 import { firstNumber } from '@/lib/compare-order.mjs';
 import { sizeLabel } from './shared';
-import { cellVal, cheapest, pillValue, textVal, type CompareRow, type DailyLoss, type FirmView, type Funded, type Val } from './firm-view';
+import { cellVal, cheapest, humanDate, pillValue, textVal, type CompareRow, type DailyLoss, type FirmView, type Funded, type Val } from './firm-view';
 
 // price null = announced but not on sale yet ("Coming soon").
 // altPrice: a second version of the same account, shown in the same cell after a « / » (Angelo,
 // 12/10/2026 : « dans la même colonne et dans chaque truc t'as un / qui met les 2 prix »): MFP
-// Elite's cheaper 3% DLL version, Vest 1-Step's 90% split (the first price is the 80% split).
-// altPrices: the same, for an account sold in more than two versions (E8 One at 80%, 90%, 100%).
+// Elite's cheaper 3% DLL version.
+// altPrices: the same, for an account sold in more than two versions (E8 One at 80%, 90%, 100%;
+// Vest 1-Step at 70%, 80%, 90%, 95% since 28/11/2026, the first price being the 70% split).
 // lines: rules that change with the size (Vest's max drawdown in dollars), a row under the price.
 type PerpsPlan = {
   size: number;
@@ -30,8 +32,8 @@ type PerpsPlan = {
   altPromoPrice?: number;
   altPrices?: { price: number; promoPrice: number | null }[];
   lines?: { label: string; value: string }[];
-  // more: other versions of the same account, one price row each under the main one (Vest 1-Step:
-  // 3% DLL on the main row, then 4% DLL and No DLL; Angelo 21/10/2026: « les regrouper »).
+  // more: other versions of the same account, one price row each under the main one (Vest 1-Step
+  // until 23/11/2026: 3% DLL on the main row, then 4% DLL and No DLL; Angelo 21/10/2026: « les regrouper »).
   more?: { label: string; price: number; promoPrice: number | null; altPrice?: number; altPromoPrice?: number }[];
   note?: string;
 };
@@ -60,8 +62,19 @@ type PerpsFirm = {
   pairs?: { count: number; title: string };
   // endsAt null: no announced end, no countdown. firstPurchase: the rate applies to a first order.
   // thenPct: the rate on every later order (MFP, 12/10/2026: « 35% off your first purchase — 30%
-  // off every purchase after »).
-  promo: { code: string; discountPct: number; endsAt: string | null; firstPurchase?: boolean; thenPct?: number; lastChecked: string } | null;
+  // off every purchase after »). instantPct: the rate on Instant accounts when it differs (Vest,
+  // affiliate dashboard 28/11/2026: « Evaluation 10% · Instant 5% »).
+  promo: {
+    code: string;
+    discountPct: number;
+    endsAt: string | null;
+    firstPurchase?: boolean;
+    thenPct?: number;
+    instantPct?: number;
+    lastChecked: string;
+  } | null;
+  // true: the daily sync could not read the firm's site, the prices are the last ones read (lastChecked).
+  stale?: boolean;
   programs: PerpsProgram[];
 };
 
@@ -95,7 +108,7 @@ function promoOf(firm: PerpsFirm, promoLive: boolean): PerpsFirm['promo'] {
 
 // Split and leverage per program, by firm, from the firm's checkout and docs; the payout rules
 // live in FUNDED below.
-const DETAILS: Record<string, Record<string, { split: string; leverage: string; leverageTitle?: string }>> = {
+const DETAILS: Record<string, Record<string, { split?: string; leverage: string; leverageTitle?: string }>> = {
   // E8 Perpetual, read 01/11/2026 on help.e8markets.com, « How much leverage do you offer? »
   // (Perpetual futures table, the same for E8 One and E8 Pro) and the product overview (« Payout
   // 80%, 90%, 100% » for E8 One, « 80%, 100% » for E8 Pro). Its own id, e8-perps: e8-markets is the
@@ -128,22 +141,12 @@ const DETAILS: Record<string, Record<string, { split: string; leverage: string; 
     Pro: { split: '80% (90% option)', leverage: 'Up to 10x' },
     Turbo: { split: '80% (90% option)', leverage: 'Up to 10x' },
   },
-  // Vest 50K (perps-firms.json), added after Vest's tweet of 21/10/2026, read 22/10/2026:
-  // next.vestmarkets.com/vest-capital, Instant card « $50,000 Trading Capital », « Max. Drawdown
-  // $2,000 », « One-Time Payment $2,000 »; Evaluation card « EMERALD », « Max. Drawdown $3,000 »;
-  // www.vestmarkets.com « $50,000 … Max. Daily Loss 3% … Max. Drawdown $3,000 … Evaluation Goal
-  // 10% … Profit Split 80% … One-Time Payment $415 »; « Create Your Bespoke Account » at $50,000
-  // (tier « Emerald », « Max. Drawdown $3,000 (6%) »): 1-Step 10% 3%/4%/no DLL $415/$555/$745 at
-  // 80%, $498/$666/$894 at 90%; 1-Step 20% $255/$335/$495 at 80%, $306/$402/$594 at 90%; 2-Step
-  // « 10% → 5% » $175; Instant « $2,000 (4%) » $2,000. No 50K-specific rule published; the docs
-  // (docs.vestmarkets.com/vest-capital/account-tiers) still say « from $500 up to $25,000 ».
-  // Vest, read 21/10/2026 on next.vestmarkets.com/vest-capital/evaluation (« Create Bespoke
-  // Account »: 1-Step « Profit Split 80% 90% », 2-Step « 80% », Instant « 95% profit split ») and
-  // docs.vestmarkets.com/vest-capital/overview (« Up to 75x leverage (market-dependent) »).
+  // Vest, read 28/11/2026: docs.vestmarkets.com/vest-capital/overview « Up to 100x leverage
+  // (market-dependent) » (« Up to 75x » until then). Splits, sizes, targets and drawdowns come from
+  // their catalogue every day (scripts/lib/firms/perps-vest.mjs), so no split here: the program's own.
   'vest-markets': {
-    '1-Step': { split: '80% / 90%', leverage: 'Up to 75x' },
-    '2-Step': { split: '80%', leverage: 'Up to 75x' },
-    Instant: { split: '95%', leverage: 'Up to 75x' },
+    '1-Step': { leverage: 'Up to 100x' },
+    Instant: { leverage: 'Up to 100x' },
   },
 };
 
@@ -243,8 +246,8 @@ const SUMMARY: Record<string, string> = {
   myfundedperps: '80–90% split',
   // breakoutprop.com, 13/10/2026: « Keep 80-90% of the profits ».
   breakout: '80–90% split',
-  // docs.vestmarkets.com/vest-capital/overview, 21/10/2026: « keep 80–95% of your profits ».
-  'vest-markets': '80–95% split',
+  // docs.vestmarkets.com/vest-capital/overview, 28/11/2026: « keep 70–95% of your profits ».
+  'vest-markets': '70–95% split',
   // help.e8markets.com product overview, 01/11/2026: E8 One « 80%, 90%, 100% », E8 Pro « 80%, 100% ».
   'e8-perps': '80–100% split',
 };
@@ -341,9 +344,17 @@ export const perpsFirms = (promoLive: boolean): FirmView[] =>
     logo: firm.logo,
     summary: SUMMARY[firm.id] ?? '',
     code: { code: 'JTNQ', title: 'My affiliate code' },
-    // The firm's published rate; MFP: 35% on a first order, then 30%, so « Up to 35% off ».
-    offer: discountWords([promoOf(firm, promoLive)?.discountPct, promoOf(firm, promoLive)?.thenPct]),
-    stale: null,
+    // The firm's published rate; MFP: 35% on a first order, then 30%, so « Up to 35% off »; Vest:
+    // 10% on evaluations, 5% on Instant, « Up to 10% off ».
+    offer: discountWords([promoOf(firm, promoLive)?.discountPct, promoOf(firm, promoLive)?.thenPct, promoOf(firm, promoLive)?.instantPct]),
+    // A firm whose site the daily sync could not read keeps its last prices: say from when, like the
+    // futures firms read by their own scraper (futures.ts, firmView).
+    stale: firm.stale
+      ? {
+          label: `Prices ${humanDate(firm.lastChecked)}`,
+          title: `Prices last verified on ${humanDate(firm.lastChecked)}. Check the live checkout price.`,
+        }
+      : null,
     from: cheapest(rowsOf(firm, promoLive)),
     href: goHref('prop-firms', firm.id),
   }));
