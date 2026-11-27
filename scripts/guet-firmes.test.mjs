@@ -1,11 +1,17 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
+import { mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+import { args, envoyer } from './guet-firmes.mjs';
 import {
   blocsOffres,
   blocsPages,
   differences,
   extraitChangement,
+  journalEchecEnvoi,
   messages,
   pagesARelire,
   pagesDeLaNote,
@@ -14,6 +20,7 @@ import {
   reglesDuPlan,
   suivrePage,
   texteDePage,
+  texteRetenu,
   titreDePage,
   urlCanonique,
 } from './lib/guet-firmes.mjs';
@@ -296,6 +303,99 @@ test('texte changé : extrait de la première zone différente, 300 caractères 
     '  après : 8',
     '  fichiers de règles propsim peut-être périmés (non modifiés) : tradeify/a.json',
   ].join('\n'));
+});
+
+test("corps de l'article seulement : Intercom sans related, GitBook sans menu ni boutons, autres sites par article", () => {
+  const intercom = `<html><body><div class="intercom-force-break">
+    <article>
+      <header>Centre d'aide</header>
+      <nav aria-label="Breadcrumb">All Collections First Steps</nav>
+      <p>La perte max est de 6 %.</p>
+      <section class="related_articles"><h2>Related Articles</h2><a>How does the Daily Loss Limit Add-On works</a></section>
+      <footer>Pied du centre</footer>
+    </article>
+  </div></body></html>`;
+  assert.equal(texteDePage(intercom), 'La perte max est de 6 %.');
+
+  const gitbook = `<main id="gitbook-main-content">
+    <button>Copy</button>
+    <nav aria-label="On this page"><a>Platform Overview</a><a>Max. Drawdown</a></nav>
+    <nav aria-label="Breadcrumb">Platform Overview Vest Capital</nav>
+    <h1>Loss Limits</h1>
+    <p>Max drawdown is 6% of capital.</p>
+  </main>`;
+  assert.equal(texteDePage(gitbook), 'Loss Limits Max drawdown is 6% of capital.');
+
+  const autre = `<body><nav>Menu du site</nav><article><h1>Consistency</h1><p>The rule is 50%.</p><button>Copy</button></article><footer>Pied</footer></body>`;
+  assert.equal(texteDePage(autre), 'Consistency The rule is 50%. Copy');
+});
+
+test('page vide ou plus courte que 40 % : illisible, même compteur que les 403, référence gardée, pas de texte changé', () => {
+  const q = '2026-11-27T08:00:00Z';
+  const depart = suivrePage(null, { statut: 200, texte: 'A'.repeat(100), titre: 'Rules' }, 'h1', q).etat;
+  assert.equal(depart.longueur, 100);
+  let r = suivrePage(depart, { statut: 200, texte: '' }, 'vide', q);
+  assert.equal(r.evenement, null);
+  assert.equal(r.etat.empreinte, 'h1');
+  assert.equal(r.etat.longueur, 100);
+  assert.equal(r.etat.echecs, 1);
+  assert.equal(texteRetenu({ statut: 200, texte: '' }, r.etat), false);
+  r = suivrePage(depart, { statut: 403 }, null, q);
+  assert.equal(r.etat.echecs, 1);
+  r = suivrePage(r.etat, { statut: 200, texte: 'B'.repeat(39) }, 'court', q);
+  assert.equal(r.evenement, null);
+  assert.equal(r.etat.empreinte, 'h1');
+  assert.equal(r.etat.echecs, 2);
+  assert.equal(r.etat.longueur, 100);
+  r = suivrePage(r.etat, { statut: 200, texte: '' }, 'vide', q);
+  assert.equal(r.evenement, 'illisible');
+  assert.equal(r.etat.empreinte, 'h1');
+  const pile = suivrePage(depart, { statut: 200, texte: 'C'.repeat(40) }, 'h40', q);
+  assert.equal(pile.evenement, 'texte');
+  assert.equal(texteRetenu({ statut: 200, texte: 'C'.repeat(40) }, pile.etat), true);
+});
+
+test('guet-envoi.py en échec : son stderr est écrit dans le journal du tour', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'guet-envoi-'));
+  const script = join(dir, 'faux-envoi.mjs');
+  writeFileSync(script, [
+    'let s = "";',
+    'process.stdin.on("data", (d) => { s += d; });',
+    'process.stdin.on("end", () => {',
+    '  process.stderr.write("envoi impossible : ModuleNotFoundError : runner_auto\\n");',
+    '  process.exit(2);',
+    '});',
+    '',
+  ].join('\n'));
+  const journal = [];
+  const ok = await envoyer(['alerte'], { python: process.execPath, script, journal: (l) => journal.push(l) });
+  assert.deepEqual(ok, [false]);
+  const ligne = journal.join('\n');
+  assert.match(ligne, /envoi impossible : ModuleNotFoundError : runner_auto/);
+  assert.equal(journalEchecEnvoi('envoi impossible : salon inconnu\n', null), 'envoi Discord raté\nenvoi impossible : salon inconnu');
+});
+
+test('--rebase-pages : nouvelle référence enregistrée, aucune alerte, le vide n\'écrase pas', () => {
+  const o = args(['--envoyer', '--rebase-pages', '--etat', join(tmpdir(), 'guet-rebase'), '--sans-prix']);
+  assert.equal(o.rebasePages, true);
+  assert.equal(o.envoyer, false);
+  const q = '2026-11-27T08:00:00Z';
+  const ancien = { statut: 200, empreinte: 'old', longueur: 1000, titre: 'Loss Limits', echecs: 0 };
+  const corps = 'Max drawdown is 6% of capital. '.repeat(20);
+  assert.ok(corps.length >= 400);
+  const r = suivrePage(ancien, { statut: 200, texte: corps, titre: 'Loss Limits' }, 'sha-new', q, { rebase: true });
+  assert.equal(r.evenement, null);
+  assert.equal(r.etat.empreinte, 'sha-new');
+  assert.equal(r.etat.longueur, corps.length);
+  assert.equal(texteRetenu({ statut: 200, texte: corps }, r.etat), true);
+  const court = suivrePage(ancien, { statut: 200, texte: 'trop court' }, 'sha-court', q, { rebase: true });
+  assert.equal(court.evenement, null);
+  assert.equal(court.etat.empreinte, 'old');
+  const vide = suivrePage(r.etat, { statut: 200, texte: '' }, 'sha-vide', q, { rebase: true });
+  assert.equal(vide.evenement, null);
+  assert.equal(vide.etat.empreinte, 'sha-new');
+  assert.equal(vide.etat.longueur, corps.length);
+  assert.equal(texteRetenu({ statut: 200, texte: '' }, vide.etat), false);
 });
 
 test('messages Discord : en-tête en tête, aucun message au-dessus de la limite', () => {

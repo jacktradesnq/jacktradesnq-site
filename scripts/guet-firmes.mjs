@@ -13,6 +13,7 @@
  *   node scripts/guet-firmes.mjs                       # un tour, AUCUN envoi : alerte écrite dans l'aperçu
  *   node scripts/guet-firmes.mjs --envoyer             # un tour, alerte envoyée dans #runner (chemin du runner)
  *   node scripts/guet-firmes.mjs --de <rev> --a <rev>  # rejoue les offres entre deux commits (sans état, sans pages)
+ *   node scripts/guet-firmes.mjs --rebase-pages        # relit les pages, enregistre la référence, aucune alerte, aucun envoi
  *   options : --depot <dossier git du site> --ref <rev> --etat <dossier> --apercu <fichier> --sans-pages --sans-prix
  *
  * Premier tour : rien n'est signalé, l'état de départ est enregistré (commit des offres, empreinte de chaque page).
@@ -23,6 +24,7 @@ import { execFile, execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { cfFetch } from './lib/cf-fetch.mjs';
 import {
@@ -35,7 +37,9 @@ import {
   messages,
   pagesARelire,
   suivrePage,
+  journalEchecEnvoi,
   texteDePage,
+  texteRetenu,
   titreDePage,
   urlCanonique,
 } from './lib/guet-firmes.mjs';
@@ -58,8 +62,8 @@ const CATALOGUE_APEX = path.join(HOME, 'pipeline-v2-boucle/apex/help_urls.txt');
 const ENVOI_PY = path.join(ICI, 'lib/guet-envoi.py');
 const PYTHON_ENVOI = process.env.GUET_PYTHON || path.join(HOME, 'monfxreplay-python/.venv/bin/python');
 
-function args(argv) {
-  const o = { depot: path.resolve(ICI, '..'), ref: 'HEAD', etat: path.join(HOME, '.local/share/guet-firmes'), envoyer: false, pages: true, prix: true };
+export function args(argv) {
+  const o = { depot: path.resolve(ICI, '..'), ref: 'HEAD', etat: path.join(HOME, '.local/share/guet-firmes'), envoyer: false, pages: true, prix: true, rebasePages: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const val = () => {
@@ -75,9 +79,14 @@ function args(argv) {
     else if (a === '--sans-prix') o.prix = false;
     else if (a === '--de') o.de = val();
     else if (a === '--a') o.a = val();
+    else if (a === '--rebase-pages') o.rebasePages = true;
     else throw new Error(`option inconnue : ${a}`);
   }
   if ((o.de && !o.a) || (!o.de && o.a)) throw new Error('--de et --a vont ensemble');
+  if (o.rebasePages) {
+    o.envoyer = false; // aucune alerte, donc aucun envoi
+    o.pages = true;
+  }
   o.apercu ??= path.join(o.etat, 'apercu.jsonl');
   return o;
 }
@@ -180,23 +189,37 @@ function noterApercu(fichier, texte, mode, envoye) {
   fs.appendFileSync(fichier, `${JSON.stringify({ quand: new Date().toISOString(), mode, envoye, texte })}\n`);
 }
 
-/** Envoie par le chemin des bots du runner (scripts/lib/guet-envoi.py) ; rend un booléen par message. */
-function envoyer(textes) {
+/**
+ * Envoie par le chemin des bots du runner (scripts/lib/guet-envoi.py) ; rend un booléen par message.
+ * opt.journal reçoit la ligne d'erreur (stderr de guet-envoi.py) quand l'envoi échoue : c'est le journal du tour.
+ */
+export function envoyer(textes, opt = {}) {
+  const python = opt.python || PYTHON_ENVOI;
+  const script = opt.script || ENVOI_PY;
+  const salon = opt.salon || 'runner';
+  const journal = opt.journal || ((ligne) => console.error(ligne));
   return new Promise((resolve) => {
     const p = execFile(
-      PYTHON_ENVOI,
-      [ENVOI_PY, '--salon', 'runner'],
-      { encoding: 'utf8', timeout: 5 * 60_000, env: { ...process.env, PYTHONPATH: process.env.RUNNER_CODE || path.join(HOME, '.local/share/runner-auto/code') } },
+      python,
+      [script, '--salon', salon],
+      {
+        encoding: 'utf8',
+        timeout: 5 * 60_000,
+        maxBuffer: 8 * 1024 * 1024,
+        env: { ...process.env, PYTHONUNBUFFERED: '1', PYTHONPATH: process.env.RUNNER_CODE || path.join(HOME, '.local/share/runner-auto/code') },
+      },
       (err, stdout, stderr) => {
-        if (stderr) console.error(stderr.trim());
+        let ok = null;
         try {
-          const r = JSON.parse(stdout.trim().split('\n').pop());
-          if (Array.isArray(r) && r.length === textes.length) return resolve(r.map(Boolean));
+          const r = JSON.parse(String(stdout || '').trim().split('\n').pop());
+          if (Array.isArray(r) && r.length === textes.length) ok = r.map(Boolean);
         } catch {}
-        console.error(`envoi Discord raté : ${err?.message || 'réponse illisible'}`);
-        resolve(textes.map(() => false));
+        if (!ok) ok = textes.map(() => false);
+        if (err || ok.some((x) => !x)) journal(journalEchecEnvoi(stderr, err));
+        resolve(ok);
       },
     );
+    p.stdin.on('error', () => {});
     p.stdin.end(JSON.stringify(textes));
   });
 }
@@ -230,7 +253,7 @@ async function lirePage(url) {
   }
 }
 
-async function guetPages(etat, dossierEtat, quand) {
+async function guetPages(etat, dossierEtat, quand, { rebase = false } = {}) {
   const regles = chargerRegles();
   const pages = pagesARelire(regles, sourcesDesPages());
   const dossierTextes = path.join(dossierEtat, 'pages');
@@ -242,18 +265,18 @@ async function guetPages(etat, dossierEtat, quand) {
     const lu = await lirePage(url);
     const empreinte = typeof lu.texte === 'string' ? sha('sha256', lu.texte) : null;
     const ancien = etat.pages[url] || null;
-    const { etat: nouveau, evenement } = suivrePage(ancien, lu, empreinte, quand);
+    const { etat: nouveau, evenement } = suivrePage(ancien, lu, empreinte, quand, { rebase });
     nouveau.firme = firme;
     etat.pages[url] = nouveau;
     const f = path.join(dossierTextes, `${sha('sha1', url).slice(0, 16)}.txt`);
     const texteAvant = evenement === 'texte' ? texteSauve(f) : null;
-    if (empreinte) {
+    if (texteRetenu(lu, nouveau)) {
       bilan.lues++;
       if (evenement === 'texte' && fs.existsSync(f)) fs.copyFileSync(f, f.replace(/\.txt$/, `.avant-${quand.slice(0, 10)}.txt`));
       fs.writeFileSync(f, `${url}\n\n${lu.texte}\n`);
     } else if (lu.statut === 404 || lu.statut === 410) bilan.absentes.push(`${url} (HTTP ${lu.statut})`);
-    else bilan.echecs.push(`${url} (${lu.erreur || `HTTP ${lu.statut}`})`);
-    if (evenement) {
+    else bilan.echecs.push(`${url} (${nouveau.derniereErreur || lu.erreur || 'page illisible'})`);
+    if (evenement && !rebase) {
       const ch = { url, firme, evenement, titre: nouveau.titre, statut: lu.statut, fichiers };
       if (evenement === 'texte' && typeof texteAvant === 'string') {
         ch.texteAvant = texteAvant;
@@ -274,6 +297,16 @@ async function main() {
   const o = args(process.argv.slice(2));
   const quand = new Date().toISOString();
   const aujourdhui = new Date().toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' });
+  if (o.rebasePages) {
+    // Nouvelle extraction seulement : la référence des pages est réécrite, rien n'est signalé ni envoyé.
+    const etat = lireEtat(o.etat);
+    const { bilan, total } = await guetPages(etat, o.etat, quand, { rebase: true });
+    ecrireEtat(o.etat, etat);
+    console.log(`rebase des pages : ${total} à relire, ${bilan.lues} références enregistrées, ${bilan.absentes.length} absentes (404/410), ${bilan.echecs.length} non lues, aucune alerte, aucun envoi`);
+    for (const x of bilan.absentes) console.log(`  absente : ${x}`);
+    for (const x of bilan.echecs) console.log(`  non lue : ${x}`);
+    return;
+  }
   const regles = o.prix ? chargerRegles() : [];
   const sections = [];
 
@@ -331,7 +364,10 @@ async function main() {
   if (!ok.every(Boolean)) process.exitCode = 1;
 }
 
-main().catch((e) => {
-  console.error(e.stack || e.message);
-  process.exit(1);
-});
+const lanceDirect = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (lanceDirect) {
+  main().catch((e) => {
+    console.error(e.stack || e.message);
+    process.exit(1);
+  });
+}

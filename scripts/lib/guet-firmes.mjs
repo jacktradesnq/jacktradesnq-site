@@ -344,21 +344,123 @@ export function pagesARelire(regles, sources = {}) {
 
 const ENTITES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', rsquo: '’', lsquo: '‘', ldquo: '“', rdquo: '”', ndash: '–', mdash: '—', hellip: '…' };
 
+/** Intérieur de la première balise <tag>…</tag> (jusqu'à la dernière fermeture : une seule par page). null si absente. */
+function blocBalise(html, tag) {
+  const m = html.match(new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*)<\\/${tag}\\s*>`, 'i'));
+  return m ? m[1] : null;
+}
+
+/** Élément équilibré dont la balise ouvrante commence à index. */
+function elementEquilibre(html, index) {
+  const m = /^<([a-zA-Z][\w:-]*)\b[^>]*>/.exec(html.slice(index));
+  if (!m) return null;
+  const tag = m[1];
+  const ouverture = m[0].length;
+  if (/\/>$/.test(m[0])) return { inner: '', end: index + ouverture };
+  const re = new RegExp(`<${tag}\\b[^>]*>|</${tag}\\s*>`, 'gi');
+  re.lastIndex = index + ouverture;
+  let profondeur = 1;
+  let mm;
+  while ((mm = re.exec(html))) {
+    if (mm[0][1] === '/') {
+      profondeur--;
+      if (profondeur === 0) return { inner: html.slice(index + ouverture, mm.index), end: mm.index + mm[0].length };
+    } else profondeur++;
+  }
+  return { inner: html.slice(index + ouverture), end: html.length };
+}
+
+/** Retire chaque élément dont la balise ouvrante satisfait le prédicat (enfants compris). */
+function retirerOuverts(html, predicat) {
+  let out = '';
+  let i = 0;
+  const re = /<([a-zA-Z][\w:-]*)\b[^>]*>/g;
+  while (i < html.length) {
+    re.lastIndex = i;
+    const m = re.exec(html);
+    if (!m) {
+      out += html.slice(i);
+      break;
+    }
+    if (!predicat(m[1], m[0])) {
+      out += html.slice(i, m.index + m[0].length);
+      i = m.index + m[0].length;
+      continue;
+    }
+    out += html.slice(i, m.index);
+    const el = elementEquilibre(html, m.index);
+    i = el ? el.end : m.index + m[0].length;
+  }
+  return out;
+}
+
+/** gitbook (docs.vestmarkets.com), intercom (centres d'aide), ou le reste. */
+function typeDePage(html) {
+  const h = String(html);
+  if (/id=["']gitbook-main-content["']|gb-icon|powered by gitbook/i.test(h)) return 'gitbook';
+  if (/intercom-force-break|intercom-interblocks|related_articles|intercom-reaction/i.test(h)) return 'intercom';
+  return 'autre';
+}
+
+/** Conteneur Intercom `<div class="article …">` quand la balise <article> est vide ou absente. */
+function conteneurArticle(html) {
+  const m = /<div\b[^>]*\bclass\s*=\s*["'][^"']*\barticle\b[^"']*["'][^>]*>/i.exec(html);
+  if (!m) return null;
+  return elementEquilibre(html, m.index)?.inner ?? null;
+}
+
+function texteNu(fragment) {
+  return String(fragment).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+/** Intercom : sans Related articles, fil d'Ariane, en-tête, pied. */
+function nettoyerIntercom(html) {
+  const h = retirerOuverts(html, (tag, open) => {
+    const t = tag.toLowerCase();
+    if (t === 'header' || t === 'footer') return true;
+    if (t === 'nav' && /breadcrumb/i.test(open)) return true;
+    if (/\bbreadcrumb\b/i.test(open) || /related[_-]articles/i.test(open)) return true;
+    return false;
+  });
+  return h.replace(/<(section|div|aside|h[1-6])\b[^>]*>\s*Related\s+Articles\s*<\/\1>[\s\S]*$/i, ' ');
+}
+
+/** GitBook : le <main>, sans les boutons (Copy) ni la navigation (On this page, menu). */
+function nettoyerGitbook(html) {
+  return retirerOuverts(html, (tag, open) => {
+    const t = tag.toLowerCase();
+    if (t === 'button' || t === 'nav') return true;
+    if (/aria-label\s*=\s*["']On this page["']/i.test(open)) return true;
+    if (/\btable-of-contents\b|\btoclink\b/i.test(open)) return true;
+    return false;
+  });
+}
+
 /**
- * Texte lisible d'une page : l'article (<article>, centres Intercom) à défaut <main> (Apex, GitBook) à défaut <body>,
- * sans scripts ni styles, espaces regroupés. Les dates relatives qui bougent seules (« Last updated 2 days ago »,
- * « Updated over a week ago ») sont retirées : seules les vraies modifications du texte comptent. Une date écrite
+ * Texte lisible d'une page : seulement le corps de l'article.
+ *  - Intercom : la balise <article>, ou le conteneur `div.article` s'il est vide, sans « Related articles »,
+ *    fil d'Ariane, en-tête ni pied.
+ *  - GitBook : le <main>, sans la navigation « On this page », le menu, ni les boutons.
+ *  - Autres sites : <article> s'il est présent, sinon <main>, sinon <body>.
+ * Scripts, styles et dates relatives (« Last updated 2 days ago ») sont retirés. Une date écrite
  * (« Updated November 23, 2026 ») reste.
  */
 export function texteDePage(html) {
-  let h = String(html)
+  const brut = String(html);
+  const type = typeDePage(brut);
+  let h = brut
     .replace(/<!--[\s\S]*?-->/g, ' ') // commentaires (tradeify.co y range un vieux <script>)
     .replace(/<(script|style|noscript|svg|template|head)\b[\s\S]*?<\/\1\s*>/gi, ' ');
-  const bloc = (tag) => {
-    const m = h.match(new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*)<\\/${tag}\\s*>`, 'i'));
-    return m ? m[1] : null;
-  };
-  const partie = bloc('article') ?? bloc('main') ?? bloc('body') ?? h;
+  let partie;
+  if (type === 'gitbook') {
+    partie = nettoyerGitbook(blocBalise(h, 'main') ?? blocBalise(h, 'body') ?? h);
+  } else if (type === 'intercom') {
+    const article = blocBalise(h, 'article');
+    const region = article != null && texteNu(article) ? article : (conteneurArticle(h) ?? blocBalise(h, 'main') ?? blocBalise(h, 'body') ?? h);
+    partie = nettoyerIntercom(region);
+  } else {
+    partie = blocBalise(h, 'article') ?? blocBalise(h, 'main') ?? blocBalise(h, 'body') ?? h;
+  }
   return partie
     .replace(/<[^>]+>/g, ' ')
     .replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (tout, e) => {
@@ -388,20 +490,65 @@ export function titreDePage(html) {
 
 const ECHECS_PAGE_ILLISIBLE = 3;
 
+/** Part de la référence en dessous de laquelle la page est illisible (lecture tronquée), pas un vrai changement. */
+const PART_MIN_TEXTE = 0.4;
+
+/**
+ * Lecture assez bonne pour remplacer la référence. Un texte vide ou un échec (echecs > 0) ne l'écrase pas.
+ * lu = { statut, texte? } ; etat = ce que suivrePage vient de rendre.
+ */
+export function texteRetenu(lu, etat) {
+  return Boolean(
+    etat && etat.echecs === 0 && lu && lu.statut >= 200 && lu.statut < 300
+      && typeof lu.texte === 'string' && lu.texte.trim() !== '',
+  );
+}
+
+/**
+ * Ligne du journal du tour quand guet-envoi.py échoue. stderr = sa sortie d'erreur, toujours présente
+ * dans la ligne (le message de Node ne la contient pas toujours).
+ */
+export function journalEchecEnvoi(stderr, err) {
+  const brut = String(stderr ?? '').trim();
+  const base = err?.message ? `envoi Discord raté : ${err.message}` : 'envoi Discord raté';
+  if (brut && !base.includes(brut)) return `${base}\n${brut}`;
+  return brut && !err ? `envoi Discord raté\n${brut}` : base;
+}
+
 /**
  * Nouvel état d'une page + ce qui change. lu = { statut, texte?, titre?, erreur? } ; ancien = état enregistré ou null.
  * evenement : null (rien, ou 1re lecture = état de départ), 'texte' (texte changé), 'disparue' (404/410 après une
- * lecture réussie), 'revenue' (relue après une disparition), 'illisible' (3e échec de suite : 403, réseau, 5xx ;
- * une seule fois, le compteur repart à zéro quand la page redevient lisible). Une lecture ratée ne change pas
- * l'empreinte.
+ * lecture réussie), 'revenue' (relue après une disparition), 'illisible' (3e échec de suite : 403, réseau, 5xx,
+ * texte vide, ou texte plus court que 40 % de la référence ; une seule fois, le compteur repart à zéro quand la
+ * page redevient lisible). Une lecture ratée ne change pas l'empreinte.
+ * opts.rebase : enregistre le nouveau texte sans aucun événement. Un texte vide ou trop court ne l'écrase pas.
  */
-export function suivrePage(ancien, lu, empreinte, quand) {
-  const ok = lu.statut >= 200 && lu.statut < 300 && typeof lu.texte === 'string';
+export function suivrePage(ancien, lu, empreinte, quand, opts = {}) {
+  const httpOk = lu.statut >= 200 && lu.statut < 300 && typeof lu.texte === 'string';
+  const vide = httpOk && lu.texte.trim() === '';
+  const ref = typeof ancien?.longueur === 'number' ? ancien.longueur : 0;
+  const tropCourt = httpOk && !vide && ref > 0 && lu.texte.length < ref * PART_MIN_TEXTE;
+  const illisible = vide || tropCourt;
+  const ok = httpOk && !illisible;
   const absente = lu.statut === 404 || lu.statut === 410;
+  if (opts.rebase) {
+    if (!ok) return { etat: ancien ? { ...ancien } : { statut: null, empreinte: null, echecs: 0 }, evenement: null };
+    return {
+      etat: {
+        statut: lu.statut,
+        empreinte,
+        longueur: lu.texte.length,
+        titre: lu.titre || ancien?.titre || null,
+        luLe: quand,
+        echecs: 0,
+      },
+      evenement: null,
+    };
+  }
   if (!ok && !absente) {
     const etat = ancien ? { ...ancien } : { statut: null, empreinte: null };
     etat.echecs = (ancien?.echecs || 0) + 1;
-    etat.derniereErreur = lu.erreur || `HTTP ${lu.statut}`;
+    etat.derniereErreur = lu.erreur || (illisible ? 'page illisible' : `HTTP ${lu.statut}`);
     etat.tenteLe = quand;
     return { etat, evenement: etat.echecs === ECHECS_PAGE_ILLISIBLE ? 'illisible' : null };
   }
