@@ -357,7 +357,9 @@
               "ddType": "EOD Trailing",
               "consistency": "55%",
               "contracts": "5 minis or 50 micros",
-              "activationFee": 99
+              "activationFee": 99,
+              "dailyLoss": null,
+              "minDays": 0
             },
             {
               "size": 100000,
@@ -368,7 +370,9 @@
               "ddType": "EOD Trailing",
               "consistency": "55%",
               "contracts": "10 minis or 100 micros",
-              "activationFee": 149
+              "activationFee": 149,
+              "dailyLoss": null,
+              "minDays": 0
             },
             {
               "size": 200000,
@@ -379,7 +383,9 @@
               "ddType": "Static",
               "consistency": "55%",
               "contracts": "2 minis or 20 micros",
-              "activationFee": 179
+              "activationFee": 179,
+              "dailyLoss": null,
+              "minDays": 0
             }
           ]
         },
@@ -395,8 +401,11 @@
               "profitTarget": 1500,
               "maxDrawdown": 1200,
               "ddType": "EOD Trailing",
-              "consistency": "34%",
-              "contracts": "2 minis or 25 micros"
+              "consistency": "55%",
+              "contracts": "2 minis or 25 micros",
+              "dailyLoss": null,
+              "minDays": 0,
+              "activationFee": 0
             },
             {
               "size": 50000,
@@ -405,8 +414,11 @@
               "profitTarget": 3000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
-              "consistency": "34%",
-              "contracts": "5 minis or 50 micros"
+              "consistency": "55%",
+              "contracts": "5 minis or 50 micros",
+              "dailyLoss": null,
+              "minDays": 0,
+              "activationFee": 0
             },
             {
               "size": 100000,
@@ -415,8 +427,11 @@
               "profitTarget": 6000,
               "maxDrawdown": 2500,
               "ddType": "EOD Trailing",
-              "consistency": "34%",
-              "contracts": "10 minis or 100 micros"
+              "consistency": "55%",
+              "contracts": "10 minis or 100 micros",
+              "dailyLoss": null,
+              "minDays": 0,
+              "activationFee": 0
             },
             {
               "size": 150000,
@@ -425,8 +440,11 @@
               "profitTarget": 3000,
               "maxDrawdown": 1000,
               "ddType": "Static",
-              "consistency": "34%",
-              "contracts": "1 mini or 15 micros"
+              "consistency": "55%",
+              "contracts": "1 mini or 15 micros",
+              "dailyLoss": null,
+              "minDays": 0,
+              "activationFee": 0
             },
             {
               "size": 200000,
@@ -435,8 +453,11 @@
               "profitTarget": 6000,
               "maxDrawdown": 2000,
               "ddType": "Static",
-              "consistency": "34%",
-              "contracts": "2 minis or 20 micros"
+              "consistency": "55%",
+              "contracts": "2 minis or 20 micros",
+              "dailyLoss": null,
+              "minDays": 0,
+              "activationFee": 0
             },
             {
               "size": 300000,
@@ -445,8 +466,10 @@
               "profitTarget": 20000,
               "maxDrawdown": 5000,
               "ddType": "Static",
-              "consistency": "21%",
-              "contracts": "5 minis or 50 micros"
+              "consistency": "55%",
+              "contracts": "5 minis or 50 micros",
+              "minDays": 0,
+              "activationFee": 0
             }
           ]
         },
@@ -465,7 +488,9 @@
               "consistency": "None",
               "minDays": 1,
               "contracts": "5 minis or 50 micros",
-              "note": "30 days to pass from purchase, a reset does not extend it."
+              "note": "30 days to pass from purchase, a reset does not extend it.",
+              "dailyLoss": null,
+              "activationFee": 0
             },
             {
               "size": 100000,
@@ -477,7 +502,9 @@
               "consistency": "None",
               "minDays": 1,
               "contracts": "10 minis or 100 micros",
-              "note": "30 days to pass from purchase, a reset does not extend it."
+              "note": "30 days to pass from purchase, a reset does not extend it.",
+              "dailyLoss": null,
+              "activationFee": 0
             },
             {
               "size": 150000,
@@ -489,7 +516,9 @@
               "consistency": "None",
               "minDays": 1,
               "contracts": "15 minis or 150 micros",
-              "note": "30 days to pass from purchase, a reset does not extend it."
+              "note": "30 days to pass from purchase, a reset does not extend it.",
+              "dailyLoss": null,
+              "activationFee": 0
             },
             {
               "size": 200000,
@@ -501,7 +530,9 @@
               "consistency": "None",
               "minDays": 1,
               "contracts": "3 minis or 30 micros",
-              "note": "30 days to pass from purchase, a reset does not extend it."
+              "note": "30 days to pass from purchase, a reset does not extend it.",
+              "dailyLoss": null,
+              "activationFee": 0
             }
           ]
         },
@@ -520,7 +551,9 @@
               "dailyLoss": 2000,
               "consistency": "21%",
               "contracts": "5 minis or 50 micros",
-              "note": "Profit split 50% for 30 trading days, then 80%. No more than 3 losing days in any 10 trading days."
+              "note": "Profit split 50% for 30 trading days, then 80%. No more than 3 losing days in any 10 trading days.",
+              "minDays": 0,
+              "activationFee": 0
             }
           ]
         },
@@ -539,7 +572,9 @@
               "dailyLoss": 1000,
               "consistency": "21%",
               "contracts": "5 minis or 50 micros",
-              "note": "Profit split 80%. The trailing drawdown stops at $51,000 once the balance passes $53,000."
+              "note": "Profit split 80%. The trailing drawdown stops at $51,000 once the balance passes $53,000.",
+              "minDays": 0,
+              "activationFee": 0
             }
           ]
         }
