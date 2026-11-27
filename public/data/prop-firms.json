@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-26",
+  "generatedAt": "2026-11-27",
   "firms": [
     {
       "id": "traders-launch",
@@ -8,7 +8,7 @@
       "payout": "Daily",
       "promo": null,
       "url": "https://app.traderslaunch.com/auth/purchasing-signup?ref=a3c0661ed05708abe4eceb42&coupon=JTNQ",
-      "lastChecked": "2026-11-26",
+      "lastChecked": "2026-11-27",
       "stale": false,
       "programs": [
         {
@@ -18,7 +18,7 @@
           "plans": [
             {
               "size": 100000,
-              "price": 111.3,
+              "price": 159,
               "profitTarget": 2000,
               "maxDrawdown": 1000,
               "ddType": "EOD Trailing",
@@ -26,15 +26,14 @@
               "contracts": "2 minis or 20 micros",
               "note": "Session profit limit: 40% of profit target. Price shown for the 80% split.",
               "splitPrices": {
-                "60": 69.3
+                "60": 99
               },
               "minDays": 0,
-              "dailyLoss": null,
-              "originalPrice": 159
+              "dailyLoss": null
             },
             {
               "size": 200000,
-              "price": 209.3,
+              "price": 299,
               "profitTarget": 4000,
               "maxDrawdown": 2000,
               "ddType": "EOD Trailing",
@@ -42,15 +41,14 @@
               "contracts": "4 minis or 40 micros",
               "note": "Session profit limit: 40% of profit target. Price shown for the 80% split.",
               "splitPrices": {
-                "60": 139.3
+                "60": 199
               },
               "minDays": 0,
-              "dailyLoss": null,
-              "originalPrice": 299
+              "dailyLoss": null
             },
             {
               "size": 300000,
-              "price": 419.3,
+              "price": 599,
               "profitTarget": 6000,
               "maxDrawdown": 3000,
               "ddType": "EOD Trailing",
@@ -58,11 +56,10 @@
               "contracts": "6 minis or 60 micros",
               "note": "Session profit limit: 40% of profit target. Price shown for the 80% split.",
               "splitPrices": {
-                "60": 279.3
+                "60": 399
               },
               "minDays": 0,
-              "dailyLoss": null,
-              "originalPrice": 599
+              "dailyLoss": null
             }
           ]
         },
@@ -157,7 +154,7 @@
       },
       "code": "JTNQ",
       "url": "https://e8markets.com/d/B1770991",
-      "lastChecked": "2026-11-26",
+      "lastChecked": "2026-11-27",
       "stale": false,
       "programs": [
         {
@@ -338,7 +335,7 @@
         "code": "JTNQ"
       },
       "url": "https://trader.blusky.pro/checkout?referral_id=09577e87582233340375",
-      "lastChecked": "2026-11-26",
+      "lastChecked": "2026-11-27",
       "stale": false,
       "programs": [
         {
@@ -553,7 +550,7 @@
         "code": "JTNQ"
       },
       "url": "https://toponefutures.com/?linkId=lp_707970&sourceId=jtnq&tenantId=toponefutures",
-      "lastChecked": "2026-11-26",
+      "lastChecked": "2026-11-27",
       "stale": false,
       "programs": [
         {
