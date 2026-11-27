@@ -8,11 +8,11 @@
  *    tout ce que la firme vend. guardCatalog() + syncCatalog() creent les
  *    programmes et les tailles nouveaux, retirent ce qui n'est plus vendu, et
  *    gardent les regles curatees a la main que le lecteur n'encode pas.
- *    Traders Launch.
+ *    Traders Launch, Top One Futures.
  *
  *  - `{ updates }` — le chemin historique, un metteur a jour de PRIX sur des
  *    programmes figes a la main : guard() + apply() ne touchent que price /
- *    originalPrice / activationFee / note. E8, BluSky et Top One Futures.
+ *    originalPrice / activationFee / note. E8 et BluSky.
  *
  * Dans les deux cas les promos (promo firme, promoCode / promoLabel par
  * programme) passent par applyPromos(), et une firme dont le scraper echoue
@@ -28,7 +28,7 @@ import { guardCatalog, syncCatalog } from './lib/catalog-sync.mjs';
 import { fetchPageText } from './lib/cf-fetch.mjs';
 import { fetchBluSkyPlans } from './lib/firms/blusky.mjs';
 import { fetchE8Plans } from './lib/firms/e8.mjs';
-import { fetchTopOneCards, topOnePromo, topOneUpdates } from './lib/firms/topone.mjs';
+import { fetchTopOneCards, topOnePrograms, topOnePromo } from './lib/firms/topone.mjs';
 import { fetchTradersLaunchPrograms } from './lib/firms/traderslaunch.mjs';
 
 const DATA_URL = new URL('../public/data/prop-firms.json', import.meta.url);
@@ -124,13 +124,16 @@ export async function scrapeBluSky(read = fetchBluSkyPlans) {
 /* Top One Futures — https://toponefutures.com, rendu serveur (Webflow) */
 /* ------------------------------------------------------------------ */
 
-// Chemin `updates` : prix, prix barre, activation fee et note de chaque carte, lus dans le panneau
-// de son onglet (scripts/lib/firms/topone.mjs) ; la promo de la firme vient des pastilles des
-// onglets, au code JTNQ, jamais leur code public. Regles ecrites dans le JSON, derive relue par
-// scripts/check-rule-drift.mjs.
+// Chemin `programs` (catalogue), comme Traders Launch : chaque onglet de prix est un programme,
+// chaque carte une taille (scripts/lib/firms/topone.mjs). Un onglet ou une taille que la firme ajoute
+// est cree, ce qu'elle ne vend plus est retire (CLAUDE.md, 21/10/2026 : « tant que y a sur leur site
+// faut que ca sois sur nôtre site aussi ») ; prix, prix barre, activation fee, note et les regles que
+// la carte ecrit sont relus, une regle qu'elle n'ecrit pas (drawdown d'evaluation d'Elite Access)
+// reste celle du JSON. La promo de la firme vient des pastilles des onglets, au code JTNQ, jamais
+// leur code public.
 export async function scrapeTopOne(read = () => fetchTopOneCards(fetchText)) {
   const cards = await read();
-  return { updates: topOneUpdates(cards), firmPromo: topOnePromo(cards) };
+  return { programs: topOnePrograms(cards), firmPromo: topOnePromo(cards) };
 }
 
 /** Ce que la firme vend et que le JSON n'a pas : signale, jamais ajoute (choix d'Angelo). */

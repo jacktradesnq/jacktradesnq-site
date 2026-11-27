@@ -193,11 +193,11 @@ async function extractE8() {
  * instant accounts. Every card has both faces since Aug 2026; « Consistency on Eval: None! » on
  * Elite Access is the evaluation (its 40% is funded only, carried by the site's funded rules).
  * A row a card no longer carries is BROKEN, except the two it never had:
- *   - profitTarget on Instant Sim Funded / Ignite (no evaluation, JSON null);
+ *   - profitTarget on an account without evaluation (Instant Sim Funded, Ignite: card.type
+ *     'instant', JSON null);
  *   - maxDrawdown on Elite Access: its evaluation face prints the drawdown mode, not the amount
  *     (help.toponefutures.com, hand-maintained).
  */
-const TOPONE_INSTANT = new Set(['Instant Sim Funded', 'Ignite']);
 export function topOneRules(cards) {
   const read = (v, norm) => (v == null ? BROKEN : norm(v));
   const amount = (v) => (/^none!?$/i.test(String(v).trim()) ? null : money(v) ?? BROKEN);
@@ -208,7 +208,7 @@ export function topOneRules(cards) {
       consistency: read(r.consistency, consistency),
       contracts: read(r.contracts, (v) => contracts(v) ?? BROKEN),
     };
-    if (!TOPONE_INSTANT.has(card.programName)) rules.profitTarget = read(r.profitTarget, amount);
+    if (card.type !== 'instant') rules.profitTarget = read(r.profitTarget, amount);
     if (card.programName !== 'Elite Access') rules.maxDrawdown = read(r.maxDrawdown, amount);
     return { programName: card.programName, size: card.size, rules };
   });
