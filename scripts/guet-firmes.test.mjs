@@ -97,6 +97,31 @@ test('perps : perte max lue dans la ligne « Max drawdown », le « 20x » de Li
   assert.match(bloc, /- nouveau plan · 2-Step 5K : perte max 300 \$ \/ prix 14,25 \$ = 21,1x/);
 });
 
+test('perps à curseurs (Vest 1-Step, 28/11/2026) : un prix changé dans la grille est vu, nommé par sa combinaison', () => {
+  const g = (profitTarget, maxDrawdown, split, price, promoPrice) => ({ profitTarget, maxDrawdown, split, price, promoPrice });
+  const vest = (prix2070) => ({
+    'public/data/perps-firms.json': {
+      firms: [
+        {
+          id: 'vest-markets',
+          name: 'Vest Markets',
+          promo: { code: 'JTNQ', discountPct: 10, endsAt: null, instantPct: 5, lastChecked: '2026-11-28' },
+          programs: [
+            {
+              name: '1-Step',
+              maxDrawdown: '6–8%',
+              plans: [{ size: 5000, price: 90, promoPrice: 81, lines: [{ label: 'Max drawdown', value: '$300' }], grid: [g(10, 6, 80, 90, 81), g(20, 6, 70, 55, prix2070)] }],
+            },
+          ],
+        },
+      ],
+    },
+  });
+  assert.deepEqual(blocsOffres(differences(vest(49.5), vest(49.5))), []);
+  const [bloc] = blocsOffres(differences(vest(49.5), vest(45)));
+  assert.match(bloc, /- prix changé · 1-Step 5K : 20% \/ 6% \/ 70%, prix 49,50 \$ → 45 \$ · perte max 300 \$ \/ prix 81 \$ = 3,7x$/);
+});
+
 test('perte max perps : ligne en dollars, sinon % du programme x taille, sinon non calculable', () => {
   assert.equal(perteMax({ size: 500, lines: [{ label: 'Max drawdown', value: '$10 (2%)' }] }, {}, 'perps'), 10);
   assert.equal(perteMax({ size: 10000, lines: [{ label: 'Max drawdown', value: '$1,000' }] }, {}, 'perps'), 1000);

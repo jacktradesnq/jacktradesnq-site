@@ -375,4 +375,57 @@ export const COMPARE_CSS = `
 }
 .jtnq-cmp .cmp-opt:hover{ color: var(--c-accent); }
 .jtnq-cmp .cmp-opt[aria-pressed="true"]{ color: var(--c-accent); border-color: var(--c-accent); }
+
+/* Slider of a plan sold in many combinations (Vest 1-Step): the value picked, a rail with one stop per
+   value, the lowest and highest under its ends. The thumb's centre runs from 8px to width - 8px, so the
+   rail and its stops sit 8px in from each side. */
+.jtnq-cmp .cmp-slide{
+  display: inline-flex; flex-direction: column; align-items: stretch; gap: 4px; width: 104px; vertical-align: middle;
+}
+.jtnq-cmp .cmp-slide-val{ display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.jtnq-cmp .cmp-slide-track{ position: relative; height: 24px; }
+.jtnq-cmp .cmp-slide-rail{
+  position: absolute; left: 8px; right: 8px; top: 50%; height: 2px; margin-top: -1px; border-radius: 999px;
+  --rest: color-mix(in oklab, var(--c-text-mute) 45%, var(--c-bg-raise));
+  background: linear-gradient(to right, var(--c-accent) var(--pos), var(--rest) var(--pos));
+}
+.jtnq-cmp .cmp-slide-stop{
+  position: absolute; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 999px;
+  background: var(--c-bg-raise); box-shadow: inset 0 0 0 2px var(--rest);
+}
+.jtnq-cmp .cmp-slide-stop.on{ box-shadow: inset 0 0 0 2px var(--c-accent); }
+.jtnq-cmp .cmp-slide input{
+  position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0;
+  -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer;
+}
+.jtnq-cmp .cmp-slide input:focus-visible{ outline: none; }
+.jtnq-cmp .cmp-slide input::-webkit-slider-runnable-track{ height: 24px; background: transparent; border: none; }
+.jtnq-cmp .cmp-slide input::-moz-range-track{ height: 24px; background: transparent; border: none; }
+.jtnq-cmp .cmp-slide input::-webkit-slider-thumb{
+  -webkit-appearance: none; appearance: none; box-sizing: border-box; width: 16px; height: 16px; margin-top: 4px;
+  border: 3px solid var(--c-bg-raise); border-radius: 999px; background: var(--c-accent);
+  box-shadow: 0 0 0 1px var(--c-accent), 0 1px 2px oklch(0.05 0.02 165 / .5);
+  transition: box-shadow .2s ease;
+}
+.jtnq-cmp .cmp-slide input::-moz-range-thumb{
+  box-sizing: border-box; width: 16px; height: 16px;
+  border: 3px solid var(--c-bg-raise); border-radius: 999px; background: var(--c-accent);
+  box-shadow: 0 0 0 1px var(--c-accent), 0 1px 2px oklch(0.05 0.02 165 / .5);
+  transition: box-shadow .2s ease;
+}
+.jtnq-cmp .cmp-slide input:hover::-webkit-slider-thumb, .jtnq-cmp .cmp-slide input:focus-visible::-webkit-slider-thumb{
+  box-shadow: 0 0 0 1px var(--c-accent), 0 0 0 5px color-mix(in oklab, var(--c-accent) 25%, transparent);
+}
+.jtnq-cmp .cmp-slide input:hover::-moz-range-thumb, .jtnq-cmp .cmp-slide input:focus-visible::-moz-range-thumb{
+  box-shadow: 0 0 0 1px var(--c-accent), 0 0 0 5px color-mix(in oklab, var(--c-accent) 25%, transparent);
+}
+.jtnq-cmp .cmp-slide-ends{
+  display: flex; justify-content: space-between; gap: 8px;
+  font-family: var(--f-sans); font-size: 14px; line-height: 1.2; color: var(--c-text-mute);
+}
+/* On a phone card, like the firm's configurator: the label on the left, the value on the right, the
+   rail under it across the field. */
+.jtnq-cmp .cmp[class] .cmp-card-row:has(.cmp-slide){ align-items: start; }
+.jtnq-cmp .cmp-card-row .cmp-slide{ width: 100%; max-width: 192px; }
+.jtnq-cmp .cmp-card-row .cmp-slide-val{ align-items: flex-end; }
 `;

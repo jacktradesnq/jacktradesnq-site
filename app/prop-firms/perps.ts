@@ -15,15 +15,17 @@ import { BUILD_TS, usePromoClock } from './promo-clock';
 import { goHref } from '@/lib/go-links';
 import { firstNumber } from '@/lib/compare-order.mjs';
 import { sizeLabel } from './shared';
-import { cellVal, cheapest, humanDate, pillValue, textVal, type CompareRow, type DailyLoss, type FirmView, type Funded, type Val } from './firm-view';
+import { cellVal, cheapest, humanDate, pillValue, textVal, type ComparePrice, type CompareRow, type DailyLoss, type FirmView, type Funded, type Slider, type Val } from './firm-view';
 
 // price null = announced but not on sale yet ("Coming soon").
 // altPrice: a second version of the same account, shown in the same cell after a « / » (Angelo,
 // 12/10/2026 : « dans la même colonne et dans chaque truc t'as un / qui met les 2 prix »): MFP
 // Elite's cheaper 3% DLL version.
-// altPrices: the same, for an account sold in more than two versions (E8 One at 80%, 90%, 100%;
-// Vest 1-Step at 70%, 80%, 90%, 95% since 28/11/2026, the first price being the 70% split).
+// altPrices: the same, for an account sold in more than two versions (E8 One at 80%, 90%, 100%).
 // lines: rules that change with the size (Vest's max drawdown in dollars), a row under the price.
+// grid: every price of a plan picked with sliders (Vest 1-Step since 28/11/2026), one entry per
+// combination, keyed by the program's slider fields (profitTarget, maxDrawdown, split, in %); price
+// and promoPrice of the plan are its default combination.
 type PerpsPlan = {
   size: number;
   price: number | null;
@@ -32,6 +34,7 @@ type PerpsPlan = {
   altPromoPrice?: number;
   altPrices?: { price: number; promoPrice: number | null }[];
   lines?: { label: string; value: string }[];
+  grid?: ({ price: number; promoPrice: number | null } & Record<string, number | null>)[];
   // more: other versions of the same account, one price row each under the main one (Vest 1-Step
   // until 23/11/2026: 3% DLL on the main row, then 4% DLL and No DLL; Angelo 21/10/2026: « les regrouper »).
   more?: { label: string; price: number; promoPrice: number | null; altPrice?: number; altPromoPrice?: number }[];
@@ -49,8 +52,14 @@ type PerpsProgram = {
   dailyLoss: string | null;
   note: string;
   priceLabel?: string; // name of the main price row when the plans carry `more` rows
+  // The rules the buyer picks (Vest 1-Step: target, drawdown, split), each shown as a slider in place
+  // of the program's own field of the same name; values in %, default = the firm's.
+  sliders?: { field: SliderField; label: string; values: number[]; default: number }[];
   plans: PerpsPlan[];
 };
+type SliderField = 'profitTarget' | 'maxDrawdown' | 'split';
+// The comparator column each slider sits in.
+const SLIDER_COL: Record<SliderField, string> = { profitTarget: 'target', maxDrawdown: 'maxLoss', split: 'split' };
 type PerpsFirm = {
   id: string;
   name: string;
@@ -289,6 +298,29 @@ function dailyLossOf(text: string | null): DailyLoss {
   return none && some ? 'both' : none ? 'without' : 'with';
 }
 
+const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
+
+// The sliders of a plan and its price for each combination (see CompareRow.sliders). A combination the
+// grid does not hold is left out: the row then keeps its default price.
+function slidersOf(p: PerpsProgram, plan: PerpsPlan, priceOf: (list: number, discounted: number | null) => ComparePrice) {
+  if (!p.sliders?.length || !plan.grid?.length) return {};
+  const sliders: Slider[] = p.sliders.map((s) => ({
+    col: SLIDER_COL[s.field],
+    label: s.label,
+    values: s.values.map((v) => `${v}%`),
+    sorts: s.values,
+    // Max loss in dollars, as the plan's own line: the drawdown % of the account size.
+    subs: s.field === 'maxDrawdown' ? s.values.map((v) => usd(Math.round((plan.size * v) / 100))) : undefined,
+    start: Math.max(0, s.values.indexOf(s.default)),
+  }));
+  const combos: Record<string, ComparePrice> = {};
+  for (const g of plan.grid) {
+    const stops = p.sliders.map((s) => s.values.indexOf(g[s.field] as number));
+    if (stops.every((i) => i >= 0)) combos[stops.join('|')] = priceOf(g.price, g.promoPrice);
+  }
+  return { sliders, combos };
+}
+
 function rowsOf(firm: PerpsFirm, promoLive: boolean): CompareRow[] {
   const promo = promoOf(firm, promoLive);
   const rulesKey = (p: PerpsProgram) => p.rulesKey ?? p.name.split(' ')[0];
@@ -340,6 +372,7 @@ function rowsOf(firm: PerpsFirm, promoLive: boolean): CompareRow[] {
         lossType: p.ddType,
         dailyLoss: dailyLossOf(p.dailyLoss),
         note: plan.price != null ? plan.note : undefined,
+        ...slidersOf(p, plan, (list, discounted) => ({ kind: 'price', list, discounted: promo ? discounted : null, alts: [], per: null, from: false })),
         options: dailyLossChoices(p, plan)?.map((c) => ({
           label: c.label,
           price: {

@@ -11,11 +11,14 @@
  * are no longer sold in the Customizer », docs.vestmarkets.com/vest-capital/overview) ; Angelo, 28/11 :
  * « 2 step? ca existe pas 2 step avec vest ».
  *
- * Affichage = les formats déjà choisis par Angelo pour les variantes d'un même compte :
- *   - un programme par objectif, comme le Vest du 21/10/2026 (« 1-Step · 10% », « 1-Step · 20% ») ;
- *   - un programme par drawdown, comme E8 One (« E8 One · 4% Max ») ;
- *   - les splits dans la même case, séparés par « / », dans l'ordre (12/10/2026 : « dans la même
- *     colonne et dans chaque truc t'as un / qui met les 2 prix » ; E8 One 80 / 90 / 100 %).
+ * Affichage du 1-Step depuis le 28/11/2026 : un seul programme, une ligne par taille, et trois curseurs
+ * comme ceux de leur configurateur (objectif, drawdown max, split), chacun dans la colonne qu'il change ;
+ * le prix de la ligne suit la combinaison choisie (Angelo, 28/11/2026, sur les 4 prix empilés « $31.50
+ * $35 / $36 $40 / $40.50 $45 / $45 $50 » : « un humain qui lit ca se dit, ok je comprends rien LOL mais
+ * enfaite vest vu que y a pleins de combinaison je pense faut faire ca de vest », « tu clique tu drag
+ * gauche droite, quand y a bcp de choix possible pour pas prendre trop trop de place, je pense ca c
+ * mieux »). Position de départ = les défauts que leur catalogue publie (« default » de chaque règle de
+ * /catalog/options), jamais écrits ici. Avant : un programme par objectif et drawdown, 4 prix par case.
  * Un compte que Vest ajoute ou retire apparaît / disparaît seul (Angelo, 28/11/2026, règle du 21/10 :
  * « tant que y a sur leur site faut que ca sois sur nôtre site aussi »).
  *
@@ -132,39 +135,57 @@ export function vestPerpsFromSnapshot(snap, { checkedOn, promo }) {
   const ddPcts = instant.map((p) => pct(p.dd));
   const ddRange = Math.min(...ddPcts) === Math.max(...ddPcts) ? `${ddPcts[0]}%` : `${Math.min(...ddPcts)}–${Math.max(...ddPcts)}%`;
 
-  const programs = [];
-  // 1-Step : un programme par (objectif, drawdown), toutes les tailles, un prix par split.
-  for (const goal of targets)
-    for (const dd of dds) {
-      const plans = evalSizes.map((size) => {
-        const prices = splits.map((split) => {
+  // Position de départ des curseurs : le « default » de chaque règle, lu dans leur catalogue.
+  const defaultOf = (k, list) => {
+    const d = Number(rules[k]?.default);
+    if (!list.includes(d)) fail(`1-Step : le défaut de ${k} (${rules[k]?.default}) n'est pas l'un de ses choix (${list.join(', ')})`);
+    return d;
+  };
+  const start = { goal: defaultOf('profitTargetPct', targets), dd: defaultOf('maxDrawdownPct', dds), split: defaultOf('profitSplitPct', splits) };
+  const range = (list) => (list.length === 1 ? `${pct(list[0])}%` : `${pct(list[0])}–${pct(list[list.length - 1])}%`);
+
+  // 1-Step : un programme, une ligne par taille ; chaque ligne porte la grille de tous ses prix
+  // (objectif × drawdown × split), price / promoPrice = la combinaison par défaut.
+  const plans = evalSizes.map((size) => {
+    const grid = [];
+    for (const goal of targets)
+      for (const dd of dds)
+        for (const split of splits) {
           const p = products.find(
             (x) => x.type === 'eval' && x.size === size && Math.abs(x.goal - size * goal) < 0.01 && x.dd === dd && x.split === split,
           );
           if (!p) fail(`1-Step ${money(size)} ${pct(goal)} % / ${pct(dd)} % / split ${pct(split)} % annoncé mais absent du catalogue`);
-          return p.price;
-        });
-        return {
-          size,
-          price: prices[0],
-          promoPrice: off(prices[0], evalPct),
-          altPrices: prices.slice(1).map((price) => ({ price, promoPrice: off(price, evalPct) })),
-          lines: [{ label: 'Max drawdown', value: money(Math.round(size * dd)) }],
-        };
-      });
-      programs.push({
-        name: `1-Step · ${pct(goal)}% · ${pct(dd)}% Max`,
-        rulesKey: '1-Step',
-        steps: '1 step',
-        split: splits.map((s) => `${pct(s)}%`).join(' / '),
-        profitTarget: `${pct(goal)}%`,
-        maxDrawdown: `${pct(dd)}%`,
-        ddType: 'Static',
-        dailyLoss: 'None',
-        note: '',
-        plans,
-      });
-    }
+          grid.push({ profitTarget: pct(goal), maxDrawdown: pct(dd), split: pct(split), price: p.price, promoPrice: off(p.price, evalPct) });
+        }
+    const first = grid.find((g) => g.profitTarget === pct(start.goal) && g.maxDrawdown === pct(start.dd) && g.split === pct(start.split));
+    return {
+      size,
+      price: first.price,
+      promoPrice: first.promoPrice,
+      lines: [{ label: 'Max drawdown', value: money(Math.round(size * start.dd)) }],
+      grid,
+    };
+  });
+  const programs = [
+    {
+      name: '1-Step',
+      steps: '1 step',
+      split: splits.map((s) => `${pct(s)}%`).join(' / '),
+      profitTarget: range(targets),
+      maxDrawdown: range(dds),
+      ddType: 'Static',
+      dailyLoss: 'None',
+      note: '',
+      // Un curseur par règle au choix : `field` = le champ du programme qu'il remplace et la clé de la
+      // grille, `values` en %, `default` = position de départ (leur catalogue).
+      sliders: [
+        { field: 'profitTarget', label: 'Profit target', values: targets.map(pct), default: pct(start.goal) },
+        { field: 'maxDrawdown', label: 'Max drawdown', values: dds.map(pct), default: pct(start.dd) },
+        { field: 'split', label: 'Profit split', values: splits.map(pct), default: pct(start.split) },
+      ],
+      plans,
+    },
+  ];
   programs.push({
     name: 'Instant',
     steps: 'Instant',

@@ -39,7 +39,7 @@ test('a plan sold in several daily loss versions (Vest 1-Step until 23/11): 3%, 
 test('a plan sold one way has no buttons', () => {
   assert.equal(dailyLossChoices({ name: 'Classic', dailyLoss: '3%' }, { size: 5000, price: 45, promoPrice: 42.75 }), null);
   assert.equal(dailyLossChoices({ dailyLoss: 'None / 3%' }, { price: null }), null);
-  // Vest 1-Step since 28/11/2026: four split prices, no daily loss: no buttons.
+  // A plan with split prices and no daily loss (Vest 1-Step on 28/11/2026, before its sliders): no buttons.
   assert.equal(
     dailyLossChoices({ name: '1-Step · 10% · 6% Max', dailyLoss: 'None' }, { size: 5000, price: 80, promoPrice: 72, altPrices: [{ price: 90, promoPrice: 81 }] }),
     null,

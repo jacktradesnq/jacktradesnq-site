@@ -17,10 +17,10 @@
 //   genre annuler »): a ticked plan joins the others at the top of the table, the list stays under.
 // Self-contained: it can move to a page of its own by rendering <ComparePanel> there.
 
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { defaultOrder, filterRows, firmMatches, pickedFirst, sortBy, togglePick } from '@/lib/compare-order.mjs';
 import { FirmSearch } from '../FirmSearch';
-import { FAMILIES, shownPrice, type ComparePrice, type CompareRow, type Family } from '../firm-view';
+import { FAMILIES, shownPrice, type ComparePrice, type CompareRow, type Family, type Slider } from '../firm-view';
 import { EXTRA_PROMO_ENDS, futuresRows } from '../futures';
 import { perpsRows, usePromoLive } from '../perps';
 import { usePromoClock } from '../promo-clock';
@@ -57,10 +57,56 @@ function PriceCell({ price, discount }: { price: ComparePrice; discount: boolean
   return <PriceView price={{ ...p, per: price.per, from: price.from }} />;
 }
 
-// Options: the row's Daily loss buttons, when the plan is sold with several limits.
-type Options = { chosen: (row: CompareRow) => number; choose: (row: CompareRow, i: number) => void };
+// Options: the row's Daily loss buttons, when the plan is sold with several limits; and the stop of
+// each of its sliders, when the plan is picked with sliders (CompareRow.sliders).
+type Options = {
+  chosen: (row: CompareRow) => number;
+  choose: (row: CompareRow, i: number) => void;
+  stops: (row: CompareRow) => number[];
+  move: (row: CompareRow, slider: number, stop: number) => void;
+};
+
+// One rule of a plan sold in many combinations, picked like on the firm's configurator (Vest 1-Step,
+// Angelo 28/11/2026: « tu clique tu drag gauche droite »): click or drag, one stop per value, arrow
+// keys; the value picked above, the lowest and highest under the ends.
+function SliderCell({ row, slider, stop, onMove }: { row: CompareRow; slider: Slider; stop: number; onMove: (stop: number) => void }) {
+  const last = slider.values.length - 1;
+  const at = (i: number) => (last > 0 ? (i / last) * 100 : 0);
+  return (
+    <span className="cmp-slide" style={{ '--pos': `${at(stop)}%` } as CSSProperties}>
+      <span className="cmp-slide-val">
+        <span className="ft-fig">{slider.values[stop]}</span>
+        {slider.subs && <span className="cmp-sub">{slider.subs[stop]}</span>}
+      </span>
+      <span className="cmp-slide-track">
+        <span className="cmp-slide-rail" aria-hidden="true">
+          {slider.values.map((v, i) => (
+            <span key={v} className={`cmp-slide-stop${i <= stop ? ' on' : ''}`} style={{ left: `${at(i)}%` }} />
+          ))}
+        </span>
+        <input
+          type="range"
+          min={0}
+          max={last}
+          step={1}
+          value={stop}
+          aria-label={`${slider.label}, ${row.firmName} ${row.program} ${sizeLabel(row.size)}`}
+          aria-valuetext={slider.values[stop]}
+          onChange={(e) => onMove(Number(e.target.value))}
+        />
+      </span>
+      <span className="cmp-slide-ends" aria-hidden="true">
+        <span>{slider.values[0]}</span>
+        <span>{slider.values[last]}</span>
+      </span>
+    </span>
+  );
+}
 
 function ValCell({ row, col, options }: { row: CompareRow; col: string; options: Options }) {
+  const si = row.sliders?.findIndex((s) => s.col === col) ?? -1;
+  if (row.sliders && si >= 0)
+    return <SliderCell row={row} slider={row.sliders[si]} stop={options.stops(row)[si]} onMove={(stop) => options.move(row, si, stop)} />;
   if (col === 'dailyLoss' && row.options)
     return (
       <span className="cmp-opts" role="group" aria-label={`Daily loss limit, ${row.firmName} ${row.program} ${sizeLabel(row.size)}`}>
@@ -195,11 +241,23 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   const countRef = useRef<HTMLParagraphElement>(null);
   // The Daily loss button picked on each plan sold with several limits; none = its first version.
   const [optionOf, setOptionOf] = useState<Record<string, number>>({});
+  // The slider stops picked on each plan picked with sliders; none = the firm's defaults.
+  const [stopsOf, setStopsOf] = useState<Record<string, number[]>>({});
+  const startStops = (r: CompareRow) => r.sliders?.map((s) => s.start) ?? [];
   const options: Options = {
     chosen: (r) => optionOf[r.key] ?? 0,
     choose: (r, i) => setOptionOf((prev) => ({ ...prev, [r.key]: i })),
+    stops: (r) => stopsOf[r.key] ?? startStops(r),
+    move: (r, slider, stop) =>
+      setStopsOf((prev) => {
+        const next = [...(prev[r.key] ?? startStops(r))];
+        next[slider] = stop;
+        return { ...prev, [r.key]: next };
+      }),
   };
-  const priceNow = (r: CompareRow) => r.options?.[options.chosen(r)]?.price ?? r.price;
+  // The price of the row as picked: its sliders' combination, or its Daily loss button.
+  const priceNow = (r: CompareRow) =>
+    (r.combos && r.combos[options.stops(r).join('|')]) ?? r.options?.[options.chosen(r)]?.price ?? r.price;
 
   // The firm id this panel last put in the address itself (Firm filter), so its echo back
   // through `firm` is not taken for a firm picked from its window.
@@ -290,8 +348,13 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
     { firmIds: firms, firmQuery: query, size, steps, lossType, dailyLoss, maxPrice: budget != null && Number.isFinite(budget) ? budget : null },
     priceOf,
   );
+  // A column with a slider sorts by the value picked on it.
+  const sliderSort = (r: CompareRow, col: string) => {
+    const i = r.sliders?.findIndex((s) => s.col === col) ?? -1;
+    return r.sliders && i >= 0 ? r.sliders[i].sorts[options.stops(r)[i]] ?? null : undefined;
+  };
   const keyOf = (col: string) => (r: CompareRow) =>
-    col === 'price' ? priceOf(r) : col === 'firm' ? `${r.firmName} ${r.program}` : r.cells[col]?.sort ?? null;
+    col === 'price' ? priceOf(r) : col === 'firm' ? `${r.firmName} ${r.program}` : sliderSort(r, col) ?? r.cells[col]?.sort ?? null;
   const ordered = (rows: CompareRow[]) => (sort ? sortBy(rows, keyOf(sort.col), sort.dir) : rows);
   const shown = pickedFirst(ordered(picked), ordered(filtered));
   const lastPicked = picked.length < shown.length ? picked.length - 1 : -1;

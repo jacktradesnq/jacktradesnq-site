@@ -43,8 +43,8 @@ export type ComparePrice =
       kind: 'price';
       list: number;
       discounted: number | null;
-      // Other versions of the same account, each after a « / » (MFP Elite 3% DLL, Vest 90% split,
-      // E8 One 90% and 100% payout).
+      // Other versions of the same account, each after a « / » (MFP Elite 3% DLL, E8 One 90% and 100%
+      // payout).
       alts: { list: number; discounted: number | null }[];
       per: '/month' | 'one-time' | null;
       // Several prices live for the same product: the cheapest is shown, prefixed "from".
@@ -52,7 +52,7 @@ export type ComparePrice =
     }
   | { kind: 'text'; text: string }; // "Coming soon"
 
-// 'both': the same plan is sold with and without one (MFP Elite / Elite 3% DLL, Vest 1-Step 3%, 4% or none).
+// 'both': the same plan is sold with and without one (MFP Elite / Elite 3% DLL; Vest 1-Step 3%, 4% or none until 23/11/2026).
 export type DailyLoss = 'with' | 'without' | 'both' | null;
 
 export type CompareRow = {
@@ -76,11 +76,31 @@ export type CompareRow = {
   // The versions of the plan sold with different daily loss limits, one button each in the Daily
   // loss cell; the button picked gives the price shown. No key: the plan is sold one way.
   options?: { label: string; price: ComparePrice }[];
+  // A plan sold in many combinations, picked with sliders like the firm's own configurator (Vest
+  // 1-Step since 28/11/2026; Angelo, 28/11/2026: « tu clique tu drag gauche droite, quand y a bcp de
+  // choix possible pour pas prendre trop trop de place »): one slider per rule, drawn in the column it
+  // changes, starting on the firm's default. The price shown is combos[<stop of each slider>.join('|')].
+  sliders?: Slider[];
+  combos?: Record<string, ComparePrice>;
   href: string;
   // false: a firm Angelo is not partnered with (compare-extra-firms.json), its own site and
   // its public code, shown in the comparator only.
   affiliate: boolean;
   code: { code: string; title: string } | null;
+};
+
+export type Slider = {
+  // The column it sits in, in place of the fixed value (target, maxLoss, split).
+  col: string;
+  // Its name for screen readers (« Profit target »).
+  label: string;
+  // One stop per value the firm sells, as shown (« 10% »), and the same as numbers for the column sort.
+  values: string[];
+  sorts: number[];
+  // A second line per stop (the max loss in dollars of that drawdown).
+  subs?: string[];
+  // The stop it starts on: the firm's default.
+  start: number;
 };
 
 export type FirmView = {

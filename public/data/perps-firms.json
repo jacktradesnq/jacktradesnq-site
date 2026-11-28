@@ -328,1379 +328,744 @@
       },
       "programs": [
         {
-          "name": "1-Step · 5% · 6% Max",
-          "rulesKey": "1-Step",
+          "name": "1-Step",
           "steps": "1 step",
           "split": "70% / 80% / 90% / 95%",
-          "profitTarget": "5%",
-          "maxDrawdown": "6%",
+          "profitTarget": "5–20%",
+          "maxDrawdown": "6–8%",
           "ddType": "Static",
           "dailyLoss": "None",
           "note": "",
-          "plans": [
+          "sliders": [
             {
-              "size": 1000,
-              "price": 35,
-              "promoPrice": 31.5,
-              "altPrices": [
-                {
-                  "price": 40,
-                  "promoPrice": 36
-                },
-                {
-                  "price": 45,
-                  "promoPrice": 40.5
-                },
-                {
-                  "price": 50,
-                  "promoPrice": 45
-                }
+              "field": "profitTarget",
+              "label": "Profit target",
+              "values": [
+                5,
+                10,
+                15,
+                20
               ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$60"
-                }
-              ]
+              "default": 10
             },
             {
-              "size": 2500,
-              "price": 75,
-              "promoPrice": 67.5,
-              "altPrices": [
-                {
-                  "price": 80,
-                  "promoPrice": 72
-                },
-                {
-                  "price": 100,
-                  "promoPrice": 90
-                },
-                {
-                  "price": 110,
-                  "promoPrice": 99
-                }
+              "field": "maxDrawdown",
+              "label": "Max drawdown",
+              "values": [
+                6,
+                7,
+                8
               ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$150"
-                }
-              ]
+              "default": 6
             },
             {
-              "size": 5000,
-              "price": 130,
-              "promoPrice": 117,
-              "altPrices": [
-                {
-                  "price": 140,
-                  "promoPrice": 126
-                },
-                {
-                  "price": 180,
-                  "promoPrice": 162
-                },
-                {
-                  "price": 190,
-                  "promoPrice": 171
-                }
+              "field": "split",
+              "label": "Profit split",
+              "values": [
+                70,
+                80,
+                90,
+                95
               ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$300"
-                }
-              ]
-            },
-            {
-              "size": 10000,
-              "price": 240,
-              "promoPrice": 216,
-              "altPrices": [
-                {
-                  "price": 270,
-                  "promoPrice": 243
-                },
-                {
-                  "price": 320,
-                  "promoPrice": 288
-                },
-                {
-                  "price": 350,
-                  "promoPrice": 315
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$600"
-                }
-              ]
-            },
-            {
-              "size": 25000,
-              "price": 590,
-              "promoPrice": 531,
-              "altPrices": [
-                {
-                  "price": 670,
-                  "promoPrice": 603
-                },
-                {
-                  "price": 790,
-                  "promoPrice": 711
-                },
-                {
-                  "price": 840,
-                  "promoPrice": 756
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$1,500"
-                }
-              ]
-            },
-            {
-              "size": 50000,
-              "price": 1140,
-              "promoPrice": 1026,
-              "altPrices": [
-                {
-                  "price": 1300,
-                  "promoPrice": 1170
-                },
-                {
-                  "price": 1570,
-                  "promoPrice": 1413
-                },
-                {
-                  "price": 1660,
-                  "promoPrice": 1494
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$3,000"
-                }
-              ]
-            },
-            {
-              "size": 100000,
-              "price": 2400,
-              "promoPrice": 2160,
-              "altPrices": [
-                {
-                  "price": 2730,
-                  "promoPrice": 2457
-                },
-                {
-                  "price": 3280,
-                  "promoPrice": 2952
-                },
-                {
-                  "price": 3470,
-                  "promoPrice": 3123
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$6,000"
-                }
-              ]
+              "default": 80
             }
-          ]
-        },
-        {
-          "name": "1-Step · 5% · 7% Max",
-          "rulesKey": "1-Step",
-          "steps": "1 step",
-          "split": "70% / 80% / 90% / 95%",
-          "profitTarget": "5%",
-          "maxDrawdown": "7%",
-          "ddType": "Static",
-          "dailyLoss": "None",
-          "note": "",
-          "plans": [
-            {
-              "size": 1000,
-              "price": 40,
-              "promoPrice": 36,
-              "altPrices": [
-                {
-                  "price": 45,
-                  "promoPrice": 40.5
-                },
-                {
-                  "price": 55,
-                  "promoPrice": 49.5
-                },
-                {
-                  "price": 60,
-                  "promoPrice": 54
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$70"
-                }
-              ]
-            },
-            {
-              "size": 2500,
-              "price": 90,
-              "promoPrice": 81,
-              "altPrices": [
-                {
-                  "price": 100,
-                  "promoPrice": 90
-                },
-                {
-                  "price": 120,
-                  "promoPrice": 108
-                },
-                {
-                  "price": 130,
-                  "promoPrice": 117
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$175"
-                }
-              ]
-            },
-            {
-              "size": 5000,
-              "price": 150,
-              "promoPrice": 135,
-              "altPrices": [
-                {
-                  "price": 180,
-                  "promoPrice": 162
-                },
-                {
-                  "price": 210,
-                  "promoPrice": 189
-                },
-                {
-                  "price": 220,
-                  "promoPrice": 198
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$350"
-                }
-              ]
-            },
-            {
-              "size": 10000,
-              "price": 300,
-              "promoPrice": 270,
-              "altPrices": [
-                {
-                  "price": 340,
-                  "promoPrice": 306
-                },
-                {
-                  "price": 400,
-                  "promoPrice": 360
-                },
-                {
-                  "price": 430,
-                  "promoPrice": 387
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$700"
-                }
-              ]
-            },
-            {
-              "size": 25000,
-              "price": 720,
-              "promoPrice": 648,
-              "altPrices": [
-                {
-                  "price": 830,
-                  "promoPrice": 747
-                },
-                {
-                  "price": 980,
-                  "promoPrice": 882
-                },
-                {
-                  "price": 1040,
-                  "promoPrice": 936
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$1,750"
-                }
-              ]
-            },
-            {
-              "size": 50000,
-              "price": 1430,
-              "promoPrice": 1287,
-              "altPrices": [
-                {
-                  "price": 1620,
-                  "promoPrice": 1458
-                },
-                {
-                  "price": 1950,
-                  "promoPrice": 1755
-                },
-                {
-                  "price": 2060,
-                  "promoPrice": 1854
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$3,500"
-                }
-              ]
-            },
-            {
-              "size": 100000,
-              "price": 3000,
-              "promoPrice": 2700,
-              "altPrices": [
-                {
-                  "price": 3400,
-                  "promoPrice": 3060
-                },
-                {
-                  "price": 4100,
-                  "promoPrice": 3690
-                },
-                {
-                  "price": 4310,
-                  "promoPrice": 3879
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$7,000"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "1-Step · 5% · 8% Max",
-          "rulesKey": "1-Step",
-          "steps": "1 step",
-          "split": "70% / 80% / 90% / 95%",
-          "profitTarget": "5%",
-          "maxDrawdown": "8%",
-          "ddType": "Static",
-          "dailyLoss": "None",
-          "note": "",
-          "plans": [
-            {
-              "size": 1000,
-              "price": 50,
-              "promoPrice": 45,
-              "altPrices": [
-                {
-                  "price": 55,
-                  "promoPrice": 49.5
-                },
-                {
-                  "price": 60,
-                  "promoPrice": 54
-                },
-                {
-                  "price": 65,
-                  "promoPrice": 58.5
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$80"
-                }
-              ]
-            },
-            {
-              "size": 2500,
-              "price": 110,
-              "promoPrice": 99,
-              "altPrices": [
-                {
-                  "price": 120,
-                  "promoPrice": 108
-                },
-                {
-                  "price": 140,
-                  "promoPrice": 126
-                },
-                {
-                  "price": 150,
-                  "promoPrice": 135
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$200"
-                }
-              ]
-            },
-            {
-              "size": 5000,
-              "price": 190,
-              "promoPrice": 171,
-              "altPrices": [
-                {
-                  "price": 210,
-                  "promoPrice": 189
-                },
-                {
-                  "price": 240,
-                  "promoPrice": 216
-                },
-                {
-                  "price": 260,
-                  "promoPrice": 234
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$400"
-                }
-              ]
-            },
-            {
-              "size": 10000,
-              "price": 360,
-              "promoPrice": 324,
-              "altPrices": [
-                {
-                  "price": 400,
-                  "promoPrice": 360
-                },
-                {
-                  "price": 480,
-                  "promoPrice": 432
-                },
-                {
-                  "price": 510,
-                  "promoPrice": 459
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$800"
-                }
-              ]
-            },
-            {
-              "size": 25000,
-              "price": 870,
-              "promoPrice": 783,
-              "altPrices": [
-                {
-                  "price": 1000,
-                  "promoPrice": 900
-                },
-                {
-                  "price": 1190,
-                  "promoPrice": 1071
-                },
-                {
-                  "price": 1260,
-                  "promoPrice": 1134
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$2,000"
-                }
-              ]
-            },
-            {
-              "size": 50000,
-              "price": 1710,
-              "promoPrice": 1539,
-              "altPrices": [
-                {
-                  "price": 1960,
-                  "promoPrice": 1764
-                },
-                {
-                  "price": 2350,
-                  "promoPrice": 2115
-                },
-                {
-                  "price": 2480,
-                  "promoPrice": 2232
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$4,000"
-                }
-              ]
-            },
-            {
-              "size": 100000,
-              "price": 3590,
-              "promoPrice": 3231,
-              "altPrices": [
-                {
-                  "price": 4120,
-                  "promoPrice": 3708
-                },
-                {
-                  "price": 4930,
-                  "promoPrice": 4437
-                },
-                {
-                  "price": 5200,
-                  "promoPrice": 4680
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$8,000"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "1-Step · 10% · 6% Max",
-          "rulesKey": "1-Step",
-          "steps": "1 step",
-          "split": "70% / 80% / 90% / 95%",
-          "profitTarget": "10%",
-          "maxDrawdown": "6%",
-          "ddType": "Static",
-          "dailyLoss": "None",
-          "note": "",
-          "plans": [
-            {
-              "size": 1000,
-              "price": 20,
-              "promoPrice": 18,
-              "altPrices": [
-                {
-                  "price": 22,
-                  "promoPrice": 19.8
-                },
-                {
-                  "price": 26,
-                  "promoPrice": 23.4
-                },
-                {
-                  "price": 29,
-                  "promoPrice": 26.1
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$60"
-                }
-              ]
-            },
-            {
-              "size": 2500,
-              "price": 50,
-              "promoPrice": 45,
-              "altPrices": [
-                {
-                  "price": 55,
-                  "promoPrice": 49.5
-                },
-                {
-                  "price": 60,
-                  "promoPrice": 54
-                },
-                {
-                  "price": 70,
-                  "promoPrice": 63
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$150"
-                }
-              ]
-            },
-            {
-              "size": 5000,
-              "price": 80,
-              "promoPrice": 72,
-              "altPrices": [
-                {
-                  "price": 90,
-                  "promoPrice": 81
-                },
-                {
-                  "price": 110,
-                  "promoPrice": 99
-                },
-                {
-                  "price": 120,
-                  "promoPrice": 108
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$300"
-                }
-              ]
-            },
-            {
-              "size": 10000,
-              "price": 160,
-              "promoPrice": 144,
-              "altPrices": [
-                {
-                  "price": 180,
-                  "promoPrice": 162
-                },
-                {
-                  "price": 210,
-                  "promoPrice": 189
-                },
-                {
-                  "price": 230,
-                  "promoPrice": 207
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$600"
-                }
-              ]
-            },
-            {
-              "size": 25000,
-              "price": 400,
-              "promoPrice": 360,
-              "altPrices": [
-                {
-                  "price": 430,
-                  "promoPrice": 387
-                },
-                {
-                  "price": 520,
-                  "promoPrice": 468
-                },
-                {
-                  "price": 570,
-                  "promoPrice": 513
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$1,500"
-                }
-              ]
-            },
-            {
-              "size": 50000,
-              "price": 790,
-              "promoPrice": 711,
-              "altPrices": [
-                {
-                  "price": 850,
-                  "promoPrice": 765
-                },
-                {
-                  "price": 1020,
-                  "promoPrice": 918
-                },
-                {
-                  "price": 1140,
-                  "promoPrice": 1026
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$3,000"
-                }
-              ]
-            },
-            {
-              "size": 100000,
-              "price": 1660,
-              "promoPrice": 1494,
-              "altPrices": [
-                {
-                  "price": 1790,
-                  "promoPrice": 1611
-                },
-                {
-                  "price": 2140,
-                  "promoPrice": 1926
-                },
-                {
-                  "price": 2400,
-                  "promoPrice": 2160
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$6,000"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "1-Step · 10% · 7% Max",
-          "rulesKey": "1-Step",
-          "steps": "1 step",
-          "split": "70% / 80% / 90% / 95%",
-          "profitTarget": "10%",
-          "maxDrawdown": "7%",
-          "ddType": "Static",
-          "dailyLoss": "None",
-          "note": "",
-          "plans": [
-            {
-              "size": 1000,
-              "price": 26,
-              "promoPrice": 23.4,
-              "altPrices": [
-                {
-                  "price": 35,
-                  "promoPrice": 31.5
-                },
-                {
-                  "price": 40,
-                  "promoPrice": 36
-                },
-                {
-                  "price": 45,
-                  "promoPrice": 40.5
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$70"
-                }
-              ]
-            },
-            {
-              "size": 2500,
-              "price": 60,
-              "promoPrice": 54,
-              "altPrices": [
-                {
-                  "price": 75,
-                  "promoPrice": 67.5
-                },
-                {
-                  "price": 90,
-                  "promoPrice": 81
-                },
-                {
-                  "price": 95,
-                  "promoPrice": 85.5
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$175"
-                }
-              ]
-            },
-            {
-              "size": 5000,
-              "price": 110,
-              "promoPrice": 99,
-              "altPrices": [
-                {
-                  "price": 130,
-                  "promoPrice": 117
-                },
-                {
-                  "price": 150,
-                  "promoPrice": 135
-                },
-                {
-                  "price": 160,
-                  "promoPrice": 144
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$350"
-                }
-              ]
-            },
-            {
-              "size": 10000,
-              "price": 210,
-              "promoPrice": 189,
-              "altPrices": [
-                {
-                  "price": 240,
-                  "promoPrice": 216
-                },
-                {
-                  "price": 290,
-                  "promoPrice": 261
-                },
-                {
-                  "price": 300,
-                  "promoPrice": 270
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$700"
-                }
-              ]
-            },
-            {
-              "size": 25000,
-              "price": 520,
-              "promoPrice": 468,
-              "altPrices": [
-                {
-                  "price": 590,
-                  "promoPrice": 531
-                },
-                {
-                  "price": 700,
-                  "promoPrice": 630
-                },
-                {
-                  "price": 730,
-                  "promoPrice": 657
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$1,750"
-                }
-              ]
-            },
-            {
-              "size": 50000,
-              "price": 1010,
-              "promoPrice": 909,
-              "altPrices": [
-                {
-                  "price": 1160,
-                  "promoPrice": 1044
-                },
-                {
-                  "price": 1380,
-                  "promoPrice": 1242
-                },
-                {
-                  "price": 1450,
-                  "promoPrice": 1305
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$3,500"
-                }
-              ]
-            },
-            {
-              "size": 100000,
-              "price": 2110,
-              "promoPrice": 1899,
-              "altPrices": [
-                {
-                  "price": 2420,
-                  "promoPrice": 2178
-                },
-                {
-                  "price": 2900,
-                  "promoPrice": 2610
-                },
-                {
-                  "price": 3040,
-                  "promoPrice": 2736
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$7,000"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "1-Step · 10% · 8% Max",
-          "rulesKey": "1-Step",
-          "steps": "1 step",
-          "split": "70% / 80% / 90% / 95%",
-          "profitTarget": "10%",
-          "maxDrawdown": "8%",
-          "ddType": "Static",
-          "dailyLoss": "None",
-          "note": "",
-          "plans": [
-            {
-              "size": 1000,
-              "price": 35,
-              "promoPrice": 31.5,
-              "altPrices": [
-                {
-                  "price": 40,
-                  "promoPrice": 36
-                },
-                {
-                  "price": 45,
-                  "promoPrice": 40.5
-                },
-                {
-                  "price": 50,
-                  "promoPrice": 45
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$80"
-                }
-              ]
-            },
-            {
-              "size": 2500,
-              "price": 75,
-              "promoPrice": 67.5,
-              "altPrices": [
-                {
-                  "price": 90,
-                  "promoPrice": 81
-                },
-                {
-                  "price": 100,
-                  "promoPrice": 90
-                },
-                {
-                  "price": 110,
-                  "promoPrice": 99
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$200"
-                }
-              ]
-            },
-            {
-              "size": 5000,
-              "price": 130,
-              "promoPrice": 117,
-              "altPrices": [
-                {
-                  "price": 150,
-                  "promoPrice": 135
-                },
-                {
-                  "price": 180,
-                  "promoPrice": 162
-                },
-                {
-                  "price": 190,
-                  "promoPrice": 171
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$400"
-                }
-              ]
-            },
-            {
-              "size": 10000,
-              "price": 260,
-              "promoPrice": 234,
-              "altPrices": [
-                {
-                  "price": 290,
-                  "promoPrice": 261
-                },
-                {
-                  "price": 350,
-                  "promoPrice": 315
-                },
-                {
-                  "price": 370,
-                  "promoPrice": 333
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$800"
-                }
-              ]
-            },
-            {
-              "size": 25000,
-              "price": 630,
-              "promoPrice": 567,
-              "altPrices": [
-                {
-                  "price": 720,
-                  "promoPrice": 648
-                },
-                {
-                  "price": 860,
-                  "promoPrice": 774
-                },
-                {
-                  "price": 910,
-                  "promoPrice": 819
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$2,000"
-                }
-              ]
-            },
-            {
-              "size": 50000,
-              "price": 1250,
-              "promoPrice": 1125,
-              "altPrices": [
-                {
-                  "price": 1420,
-                  "promoPrice": 1278
-                },
-                {
-                  "price": 1700,
-                  "promoPrice": 1530
-                },
-                {
-                  "price": 1790,
-                  "promoPrice": 1611
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$4,000"
-                }
-              ]
-            },
-            {
-              "size": 100000,
-              "price": 2610,
-              "promoPrice": 2349,
-              "altPrices": [
-                {
-                  "price": 2970,
-                  "promoPrice": 2673
-                },
-                {
-                  "price": 3570,
-                  "promoPrice": 3213
-                },
-                {
-                  "price": 3760,
-                  "promoPrice": 3384
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$8,000"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "1-Step · 15% · 6% Max",
-          "rulesKey": "1-Step",
-          "steps": "1 step",
-          "split": "70% / 80% / 90% / 95%",
-          "profitTarget": "15%",
-          "maxDrawdown": "6%",
-          "ddType": "Static",
-          "dailyLoss": "None",
-          "note": "",
-          "plans": [
-            {
-              "size": 1000,
-              "price": 18,
-              "promoPrice": 16.2,
-              "altPrices": [
-                {
-                  "price": 20,
-                  "promoPrice": 18
-                },
-                {
-                  "price": 23,
-                  "promoPrice": 20.7
-                },
-                {
-                  "price": 25,
-                  "promoPrice": 22.5
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$60"
-                }
-              ]
-            },
-            {
-              "size": 2500,
-              "price": 40,
-              "promoPrice": 36,
-              "altPrices": [
-                {
-                  "price": 50,
-                  "promoPrice": 45
-                },
-                {
-                  "price": 55,
-                  "promoPrice": 49.5
-                },
-                {
-                  "price": 60,
-                  "promoPrice": 54
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$150"
-                }
-              ]
-            },
-            {
-              "size": 5000,
-              "price": 70,
-              "promoPrice": 63,
-              "altPrices": [
-                {
-                  "price": 80,
-                  "promoPrice": 72
-                },
-                {
-                  "price": 95,
-                  "promoPrice": 85.5
-                },
-                {
-                  "price": 100,
-                  "promoPrice": 90
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$300"
-                }
-              ]
-            },
-            {
-              "size": 10000,
-              "price": 140,
-              "promoPrice": 126,
-              "altPrices": [
-                {
-                  "price": 160,
-                  "promoPrice": 144
-                },
-                {
-                  "price": 190,
-                  "promoPrice": 171
-                },
-                {
-                  "price": 200,
-                  "promoPrice": 180
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$600"
-                }
-              ]
-            },
-            {
-              "size": 25000,
-              "price": 340,
-              "promoPrice": 306,
-              "altPrices": [
-                {
-                  "price": 380,
-                  "promoPrice": 342
-                },
-                {
-                  "price": 460,
-                  "promoPrice": 414
-                },
-                {
-                  "price": 480,
-                  "promoPrice": 432
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$1,500"
-                }
-              ]
-            },
-            {
-              "size": 50000,
-              "price": 650,
-              "promoPrice": 585,
-              "altPrices": [
-                {
-                  "price": 760,
-                  "promoPrice": 684
-                },
-                {
-                  "price": 910,
-                  "promoPrice": 819
-                },
-                {
-                  "price": 950,
-                  "promoPrice": 855
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$3,000"
-                }
-              ]
-            },
-            {
-              "size": 100000,
-              "price": 1370,
-              "promoPrice": 1233,
-              "altPrices": [
-                {
-                  "price": 1580,
-                  "promoPrice": 1422
-                },
-                {
-                  "price": 1900,
-                  "promoPrice": 1710
-                },
-                {
-                  "price": 1990,
-                  "promoPrice": 1791
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$6,000"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "1-Step · 15% · 7% Max",
-          "rulesKey": "1-Step",
-          "steps": "1 step",
-          "split": "70% / 80% / 90% / 95%",
-          "profitTarget": "15%",
-          "maxDrawdown": "7%",
-          "ddType": "Static",
-          "dailyLoss": "None",
-          "note": "",
+          ],
           "plans": [
             {
               "size": 1000,
               "price": 22,
               "promoPrice": 19.8,
-              "altPrices": [
+              "lines": [
                 {
-                  "price": 25,
-                  "promoPrice": 22.5
-                },
+                  "label": "Max drawdown",
+                  "value": "$60"
+                }
+              ],
+              "grid": [
                 {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 70,
                   "price": 35,
                   "promoPrice": 31.5
                 },
                 {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 80,
                   "price": 40,
                   "promoPrice": 36
-                }
-              ],
-              "lines": [
+                },
                 {
-                  "label": "Max drawdown",
-                  "value": "$70"
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 45,
+                  "promoPrice": 40.5
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 50,
+                  "promoPrice": 45
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 40,
+                  "promoPrice": 36
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 45,
+                  "promoPrice": 40.5
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 55,
+                  "promoPrice": 49.5
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 60,
+                  "promoPrice": 54
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 50,
+                  "promoPrice": 45
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 55,
+                  "promoPrice": 49.5
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 60,
+                  "promoPrice": 54
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 65,
+                  "promoPrice": 58.5
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 20,
+                  "promoPrice": 18
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 22,
+                  "promoPrice": 19.8
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 26,
+                  "promoPrice": 23.4
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 29,
+                  "promoPrice": 26.1
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 26,
+                  "promoPrice": 23.4
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 35,
+                  "promoPrice": 31.5
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 40,
+                  "promoPrice": 36
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 45,
+                  "promoPrice": 40.5
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 35,
+                  "promoPrice": 31.5
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 40,
+                  "promoPrice": 36
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 45,
+                  "promoPrice": 40.5
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 50,
+                  "promoPrice": 45
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 18,
+                  "promoPrice": 16.2
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 20,
+                  "promoPrice": 18
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 23,
+                  "promoPrice": 20.7
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 25,
+                  "promoPrice": 22.5
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 22,
+                  "promoPrice": 19.8
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 25,
+                  "promoPrice": 22.5
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 35,
+                  "promoPrice": 31.5
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 40,
+                  "promoPrice": 36
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 28,
+                  "promoPrice": 25.2
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 35,
+                  "promoPrice": 31.5
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 40,
+                  "promoPrice": 36
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 45,
+                  "promoPrice": 40.5
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 13,
+                  "promoPrice": 11.7
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 15,
+                  "promoPrice": 13.5
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 18,
+                  "promoPrice": 16.2
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 20,
+                  "promoPrice": 18
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 19,
+                  "promoPrice": 17.1
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 20,
+                  "promoPrice": 18
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 25,
+                  "promoPrice": 22.5
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 26,
+                  "promoPrice": 23.4
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 23,
+                  "promoPrice": 20.7
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 26,
+                  "promoPrice": 23.4
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 35,
+                  "promoPrice": 31.5
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 40,
+                  "promoPrice": 36
                 }
               ]
             },
             {
               "size": 2500,
-              "price": 50,
-              "promoPrice": 45,
-              "altPrices": [
+              "price": 55,
+              "promoPrice": 49.5,
+              "lines": [
                 {
-                  "price": 60,
-                  "promoPrice": 54
-                },
+                  "label": "Max drawdown",
+                  "value": "$150"
+                }
+              ],
+              "grid": [
                 {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 70,
                   "price": 75,
                   "promoPrice": 67.5
                 },
                 {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 80,
                   "price": 80,
                   "promoPrice": 72
-                }
-              ],
-              "lines": [
+                },
                 {
-                  "label": "Max drawdown",
-                  "value": "$175"
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 100,
+                  "promoPrice": 90
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 110,
+                  "promoPrice": 99
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 90,
+                  "promoPrice": 81
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 100,
+                  "promoPrice": 90
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 120,
+                  "promoPrice": 108
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 130,
+                  "promoPrice": 117
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 110,
+                  "promoPrice": 99
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 120,
+                  "promoPrice": 108
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 140,
+                  "promoPrice": 126
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 150,
+                  "promoPrice": 135
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 50,
+                  "promoPrice": 45
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 55,
+                  "promoPrice": 49.5
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 60,
+                  "promoPrice": 54
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 70,
+                  "promoPrice": 63
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 60,
+                  "promoPrice": 54
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 75,
+                  "promoPrice": 67.5
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 90,
+                  "promoPrice": 81
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 95,
+                  "promoPrice": 85.5
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 75,
+                  "promoPrice": 67.5
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 90,
+                  "promoPrice": 81
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 100,
+                  "promoPrice": 90
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 110,
+                  "promoPrice": 99
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 40,
+                  "promoPrice": 36
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 50,
+                  "promoPrice": 45
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 55,
+                  "promoPrice": 49.5
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 60,
+                  "promoPrice": 54
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 50,
+                  "promoPrice": 45
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 60,
+                  "promoPrice": 54
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 75,
+                  "promoPrice": 67.5
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 80,
+                  "promoPrice": 72
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 65,
+                  "promoPrice": 58.5
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 75,
+                  "promoPrice": 67.5
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 90,
+                  "promoPrice": 81
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 95,
+                  "promoPrice": 85.5
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 30,
+                  "promoPrice": 27
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 35,
+                  "promoPrice": 31.5
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 40,
+                  "promoPrice": 36
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 50,
+                  "promoPrice": 45
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 45,
+                  "promoPrice": 40.5
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 50,
+                  "promoPrice": 45
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 60,
+                  "promoPrice": 54
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 65,
+                  "promoPrice": 58.5
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 55,
+                  "promoPrice": 49.5
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 60,
+                  "promoPrice": 54
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 75,
+                  "promoPrice": 67.5
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 80,
+                  "promoPrice": 72
                 }
               ]
             },
@@ -1708,24 +1073,348 @@
               "size": 5000,
               "price": 90,
               "promoPrice": 81,
-              "altPrices": [
+              "lines": [
                 {
-                  "price": 100,
-                  "promoPrice": 90
-                },
+                  "label": "Max drawdown",
+                  "value": "$300"
+                }
+              ],
+              "grid": [
                 {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 70,
                   "price": 130,
                   "promoPrice": 117
                 },
                 {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 80,
                   "price": 140,
                   "promoPrice": 126
-                }
-              ],
-              "lines": [
+                },
                 {
-                  "label": "Max drawdown",
-                  "value": "$350"
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 180,
+                  "promoPrice": 162
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 190,
+                  "promoPrice": 171
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 150,
+                  "promoPrice": 135
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 180,
+                  "promoPrice": 162
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 210,
+                  "promoPrice": 189
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 220,
+                  "promoPrice": 198
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 190,
+                  "promoPrice": 171
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 210,
+                  "promoPrice": 189
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 240,
+                  "promoPrice": 216
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 260,
+                  "promoPrice": 234
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 80,
+                  "promoPrice": 72
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 90,
+                  "promoPrice": 81
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 110,
+                  "promoPrice": 99
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 120,
+                  "promoPrice": 108
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 110,
+                  "promoPrice": 99
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 130,
+                  "promoPrice": 117
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 150,
+                  "promoPrice": 135
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 160,
+                  "promoPrice": 144
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 130,
+                  "promoPrice": 117
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 150,
+                  "promoPrice": 135
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 180,
+                  "promoPrice": 162
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 190,
+                  "promoPrice": 171
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 70,
+                  "promoPrice": 63
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 80,
+                  "promoPrice": 72
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 95,
+                  "promoPrice": 85.5
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 100,
+                  "promoPrice": 90
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 90,
+                  "promoPrice": 81
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 100,
+                  "promoPrice": 90
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 130,
+                  "promoPrice": 117
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 140,
+                  "promoPrice": 126
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 110,
+                  "promoPrice": 99
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 130,
+                  "promoPrice": 117
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 150,
+                  "promoPrice": 135
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 160,
+                  "promoPrice": 144
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 55,
+                  "promoPrice": 49.5
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 60,
+                  "promoPrice": 54
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 70,
+                  "promoPrice": 63
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 80,
+                  "promoPrice": 72
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 75,
+                  "promoPrice": 67.5
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 80,
+                  "promoPrice": 72
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 100,
+                  "promoPrice": 90
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 110,
+                  "promoPrice": 99
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 95,
+                  "promoPrice": 85.5
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 110,
+                  "promoPrice": 99
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 130,
+                  "promoPrice": 117
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 140,
+                  "promoPrice": 126
                 }
               ]
             },
@@ -1733,49 +1422,697 @@
               "size": 10000,
               "price": 180,
               "promoPrice": 162,
-              "altPrices": [
+              "lines": [
                 {
-                  "price": 200,
-                  "promoPrice": 180
-                },
+                  "label": "Max drawdown",
+                  "value": "$600"
+                }
+              ],
+              "grid": [
                 {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 70,
                   "price": 240,
                   "promoPrice": 216
                 },
                 {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 270,
+                  "promoPrice": 243
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 320,
+                  "promoPrice": 288
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 350,
+                  "promoPrice": 315
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 300,
+                  "promoPrice": 270
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 340,
+                  "promoPrice": 306
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 400,
+                  "promoPrice": 360
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 430,
+                  "promoPrice": 387
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 360,
+                  "promoPrice": 324
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 400,
+                  "promoPrice": 360
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 480,
+                  "promoPrice": 432
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 510,
+                  "promoPrice": 459
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 160,
+                  "promoPrice": 144
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 180,
+                  "promoPrice": 162
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 210,
+                  "promoPrice": 189
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 230,
+                  "promoPrice": 207
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 210,
+                  "promoPrice": 189
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 240,
+                  "promoPrice": 216
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 290,
+                  "promoPrice": 261
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 300,
+                  "promoPrice": 270
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 70,
                   "price": 260,
                   "promoPrice": 234
-                }
-              ],
-              "lines": [
+                },
                 {
-                  "label": "Max drawdown",
-                  "value": "$700"
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 290,
+                  "promoPrice": 261
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 350,
+                  "promoPrice": 315
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 370,
+                  "promoPrice": 333
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 140,
+                  "promoPrice": 126
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 160,
+                  "promoPrice": 144
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 190,
+                  "promoPrice": 171
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 200,
+                  "promoPrice": 180
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 180,
+                  "promoPrice": 162
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 200,
+                  "promoPrice": 180
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 240,
+                  "promoPrice": 216
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 260,
+                  "promoPrice": 234
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 220,
+                  "promoPrice": 198
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 250,
+                  "promoPrice": 225
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 300,
+                  "promoPrice": 270
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 310,
+                  "promoPrice": 279
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 110,
+                  "promoPrice": 99
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 120,
+                  "promoPrice": 108
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 140,
+                  "promoPrice": 126
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 160,
+                  "promoPrice": 144
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 150,
+                  "promoPrice": 135
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 160,
+                  "promoPrice": 144
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 200,
+                  "promoPrice": 180
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 210,
+                  "promoPrice": 189
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 180,
+                  "promoPrice": 162
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 210,
+                  "promoPrice": 189
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 240,
+                  "promoPrice": 216
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 260,
+                  "promoPrice": 234
                 }
               ]
             },
             {
               "size": 25000,
-              "price": 440,
-              "promoPrice": 396,
-              "altPrices": [
+              "price": 430,
+              "promoPrice": 387,
+              "lines": [
                 {
-                  "price": 490,
-                  "promoPrice": 441
-                },
+                  "label": "Max drawdown",
+                  "value": "$1,500"
+                }
+              ],
+              "grid": [
                 {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 70,
                   "price": 590,
                   "promoPrice": 531
                 },
                 {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 670,
+                  "promoPrice": 603
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 790,
+                  "promoPrice": 711
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 840,
+                  "promoPrice": 756
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 720,
+                  "promoPrice": 648
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 830,
+                  "promoPrice": 747
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 980,
+                  "promoPrice": 882
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 1040,
+                  "promoPrice": 936
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 870,
+                  "promoPrice": 783
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 1000,
+                  "promoPrice": 900
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 1190,
+                  "promoPrice": 1071
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 1260,
+                  "promoPrice": 1134
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 400,
+                  "promoPrice": 360
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 430,
+                  "promoPrice": 387
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 520,
+                  "promoPrice": 468
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 570,
+                  "promoPrice": 513
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 520,
+                  "promoPrice": 468
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 590,
+                  "promoPrice": 531
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 700,
+                  "promoPrice": 630
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 730,
+                  "promoPrice": 657
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 630,
+                  "promoPrice": 567
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 720,
+                  "promoPrice": 648
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 860,
+                  "promoPrice": 774
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 910,
+                  "promoPrice": 819
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 340,
+                  "promoPrice": 306
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 380,
+                  "promoPrice": 342
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 460,
+                  "promoPrice": 414
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 480,
+                  "promoPrice": 432
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 440,
+                  "promoPrice": 396
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 490,
+                  "promoPrice": 441
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 590,
+                  "promoPrice": 531
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 95,
                   "price": 620,
                   "promoPrice": 558
-                }
-              ],
-              "lines": [
+                },
                 {
-                  "label": "Max drawdown",
-                  "value": "$1,750"
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 540,
+                  "promoPrice": 486
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 610,
+                  "promoPrice": 549
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 730,
+                  "promoPrice": 657
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 770,
+                  "promoPrice": 693
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 270,
+                  "promoPrice": 243
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 290,
+                  "promoPrice": 261
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 350,
+                  "promoPrice": 315
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 390,
+                  "promoPrice": 351
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 360,
+                  "promoPrice": 324
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 400,
+                  "promoPrice": 360
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 480,
+                  "promoPrice": 432
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 510,
+                  "promoPrice": 459
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 440,
+                  "promoPrice": 396
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 510,
+                  "promoPrice": 459
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 600,
+                  "promoPrice": 540
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 630,
+                  "promoPrice": 567
                 }
               ]
             },
@@ -1783,801 +2120,697 @@
               "size": 50000,
               "price": 850,
               "promoPrice": 765,
-              "altPrices": [
-                {
-                  "price": 970,
-                  "promoPrice": 873
-                },
-                {
-                  "price": 1170,
-                  "promoPrice": 1053
-                },
-                {
-                  "price": 1220,
-                  "promoPrice": 1098
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$3,500"
-                }
-              ]
-            },
-            {
-              "size": 100000,
-              "price": 1780,
-              "promoPrice": 1602,
-              "altPrices": [
-                {
-                  "price": 2040,
-                  "promoPrice": 1836
-                },
-                {
-                  "price": 2450,
-                  "promoPrice": 2205
-                },
-                {
-                  "price": 2570,
-                  "promoPrice": 2313
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$7,000"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "1-Step · 15% · 8% Max",
-          "rulesKey": "1-Step",
-          "steps": "1 step",
-          "split": "70% / 80% / 90% / 95%",
-          "profitTarget": "15%",
-          "maxDrawdown": "8%",
-          "ddType": "Static",
-          "dailyLoss": "None",
-          "note": "",
-          "plans": [
-            {
-              "size": 1000,
-              "price": 28,
-              "promoPrice": 25.2,
-              "altPrices": [
-                {
-                  "price": 35,
-                  "promoPrice": 31.5
-                },
-                {
-                  "price": 40,
-                  "promoPrice": 36
-                },
-                {
-                  "price": 45,
-                  "promoPrice": 40.5
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$80"
-                }
-              ]
-            },
-            {
-              "size": 2500,
-              "price": 65,
-              "promoPrice": 58.5,
-              "altPrices": [
-                {
-                  "price": 75,
-                  "promoPrice": 67.5
-                },
-                {
-                  "price": 90,
-                  "promoPrice": 81
-                },
-                {
-                  "price": 95,
-                  "promoPrice": 85.5
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$200"
-                }
-              ]
-            },
-            {
-              "size": 5000,
-              "price": 110,
-              "promoPrice": 99,
-              "altPrices": [
-                {
-                  "price": 130,
-                  "promoPrice": 117
-                },
-                {
-                  "price": 150,
-                  "promoPrice": 135
-                },
-                {
-                  "price": 160,
-                  "promoPrice": 144
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$400"
-                }
-              ]
-            },
-            {
-              "size": 10000,
-              "price": 220,
-              "promoPrice": 198,
-              "altPrices": [
-                {
-                  "price": 250,
-                  "promoPrice": 225
-                },
-                {
-                  "price": 300,
-                  "promoPrice": 270
-                },
-                {
-                  "price": 310,
-                  "promoPrice": 279
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$800"
-                }
-              ]
-            },
-            {
-              "size": 25000,
-              "price": 540,
-              "promoPrice": 486,
-              "altPrices": [
-                {
-                  "price": 610,
-                  "promoPrice": 549
-                },
-                {
-                  "price": 730,
-                  "promoPrice": 657
-                },
-                {
-                  "price": 770,
-                  "promoPrice": 693
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$2,000"
-                }
-              ]
-            },
-            {
-              "size": 50000,
-              "price": 1050,
-              "promoPrice": 945,
-              "altPrices": [
-                {
-                  "price": 1200,
-                  "promoPrice": 1080
-                },
-                {
-                  "price": 1440,
-                  "promoPrice": 1296
-                },
-                {
-                  "price": 1520,
-                  "promoPrice": 1368
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$4,000"
-                }
-              ]
-            },
-            {
-              "size": 100000,
-              "price": 2210,
-              "promoPrice": 1989,
-              "altPrices": [
-                {
-                  "price": 2520,
-                  "promoPrice": 2268
-                },
-                {
-                  "price": 3020,
-                  "promoPrice": 2718
-                },
-                {
-                  "price": 3190,
-                  "promoPrice": 2871
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$8,000"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "1-Step · 20% · 6% Max",
-          "rulesKey": "1-Step",
-          "steps": "1 step",
-          "split": "70% / 80% / 90% / 95%",
-          "profitTarget": "20%",
-          "maxDrawdown": "6%",
-          "ddType": "Static",
-          "dailyLoss": "None",
-          "note": "",
-          "plans": [
-            {
-              "size": 1000,
-              "price": 13,
-              "promoPrice": 11.7,
-              "altPrices": [
-                {
-                  "price": 15,
-                  "promoPrice": 13.5
-                },
-                {
-                  "price": 18,
-                  "promoPrice": 16.2
-                },
-                {
-                  "price": 20,
-                  "promoPrice": 18
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$60"
-                }
-              ]
-            },
-            {
-              "size": 2500,
-              "price": 30,
-              "promoPrice": 27,
-              "altPrices": [
-                {
-                  "price": 35,
-                  "promoPrice": 31.5
-                },
-                {
-                  "price": 40,
-                  "promoPrice": 36
-                },
-                {
-                  "price": 50,
-                  "promoPrice": 45
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$150"
-                }
-              ]
-            },
-            {
-              "size": 5000,
-              "price": 55,
-              "promoPrice": 49.5,
-              "altPrices": [
-                {
-                  "price": 60,
-                  "promoPrice": 54
-                },
-                {
-                  "price": 70,
-                  "promoPrice": 63
-                },
-                {
-                  "price": 80,
-                  "promoPrice": 72
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$300"
-                }
-              ]
-            },
-            {
-              "size": 10000,
-              "price": 110,
-              "promoPrice": 99,
-              "altPrices": [
-                {
-                  "price": 120,
-                  "promoPrice": 108
-                },
-                {
-                  "price": 140,
-                  "promoPrice": 126
-                },
-                {
-                  "price": 160,
-                  "promoPrice": 144
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$600"
-                }
-              ]
-            },
-            {
-              "size": 25000,
-              "price": 270,
-              "promoPrice": 243,
-              "altPrices": [
-                {
-                  "price": 290,
-                  "promoPrice": 261
-                },
-                {
-                  "price": 350,
-                  "promoPrice": 315
-                },
-                {
-                  "price": 390,
-                  "promoPrice": 351
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$1,500"
-                }
-              ]
-            },
-            {
-              "size": 50000,
-              "price": 530,
-              "promoPrice": 477,
-              "altPrices": [
-                {
-                  "price": 570,
-                  "promoPrice": 513
-                },
-                {
-                  "price": 680,
-                  "promoPrice": 612
-                },
-                {
-                  "price": 760,
-                  "promoPrice": 684
-                }
-              ],
               "lines": [
                 {
                   "label": "Max drawdown",
                   "value": "$3,000"
                 }
-              ]
-            },
-            {
-              "size": 100000,
-              "price": 1110,
-              "promoPrice": 999,
-              "altPrices": [
+              ],
+              "grid": [
                 {
-                  "price": 1190,
-                  "promoPrice": 1071
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 1140,
+                  "promoPrice": 1026
                 },
                 {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 1300,
+                  "promoPrice": 1170
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 1570,
+                  "promoPrice": 1413
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 1660,
+                  "promoPrice": 1494
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 70,
                   "price": 1430,
                   "promoPrice": 1287
                 },
                 {
-                  "price": 1580,
-                  "promoPrice": 1422
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 1620,
+                  "promoPrice": 1458
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 1950,
+                  "promoPrice": 1755
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 2060,
+                  "promoPrice": 1854
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 1710,
+                  "promoPrice": 1539
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 1960,
+                  "promoPrice": 1764
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 2350,
+                  "promoPrice": 2115
+                },
+                {
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 2480,
+                  "promoPrice": 2232
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 790,
+                  "promoPrice": 711
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 850,
+                  "promoPrice": 765
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 1020,
+                  "promoPrice": 918
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 1140,
+                  "promoPrice": 1026
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 1010,
+                  "promoPrice": 909
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 1160,
+                  "promoPrice": 1044
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 1380,
+                  "promoPrice": 1242
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 1450,
+                  "promoPrice": 1305
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 1250,
+                  "promoPrice": 1125
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 1420,
+                  "promoPrice": 1278
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 1700,
+                  "promoPrice": 1530
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 1790,
+                  "promoPrice": 1611
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 650,
+                  "promoPrice": 585
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 760,
+                  "promoPrice": 684
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 910,
+                  "promoPrice": 819
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 950,
+                  "promoPrice": 855
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 850,
+                  "promoPrice": 765
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 970,
+                  "promoPrice": 873
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 1170,
+                  "promoPrice": 1053
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 1220,
+                  "promoPrice": 1098
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 1050,
+                  "promoPrice": 945
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 1200,
+                  "promoPrice": 1080
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 1440,
+                  "promoPrice": 1296
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 1520,
+                  "promoPrice": 1368
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 530,
+                  "promoPrice": 477
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 570,
+                  "promoPrice": 513
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 680,
+                  "promoPrice": 612
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 760,
+                  "promoPrice": 684
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 690,
+                  "promoPrice": 621
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 790,
+                  "promoPrice": 711
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 940,
+                  "promoPrice": 846
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 1000,
+                  "promoPrice": 900
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 870,
+                  "promoPrice": 783
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 980,
+                  "promoPrice": 882
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 1180,
+                  "promoPrice": 1062
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 1250,
+                  "promoPrice": 1125
                 }
-              ],
+              ]
+            },
+            {
+              "size": 100000,
+              "price": 1790,
+              "promoPrice": 1611,
               "lines": [
                 {
                   "label": "Max drawdown",
                   "value": "$6,000"
                 }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "1-Step · 20% · 7% Max",
-          "rulesKey": "1-Step",
-          "steps": "1 step",
-          "split": "70% / 80% / 90% / 95%",
-          "profitTarget": "20%",
-          "maxDrawdown": "7%",
-          "ddType": "Static",
-          "dailyLoss": "None",
-          "note": "",
-          "plans": [
-            {
-              "size": 1000,
-              "price": 19,
-              "promoPrice": 17.1,
-              "altPrices": [
-                {
-                  "price": 20,
-                  "promoPrice": 18
-                },
-                {
-                  "price": 25,
-                  "promoPrice": 22.5
-                },
-                {
-                  "price": 26,
-                  "promoPrice": 23.4
-                }
               ],
-              "lines": [
+              "grid": [
                 {
-                  "label": "Max drawdown",
-                  "value": "$70"
-                }
-              ]
-            },
-            {
-              "size": 2500,
-              "price": 45,
-              "promoPrice": 40.5,
-              "altPrices": [
-                {
-                  "price": 50,
-                  "promoPrice": 45
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 2400,
+                  "promoPrice": 2160
                 },
                 {
-                  "price": 60,
-                  "promoPrice": 54
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 2730,
+                  "promoPrice": 2457
                 },
                 {
-                  "price": 65,
-                  "promoPrice": 58.5
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$175"
-                }
-              ]
-            },
-            {
-              "size": 5000,
-              "price": 75,
-              "promoPrice": 67.5,
-              "altPrices": [
-                {
-                  "price": 80,
-                  "promoPrice": 72
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 3280,
+                  "promoPrice": 2952
                 },
                 {
-                  "price": 100,
-                  "promoPrice": 90
+                  "profitTarget": 5,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 3470,
+                  "promoPrice": 3123
                 },
                 {
-                  "price": 110,
-                  "promoPrice": 99
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$350"
-                }
-              ]
-            },
-            {
-              "size": 10000,
-              "price": 150,
-              "promoPrice": 135,
-              "altPrices": [
-                {
-                  "price": 160,
-                  "promoPrice": 144
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 3000,
+                  "promoPrice": 2700
                 },
                 {
-                  "price": 200,
-                  "promoPrice": 180
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 3400,
+                  "promoPrice": 3060
                 },
                 {
-                  "price": 210,
-                  "promoPrice": 189
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$700"
-                }
-              ]
-            },
-            {
-              "size": 25000,
-              "price": 360,
-              "promoPrice": 324,
-              "altPrices": [
-                {
-                  "price": 400,
-                  "promoPrice": 360
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 4100,
+                  "promoPrice": 3690
                 },
                 {
-                  "price": 480,
-                  "promoPrice": 432
+                  "profitTarget": 5,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 4310,
+                  "promoPrice": 3879
                 },
                 {
-                  "price": 510,
-                  "promoPrice": 459
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$1,750"
-                }
-              ]
-            },
-            {
-              "size": 50000,
-              "price": 690,
-              "promoPrice": 621,
-              "altPrices": [
-                {
-                  "price": 790,
-                  "promoPrice": 711
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 3590,
+                  "promoPrice": 3231
                 },
                 {
-                  "price": 940,
-                  "promoPrice": 846
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 4120,
+                  "promoPrice": 3708
                 },
                 {
-                  "price": 1000,
-                  "promoPrice": 900
-                }
-              ],
-              "lines": [
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 4930,
+                  "promoPrice": 4437
+                },
                 {
-                  "label": "Max drawdown",
-                  "value": "$3,500"
-                }
-              ]
-            },
-            {
-              "size": 100000,
-              "price": 1440,
-              "promoPrice": 1296,
-              "altPrices": [
+                  "profitTarget": 5,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 5200,
+                  "promoPrice": 4680
+                },
                 {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 70,
                   "price": 1660,
                   "promoPrice": 1494
                 },
                 {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 1790,
+                  "promoPrice": 1611
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 2140,
+                  "promoPrice": 1926
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 2400,
+                  "promoPrice": 2160
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 2110,
+                  "promoPrice": 1899
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 2420,
+                  "promoPrice": 2178
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 2900,
+                  "promoPrice": 2610
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 3040,
+                  "promoPrice": 2736
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 2610,
+                  "promoPrice": 2349
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 2970,
+                  "promoPrice": 2673
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 3570,
+                  "promoPrice": 3213
+                },
+                {
+                  "profitTarget": 10,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 3760,
+                  "promoPrice": 3384
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 1370,
+                  "promoPrice": 1233
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 1580,
+                  "promoPrice": 1422
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 1900,
+                  "promoPrice": 1710
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 1990,
+                  "promoPrice": 1791
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 1780,
+                  "promoPrice": 1602
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 2040,
+                  "promoPrice": 1836
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 90,
+                  "price": 2450,
+                  "promoPrice": 2205
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 7,
+                  "split": 95,
+                  "price": 2570,
+                  "promoPrice": 2313
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 2210,
+                  "promoPrice": 1989
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 80,
+                  "price": 2520,
+                  "promoPrice": 2268
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 90,
+                  "price": 3020,
+                  "promoPrice": 2718
+                },
+                {
+                  "profitTarget": 15,
+                  "maxDrawdown": 8,
+                  "split": 95,
+                  "price": 3190,
+                  "promoPrice": 2871
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 70,
+                  "price": 1110,
+                  "promoPrice": 999
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 80,
+                  "price": 1190,
+                  "promoPrice": 1071
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 90,
+                  "price": 1430,
+                  "promoPrice": 1287
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 6,
+                  "split": 95,
+                  "price": 1580,
+                  "promoPrice": 1422
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 70,
+                  "price": 1440,
+                  "promoPrice": 1296
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 80,
+                  "price": 1660,
+                  "promoPrice": 1494
+                },
+                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 90,
                   "price": 1970,
                   "promoPrice": 1773
                 },
                 {
+                  "profitTarget": 20,
+                  "maxDrawdown": 7,
+                  "split": 95,
                   "price": 2090,
                   "promoPrice": 1881
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$7,000"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "1-Step · 20% · 8% Max",
-          "rulesKey": "1-Step",
-          "steps": "1 step",
-          "split": "70% / 80% / 90% / 95%",
-          "profitTarget": "20%",
-          "maxDrawdown": "8%",
-          "ddType": "Static",
-          "dailyLoss": "None",
-          "note": "",
-          "plans": [
-            {
-              "size": 1000,
-              "price": 23,
-              "promoPrice": 20.7,
-              "altPrices": [
-                {
-                  "price": 26,
-                  "promoPrice": 23.4
                 },
                 {
-                  "price": 35,
-                  "promoPrice": 31.5
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 70,
+                  "price": 1820,
+                  "promoPrice": 1638
                 },
                 {
-                  "price": 40,
-                  "promoPrice": 36
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$80"
-                }
-              ]
-            },
-            {
-              "size": 2500,
-              "price": 55,
-              "promoPrice": 49.5,
-              "altPrices": [
-                {
-                  "price": 60,
-                  "promoPrice": 54
-                },
-                {
-                  "price": 75,
-                  "promoPrice": 67.5
-                },
-                {
-                  "price": 80,
-                  "promoPrice": 72
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$200"
-                }
-              ]
-            },
-            {
-              "size": 5000,
-              "price": 95,
-              "promoPrice": 85.5,
-              "altPrices": [
-                {
-                  "price": 110,
-                  "promoPrice": 99
-                },
-                {
-                  "price": 130,
-                  "promoPrice": 117
-                },
-                {
-                  "price": 140,
-                  "promoPrice": 126
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$400"
-                }
-              ]
-            },
-            {
-              "size": 10000,
-              "price": 180,
-              "promoPrice": 162,
-              "altPrices": [
-                {
-                  "price": 210,
-                  "promoPrice": 189
-                },
-                {
-                  "price": 240,
-                  "promoPrice": 216
-                },
-                {
-                  "price": 260,
-                  "promoPrice": 234
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$800"
-                }
-              ]
-            },
-            {
-              "size": 25000,
-              "price": 440,
-              "promoPrice": 396,
-              "altPrices": [
-                {
-                  "price": 510,
-                  "promoPrice": 459
-                },
-                {
-                  "price": 600,
-                  "promoPrice": 540
-                },
-                {
-                  "price": 630,
-                  "promoPrice": 567
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$2,000"
-                }
-              ]
-            },
-            {
-              "size": 50000,
-              "price": 870,
-              "promoPrice": 783,
-              "altPrices": [
-                {
-                  "price": 980,
-                  "promoPrice": 882
-                },
-                {
-                  "price": 1180,
-                  "promoPrice": 1062
-                },
-                {
-                  "price": 1250,
-                  "promoPrice": 1125
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$4,000"
-                }
-              ]
-            },
-            {
-              "size": 100000,
-              "price": 1820,
-              "promoPrice": 1638,
-              "altPrices": [
-                {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 80,
                   "price": 2060,
                   "promoPrice": 1854
                 },
                 {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 90,
                   "price": 2470,
                   "promoPrice": 2223
                 },
                 {
+                  "profitTarget": 20,
+                  "maxDrawdown": 8,
+                  "split": 95,
                   "price": 2610,
                   "promoPrice": 2349
-                }
-              ],
-              "lines": [
-                {
-                  "label": "Max drawdown",
-                  "value": "$8,000"
                 }
               ]
             }

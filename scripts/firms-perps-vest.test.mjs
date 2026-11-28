@@ -11,41 +11,82 @@ const PROMO = { code: 'JTNQ', discountPct: 10, endsAt: null, instantPct: 5, last
 const read = (snap = SNAP, promo = PROMO) => vestPerpsFromSnapshot(snap, { checkedOn: '2026-11-28', promo });
 const program = (r, name) => r.programs.find((p) => p.name === name);
 const plan = (r, name, size) => program(r, name).plans.find((p) => p.size === size);
+// Le prix d'une combinaison (objectif, drawdown, split en %) d'une taille du 1-Step.
+const combo = (r, size, profitTarget, maxDrawdown, split) =>
+  plan(r, '1-Step', size).grid.find((g) => g.profitTarget === profitTarget && g.maxDrawdown === maxDrawdown && g.split === split);
 const clone = () => structuredClone(SNAP);
 
-test('Vest du 28/11 : 12 programmes 1-Step (objectif × drawdown) + Instant, aucun 2-Step, aucune daily loss', () => {
+test('Vest du 28/11 : un seul 1-Step à curseurs (objectif, drawdown, split) + Instant, aucun 2-Step, aucune daily loss', () => {
   const r = read();
-  assert.deepEqual(
-    r.programs.map((p) => p.name),
-    [5, 10, 15, 20].flatMap((t) => [6, 7, 8].map((d) => `1-Step · ${t}% · ${d}% Max`)).concat('Instant'),
-  );
+  assert.deepEqual(r.programs.map((p) => p.name), ['1-Step', 'Instant']);
   assert.ok(!r.programs.some((p) => /2-Step/.test(p.name)));
   for (const p of r.programs) assert.equal(p.dailyLoss, 'None');
-  const one = program(r, '1-Step · 10% · 6% Max');
+  const one = program(r, '1-Step');
   assert.deepEqual(one.plans.map((x) => x.size), [1000, 2500, 5000, 10000, 25000, 50000, 100000]);
   assert.equal(one.split, '70% / 80% / 90% / 95%');
-  assert.equal(one.profitTarget, '10%');
-  assert.equal(one.maxDrawdown, '6%');
+  assert.equal(one.profitTarget, '5–20%');
+  assert.equal(one.maxDrawdown, '6–8%');
   assert.equal(one.ddType, 'Static');
-  assert.equal(one.rulesKey, '1-Step');
+  assert.deepEqual(one.sliders, [
+    { field: 'profitTarget', label: 'Profit target', values: [5, 10, 15, 20], default: 10 },
+    { field: 'maxDrawdown', label: 'Max drawdown', values: [6, 7, 8], default: 6 },
+    { field: 'split', label: 'Profit split', values: [70, 80, 90, 95], default: 80 },
+  ]);
+  // Chaque taille porte ses 48 combinaisons (4 objectifs × 3 drawdowns × 4 splits), aucune en double.
+  for (const p of one.plans) {
+    assert.equal(p.grid.length, 48);
+    assert.equal(new Set(p.grid.map((g) => `${g.profitTarget}|${g.maxDrawdown}|${g.split}`)).size, 48);
+    assert.equal(p.altPrices, undefined);
+  }
+});
+
+test('position de départ = les défauts de leur catalogue (« default » 0.1 / 0.06 / 0.8), lus, pas écrits en dur', () => {
+  const r = read();
+  const p = plan(r, '1-Step', 5000);
+  assert.equal(p.price, 90); // 10 % / 6 % / 80 %
+  assert.equal(p.promoPrice, 81);
+  assert.deepEqual(p.lines, [{ label: 'Max drawdown', value: '$300' }]);
+
+  const moved = clone();
+  moved.options.oneStepRules.profitTargetPct.default = '0.2';
+  moved.options.oneStepRules.maxDrawdownPct.default = '0.08';
+  moved.options.oneStepRules.profitSplitPct.default = '0.7';
+  const m = read(moved);
+  assert.deepEqual(program(m, '1-Step').sliders.map((s) => s.default), [20, 8, 70]);
+  const q = plan(m, '1-Step', 5000);
+  assert.equal(q.price, combo(m, 5000, 20, 8, 70).price);
+  assert.deepEqual(q.lines, [{ label: 'Max drawdown', value: '$400' }]);
+
+  const off = clone();
+  off.options.oneStepRules.maxDrawdownPct.default = '0.05';
+  assert.throws(() => read(off), /Vest illisible : 1-Step : le défaut de maxDrawdownPct/);
+  const none = clone();
+  delete none.options.oneStepRules.profitSplitPct.default;
+  assert.throws(() => read(none), /Vest illisible : 1-Step : le défaut de profitSplitPct/);
 });
 
 test('les prix de leur grille et de leur doc (« 10% target, 6% drawdown, 80% split » : $22 $55 $90 $180 $430 $850)', () => {
   const r = read();
-  const at80 = [1000, 2500, 5000, 10000, 25000, 50000].map((s) => plan(r, '1-Step · 10% · 6% Max', s).altPrices[0].price);
-  assert.deepEqual(at80, [22, 55, 90, 180, 430, 850]);
+  const sizes = [1000, 2500, 5000, 10000, 25000, 50000];
+  assert.deepEqual(sizes.map((s) => combo(r, s, 10, 6, 80).price), [22, 55, 90, 180, 430, 850]);
+  // La combinaison par défaut est aussi le prix de la ligne.
+  assert.deepEqual(sizes.map((s) => plan(r, '1-Step', s).price), [22, 55, 90, 180, 430, 850]);
   // « 20% target, 6% drawdown, 70% split (lowest price) $13 $30 $55 $110 $270 $530 »
-  assert.deepEqual([1000, 2500, 5000, 10000, 25000, 50000].map((s) => plan(r, '1-Step · 20% · 6% Max', s).price), [13, 30, 55, 110, 270, 530]);
+  assert.deepEqual(sizes.map((s) => combo(r, s, 20, 6, 70).price), [13, 30, 55, 110, 270, 530]);
   // « 5% target, 8% drawdown, 95% split (highest price) $65 $150 $260 $510 $1,260 $2,480 »
-  assert.deepEqual([1000, 2500, 5000, 10000, 25000, 50000].map((s) => plan(r, '1-Step · 5% · 8% Max', s).altPrices[2].price), [65, 150, 260, 510, 1260, 2480]);
-  const p = plan(r, '1-Step · 10% · 6% Max', 50000);
+  assert.deepEqual(sizes.map((s) => combo(r, s, 5, 8, 95).price), [65, 150, 260, 510, 1260, 2480]);
+  const p = plan(r, '1-Step', 50000);
   assert.deepEqual(p.lines, [{ label: 'Max drawdown', value: '$3,000' }]);
-  assert.equal(p.promoPrice, 711); // 790 - 10 %
-  assert.deepEqual(p.altPrices, [
-    { price: 850, promoPrice: 765 },
-    { price: 1020, promoPrice: 918 },
-    { price: 1140, promoPrice: 1026 },
-  ]);
+  assert.equal(p.promoPrice, 765); // 850 - 10 %
+  assert.deepEqual(
+    [70, 80, 90, 95].map((s) => combo(r, 50000, 10, 6, s)),
+    [
+      { profitTarget: 10, maxDrawdown: 6, split: 70, price: 790, promoPrice: 711 },
+      { profitTarget: 10, maxDrawdown: 6, split: 80, price: 850, promoPrice: 765 },
+      { profitTarget: 10, maxDrawdown: 6, split: 90, price: 1020, promoPrice: 918 },
+      { profitTarget: 10, maxDrawdown: 6, split: 95, price: 1140, promoPrice: 1026 },
+    ],
+  );
 });
 
 test('Instant : 8 tailles de $500 à $100K, prix = drawdown, 95 %, code à 5 %', () => {
@@ -73,7 +114,8 @@ test('remise JTNQ : évals au double du taux de base tant que la doc le dit, au 
   snap.docsDouble = false;
   const r = read(snap);
   assert.equal(r.promo.discountPct, 5);
-  assert.equal(plan(r, '1-Step · 10% · 6% Max', 5000).promoPrice, 76); // 80 - 5 %
+  assert.equal(plan(r, '1-Step', 5000).promoPrice, 85.5); // 90 - 5 %
+  assert.equal(combo(r, 5000, 10, 6, 70).promoPrice, 76); // 80 - 5 %
   assert.ok(DOUBLE_RE.test('For a limited time, creator codes give double their discount on Evaluation accounts.'));
 });
 

@@ -50,11 +50,29 @@ export const READERS = {
   },
 };
 
-const RULES = ['steps', 'split', 'profitTarget', 'maxDrawdown', 'ddType', 'dailyLoss', 'note'];
+const RULES = ['steps', 'split', 'profitTarget', 'maxDrawdown', 'ddType', 'dailyLoss', 'note', 'sliders'];
 const sizeWord = (n) => (n >= 1000 ? `${n / 1000}K` : `$${n}`);
 const prices = (plan) => [plan.price, ...(plan.altPrice != null ? [plan.altPrice] : []), ...(plan.altPrices ?? []).map((a) => a.price)];
 const promoPrices = (plan) => [plan.promoPrice, ...(plan.altPromoPrice != null ? [plan.altPromoPrice] : []), ...(plan.altPrices ?? []).map((a) => a.promoPrice)];
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+// Une combinaison de la grille d'un plan à curseurs (Vest 1-Step depuis le 28/11/2026) : ses valeurs en %,
+// dans l'ordre des curseurs (« 10% / 6% / 80% »).
+const comboWord = (g) => Object.entries(g).filter(([k]) => k !== 'price' && k !== 'promoPrice').map(([, v]) => `${v}%`).join(' / ');
+
+/** Prix d'une grille qui ont changé, une ligne par combinaison ajoutée, retirée ou au prix changé. */
+function gridChanges(label, before, after) {
+  const out = [];
+  const a = new Map((before ?? []).map((g) => [comboWord(g), g]));
+  const b = new Map((after ?? []).map((g) => [comboWord(g), g]));
+  for (const [k, g] of b) {
+    const old = a.get(k);
+    if (!old) out.push(`${label} : + ${k} (${g.price})`);
+    else if (old.price !== g.price) out.push(`${label} ${k} : prix ${old.price} -> ${g.price}`);
+    else if (old.promoPrice !== g.promoPrice) out.push(`${label} ${k} : prix JTNQ ${old.promoPrice} -> ${g.promoPrice}`);
+  }
+  for (const k of a.keys()) if (!b.has(k)) out.push(`${label} : - ${k}`);
+  return out;
+}
 
 /** Ce qui a changé entre deux versions d'une firme, une ligne par changement (journal du job). */
 export function describeChanges(before, after) {
@@ -78,6 +96,7 @@ export function describeChanges(before, after) {
       if (!same(prices(y), prices(x))) out.push(`${name} ${sizeWord(s)} : prix ${prices(y).join(' / ')} -> ${prices(x).join(' / ')}`);
       else if (!same(promoPrices(y), promoPrices(x))) out.push(`${name} ${sizeWord(s)} : prix JTNQ ${promoPrices(y).join(' / ')} -> ${promoPrices(x).join(' / ')}`);
       if (!same(y.more ?? null, x.more ?? null) || !same(y.lines ?? null, x.lines ?? null)) out.push(`${name} ${sizeWord(s)} : versions / lignes changées`);
+      out.push(...gridChanges(`${name} ${sizeWord(s)}`, y.grid, x.grid));
     }
   }
   const { lastChecked: _a, ...pa } = before.promo ?? {};

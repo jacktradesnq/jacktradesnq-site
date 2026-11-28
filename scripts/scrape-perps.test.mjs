@@ -104,3 +104,34 @@ test('describeChanges : règles, prix des autres splits, prix JTNQ seuls, pairs'
   cheaper.programs[0].plans[0].promoPrice = 30;
   assert.deepEqual(describeChanges(before, cheaper), ['E8 One · 4% Max 5K : prix JTNQ 20 / 22 -> 30 / 22']);
 });
+
+test('describeChanges : un prix qui change dans la grille d\'un plan à curseurs (Vest 1-Step), une combinaison ajoutée ou retirée', () => {
+  const g = (profitTarget, maxDrawdown, split, price, promoPrice) => ({ profitTarget, maxDrawdown, split, price, promoPrice });
+  const sliders = [
+    { field: 'profitTarget', label: 'Profit target', values: [10, 20], default: 10 },
+    { field: 'maxDrawdown', label: 'Max drawdown', values: [6], default: 6 },
+    { field: 'split', label: 'Profit split', values: [70, 80], default: 80 },
+  ];
+  const plan = { size: 5000, price: 90, promoPrice: 81, lines: [{ label: 'Max drawdown', value: '$300' }], grid: [g(10, 6, 70, 80, 72), g(10, 6, 80, 90, 81), g(20, 6, 70, 55, 49.5), g(20, 6, 80, 60, 54)] };
+  const before = firm('vest-markets', [prog('1-Step', [plan], { sliders, profitTarget: '10–20%' })]);
+
+  // Une combinaison qui n'est pas la position de départ : seul le journal de la grille la voit.
+  const dearer = structuredClone(before);
+  dearer.programs[0].plans[0].grid[2] = g(20, 6, 70, 60, 54);
+  assert.deepEqual(describeChanges(before, dearer), ['1-Step 5K 20% / 6% / 70% : prix 55 -> 60']);
+
+  const promo = structuredClone(before);
+  promo.programs[0].plans[0].grid[3].promoPrice = 57;
+  assert.deepEqual(describeChanges(before, promo), ['1-Step 5K 20% / 6% / 80% : prix JTNQ 54 -> 57']);
+
+  // Un choix de plus chez Vest (split 90 %) : le curseur et ses combinaisons apparaissent.
+  const more = structuredClone(before);
+  more.programs[0].sliders[2].values.push(90);
+  more.programs[0].plans[0].grid.push(g(10, 6, 90, 100, 90));
+  more.programs[0].plans[0].grid.splice(2, 1);
+  const lines = describeChanges(before, more);
+  assert.match(lines[0], /^1-Step : sliders .*"values":\[70,80\].* -> .*"values":\[70,80,90\]/);
+  assert.deepEqual(lines.slice(1), ['1-Step 5K : + 10% / 6% / 90% (100)', '1-Step 5K : - 20% / 6% / 70%']);
+
+  assert.deepEqual(describeChanges(before, structuredClone(before)), []);
+});

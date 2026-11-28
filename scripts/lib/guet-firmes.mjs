@@ -48,7 +48,10 @@ export function perteMax(plan, programme, marche) {
   return m && num(plan.size) ? (Number(m[1]) / 100) * plan.size : null;
 }
 
-/** Tous les champs de prix d'un plan, à plat : { price: 53.2, 'splitPrices.60': 69.3, 'more[4% DLL].promoPrice': 57 }. */
+/**
+ * Tous les champs de prix d'un plan, à plat : { price: 53.2, 'splitPrices.60': 69.3, 'more[4% DLL].promoPrice': 57,
+ * 'grid[10% / 6% / 80%].price': 90 }.
+ */
 export function champsPrix(plan) {
   const out = {};
   const visite = (obj, prefixe) => {
@@ -57,6 +60,12 @@ export function champsPrix(plan) {
         v.forEach((x, i) => visite(x, `${prefixe}more[${x?.label ?? i}].`));
       } else if (k === 'altPrices' && Array.isArray(v)) {
         v.forEach((x, i) => visite(x, `${prefixe}altPrices[${i}].`));
+      } else if (k === 'grid' && Array.isArray(v)) {
+        // Plan à curseurs (Vest 1-Step depuis le 28/11/2026) : chaque combinaison, nommée par ses valeurs.
+        for (const g of v) {
+          const nom = Object.entries(g || {}).filter(([c]) => !/price/i.test(c)).map(([, x]) => `${x}%`).join(' / ');
+          visite(Object.fromEntries(Object.entries(g || {}).filter(([c]) => /price/i.test(c))), `${prefixe}grid[${nom}].`);
+        }
       } else if (k === 'splitPrices' && v && typeof v === 'object') {
         for (const [s, p] of Object.entries(v)) if (num(p) != null) out[`${prefixe}splitPrices.${s}`] = p;
       } else if (/price/i.test(k) && num(v) != null) {
@@ -608,6 +617,8 @@ export function libellePrix(champ, marche) {
   if (m) return `${m[1]}, ${libellePrix(m[2], marche)}`;
   m = champ.match(/^altPrices\[(\d+)\]\.(.+)$/);
   if (m) return `variante ${Number(m[1]) + 2}, ${libellePrix(m[2], marche)}`;
+  m = champ.match(/^grid\[(.+?)\]\.(.+)$/);
+  if (m) return `${m[1]}, ${libellePrix(m[2], marche)}`;
   return champ;
 }
 
