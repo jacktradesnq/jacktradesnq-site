@@ -6,7 +6,7 @@
       "name": "MyFundedPerps",
       "logo": "/logos/myfundedperps.png",
       "url": "https://myfundedperpetuals.com/@JTNQ",
-      "lastChecked": "2026-11-27",
+      "lastChecked": "2026-11-28",
       "markets": [
         "Crypto",
         "Indices",
@@ -19,7 +19,7 @@
         "discountPct": 40,
         "endsAt": "2026-11-28T08:59:59.999Z",
         "firstPurchase": true,
-        "lastChecked": "2026-11-27",
+        "lastChecked": "2026-11-28",
         "thenPct": 35
       },
       "programs": [
@@ -135,7 +135,7 @@
       "name": "Breakout",
       "logo": "/logos/breakout.svg",
       "url": "https://breakoutprop.com",
-      "lastChecked": "2026-11-27",
+      "lastChecked": "2026-11-28",
       "markets": [
         "Crypto",
         "Indices",
@@ -145,7 +145,7 @@
         "code": "JTNQ",
         "discountPct": 25,
         "endsAt": "2026-11-30T23:59:00Z",
-        "lastChecked": "2026-11-27"
+        "lastChecked": "2026-11-28"
       },
       "programs": [
         {
@@ -311,7 +311,7 @@
       "name": "Vest Markets",
       "logo": "/logos/vest-markets.svg",
       "url": "https://next.vestmarkets.com/r/jtnq",
-      "lastChecked": "2026-11-27",
+      "lastChecked": "2026-11-28",
       "markets": [
         "Crypto",
         "Indices",
@@ -323,7 +323,7 @@
         "code": "JTNQ",
         "discountPct": 10,
         "endsAt": null,
-        "lastChecked": "2026-11-27",
+        "lastChecked": "2026-11-28",
         "instantPct": 5
       },
       "programs": [
