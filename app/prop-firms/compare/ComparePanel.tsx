@@ -69,11 +69,24 @@ type Options = {
 // One rule of a plan sold in many combinations, picked like on the firm's configurator (Vest 1-Step,
 // Angelo 28/11/2026: « tu clique tu drag gauche droite »): click or drag, one stop per value, arrow
 // keys; the value picked above, the lowest and highest under the ends.
-function SliderCell({ row, slider, stop, onMove }: { row: CompareRow; slider: Slider; stop: number; onMove: (stop: number) => void }) {
+function SliderCell({
+  row,
+  slider,
+  stop,
+  onMove,
+  titled = false,
+}: {
+  row: CompareRow;
+  slider: Slider;
+  stop: number;
+  onMove: (stop: number) => void;
+  titled?: boolean;
+}) {
   const last = slider.values.length - 1;
   const at = (i: number) => (last > 0 ? (i / last) * 100 : 0);
   return (
     <span className="cmp-slide" style={{ '--pos': `${at(stop)}%` } as CSSProperties}>
+      {titled && <span className="cmp-slide-title">{slider.label}</span>}
       <span className="cmp-slide-val">
         <span className="ft-fig">{slider.values[stop]}</span>
         {slider.subs && <span className="cmp-sub">{slider.subs[stop]}</span>}
@@ -99,6 +112,21 @@ function SliderCell({ row, slider, stop, onMove }: { row: CompareRow; slider: Sl
         <span>{slider.values[0]}</span>
         <span>{slider.values[last]}</span>
       </span>
+    </span>
+  );
+}
+
+// A slider whose column the view hides (Profit split is not in the Compact view, Angelo 22/11/2026) goes
+// under the price, with its name: the price shown always matches a slider the visitor can see (Vest
+// 1-Step and E8 One, Angelo 28/11/2026 : « quand y a bcp de choix possible »).
+function OffViewSliders({ row, shown, options }: { row: CompareRow; shown: string[]; options: Options }) {
+  const off = (row.sliders ?? []).flatMap((s, si) => (shown.includes(s.col) ? [] : [{ s, si }]));
+  if (!off.length) return null;
+  return (
+    <span className="cmp-slide-under">
+      {off.map(({ s, si }) => (
+        <SliderCell key={s.col} row={row} slider={s} stop={options.stops(row)[si]} onMove={(stop) => options.move(row, si, stop)} titled />
+      ))}
     </span>
   );
 }
@@ -341,6 +369,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
   const offByDefault = (id: string) => (view === 'compact' && !COMPACT_IDS.includes(id)) || (narrow && AUTO_HIDE.includes(id));
   const autoHidden = (id: string) => offByDefault(id) && !forced[family].includes(id);
   const cols = available.filter((c) => !hidden[family].includes(c.id) && !autoHidden(c.id));
+  const colIds = cols.map((c) => c.id);
   const toggleColumn = (id: string, on: boolean) => {
     const auto = offByDefault(id);
     setHidden((h) => ({ ...h, [family]: on ? h[family].filter((x) => x !== id) : auto ? h[family] : [...new Set([...h[family], id])] }));
@@ -645,6 +674,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
                           {c.id === 'price' ? (
                             <span className="cmp-price-go">
                               <PriceCell price={priceNow(r)} discount={discount} />
+                              <OffViewSliders row={r} shown={colIds} options={options} />
                               <Go row={r} />
                             </span>
                           ) : (
@@ -672,6 +702,7 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
                 </div>
                 <div className="cmp-card-price">
                   <PriceCell price={priceNow(r)} discount={discount} />
+                  <OffViewSliders row={r} shown={detailCols.map((c) => c.id)} options={options} />
                 </div>
                 <dl className="cmp-card-dl">
                   {detailCols.map((c) => (

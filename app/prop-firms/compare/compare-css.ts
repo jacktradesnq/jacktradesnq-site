@@ -383,6 +383,8 @@ export const COMPARE_CSS = `
   display: inline-flex; flex-direction: column; align-items: stretch; gap: 4px; width: 104px; vertical-align: middle;
 }
 .jtnq-cmp .cmp-slide-val{ display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.jtnq-cmp .cmp-slide-under{ display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.jtnq-cmp .cmp-slide-title{ display: block; text-align: center; font-size: 14px; color: var(--c-text-mute); }
 .jtnq-cmp .cmp-slide-track{ position: relative; height: 24px; }
 .jtnq-cmp .cmp-slide-rail{
   position: absolute; left: 8px; right: 8px; top: 50%; height: 2px; margin-top: -1px; border-radius: 999px;
