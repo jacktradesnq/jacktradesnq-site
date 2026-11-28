@@ -21,9 +21,9 @@ import { cellVal, cheapest, humanDate, pillValue, textVal, type ComparePrice, ty
 // altPrice: a second version of the same account, shown in the same cell after a « / » (Angelo,
 // 12/10/2026 : « dans la même colonne et dans chaque truc t'as un / qui met les 2 prix »): MFP
 // Elite's cheaper 3% DLL version.
-// altPrices: the same, for an account sold in more than two versions (E8 One at 80%, 90%, 100%).
+// altPrices: the same, as a list (E8 Pro at 80% and 100%).
 // lines: rules that change with the size (Vest's max drawdown in dollars), a row under the price.
-// grid: every price of a plan picked with sliders (Vest 1-Step since 28/11/2026), one entry per
+// grid: every price of a plan picked with sliders (Vest 1-Step, E8 One since 28/11/2026), one entry per
 // combination, keyed by the program's slider fields (profitTarget, maxDrawdown, split, in %); price
 // and promoPrice of the plan are its default combination.
 type PerpsPlan = {
@@ -42,7 +42,7 @@ type PerpsPlan = {
 };
 type PerpsProgram = {
   name: string;
-  // Key of DETAILS and FUNDED when the first word of the name is not enough (« E8 One · 4% Max »).
+  // Key of DETAILS and FUNDED when the first word of the name is not enough (« E8 Pro · 6% Max », « E8 One »).
   rulesKey?: string;
   steps: string;
   split: string;
@@ -52,14 +52,17 @@ type PerpsProgram = {
   dailyLoss: string | null;
   note: string;
   priceLabel?: string; // name of the main price row when the plans carry `more` rows
-  // The rules the buyer picks (Vest 1-Step: target, drawdown, split), each shown as a slider in place
-  // of the program's own field of the same name; values in %, default = the firm's.
-  sliders?: { field: SliderField; label: string; values: number[]; default: number }[];
+  // The rules the buyer picks (Vest 1-Step: target, drawdown, split; E8 One: drawdown, split), each
+  // shown as a slider in place of the program's own field of the same name; values in %, default = the
+  // firm's. with: the rules that follow a slider, one value per stop (E8 One: target and daily loss
+  // follow the drawdown).
+  sliders?: { field: SliderField; label: string; values: number[]; default: number; with?: Partial<Record<LinkField, number[]>> }[];
   plans: PerpsPlan[];
 };
 type SliderField = 'profitTarget' | 'maxDrawdown' | 'split';
-// The comparator column each slider sits in.
-const SLIDER_COL: Record<SliderField, string> = { profitTarget: 'target', maxDrawdown: 'maxLoss', split: 'split' };
+type LinkField = SliderField | 'dailyLoss';
+// The comparator column each slider, or rule that follows one, sits in.
+const SLIDER_COL: Record<LinkField, string> = { profitTarget: 'target', maxDrawdown: 'maxLoss', split: 'split', dailyLoss: 'dailyLoss' };
 type PerpsFirm = {
   id: string;
   name: string;
@@ -311,6 +314,12 @@ function slidersOf(p: PerpsProgram, plan: PerpsPlan, priceOf: (list: number, dis
     sorts: s.values,
     // Max loss in dollars, as the plan's own line: the drawdown % of the account size.
     subs: s.field === 'maxDrawdown' ? s.values.map((v) => usd(Math.round((plan.size * v) / 100))) : undefined,
+    links: s.with
+      ? (Object.entries(s.with) as [LinkField, number[]][]).map(([f, list]) => ({
+          col: SLIDER_COL[f],
+          values: list.map((v) => (f === 'dailyLoss' ? cellVal('dailyLoss', `${v}%`) : figure(`${v}%`)) ?? textVal(`${v}%`, v)),
+        }))
+      : undefined,
     start: Math.max(0, s.values.indexOf(s.default)),
   }));
   const combos: Record<string, ComparePrice> = {};

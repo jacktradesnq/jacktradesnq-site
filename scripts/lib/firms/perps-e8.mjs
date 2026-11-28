@@ -36,6 +36,15 @@
  *     du configurateur. Sans entree precedente, la note se limite a cette phrase.
  *   - `note` d'un programme : celle de l'entree precedente, sinon vide.
  *
+ * E8 One en curseurs depuis le 28/11/2026 (Angelo, 28/11/2026, « go oui » a « E8 One : meme curseur ? »,
+ * apres les curseurs de Vest : « tu clique tu drag gauche droite, quand y a bcp de choix possible pour pas
+ * prendre trop trop de place ») : un seul programme « E8 One », une ligne par taille, deux curseurs
+ * (drawdown max, split) ; la cible et la perte journaliere suivent le drawdown choisi (`with` du curseur),
+ * `grid` = le prix de chaque combinaison, price / promoPrice / lines = la position de depart, celle que
+ * le configurateur rendu par le serveur affiche (« Drawdown 6% Max », « Payout 80% »), sinon la premiere
+ * valeur de chaque curseur. Sa note perd la phrase sur l'ordre des prix (un seul prix par ligne). E8 Pro et
+ * E8 Classic gardent un programme par drawdown.
+ *
  * Le code imprime est TOUJOURS JTNQ ; le code public de la firme n'est ni garde dans l'instantane ni
  * rendu par ce module. Rien n'est achete, aucun formulaire, aucune connexion.
  */
@@ -98,6 +107,28 @@ export function configuratorLines(html) {
   if (from < 0) return [];
   const to = lines.findIndex((l, i) => i > from && /^save with code$/i.test(l));
   return lines.slice(from, to < 0 ? Math.min(lines.length, from + 400) : to + 1);
+}
+
+/**
+ * La position de depart que le configurateur rendu par le serveur affiche pour le compte `name` (« Configure
+ * account: », « Drawdown », « 6% Max », « Payout », « 80% ») : { drawdown, payout }, ou null si la page
+ * montre un autre compte ou ne la montre pas.
+ */
+export function configuratorStart(lines, name) {
+  if (!lines?.length) return null;
+  const head = lines.map((l) => /^(.+?) · Account · \$\d+K$/.exec(l)).find(Boolean);
+  if (!head || head[1] !== name) return null;
+  const from = lines.findIndex((l) => /^configure account:?$/i.test(l));
+  if (from < 0) return null;
+  const after = lines.slice(from);
+  const value = (label, re) => {
+    const i = after.findIndex((l) => l.toLowerCase() === label);
+    const m = i < 0 ? null : re.exec(after[i + 1] ?? '');
+    return m ? Number(m[1]) : null;
+  };
+  const drawdown = value('drawdown', /^(\d+(?:\.\d+)?)% Max$/i);
+  const payout = value('payout', /^(\d+(?:\.\d+)?)%$/);
+  return drawdown != null && payout != null ? { drawdown, payout } : null;
 }
 
 /**
@@ -356,9 +387,22 @@ function planNote(previousNote, shares) {
 }
 
 const dllLabel = (d) => (d === 0 ? 'No DLL' : `${d}% DLL`);
+const range = (list) => {
+  const lo = Math.min(...list);
+  const hi = Math.max(...list);
+  return lo === hi ? pct(lo) : `${lo}–${hi}%`;
+};
 
-/** Un compte du site -> un programme par drawdown propose (« E8 One · 4% Max »…). */
-function programsOf(entry, product, discountPct, override, previous) {
+// Les comptes montres avec des curseurs plutot qu'un programme par drawdown (Angelo, 28/11/2026 : « go oui »
+// a « E8 One : meme curseur ? » ; E8 Pro et E8 Classic ne changent pas).
+export const E8_SLIDER_ACCOUNTS = new Set(['E8 One']);
+
+/**
+ * Un compte du site -> un programme par drawdown propose (« E8 Pro · 6% Max »…), ou un seul programme a
+ * curseurs pour un compte de E8_SLIDER_ACCOUNTS (« E8 One »). `shown` : la position de depart affichee par
+ * le configurateur (configuratorStart), null s'il ne montre pas ce compte.
+ */
+function programsOf(entry, product, discountPct, override, previous, shown = null) {
   const sizes = sizesOf(product);
   if (!sizes.length) fail(`${entry.name} : aucune taille`);
   const shares = product.settings?.payoutShares ?? [];
@@ -372,6 +416,8 @@ function programsOf(entry, product, discountPct, override, previous) {
 
   const steps = Object.keys(product).filter((k) => /phase|step|evaluation\d/i.test(k));
   if (steps.length) fail(`${entry.name} : phases inattendues (${steps.join(', ')}), nombre d'etapes a relire`);
+
+  if (E8_SLIDER_ACCOUNTS.has(entry.name)) return [sliderProgram(entry, product, discountPct, override, previous, shown, { sizes, shares, drawdowns, dailies, mainDaily })];
 
   return drawdowns.map((dd) => {
     if (!Number.isFinite(dd) || dd <= 0) fail(`${entry.name} : drawdown illisible (${dd})`);
@@ -444,6 +490,78 @@ function programsOf(entry, product, discountPct, override, previous) {
   });
 }
 
+/**
+ * Un compte en curseurs (E8 One) : un programme, une ligne par taille, curseurs drawdown et split ; la cible et
+ * la perte journaliere de chaque drawdown dans `with` (elles suivent le curseur drawdown, sans curseur a elles).
+ */
+function sliderProgram(entry, product, discountPct, override, previous, shown, { sizes, shares, drawdowns, dailies, mainDaily }) {
+  const name = entry.name;
+  if (dailies.length) fail(`${name} : options de perte journaliere sur un compte a curseurs, forme a trancher`);
+  const same = (what, list) => {
+    const vals = [...new Set(list.map((v) => JSON.stringify(v)))];
+    if (vals.length !== 1) fail(`${name} : ${what} change avec la taille ou le drawdown (${vals.join(' / ')}), forme a trancher`);
+    return JSON.parse(vals[0]);
+  };
+  const ddType = same('type de drawdown', sizes.map((b) => field(product, 'evaluation', 'drawdownType', b) ?? 'eod'));
+  if (!DD_TYPES[ddType]) fail(`${name} : type de drawdown « ${ddType} » sans libelle connu`);
+  const dailyType = same('type de perte journaliere', sizes.map((b) => field(product, 'evaluation', 'dailyDrawdownType', b) ?? 'drawdown'));
+  if (dailyType !== 'drawdown') fail(`${name} : perte journaliere de type « ${dailyType} », libelle a trancher`);
+  for (const dd of drawdowns) if (!Number.isFinite(dd) || dd <= 0) fail(`${name} : drawdown illisible (${dd})`);
+  const targets = drawdowns.map((dd) => same(`cible a ${dd} %`, sizes.map((b) => derivedPct(product, b, 'profitTarget', 'profitTargetFrom', dd, override))));
+  for (const [i, t] of targets.entries()) if (!(t > 0)) fail(`${name} · ${drawdowns[i]}% Max : cible illisible`);
+  const daily = drawdowns.map((dd) => same(`perte journaliere a ${dd} %`, sizes.map((b) => derivedPct(product, b, 'dailyDrawdown', 'dailyDrawdownFrom', dd, override))));
+  const withDaily = daily.every((d) => d > 0);
+  if (!withDaily && daily.some((d) => d > 0)) fail(`${name} : perte journaliere sur une partie des drawdowns seulement, forme a trancher`);
+
+  // Position de depart : celle du configurateur s'il montre ce compte, sinon la premiere valeur de chaque curseur.
+  const start = { dd: shown?.drawdown ?? drawdowns[0], share: shown?.payout ?? shares[0] };
+  if (!drawdowns.includes(start.dd) || !shares.includes(start.share))
+    fail(`${name} : le configurateur part de ${start.dd} % / ${start.share} %, hors des choix (${drawdowns.join(', ')} / ${shares.join(', ')})`);
+
+  // Les notes de l'ancien format (un programme par drawdown, toutes identiques) servent une derniere fois.
+  const prevProgram = previous?.programs?.find((p) => p.name === name) ?? previous?.programs?.find((p) => p.name.startsWith(`${name} · `)) ?? null;
+  const plans = sizes.map((b) => {
+    const grid = [];
+    for (const dd of drawdowns)
+      for (const share of shares) {
+        const price = e8Price(product, b, dd, share, mainDaily);
+        if (!Number.isFinite(price) || price <= 0 || price > 50000) fail(`${name} · ${dd}% Max ${b} : prix aberrant (${price})`);
+        const promoPrice = e8PromoPrice(price, discountPct);
+        if (!Number.isFinite(promoPrice) || promoPrice <= 0 || promoPrice > price) fail(`${name} · ${dd}% Max ${b} : prix avec code aberrant (${promoPrice})`);
+        grid.push({ maxDrawdown: dd, split: share, price, promoPrice });
+      }
+    const first = grid.find((g) => g.maxDrawdown === start.dd && g.split === start.share);
+    const plan = { size: b, price: first.price, promoPrice: first.promoPrice, lines: [{ label: 'Max drawdown', value: money((b * start.dd) / 100) }], grid };
+    // Un seul prix par ligne : la phrase « Prices for 80%, 90% and 100% payout, in that order. » sort.
+    const note = planNote(prevProgram?.plans?.find((p) => p.size === b)?.note, []);
+    if (note) plan.note = note;
+    return plan;
+  });
+
+  return {
+    name,
+    rulesKey: name.replace(/^E8\s+/, ''),
+    steps: '1 step',
+    split: shares.map(pct).join(' / '),
+    profitTarget: range(targets),
+    maxDrawdown: range(drawdowns),
+    ddType: DD_TYPES[ddType],
+    dailyLoss: withDaily ? range(daily) : null,
+    note: prevProgram?.note ?? '',
+    sliders: [
+      {
+        field: 'maxDrawdown',
+        label: 'Max drawdown',
+        values: drawdowns,
+        default: start.dd,
+        with: { profitTarget: targets, ...(withDaily ? { dailyLoss: daily } : {}) },
+      },
+      { field: 'split', label: 'Profit split', values: shares, default: start.share },
+    ],
+    plans,
+  };
+}
+
 /** Libelles et ordre des groupes de symboles, ceux de la page trading-symbols. */
 const SYMBOL_ORDER = ['crypto', 'stocks', 'index', 'metals', 'energy', 'fx'];
 const SYMBOL_LABEL = { crypto: 'Crypto', stocks: 'Stocks', index: 'Indices', indices: 'Indices', metals: 'Metals', energy: 'Energy', fx: 'FX' };
@@ -497,8 +615,12 @@ function crossCheck(lines, programs, entries, products) {
   const entry = entries.find((e) => e.name === head[1]);
   if (!entry) fail(`le configurateur affiche « ${head[1]} », absent des comptes Perpetual lus`);
   const product = products[entry.id];
-  const dd = product.evaluation?.drawdown ?? product.settings?.drawdowns?.[0];
-  const program = programs.find((p) => p.name === `${entry.name} · ${dd}% Max`);
+  const start = configuratorStart(lines, entry.name);
+  const dd = start?.drawdown ?? product.evaluation?.drawdown ?? product.settings?.drawdowns?.[0];
+  const share = start?.payout ?? product.settings?.payoutShares?.[0];
+  const program = programs.find((p) => p.name === `${entry.name} · ${dd}% Max`) ?? programs.find((p) => p.name === entry.name && p.sliders);
+  // Un programme a curseurs : le prix de la combinaison affichee, lu dans la grille.
+  const priceAt = (plan) => (plan?.grid ? plan.grid.find((g) => g.maxDrawdown === dd && g.split === share) : plan);
   const isMoney = (l) => /^\$[\d,]+$/.test(l);
   const num = (l) => Number(l.replace(/[$,]/g, ''));
   let seen = 0;
@@ -510,7 +632,7 @@ function crossCheck(lines, programs, entries, products) {
     if (!isMoney(lines[j] ?? '') || !isMoney(lines[j + 1] ?? '')) continue;
     const size = Number(k[1]) * 1000;
     const shown = [num(lines[j]), num(lines[j + 1])];
-    const plan = program?.plans.find((p) => p.size === size);
+    const plan = priceAt(program?.plans.find((p) => p.size === size));
     if (!plan || plan.price !== shown[0] || plan.promoPrice !== shown[1])
       fail(`le configurateur affiche ${entry.name} $${k[1]}K a $${shown[0]} / $${shown[1]}, le calcul donne ${plan ? `$${plan.price} / $${plan.promoPrice}` : 'rien'}`);
     seen++;
@@ -538,7 +660,9 @@ export function e8PerpsFromSnapshot(snapshot, { checkedOn = new Date().toISOStri
   if (!entries.length) fail('aucun compte Perpetual en vente');
 
   const discounts = Object.fromEntries(entries.map((e) => [e.id, discountOf(products[e.id], discountCodes)]));
-  const programs = entries.flatMap((e) => programsOf(e, { ...products[e.id], id: e.id }, discounts[e.id].pct, dailyOverride, previous));
+  const programs = entries.flatMap((e) =>
+    programsOf(e, { ...products[e.id], id: e.id }, discounts[e.id].pct, dailyOverride, previous, configuratorStart(snapshot.configurator, e.name)),
+  );
   if (!programs.length) fail('aucun programme');
   crossCheck(snapshot.configurator, programs, entries, products);
 

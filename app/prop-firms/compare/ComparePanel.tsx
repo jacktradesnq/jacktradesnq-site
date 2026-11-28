@@ -103,10 +103,21 @@ function SliderCell({ row, slider, stop, onMove }: { row: CompareRow; slider: Sl
   );
 }
 
+// The value of `col` when it follows a slider of the row (E8 One's target and daily loss follow its
+// drawdown): the value at that slider's stop.
+function linkedVal(row: CompareRow, col: string, stops: number[]) {
+  for (const [i, s] of (row.sliders ?? []).entries()) {
+    const link = s.links?.find((l) => l.col === col);
+    if (link) return link.values[stops[i]];
+  }
+  return undefined;
+}
+
 function ValCell({ row, col, options }: { row: CompareRow; col: string; options: Options }) {
   const si = row.sliders?.findIndex((s) => s.col === col) ?? -1;
   if (row.sliders && si >= 0)
     return <SliderCell row={row} slider={row.sliders[si]} stop={options.stops(row)[si]} onMove={(stop) => options.move(row, si, stop)} />;
+  const linked = row.sliders ? linkedVal(row, col, options.stops(row)) : undefined;
   if (col === 'dailyLoss' && row.options)
     return (
       <span className="cmp-opts" role="group" aria-label={`Daily loss limit, ${row.firmName} ${row.program} ${sizeLabel(row.size)}`}>
@@ -123,7 +134,7 @@ function ValCell({ row, col, options }: { row: CompareRow; col: string; options:
         ))}
       </span>
     );
-  const v = row.cells[col];
+  const v = linked ?? row.cells[col];
   if (!v)
     return (
       <span className="none cmp-dash">
@@ -348,10 +359,12 @@ export function ComparePanel({ firm, onFirmChange }: { firm: string | null; onFi
     { firmIds: firms, firmQuery: query, size, steps, lossType, dailyLoss, maxPrice: budget != null && Number.isFinite(budget) ? budget : null },
     priceOf,
   );
-  // A column with a slider sorts by the value picked on it.
+  // A column with a slider, or that follows one, sorts by the value picked.
   const sliderSort = (r: CompareRow, col: string) => {
-    const i = r.sliders?.findIndex((s) => s.col === col) ?? -1;
-    return r.sliders && i >= 0 ? r.sliders[i].sorts[options.stops(r)[i]] ?? null : undefined;
+    if (!r.sliders) return undefined;
+    const i = r.sliders.findIndex((s) => s.col === col);
+    if (i >= 0) return r.sliders[i].sorts[options.stops(r)[i]] ?? null;
+    return linkedVal(r, col, options.stops(r))?.sort;
   };
   const keyOf = (col: string) => (r: CompareRow) =>
     col === 'price' ? priceOf(r) : col === 'firm' ? `${r.firmName} ${r.program}` : sliderSort(r, col) ?? r.cells[col]?.sort ?? null;

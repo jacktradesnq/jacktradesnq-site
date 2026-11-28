@@ -43,8 +43,7 @@ export type ComparePrice =
       kind: 'price';
       list: number;
       discounted: number | null;
-      // Other versions of the same account, each after a « / » (MFP Elite 3% DLL, E8 One 90% and 100%
-      // payout).
+      // Other versions of the same account, each after a « / » (MFP Elite 3% DLL, E8 Pro 100% payout).
       alts: { list: number; discounted: number | null }[];
       per: '/month' | 'one-time' | null;
       // Several prices live for the same product: the cheapest is shown, prefixed "from".
@@ -77,9 +76,10 @@ export type CompareRow = {
   // loss cell; the button picked gives the price shown. No key: the plan is sold one way.
   options?: { label: string; price: ComparePrice }[];
   // A plan sold in many combinations, picked with sliders like the firm's own configurator (Vest
-  // 1-Step since 28/11/2026; Angelo, 28/11/2026: « tu clique tu drag gauche droite, quand y a bcp de
-  // choix possible pour pas prendre trop trop de place »): one slider per rule, drawn in the column it
-  // changes, starting on the firm's default. The price shown is combos[<stop of each slider>.join('|')].
+  // 1-Step and E8 One since 28/11/2026; Angelo, 28/11/2026: « tu clique tu drag gauche droite, quand y
+  // a bcp de choix possible pour pas prendre trop trop de place »): one slider per rule, drawn in the
+  // column it changes, starting on the firm's default. The price shown is combos[<stop of each
+  // slider>.join('|')].
   sliders?: Slider[];
   combos?: Record<string, ComparePrice>;
   href: string;
@@ -99,6 +99,9 @@ export type Slider = {
   sorts: number[];
   // A second line per stop (the max loss in dollars of that drawdown).
   subs?: string[];
+  // Other columns that follow this slider, one value per stop, with no slider of their own (E8 One:
+  // the profit target and the daily loss follow the drawdown picked).
+  links?: { col: string; values: Val[] }[];
   // The stop it starts on: the firm's default.
   start: number;
 };

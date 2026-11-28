@@ -7,7 +7,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-import { E8_PERPS_SOURCE, e8PerpsFromSnapshot, e8Price, e8PromoPrice, readE8Perps } from './lib/firms/perps-e8.mjs';
+import { E8_PERPS_SOURCE, configuratorStart, e8PerpsFromSnapshot, e8Price, e8PromoPrice, readE8Perps } from './lib/firms/perps-e8.mjs';
 
 const SNAP = JSON.parse(fs.readFileSync(new URL('./lib/firms/fixtures/perps-e8-2026-11-28.json', import.meta.url), 'utf8'));
 const copy = () => structuredClone(SNAP);
@@ -21,16 +21,18 @@ const row = (pl) => [
   pl.lines[0].value,
 ];
 const prog = (name) => OUT.programs.find((p) => p.name === name);
+// E8 One en curseurs : une ligne de prix d'un drawdown, lue dans la grille [taille, 80 %, avec code, 90 %,
+// avec code, 100 %, avec code] (la forme des anciens programmes « E8 One · X% Max », sans le dollar).
+const oneRow = (dd) => (pl) => [pl.size, ...[80, 90, 100].flatMap((s) => {
+  const g = pl.grid.find((x) => x.maxDrawdown === dd && x.split === s);
+  return [g.price, g.promoPrice];
+})];
 
 test('les programmes Perpetual du configurateur, dans son ordre, avec leurs regles', () => {
   const rules = OUT.programs.map((p) => [p.name, p.rulesKey, p.steps, p.split, p.profitTarget, p.maxDrawdown, p.ddType, p.dailyLoss, p.priceLabel ?? null]);
   assert.deepEqual(rules, [
-    // E8 One : cible = 1,5 x drawdown, perte journaliere = 0,66 x drawdown arrondi a 0,1, sauf 4 % -> x 0,75.
-    ['E8 One · 4% Max', 'One', '1 step', '80% / 90% / 100%', '6%', '4%', 'Dynamic', '3%', null],
-    ['E8 One · 6% Max', 'One', '1 step', '80% / 90% / 100%', '9%', '6%', 'Dynamic', '4%', null],
-    ['E8 One · 8% Max', 'One', '1 step', '80% / 90% / 100%', '12%', '8%', 'Dynamic', '5.3%', null],
-    ['E8 One · 10% Max', 'One', '1 step', '80% / 90% / 100%', '15%', '10%', 'Dynamic', '6.6%', null],
-    ['E8 One · 14% Max', 'One', '1 step', '80% / 90% / 100%', '21%', '14%', 'Dynamic', '9.2%', null],
+    // E8 One en curseurs depuis le 28/11/2026 : les fourchettes, le detail par drawdown dans ses curseurs.
+    ['E8 One', 'One', '1 step', '80% / 90% / 100%', '6–21%', '4–14%', 'Dynamic', '3–9.2%', null],
     ['E8 Pro · 6% Max', 'Pro', '1 step', '80% / 100%', '6%', '6%', 'Static', '2.5%', null],
     ['E8 Pro · 8% Max', 'Pro', '1 step', '80% / 100%', '8%', '8%', 'Static', '2.5%', null],
     ['E8 Pro · 10% Max', 'Pro', '1 step', '80% / 100%', '10%', '10%', 'Static', '2.5%', null],
@@ -41,28 +43,57 @@ test('les programmes Perpetual du configurateur, dans son ordre, avec leurs regl
   assert.ok(OUT.programs.every((p) => p.note === ''));
 });
 
+test('E8 One : curseurs drawdown et split, cible et perte journaliere suivent le drawdown, depart = le configurateur', () => {
+  const one = prog('E8 One');
+  // E8 One : cible = 1,5 x drawdown, perte journaliere = 0,66 x drawdown arrondi a 0,1, sauf 4 % -> x 0,75.
+  assert.deepEqual(one.sliders, [
+    { field: 'maxDrawdown', label: 'Max drawdown', values: [4, 6, 8, 10, 14], default: 6, with: { profitTarget: [6, 9, 12, 15, 21], dailyLoss: [3, 4, 5.3, 6.6, 9.2] } },
+    { field: 'split', label: 'Profit split', values: [80, 90, 100], default: 80 },
+  ]);
+  // Le rendu serveur du configurateur : « Configure account: · Drawdown · 6% Max · Payout · 80% ».
+  assert.deepEqual(configuratorStart(SNAP.configurator, 'E8 One'), { drawdown: 6, payout: 80 });
+  assert.equal(configuratorStart(SNAP.configurator, 'E8 Pro'), null);
+  // La ligne = la position de depart : 6 % / 80 %, ses $48 / $24 (tuile $5K du configurateur), $300 de drawdown.
+  assert.deepEqual(one.plans.map((p) => [p.size, p.price, p.promoPrice, p.lines[0].value]).slice(0, 2), [
+    [5000, 48, 24, '$300'],
+    [10000, 88, 44, '$600'],
+  ]);
+  for (const p of one.plans) {
+    assert.equal(p.grid.length, 15);
+    assert.equal(p.altPrices, undefined);
+  }
+  // Sans position lisible sur la page : la premiere valeur de chaque curseur.
+  const s = copy();
+  s.configurator = [];
+  const first = e8PerpsFromSnapshot(s, { checkedOn: '2026-11-28' }).programs[0];
+  assert.deepEqual(first.sliders.map((x) => x.default), [4, 80]);
+  assert.deepEqual([first.plans[0].price, first.plans[0].lines[0].value], [40, '$200']);
+  // E8 Pro et E8 Classic : un programme par drawdown, comme avant.
+  assert.ok(OUT.programs.filter((p) => p.rulesKey !== 'One').every((p) => !p.sliders && p.plans.every((pl) => !pl.grid)));
+});
+
 test('chaque taille, chaque payout : les prix du configurateur, avec code (leur arrondi)', () => {
   // E8 One / E8 Pro : [taille, 80 %, avec code, 90 %, avec code, 100 %, avec code, perte max en $] ; ce sont
   // les memes prix que ceux relus a la main dans le configurateur le 01/11/2026 (perps-firms.json).
-  assert.deepEqual(prog('E8 One · 4% Max').plans.map(row), [
-    [5000, 40, 20, 44, 22, 49, 25, '$200'],
-    [10000, 72, 36, 81, 41, 89, 45, '$400'],
-    [25000, 154, 77, 172, 86, 190, 95, '$1,000'],
-    [50000, 235, 118, 263, 132, 291, 146, '$2,000'],
-    [100000, 398, 199, 445, 223, 493, 247, '$4,000'],
-    [200000, 650, 325, 728, 364, 806, 403, '$8,000'],
-    [400000, 1301, 651, 1457, 729, 1613, 807, '$16,000'],
-    [500000, 1627, 814, 1822, 911, 2017, 1009, '$20,000'],
+  assert.deepEqual(prog('E8 One').plans.map(oneRow(4)), [
+    [5000, 40, 20, 44, 22, 49, 25],
+    [10000, 72, 36, 81, 41, 89, 45],
+    [25000, 154, 77, 172, 86, 190, 95],
+    [50000, 235, 118, 263, 132, 291, 146],
+    [100000, 398, 199, 445, 223, 493, 247],
+    [200000, 650, 325, 728, 364, 806, 403],
+    [400000, 1301, 651, 1457, 729, 1613, 807],
+    [500000, 1627, 814, 1822, 911, 2017, 1009],
   ]);
-  assert.deepEqual(prog('E8 One · 14% Max').plans.map(row), [
-    [5000, 87, 44, 97, 49, 108, 54, '$700'],
-    [10000, 159, 80, 178, 89, 197, 99, '$1,400'],
-    [25000, 339, 170, 380, 190, 420, 210, '$3,500'],
-    [50000, 519, 260, 581, 291, 643, 322, '$7,000'],
-    [100000, 879, 440, 984, 492, 1090, 545, '$14,000'],
-    [200000, 1437, 719, 1609, 805, 1782, 891, '$28,000'],
-    [400000, 2877, 1439, 3222, 1611, 3567, 1784, '$56,000'],
-    [500000, 3597, 1799, 4028, 2014, 4460, 2230, '$70,000'],
+  assert.deepEqual(prog('E8 One').plans.map(oneRow(14)), [
+    [5000, 87, 44, 97, 49, 108, 54],
+    [10000, 159, 80, 178, 89, 197, 99],
+    [25000, 339, 170, 380, 190, 420, 210],
+    [50000, 519, 260, 581, 291, 643, 322],
+    [100000, 879, 440, 984, 492, 1090, 545],
+    [200000, 1437, 719, 1609, 805, 1782, 891],
+    [400000, 2877, 1439, 3222, 1611, 3567, 1784],
+    [500000, 3597, 1799, 4028, 2014, 4460, 2230],
   ]);
   assert.deepEqual(prog('E8 Pro · 6% Max').plans.map(row), [
     [5000, 28, 14, 34, 17, '$300'],
@@ -150,6 +181,13 @@ test('notes : reprises de l\'entree precedente, la phrase sur l\'ordre des prix 
   assert.equal(pro.plans[0].note, 'Prices for 80% and 100% payout, in that order. Daily payouts, 1% minimum.');
   assert.equal(pro.plans[1].note, 'Prices for 80% and 100% payout, in that order.');
   assert.equal(prog('E8 Classic · 5% Max').plans[0].note, 'Prices for 80% and 90% payout, in that order.');
+  // E8 One : la note de l'ancien format (« E8 One · X% Max ») reprise, sans la phrase sur l'ordre des prix.
+  const old = { programs: [{ name: 'E8 One · 4% Max', note: '', plans: [{ size: 5000, note: 'Prices for 80%, 90% and 100% payout, in that order. 40% best-day rule.' }] }] };
+  const one = e8PerpsFromSnapshot(SNAP, { checkedOn: '2026-11-28', previous: old }).programs[0];
+  assert.equal(one.plans[0].note, '40% best-day rule.');
+  assert.equal(one.plans[1].note, undefined);
+  const again = e8PerpsFromSnapshot(SNAP, { checkedOn: '2026-11-28', previous: { programs: [{ name: 'E8 One', note: '', plans: [{ size: 5000, note: '40% best-day rule.' }] }] } });
+  assert.equal(again.programs[0].plans[0].note, '40% best-day rule.');
 });
 
 test('un compte, un drawdown ou une taille que la firme retire disparait seul ; un compte ajoute apparait seul', () => {
@@ -177,7 +215,9 @@ test('un compte, un drawdown ou une taille que la firme retire disparait seul ; 
 test('l\'exception de perte journaliere est relue dans le code du site', () => {
   const s = copy();
   s.code.rules = s.code.rules.replace(/===4\?\.75:null/, '===4?.8:null');
-  assert.equal(e8PerpsFromSnapshot(s).programs[0].dailyLoss, '3.2%');
+  const one = e8PerpsFromSnapshot(s).programs[0];
+  assert.equal(one.sliders[0].with.dailyLoss[0], 3.2);
+  assert.equal(one.dailyLoss, '3.2–9.2%');
 });
 
 test('snapshot casse ou vide : erreur « E8 perps illisible »', () => {
